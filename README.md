@@ -1,6 +1,6 @@
 ## This is a script to auto-install your Quilibrium node in the easiest way. 
 
-**Want to say thank you?**
+**&#x2661; Want to say thank you?**
 
 Apart from using my referral link below you can buy me a cup of something with a small donation, here is my ERC-20 address
 ```
