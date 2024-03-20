@@ -69,12 +69,16 @@ countdown 300 || { echo "Failed to wait! Exiting..."; exit 1; }
 
 # Prompt for reboot
 echo "Do you want to reboot the system now? (y/n): "
-read choice
+read -r choice
 case "$choice" in
-  y|Y) echo "Rebooting..."; sudo reboot;;
-  n|N) echo "Skipping reboot. Please reboot the system manually later.";;
+  [yY]) echo "Rebooting..."; sudo reboot;;
+  [nN]) echo "Skipping reboot. Please reboot the system manually later.";;
   *) echo "Invalid choice. Skipping reboot. Please reboot the system manually later.";;
 esac
+
+# End of script
+echo "Script completed successfully."
+
 
 # End of script
 echo "Script completed successfully."
