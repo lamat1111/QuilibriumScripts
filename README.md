@@ -12,6 +12,8 @@ Apart from using my referral link below you can buy me a cup of something with a
 [Cherryservers](https://www.cherryservers.com/?affiliate=CRXA3YWE) support Quilibrium, is suggested by Cassie (Quilibrium founder), and they offer good solutions for a fair price. [Here is a good option to buy](https://www.cherryservers.com/server-customizer/e3_1240v3?affiliate=CRXA3YWE). Thank you for using my referral link and support my work :-)
 
 
+
+
 ## How to use the script
 
  1. Run the auto-installer script on your server (OS must be Ubuntu 22.04.X)
