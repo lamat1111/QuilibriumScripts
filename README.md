@@ -29,4 +29,37 @@ The poor_mans_cd script will also restart your node if it gets killed and will a
 
 Your node will automatically generate important key and config files. After your node has been running for a while, remember to back these files up. You can find them in the ceremonyclient/node/.store folder: keys.yml and config.yml. Keep these safe and do not share them with anyone. 
 
-An easy client to download files from your node on Windows is WinSCP. You will need to show hidden files. Select Options, Preferences from the main menu, then the Panels tab, and check the option to Show hidden files (Ctrl+Alt+H).
+An easy client to download files from your node on Windows is [WinSCP](https://winscp.net/eng/index.php). You will need to show hidden files. Select Options, Preferences from the main menu, then the Panels tab, and check the option to Show hidden files (Ctrl+Alt+H).
+
+## Resources
+ - To manage your nodes use [Termius](https://termius.com/), the coolest SSH client and terminal around :) 
+ - To track your server uptime and  resources usage use [Hetrixtools.com](https://hetrixtools.com/), you can track up to 15 servers for free and the setup is very easy
+
+## Useful server commands
+
+Check node version
+```bash
+grep -o -P 'Node -.{0,8}' ~/ceremonyclient/node/main.go
+```
+
+Get node peer ID
+```bash
+cd ~/ceremonyclient/node && GOEXPERIMENT=arenas go run ./... -peer-id
+```
+
+Check QUIL balance
+```bash
+cd ~/ceremonyclient/node && GOEXPERIMENT=arenas /root/go/bin/node -balance
+```
+
+Attach to existing tmux session
+```bash
+tmux a -t quil
+#To detach from tmux press CTRL+B then release both keys and press D 
+```
+
+Move keys.yml and config.yml to new server
+```bash
+scp -f /root/ceremonyclient/node/.config/keys.yml /root/ceremonyclient/node/.config/config.yml root@<NEW_SERVER_IP>:/root/ceremonyclient/node/.config/
+```
+
