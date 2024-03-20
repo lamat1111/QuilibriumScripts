@@ -44,8 +44,11 @@ git clone https://github.com/QuilibriumNetwork/ceremonyclient.git || { echo "Fai
 cd ceremonyclient/node || { echo "Failed to change directory to ceremonyclient/node! Exiting..."; exit 1; }
 
 # Step 9: Run the Go program in the background
+echo "Changing directory to $HOME/ceremonyclient/node..."
+cd "$HOME/ceremonyclient/node" || { echo "Failed to change directory to $HOME/ceremonyclient/node! Exiting..."; exit 1; }
+
 echo "Running the Go program in the background..."
-GOEXPERIMENT=arenas /usr/local/go/bin/go run ./... &
+/usr/local/go/bin/go run ./... &
 GO_PID=$!
 
 if ! wait $GO_PID; then
