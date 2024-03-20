@@ -57,7 +57,7 @@ An easy client to download files from your node on Windows is [WinSCP](https://w
 
 Check node version
 ```bash
-grep -o -P 'Node -.{0,8}' ~/ceremonyclient/node/main.go
+cat ~/ceremonyclient/node/config/version.go | grep -A 1 'func GetVersion() \[\]byte {' | grep -Eo '0x[0-9a-fA-F]+' | xargs printf '%d.%d.%d'
 ```
 
 Get node peer ID
