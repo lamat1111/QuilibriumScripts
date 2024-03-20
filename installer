@@ -68,18 +68,9 @@ countdown() {
 countdown 300 || { echo "Failed to wait! Exiting..."; exit 1; }
 
 # Prompt for reboot
-echo "Do you want to reboot the system now? (y/n): "
-read -r choice
-case "$choice" in
-  [yY]) echo "Rebooting..."; sudo reboot;;
-  [nN]) echo "Skipping reboot. Please reboot the system manually later.";;
-  *) echo "Invalid choice. Skipping reboot. Please reboot the system manually later.";;
-esac
+#!/bin/bash
 
-# End of script
-echo "Script completed successfully."
-
-
-# End of script
-echo "Script completed successfully."
+echo "Node installation is finished."
+echo "Type 'sudo reboot' and press Enter to reboot your server."
+echo "Then login again and follow the instructions of the guide to restart your node."
 
