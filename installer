@@ -68,8 +68,6 @@ countdown() {
 countdown 300 || { echo "Failed to wait! Exiting..."; exit 1; }
 
 # Prompt for reboot
-#!/bin/bash
-
 echo "Node installation is finished."
 echo "Type 'sudo reboot' and press Enter to reboot your server."
 echo "Then login again and follow the instructions of the guide to restart your node."
