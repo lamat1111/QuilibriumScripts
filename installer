@@ -25,7 +25,8 @@ export PATH="$PATH:/usr/local/go/bin"
 export GOPATH="$HOME/go"
 echo 'export PATH="$PATH:/usr/local/go/bin"' >> ~/.bashrc
 echo 'export GOPATH="$HOME/go"' >> ~/.bashrc
-source ~/.bashrc
+source "$HOME/.bashrc"  # Explicitly source the .bashrc file with the full path
+sleep 1  # Add a 1-second delay
 
 # Step 6: Create swap space
 echo "Creating swap space..."
