@@ -44,11 +44,11 @@ cd "$HOME" || { echo "Failed to change directory to $HOME! Exiting..."; exit 1; 
 git clone https://github.com/QuilibriumNetwork/ceremonyclient.git || { echo "Failed to clone the repository! Exiting..."; exit 1; }
 cd ceremonyclient/node || { echo "Failed to change directory to ceremonyclient/node! Exiting..."; exit 1; }
 
-# Step 9: Run the Go program in the background
+# Step 9: Run the node
 echo "Changing directory to $HOME/ceremonyclient/node..."
 cd "$HOME/ceremonyclient/node" || { echo "Failed to change directory to $HOME/ceremonyclient/node! Exiting..."; exit 1; }
 
-echo "Running the Go program in the background..."
+echo "Running the node..."
 GOEXPERIMENT=arenas /usr/local/go/bin/go run ./... > /dev/null 2>&1 &  # Redirect output to /dev/null
 GO_PID=$!
 
