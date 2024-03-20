@@ -4,7 +4,7 @@
 
  1. Run the auto-installer script on your server (OS must be Ubuntu 22.04.X)
 ```
- wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/3621cad16d203c8a5806d4a7484dd901281f705e/installer | bash
+ wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/installer | bash
 ```
  2. After installing the node and making some necessary edits, the script will run your node for 5 minutes and then you will be prompted to reboot the system, type "Y" and reboot.
  3. Login again in your server.
