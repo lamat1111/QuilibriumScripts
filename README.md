@@ -2,7 +2,7 @@
 
 ## This is a script to auto-install your Quilibrium node in the easieast way. Not tested yet, use at your own risk!
 
- 1. Run the auto-installer script
+ 1. Run the auto-installer script on your server (OS must be Ubuntu 22.04.X)
 ```
  wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/3621cad16d203c8a5806d4a7484dd901281f705e/installer | bash
 ```
