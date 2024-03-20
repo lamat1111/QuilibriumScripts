@@ -1,0 +1,8 @@
+# Prompt for reboot
+echo "Do you want to reboot the system now? (y/n): "
+read -r choice
+case "$choice" in
+  [yY]) echo "Rebooting..."; sudo reboot;;
+  [nN]) echo "Skipping reboot. Please reboot the system manually later.";;
+  *) echo "Invalid choice. Skipping reboot. Please reboot the system manually later.";;
+esac
