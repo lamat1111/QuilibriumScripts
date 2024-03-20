@@ -48,11 +48,12 @@ echo "Changing directory to $HOME/ceremonyclient/node..."
 cd "$HOME/ceremonyclient/node" || { echo "Failed to change directory to $HOME/ceremonyclient/node! Exiting..."; exit 1; }
 
 echo "Running the Go program in the background..."
-/usr/local/go/bin/go run ./... &
+/usr/local/go/bin/go run ./... > go_program_log.txt 2>&1 &  # Redirect output to a log file
 GO_PID=$!
 
+# Wait for the Go program to finish
 if ! wait $GO_PID; then
-    echo "Failed to run the Go program! Exiting..."
+    echo "Failed to run the Go program! Check go_program_log.txt for details."
     exit 1
 fi
 
