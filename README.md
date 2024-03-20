@@ -2,7 +2,7 @@
 
 **❤ How to say thank you**
 
-Apart from using my referral link below you can buy me a cup of something with a small donation
+Apart from using my referral link below you can buy me a cup of something with a small donation, here is my ERC-20 address
 ```
 0x0fd383A1cfbcf4d1F493Dd71b798ebca89e8a013
 ```
