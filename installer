@@ -52,9 +52,20 @@ echo "Running the Go program in the background..."
 GOEXPERIMENT=arenas /usr/local/go/bin/go run ./... > /dev/null 2>&1 &  # Redirect output to /dev/null
 GO_PID=$!
 
-# Wait for a few seconds before proceeding
+# Step 10: Wait for a few seconds before proceeding
 echo "Letting the node run for 5 minutes..."
-sleep 300
+
+countdown() {
+    secs=$1         # Assign the input argument (300) to the variable 'secs'
+    while [ $secs -gt 0 ]; do
+        printf "\r%02d:%02d remaining" $(($secs/60)) $(($secs%60)) # Print the remaining time (mm:ss) with a carriage return (\r) to overwrite the previous line
+        sleep 1     # Wait for 1 second
+        ((secs--))  # Decrement the 'secs' variable by 1
+    done
+    printf "\nDone!\n" # After the countdown completes, print "Done!" on a new line
+}
+
+countdown 300 || { echo "Failed to wait! Exiting..."; exit 1; }
 
 # Prompt for reboot
 read -p "Do you want to reboot the system now? (y/n): " choice
