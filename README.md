@@ -7,6 +7,15 @@ Apart from using my referral link below you can buy me a cup of something with a
 ```
 0x0fd383A1cfbcf4d1F493Dd71b798ebca89e8a013
 ```
+## Table of Contents
+
+- [Best Server to Run a Quilibrium Node](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#best-server-to-run-a-quilibrium-node)
+- [How to Use the Script](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#how-to-use-the-script)
+- [Backup Your keys.yml and config.yml Files](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#backup-your-keysyml-and-configyml-files)
+- [Resources](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#resources)
+- [Useful Server Commands](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#useful-server-commands)
+- [Migrate Node to a New Server](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#migrate-node-to-a-new-server)
+- [Setup the Firewall and gRPC Calls](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#setup-the-firewall-and-grpc-calls)
 
 
 ## Best server to run a Quilibrium node
