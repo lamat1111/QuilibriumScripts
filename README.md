@@ -83,13 +83,14 @@ tmux a -t quil
 #To detach from tmux press CTRL+B then release both keys and press D 
 ```
 
-Move keys.yml and config.yml to new server
+**Move keys.yml and config.yml to new server**
+Change <NEW_SERVER_IP> with your new server IP and enter the new server password when requested. For this to work you need to have the node installed on the new server and have it run for 5 minutes to generate the .config folder.
 ```bash
-scp -f /root/ceremonyclient/node/.config/keys.yml /root/ceremonyclient/node/.config/config.yml root@<NEW_SERVER_IP>:/root/ceremonyclient/node/.config/
+scp /root/ceremonyclient/node/.config/keys.yml /root/ceremonyclient/node/.config/config.yml root@<NEW_SERVER_IP>:/root/ceremonyclient/node/.config/
 ```
 
 ## Setup the Firewall and gRPC calls
-Run the below script to do this automatically. You need to install the node first.
+If you ran the auto-installer script of this guide, this has already been taken care of. Otherwise run the below script to setup the Firewall and gRPC calls automatically. You need to install the node first. 
 ```bash
 wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/installer-gRPC-and-firewall | bash
 ```
