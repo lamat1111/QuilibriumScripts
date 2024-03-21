@@ -2,7 +2,9 @@
 
 # Step 1: Update package lists
 echo "Updating package lists..."
-sudo apt -q update || { echo "Failed to update package lists! Exiting..."; exit 1; }
+DEBIAN_FRONTEND=noninteractive apt-get -y --with-new-pkgs upgrade || { echo "Failed to upgrade packages! Exiting..."; exit 1; }
+
+# Step 3: Install required packages
 
 # Step 2: Install git
 echo "Installing git..."
