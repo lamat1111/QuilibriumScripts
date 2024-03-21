@@ -82,14 +82,16 @@ Attach to existing tmux session
 tmux a -t quil
 #To detach from tmux press CTRL+B then release both keys and press D 
 ```
----
-
-**Move keys.yml and config.yml to new server**
-
-Change <NEW_SERVER_IP> with your new server IP and enter the new server password when requested. For this to work you need to have the node installed on the new server first and have it run for 5 minutes to generate the .config folder.
+## Migrate node to a new server
+1. Use the auto-installer script in this guide to install the node on the new server and let it run for 5 minutes.
+2. Grab your new server IP and password.
+3. Login to the old server and run this command.
+Change <NEW_SERVER_IP> with your new server IP and enter the new server password when requested.
 ```bash
 scp /root/ceremonyclient/node/.config/keys.yml /root/ceremonyclient/node/.config/config.yml root@<NEW_SERVER_IP>:/root/ceremonyclient/node/.config/
 ```
+The command will move your keys.yml and config.yml to new server. For this to work the node must already be installed in the new server and the .config folder be generated
+
 
 ## Setup the Firewall and gRPC calls
 If you ran the auto-installer script of this guide, this has already been taken care of. Otherwise run the below script to setup the Firewall and gRPC calls automatically. You need to install the node first. 
