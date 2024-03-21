@@ -100,7 +100,7 @@ The command will move your keys.yml and config.yml to new server. For this to wo
 
 
 ## Setup the Firewall and gRPC calls
-If you ran the auto-installer script of this guide, this has already been taken care of. Otherwise run the below script to setup the Firewall and gRPC calls automatically. You need to install the node first. 
+Run the below script to setup the Firewall and gRPC calls automatically. You need to install the node first and let it run for 5 minutes in order to generat its .config folder.
 ```bash
 wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/installer-gRPC-and-firewall | bash
 ```
