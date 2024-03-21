@@ -86,7 +86,7 @@ tmux a -t quil
 
 **Move keys.yml and config.yml to new server**
 
-Change <NEW_SERVER_IP> with your new server IP and enter the new server password when requested. For this to work you need to have the node installed on the new server and have it run for 5 minutes to generate the .config folder.
+Change <NEW_SERVER_IP> with your new server IP and enter the new server password when requested. For this to work you need to have the node installed on the new server first and have it run for 5 minutes to generate the .config folder.
 ```bash
 scp /root/ceremonyclient/node/.config/keys.yml /root/ceremonyclient/node/.config/config.yml root@<NEW_SERVER_IP>:/root/ceremonyclient/node/.config/
 ```
