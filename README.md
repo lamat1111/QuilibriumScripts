@@ -3,7 +3,7 @@
 
 **&#x2661; Want to say thank you?**
 
-Apart from using my referral link below you can buy me a cup of something with a small donation, here is my ERC-20 address
+Apart from using my referral links below for Cherryservers, you can buy me a cup of something with a small donation, here is my ERC-20 address
 ```
 0x0fd383A1cfbcf4d1F493Dd71b798ebca89e8a013
 ```
@@ -19,7 +19,7 @@ Apart from using my referral link below you can buy me a cup of something with a
 
 
 ## Best server to run a Quilibrium node
-[Cherryservers](https://www.cherryservers.com/?affiliate=CRXA3YWE) support Quilibrium, is suggested by Cassie (Quilibrium founder), and they offer good solutions for a fair price. Thank you for using my referral link and support my work :-)
+[Cherryservers](https://www.cherryservers.com/?affiliate=CRXA3YWE) support Quilibrium, is suggested by Cassie (Quilibrium founder), and they offer good solutions for a fair price. Thank you for using my referral links and supporting my work :-)
 
 Here are some pre-configured server options, take a look.
 [Cloud VDS 4](https://www.cherryservers.com/server-customizer/cloud_vds_4?affiliate=CRXA3YWE) | [E3-1240V3](https://www.cherryservers.com/server-customizer/e3_1240v3?affiliate=CRXA3YWE) | [E3-1240V5](https://www.cherryservers.com/server-customizer/e3_1240v5?affiliate=CRXA3YWE) | [E5-1620V4](https://www.cherryservers.com/server-customizer/e5_1620v4?affiliate=CRXA3YWE) | [E5-1650V3](https://www.cherryservers.com/server-customizer/e5_1650v3?affiliate=CRXA3YWE) | [E5-1650V4](https://www.cherryservers.com/server-customizer/e5_1650v4?affiliate=CRXA3YWE)
