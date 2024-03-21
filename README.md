@@ -93,8 +93,9 @@ tmux a -t quil
 2. Grab your new server IP and password.
 3. Login to the old server and run this command.
 Change <NEW_SERVER_IP> with your new server IP and enter the new server password when requested.
+ATTENTION: The command will ovewrite any existing keys.yml and config.yml files in the target server with no confirmation.
 ```bash
-scp /root/ceremonyclient/node/.config/keys.yml /root/ceremonyclient/node/.config/config.yml root@<NEW_SERVER_IP>:/root/ceremonyclient/node/.config/
+scp -f /root/ceremonyclient/node/.config/keys.yml /root/ceremonyclient/node/.config/config.yml root@<NEW_SERVER_IP>:/root/ceremonyclient/node/.config/
 ```
 The command will move your keys.yml and config.yml to new server. For this to work the node must already be installed in the new server and the .config folder be generated
 
