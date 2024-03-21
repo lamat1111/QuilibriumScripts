@@ -1,3 +1,4 @@
+
 ## This is a script to auto-install your Quilibrium node in the easiest way. 
 
 **&#x2661; Want to say thank you?**
@@ -49,11 +50,17 @@ Your node will automatically generate important key and config files. After your
 
 An easy client to download files from your node on Windows is [WinSCP](https://winscp.net/eng/index.php). You will need to show hidden files. Select Options, Preferences from the main menu, then the Panels tab, and check the option to Show hidden files (Ctrl+Alt+H).
 
+## Backup your keys.yml and config.yml files
+Use [WinSCP](https://winscp.net/eng/index.php) to navigate to the `root/ceremonyclient/node/.config`  folder. You may have to enable visibility of hidden files in WinSCP if you don't see the .config folder.
+Download locally your `keys.yml` and `config.yml` files. Keep them safe and offline!
+
+If you need to migrate the node elsewhere, after installing the node from scratch you just need to put these 2 files in the `root/ceremonyclient/node/.config`  folder (changing the ones automatically created by the node).
+
 ## Resources
  - To manage your nodes use [Termius](https://termius.com/), the coolest SSH client and terminal around :) 
  - To track your server uptime and  resources usage use [Hetrixtools.com](https://hetrixtools.com/), you can track up to 15 servers for free and the setup is very easy
 
-## Useful server commands
+## Useful server commands.
 
 Check node version
 ```bash
