@@ -88,3 +88,8 @@ Move keys.yml and config.yml to new server
 scp -f /root/ceremonyclient/node/.config/keys.yml /root/ceremonyclient/node/.config/config.yml root@<NEW_SERVER_IP>:/root/ceremonyclient/node/.config/
 ```
 
+## Setup the Firewall and gRPC calls
+Run the below script to do this automatically. You need to install the node first.
+```bash
+wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/installer-gRPC-and-firewall | bash
+```
