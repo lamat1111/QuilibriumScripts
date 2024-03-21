@@ -12,7 +12,7 @@ Apart from using my referral links below for Cherryservers, you can buy me a cup
 - [Best Server to Run a Quilibrium Node](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#best-server-to-run-a-quilibrium-node)
 - [Node auto-installer: how to use the script](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#node-auto-installer-how-to-use-the-script)
 - [Backup Your keys.yml and config.yml Files](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#backup-your-keysyml-and-configyml-files)
-- [Resources](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#resources)
+- [Resources](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#tools-and-resources)
 - [Useful Server Commands](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#useful-server-commands)
 - [Migrate Node to a New Server](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#migrate-node-to-a-new-server)
 - [Setup the Firewall and gRPC Calls](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#setup-the-firewall-and-grpc-calls)
@@ -55,17 +55,14 @@ To reattach later to the node session run the following `tmux a -t quil`
 The poor_mans_cd script will also restart your node if it gets killed and will auto-update it when there is a new version available.
 
 
-Your node will automatically generate important key and config files. After your node has been running for a while, remember to back these files up. You can find them in the ceremonyclient/node/.store folder: keys.yml and config.yml. Keep these safe and do not share them with anyone. 
-
-An easy client to download files from your node on Windows is [WinSCP](https://winscp.net/eng/index.php). You will need to show hidden files. Select Options, Preferences from the main menu, then the Panels tab, and check the option to Show hidden files (Ctrl+Alt+H).
-
 ## Backup your keys.yml and config.yml files
-Use [WinSCP](https://winscp.net/eng/index.php) to navigate to the `root/ceremonyclient/node/.config`  folder. You may have to enable visibility of hidden files in WinSCP if you don't see the .config folder.
-Download locally your `keys.yml` and `config.yml` files. Keep them safe and offline!
+Use [WinSCP](https://winscp.net/eng/index.php) to navigate to the `root/ceremonyclient/node/.config`  folder. You may have to enable visibility for hidden files in WinSCP if you don't see the .config folder. Select Options, Preferences from the main menu, then the Panels tab, and check the option to Show hidden files (Ctrl+Alt+H).
 
-If you need to migrate the node elsewhere, after installing the node from scratch you just need to put these 2 files in the `root/ceremonyclient/node/.config`  folder (changing the ones automatically created by the node).
+Download locally your `keys.yml` and `config.yml` files. Keep them safe and do not share them with anyone!
 
-## Resources
+If you need to migrate the node elsewhere, after installing the node from scratch you just need to put these 2 files in the `root/ceremonyclient/node/.config`  folder (changing the ones automatically created by the node). Here is a [quick way to do this](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#migrate-node-to-a-new-server).
+
+## Tools and resources
  - To manage your nodes use [Termius](https://termius.com/), the coolest SSH client and terminal around :) 
  - To track your server uptime and  resources usage use [Hetrixtools.com](https://hetrixtools.com/), you can track up to 15 servers for free and the setup is very easy
 
