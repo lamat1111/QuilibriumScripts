@@ -1,15 +1,15 @@
 #!/bin/bash
 
-# Step 9b: Enable gRPC
+# Step 1: Enable gRPC
 echo "Enabling gRPC..."
 cd "$HOME/ceremonyclient/node" || { echo "Failed to change directory to ~/ceremonyclient/node! Exiting..."; exit 1; }
 sudo sed -i 's#^listenGrpcMultiaddr:.*$#listenGrpcMultiaddr: /ip4/127.0.0.1/tcp/8337#' .config/config.yml || { echo "Failed to enable gRPC! Exiting..."; exit 1; }
 
-# Step 9c: Enable Stats Collection
+# Step 2: Enable Stats Collection
 echo "Enabling Stats Collection..."
-sudo sed -i 's#^  engine:$#  engine:\n    statsMultiaddr: "/dns/stats.quilibrium.com/tcp/443"#' .config/config.yml || { echo "Failed to enable Stats Collection! Exiting..."; exit 1; }
+sudo sed -i '/^ *engine:/a\  statsMultiaddr: "/dns/stats.quilibrium.com/tcp/443"' .config/config.yml || { echo "Failed to enable Stats Collection! Exiting..."; exit 1; }
 
-# Configure Firewall
+# Step 3: Configure Firewall
 echo "Configuring firewall..."
 echo "y" | sudo ufw enable || { echo "Failed to enable firewall! Exiting..."; exit 1; }
 sudo ufw allow 22
