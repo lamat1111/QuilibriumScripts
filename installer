@@ -14,15 +14,6 @@ sudo apt-get install curl htop tmux -y || { echo "Failed to install required pac
 curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | sudo bash
 sudo apt-get install speedtest -y || { echo "Failed to install speedtest-cli! Exiting..."; exit 1; }
 
-# Step 4: Configure firewall
-echo "Configuring firewall..."
-echo "y" | sudo ufw enable || { echo "Failed to enable firewall! Exiting..."; exit 1; }
-sudo ufw allow 22
-sudo ufw allow 8336
-sudo ufw allow 443
-sudo ufw allow 8337  # Allow gRPC port
-sudo ufw status || { echo "Failed to configure firewall! Exiting..."; exit 1; }
-
 # Step 5: Download and extract Go
 echo "Downloading and extracting Go..."
 wget https://go.dev/dl/go1.20.14.linux-amd64.tar.gz || { echo "Failed to download Go! Exiting..."; exit 1; }
