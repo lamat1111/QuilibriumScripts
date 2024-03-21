@@ -48,7 +48,7 @@ cd ceremonyclient/node || { echo "Failed to change directory to ceremonyclient/n
 
 # Step 9b: Enable gRPC
 echo "Enabling gRPC..."
-cd ~/ceremonyclient/node || { echo "Failed to change directory to ~/ceremonyclient/node! Exiting..."; exit 1; }
+cd "$HOME/ceremonyclient/node" || { echo "Failed to change directory to ~/ceremonyclient/node! Exiting..."; exit 1; }
 sudo sed -i 's#^listenGrpcMultiaddr:.*$#listenGrpcMultiaddr: /ip4/127.0.0.1/tcp/8337#' .config/config.yml || { echo "Failed to enable gRPC! Exiting..."; exit 1; }
 
 # Step 9c: Enable Stats Collection
