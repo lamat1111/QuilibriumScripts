@@ -82,6 +82,7 @@ Attach to existing tmux session
 tmux a -t quil
 #To detach from tmux press CTRL+B then release both keys and press D 
 ```
+---
 
 **Move keys.yml and config.yml to new server**
 
