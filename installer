@@ -23,11 +23,9 @@ sudo rm go1.20.14.linux-amd64.tar.gz || { echo "Failed to remove downloaded arch
 
 # Step 6: Set GO environment variables
 echo "Setting GO environment variables..."
-export PATH="$PATH:/usr/local/go/bin"
-export GOPATH="$HOME/go"
-echo 'export PATH="$PATH:/usr/local/go/bin"' >> ~/.bashrc
-echo 'export GOPATH="$HOME/go"' >> ~/.bashrc
-source "$HOME/.bashrc"  # Explicitly source the .bashrc file with the full path
+echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
+echo 'export GOPATH=$HOME/go' >> ~/.bashrc
+source ~/.bashrc
 sleep 1  # Add a 1-second delay
 
 # Step 7: Create swap space
