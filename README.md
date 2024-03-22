@@ -1,5 +1,6 @@
 
 
+
 ## This is a script to auto-install your Quilibrium node in the easiest way. 
 
 **&#x2661; Want to say thank you?**
@@ -110,10 +111,24 @@ Run the below script to setup the Firewall and gRPC calls automatically. You nee
 wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/installer-gRPC-and-firewall | bash
 ```
 ## Troubleshooting
+### Errors on servers that already hosted a node
 If you've already attempted to install a node on your server and then ran the auto-install script, you may encounter errors. Execute these commands sequentially, and they should typically suffice for initiating a new installation.
 ```bash
 sudo swapoff /swap/swapfile 2>/dev/null; sudo sed -i '/\/swap\/swapfile/d' /etc/fstab; sudo rm /swap/swapfile 2>/dev/null; sudo rmdir /swap 2>/dev/null || sudo rm -rf /swap
 ```
 ```bash
 sudo rm -rf /usr/local/go && sudo rm -rf /root/ceremonyclient
+```
+### poor_mans_cd: command not found
+If when running the poor_mans_cd.sh script in your tmux session you get this error
+
+    ./poor_mans_cd.sh: line 4: go: command not found
+then press CTRL+C and then run this command
+```bash
+export PATH=$PATH:/usr/local/go/bin:$HOME/go
+export GOEXPERIMENT=arenas
+```
+then try to run again the script 
+```bash
+./poor_mans_cd.sh
 ```
