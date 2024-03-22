@@ -9,6 +9,8 @@ Apart from using my referral links below for Cherryservers, you can buy me a cup
 ```
 0x0fd383A1cfbcf4d1F493Dd71b798ebca89e8a013
 ```
+
+
 ## Table of Contents
 
 - [Best Server to Run a Quilibrium Node](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#best-server-to-run-a-quilibrium-node)
@@ -68,13 +70,14 @@ Download locally your `keys.yml` and `config.yml` files. Keep them safe and do n
 If you need to migrate the node elsewhere, after installing the node from scratch you just need to put these 2 files in the `root/ceremonyclient/node/.config`  folder (changing the ones automatically created by the node). Here is a [quick way to do this](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#migrate-node-to-a-new-server).
 
 ------
+------
 
 ## Tools and resources
  - To manage your nodes use [Termius](https://termius.com/), the coolest SSH client and terminal around :) 
  - To track your server uptime and  resources usage use [Hetrixtools.com](https://hetrixtools.com/), you can track up to 15 servers for free and the setup is very easy
  - If you need help come to the [Quilibrium Community Discord](https://discord.gg/quilibrium)
 
-## Useful server commands.
+## Useful server commands
 
 <details>
 <summary>Check node version</summary>
@@ -133,7 +136,8 @@ Run the below script to setup the Firewall and gRPC calls automatically. You nee
 wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/installer-gRPC-and-firewall | bash
 ```
 ## Troubleshooting
-### Errors on servers that already hosted a node
+<details>
+<summary>Errors on servers that already hosted a node</summary>
 If you've already attempted to install a node on your server and then ran the auto-install script, you may encounter errors. Execute these commands sequentially, and they should typically suffice for initiating a new installation.
 ```bash
 sudo swapoff /swap/swapfile 2>/dev/null; sudo sed -i '/\/swap\/swapfile/d' /etc/fstab; sudo rm /swap/swapfile 2>/dev/null; sudo rmdir /swap 2>/dev/null || sudo rm -rf /swap
@@ -141,7 +145,9 @@ sudo swapoff /swap/swapfile 2>/dev/null; sudo sed -i '/\/swap\/swapfile/d' /etc/
 ```bash
 sudo rm -rf /usr/local/go && sudo rm -rf /root/ceremonyclient
 ```
-### poor_mans_cd: command not found
+</details>
+<details>
+<summary>poor_mans_cd: command not found</summary>
 If when running the poor_mans_cd.sh script in your tmux session you get this error
 
 ./poor_mans_cd.sh: line 4: go: command not found
@@ -156,4 +162,5 @@ then try to run again the script
 ./poor_mans_cd.sh
 ```
 This solution in general works everytime you receive the error: Command 'go' not found
+</details>
 
