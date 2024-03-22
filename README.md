@@ -72,29 +72,47 @@ If you need to migrate the node elsewhere, after installing the node from scratc
 ## Tools and resources
  - To manage your nodes use [Termius](https://termius.com/), the coolest SSH client and terminal around :) 
  - To track your server uptime and  resources usage use [Hetrixtools.com](https://hetrixtools.com/), you can track up to 15 servers for free and the setup is very easy
+ - If you need help come to the [Quilibrium Community Discord](https://discord.gg/quilibrium)
 
 ## Useful server commands.
 
-Check node version
+<details>
+<summary>Check node version</summary>
+
 ```bash
 cat ~/ceremonyclient/node/config/version.go | grep -A 1 'func GetVersion() \[\]byte {' | grep -Eo '0x[0-9a-fA-F]+' | xargs printf '%d.%d.%d'
 ```
 
-Get node peer ID
+</details>
+
+<details>
+<summary>Get node peer ID</summary>
+
 ```bash
 cd ~/ceremonyclient/node && GOEXPERIMENT=arenas go run ./... -peer-id
 ```
 
-Check QUIL balance
+</details>
+
+<details>
+<summary>Check QUIL balance</summary>
+
 ```bash
 cd ~/ceremonyclient/node && GOEXPERIMENT=arenas /root/go/bin/node -balance
 ```
 
-Attach to existing tmux session
+</details>
+
+<details>
+<summary>Attach to existing tmux session</summary>
+
 ```bash
 tmux a -t quil
-#To detach from tmux press CTRL+B then release both keys and press D 
 ```
+
+To detach from tmux press CTRL+B then release both keys and press D
+</details>
+
 ## Migrate node to a new server
 1. Use the auto-installer script in this guide to install the node on the new server and let it run for 5 minutes.
 2. Grab your new server IP and password.
