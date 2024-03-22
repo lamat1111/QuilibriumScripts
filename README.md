@@ -133,3 +133,4 @@ then try to run again the script
 ```bash
 ./poor_mans_cd.sh
 ```
+This solution in general works everytime you receive the error: Command 'go' not found
