@@ -56,6 +56,7 @@ tmux new-session -s quil
 To detach from tmux press CTRL+B then D and ENTER. Now you can safely logout from your server and the node will keep running in its persistent shell.
 
 To reattach later to the node session run the following `tmux a -t quil`
+
 The poor_mans_cd script will also restart your node if it gets killed and will auto-update it when there is a new version available.
 
 
