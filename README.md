@@ -33,7 +33,8 @@ Here are some pre-configured server options, take a look.
 
 ## Node auto-installer: how to use the script
 
- 1. Run the auto-installer script on your server (OS must be Ubuntu 22.04.X)
+ 1. If you are reinstalling your existng node, be sure to backup your keys.yml and config.yml files, they are in the root/ceremonyclient/node/.config folder. [How do I do this?](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#backup-your-keysyml-and-configyml-files)
+ 2. Run the auto-installer script on your server (OS must be Ubuntu 22.04.X)
 ```
  wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/installer | bash
 ```
