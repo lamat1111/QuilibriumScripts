@@ -1,4 +1,5 @@
 
+
 ## This is a script to auto-install your Quilibrium node in the easiest way. 
 
 **&#x2661; Want to say thank you?**
@@ -16,6 +17,7 @@ Apart from using my referral links below for Cherryservers, you can buy me a cup
 - [Useful Server Commands](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#useful-server-commands)
 - [Migrate Node to a New Server](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#migrate-node-to-a-new-server)
 - [Setup the Firewall and gRPC Calls](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#setup-the-firewall-and-grpc-calls)
+- [Troubleshooting](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#troubleshooting)
 
 
 ## Best server to run a Quilibrium node
@@ -106,4 +108,12 @@ The command will move your keys.yml and config.yml to new server. For this to wo
 Run the below script to setup the Firewall and gRPC calls automatically. You need to install the node first and let it run for 5 minutes in order to generat its .config folder.
 ```bash
 wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/installer-gRPC-and-firewall | bash
+```
+## Troubleshooting
+If you've attempted to install a node on your server and ran the auto-install script, you may encounter errors. Execute these commands sequentially, and they should typically suffice for initiating a new installation.
+```bash
+sudo swapoff /swap/swapfile 2>/dev/null; sudo sed -i '/\/swap\/swapfile/d' /etc/fstab; sudo rm /swap/swapfile 2>/dev/null; sudo rmdir /swap 2>/dev/null || sudo rm -rf /swap
+```
+```bash
+sudo rm -rf /usr/local/go && sudo rm -rf /root/ceremonyclient
 ```
