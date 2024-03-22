@@ -21,11 +21,16 @@ curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.
 sudo apt-get install speedtest -y || { echo "Failed to install speedtest-cli! Exiting..."; exit 1; }
 
 # Step 4: Download and extract Go
-echo "Downloading and extracting Go..."
-wget https://go.dev/dl/go1.20.14.linux-amd64.tar.gz || { echo "Failed to download Go! Exiting..."; exit 1; }
-sudo tar -xvf go1.20.14.linux-amd64.tar.gz || { echo "Failed to extract Go! Exiting..."; exit 1; }
-sudo mv go /usr/local || { echo "Failed to move Go to /usr/local! Exiting..."; exit 1; }
-sudo rm go1.20.14.linux-amd64.tar.gz || { echo "Failed to remove downloaded archive! Exiting..."; exit 1; }
+  # Check if Go is installed
+if ! command -v go &> /dev/null; then
+    # Step 4: Download and extract Go
+    echo "Downloading and extracting Go..."
+    wget https://go.dev/dl/go1.20.14.linux-amd64.tar.gz || { echo "Failed to download Go! Exiting..."; exit 1; }
+    sudo tar -C /usr/local -xzf go1.20.14.linux-amd64.tar.gz || { echo "Failed to extract Go! Exiting..."; exit 1; }
+    sudo rm go1.20.14.linux-amd64.tar.gz || { echo "Failed to remove downloaded archive! Exiting..."; exit 1; }
+else
+    echo "Go is already installed, skipping download and extraction."
+fi
 
 # Step 5: Set GO environment variables
 echo "Setting GO environment variables..."
@@ -46,11 +51,21 @@ fi
 echo "Adjusting network buffer sizes..."
 echo -e "\n# Increase buffer sizes for better network performance\nnet.core.rmem_max=600000000\nnet.core.wmem_max=600000000" | sudo tee -a /etc/sysctl.conf > /dev/null && sudo sysctl -p || { echo "Failed to adjust network buffer sizes! Exiting..."; exit 1; }
 
+
 # Step 8: Clone the repository
 echo "Cloning the repository..."
 cd "$HOME" || { echo "Failed to change directory to $HOME! Exiting..."; exit 1; }
+
+# Check if ceremonyclient directory exists
+if [ -d "ceremonyclient" ]; then
+    echo "ceremonyclient directory already exists, removing it..."
+    rm -rf ceremonyclient || { echo "Failed to remove existing ceremonyclient directory! Exiting..."; exit 1; }
+fi
+
+# Clone the repository
 git clone https://github.com/QuilibriumNetwork/ceremonyclient.git || { echo "Failed to clone the repository! Exiting..."; exit 1; }
 cd ceremonyclient/node || { echo "Failed to change directory to ceremonyclient/node! Exiting..."; exit 1; }
+
 
 # Step 9: Run the node
 echo "Changing directory to $HOME/ceremonyclient/node..."
