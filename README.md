@@ -65,6 +65,7 @@ Use [WinSCP](https://winscp.net/eng/index.php) to navigate to the `root/ceremony
 Download locally your `keys.yml` and `config.yml` files. Keep them safe and do not share them with anyone!
 
 If you need to migrate the node elsewhere, after installing the node from scratch you just need to put these 2 files in the `root/ceremonyclient/node/.config`  folder (changing the ones automatically created by the node). Here is a [quick way to do this](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#migrate-node-to-a-new-server).
+---
 
 ## Tools and resources
  - To manage your nodes use [Termius](https://termius.com/), the coolest SSH client and terminal around :) 
