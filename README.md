@@ -121,7 +121,9 @@ sudo rm -rf /usr/local/go && sudo rm -rf /root/ceremonyclient
 ```
 ### poor_mans_cd: command not found
 If when running the poor_mans_cd.sh script in your tmux session you get this error
+
 ./poor_mans_cd.sh: line 4: go: command not found
+
 then press CTRL+C and then run this command
 ```bash
 export PATH=$PATH:/usr/local/go/bin:$HOME/go
