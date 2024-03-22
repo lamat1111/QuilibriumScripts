@@ -134,9 +134,4 @@ then try to run again the script
 ./poor_mans_cd.sh
 ```
 This solution in general works everytime you receive the error: Command 'go' not found
-<details>
-<summary>Click to toggle</summary>
-
-This content will be hidden by default but can be toggled by clicking the summary above.
-</details>
 
