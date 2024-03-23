@@ -57,13 +57,14 @@ Here are some pre-configured server options, take a look.
 
 
  3. After installing the node and making some necessary edits, the script will run your node for 5 minutes and then you will be prompted to reboot the system, type "Y" and reboot.
- 4. Login again in your server.
- 5. Run the command below. This will go to the node folder, create a persistent shell (session) and run the poor_mans_cd script.
+ 4. Wait 3 minutes, then login again in your server.
+ 5. Run the command below. This will go to the node folder, create a persistent shell (session), run the poor_mans_cd script and detach form the session again.
     
 ```
 cd ceremonyclient/node && tmux new-session -d -s quil './poor_mans_cd.sh' && tmux detach
 ```
-
+6. Now you can safely logout from your server and the node will keep running in its persistent shell.
+   The poor_mans_cd is a script used to run the node, it will also restart it if it gets killed and will auto-update it when there is a new version available.
 <blockquote>
 <details>
  <summary>Alternatve: step by step commands</summary>
@@ -80,15 +81,17 @@ tmux new-session -s quil
 ```
 ./poor_mans_cd.sh
 ```
+To detach from tmux press CTRL+B then D and ENTER. Now you can safely logout from your server and the node will keep running in its persistent shell.
 </details>
 </blockquote>
 </br>
 <blockquote>
-To detach from tmux press CTRL+B then D and ENTER. Now you can safely logout from your server and the node will keep running in its persistent shell.
 
-To reattach later to the node session run the following `tmux a -t quil`
+To attach to the tmux session and see your node log, just use `tmux a -t quil`
 
-The poor_mans_cd script will also restart your node if it gets killed and will auto-update it when there is a new version available.
+To detach from tmux press CTRL+B then D and ENTER. 
+
+
 </blockquote>
 
 ## Backup your keys.yml and config.yml files
