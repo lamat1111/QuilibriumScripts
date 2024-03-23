@@ -82,6 +82,7 @@ Run the command below. This will go to the node folder, create a persistent shel
   ./poor_mans_cd.sh
   ```
 To detach from tmux press CTRL+B then D. Now you can safely logout from your server and the node will keep running in its persistent shell.
+To reattach to the tmux session and see your node log, just use `tmux a -t quil`
 </details>
 </blockquote>
 
@@ -96,16 +97,6 @@ Once you are in the tmux session a green bar will appear at the bottom of the sc
 It will usually take 15-30 minutes before you will begin to see new log entries in the node log.
 
 The poor_mans_cd is a script used to run the node, it will also restart it if it gets killed and will auto-update it when there is a new version available.
-
-</br>
-<blockquote>
-
-To attach to the tmux session and see your node log, just use `tmux a -t quil`
-
-To detach from tmux press CTRL+B then D and ENTER. 
-
-
-</blockquote>
 
 ## Backup your keys.yml and config.yml files
 Use [WinSCP](https://winscp.net/eng/index.php) to navigate to the `root/ceremonyclient/node/.config`  folder. You may have to enable visibility for hidden files in WinSCP if you don't see the .config folder. Select Options, Preferences from the main menu, then the Panels tab, and check the option to Show hidden files (Ctrl+Alt+H).
