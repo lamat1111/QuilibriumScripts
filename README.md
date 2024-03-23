@@ -34,9 +34,10 @@ Here are some pre-configured server options, take a look.
 
 
 ## Node auto-installer: how to use the script
-
- 1. If you are reinstalling your existing node, be sure to backup your keys.yml and config.yml files, they are in the root/ceremonyclient/node/.config folder. [How do I do this?](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#backup-your-keysyml-and-configyml-files)
- 2. Run the auto-installer script on your server (OS must be Ubuntu 22.04.X)
+### Step 1
+If you are reinstalling your existing node, be sure to backup your keys.yml and config.yml files, they are in the root/ceremonyclient/node/.config folder. [How do I do this?](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#backup-your-keysyml-and-configyml-files)
+### Step 2
+Run the auto-installer script on your server (OS must be Ubuntu 22.04.X)
 ```
  wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/installer | bash
 ```
@@ -53,40 +54,49 @@ Here are some pre-configured server options, take a look.
 
 </details>
 </blockquote>
-<br>
 
-
- 3. After installing the node and making some necessary edits, the script will run your node for 5 minutes and then you will be prompted to reboot the system, type "Y" and reboot.
- 4. Wait 3 minutes, then login again in your server.
- 5. Run the command below. This will go to the node folder, create a persistent shell (session), run the poor_mans_cd script and detach form the session again.
-    
-```
-cd ceremonyclient/node && tmux new-session -d -s quil './poor_mans_cd.sh' && tmux detach
-```
-6. Now you can safely logout from your server and the node will keep running in its persistent shell.
-
-   It will take 15-30 minutes before you will begin to see new log entries in the node log.
-
-   The poor_mans_cd is a script used to run the node, it will also restart it if it gets killed and will auto-update it when there is a new version available.
-<blockquote>
-<details>
- <summary>Alternatve: step by step commands</summary>
- You can also run these command one after the other if you prefer.
-
- ```
-cd ceremonyclient/node 
-```
-
-```
-tmux new-session -s quil 
-```
-
-```
-./poor_mans_cd.sh
-```
+### Step 3
+After installing the node and making some necessary edits, the script will run your node for 5 minutes and then you will be prompted to reboot the system, type "Y" and reboot.
+### Step 4
+Wait 3 minutes, then login again in your server.
+### Step 5
+Run the command below. This will go to the node folder, create a persistent shell (session), run the poor_mans_cd script and detach from the session again.
+      
+  ```
+  cd ceremonyclient/node && tmux new-session -d -s quil './poor_mans_cd.sh' && tmux detach
+  ```
+  <blockquote>
+  <details>
+   <summary>Alternatve: step by step commands</summary>
+   You can also run these command one after the other if you prefer.
+  
+   ```
+  cd ceremonyclient/node 
+  ```
+  
+  ```
+  tmux new-session -s quil 
+  ```
+  
+  ```
+  ./poor_mans_cd.sh
+  ```
 To detach from tmux press CTRL+B then D and ENTER. Now you can safely logout from your server and the node will keep running in its persistent shell.
 </details>
 </blockquote>
+
+### Step 6
+Now you can safely logout from your server and the node will keep running in its persistent shell.
+</br>
+</br>
+If you want to see you node log you can reattach to the tmux session with `tmux a -t quil`
+
+Once you are in the tmux session a green bar will appear at the bottom of the screen, to detach from tmux press CTRL+B then D and ENTER.
+
+It will usually take 15-30 minutes before you will begin to see new log entries in the node log.
+
+The poor_mans_cd is a script used to run the node, it will also restart it if it gets killed and will auto-update it when there is a new version available.
+
 </br>
 <blockquote>
 
