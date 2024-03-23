@@ -35,14 +35,30 @@ Here are some pre-configured server options, take a look.
 
 ## Node auto-installer: how to use the script
 
- 1. If you are reinstalling your existng node, be sure to backup your keys.yml and config.yml files, they are in the root/ceremonyclient/node/.config folder. [How do I do this?](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#backup-your-keysyml-and-configyml-files)
+ 1. If you are reinstalling your existing node, be sure to backup your keys.yml and config.yml files, they are in the root/ceremonyclient/node/.config folder. [How do I do this?](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#backup-your-keysyml-and-configyml-files)
  2. Run the auto-installer script on your server (OS must be Ubuntu 22.04.X)
 ```
  wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/installer | bash
 ```
- 2. After installing the node and making some necessary edits, the script will run your node for 5 minutes and then you will be prompted to reboot the system, type "Y" and reboot.
- 3. Login again in your server.
- 4. Go to the node folder, create a persistent shell (session) and run the poor_mans_cd script. To do all this run these commands one after the other.
+---
+
+<details>
+ <summary>Auto-installer script for Almalinux 8 (untested)</summary>
+ The below script has not been tested yet, run it at you own risk!
+ 
+ 
+ ```
+ wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/installer-ubuntu-almalinux | bash
+```
+
+</details>
+
+---
+
+ 3. After installing the node and making some necessary edits, the script will run your node for 5 minutes and then you will be prompted to reboot the system, type "Y" and reboot.
+ 4. Login again in your server.
+ 5. Go to the node folder, create a persistent shell (session) and run the poor_mans_cd script. To do all this run these commands one after the other.
+ 
 ```
 cd ceremonyclient/node 
 ```
