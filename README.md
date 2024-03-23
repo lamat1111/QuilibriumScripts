@@ -99,12 +99,15 @@ It will usually take 15-30 minutes before you will begin to see new log entries 
 The poor_mans_cd is a script used to run the node, it will also restart it if it gets killed and will auto-update it when there is a new version available.
 
 ## Backup your keys.yml and config.yml files
+After 15-30 minutes that then ode has been running, it shoudl ahve gnerated our keys and config files correctly.
 Use [WinSCP](https://winscp.net/eng/index.php) to navigate to the `root/ceremonyclient/node/.config`  folder. You may have to enable visibility for hidden files in WinSCP if you don't see the .config folder. Select Options, Preferences from the main menu, then the Panels tab, and check the option to Show hidden files (Ctrl+Alt+H).
 
 Download locally your `keys.yml` and `config.yml` files. Keep them safe and do not share them with anyone!
+Is a good idea to put them in an encrypted folder using a free tool such as [Encrypto](https://macpaw.com/encrypto)
 
 If you need to migrate the node elsewhere, after installing the node from scratch you just need to put these 2 files in the `root/ceremonyclient/node/.config`  folder (changing the ones automatically created by the node). Here is a [quick way to do this](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#migrate-node-to-a-new-server).
 
+------
 ------
 ------
 
