@@ -81,7 +81,7 @@ Run the command below. This will go to the node folder, create a persistent shel
   ```
   ./poor_mans_cd.sh
   ```
-To detach from tmux press CTRL+B then D and ENTER. Now you can safely logout from your server and the node will keep running in its persistent shell.
+To detach from tmux press CTRL+B then D. Now you can safely logout from your server and the node will keep running in its persistent shell.
 </details>
 </blockquote>
 
@@ -91,7 +91,7 @@ Now you can safely logout from your server and the node will keep running in its
 </br>
 If you want to see you node log you can reattach to the tmux session with `tmux a -t quil`
 
-Once you are in the tmux session a green bar will appear at the bottom of the screen, to detach from tmux press CTRL+B then D and ENTER.
+Once you are in the tmux session a green bar will appear at the bottom of the screen, to detach from tmux press CTRL+B then D.
 
 It will usually take 15-30 minutes before you will begin to see new log entries in the node log.
 
