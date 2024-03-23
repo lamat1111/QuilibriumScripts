@@ -64,6 +64,9 @@ Here are some pre-configured server options, take a look.
 cd ceremonyclient/node && tmux new-session -d -s quil './poor_mans_cd.sh' && tmux detach
 ```
 6. Now you can safely logout from your server and the node will keep running in its persistent shell.
+
+   It will take 15-30 minutes before you will begin to see new log entries in the node log.
+
    The poor_mans_cd is a script used to run the node, it will also restart it if it gets killed and will auto-update it when there is a new version available.
 <blockquote>
 <details>
