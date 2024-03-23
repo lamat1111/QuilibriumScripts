@@ -40,8 +40,8 @@ Here are some pre-configured server options, take a look.
 ```
  wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/installer | bash
 ```
----
 
+<blockquote>
 <details>
  <summary>Auto-installer script for Almalinux 8 (untested)</summary>
  The below script has not been tested yet, run it at you own risk!
@@ -52,14 +52,24 @@ Here are some pre-configured server options, take a look.
 ```
 
 </details>
+</blockquote>
+<br>
 
----
 
  3. After installing the node and making some necessary edits, the script will run your node for 5 minutes and then you will be prompted to reboot the system, type "Y" and reboot.
  4. Login again in your server.
- 5. Go to the node folder, create a persistent shell (session) and run the poor_mans_cd script. To do all this run these commands one after the other.
- 
+ 5. Run the command below. This will go to the node folder, create a persistent shell (session) and run the poor_mans_cd script.
+    
 ```
+cd ceremonyclient/node && tmux new-session -d -s quil './poor_mans_cd.sh' && tmux detach
+```
+
+<blockquote>
+<details>
+ <summary>Alternatve: step by step commands</summary>
+ You can also run these command one after the other if you prefer.
+
+ ```
 cd ceremonyclient/node 
 ```
 
@@ -70,13 +80,16 @@ tmux new-session -s quil
 ```
 ./poor_mans_cd.sh
 ```
-
+</details>
+</blockquote>
+</br>
+<blockquote>
 To detach from tmux press CTRL+B then D and ENTER. Now you can safely logout from your server and the node will keep running in its persistent shell.
 
 To reattach later to the node session run the following `tmux a -t quil`
 
 The poor_mans_cd script will also restart your node if it gets killed and will auto-update it when there is a new version available.
-
+</blockquote>
 
 ## Backup your keys.yml and config.yml files
 Use [WinSCP](https://winscp.net/eng/index.php) to navigate to the `root/ceremonyclient/node/.config`  folder. You may have to enable visibility for hidden files in WinSCP if you don't see the .config folder. Select Options, Preferences from the main menu, then the Panels tab, and check the option to Show hidden files (Ctrl+Alt+H).
@@ -141,10 +154,11 @@ Change <NEW_SERVER_IP> with your new server IP and enter the new server password
 ```bash
 scp -f /root/ceremonyclient/node/.config/keys.yml /root/ceremonyclient/node/.config/config.yml root@<NEW_SERVER_IP>:/root/ceremonyclient/node/.config/
 ```
+<blockquote>
 ATTENTION: The command will ovewrite any existing keys.yml and config.yml files in the target server with no confirmation.
 
 The command will move your keys.yml and config.yml to new server. For this to work the node must already be installed in the new server and the .config folder be generated.
-
+</blockquote>
 
 ## Setup the Firewall and gRPC calls
 Run the below script to setup the Firewall and gRPC calls automatically. You need to install the node first and let it run for 5 minutes in order to generat its .config folder.
