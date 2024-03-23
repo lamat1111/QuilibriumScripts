@@ -10,36 +10,28 @@ fi
 echo "Updating package lists..."
 sudo apt -q update || { echo "Failed to update package lists! Exiting..."; exit 1; }
 
-# Step 2: Install git
-echo "Installing git..."
-sudo apt install git -y || { echo "Failed to install git! Exiting..."; exit 1; }
-
-# Step 3: Install required packages
+# Step 2: Install required packages
 echo "Installing required packages..."
-sudo apt-get install wget htop tmux tar -y || { echo "Failed to install required packages! Exiting..."; exit 1; }
-curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | sudo bash
-sudo apt-get install speedtest -y || { echo "Failed to install speedtest-cli! Exiting..."; exit 1; }
+sudo apt-get install git wget tmux tar -y || { echo "Failed to install required packages! Exiting..."; exit 1; }
 
-# Step 4: Download and extract Go
-  # Check if Go is installed
-if ! command -v go &> /dev/null; then
-    # Step 4: Download and extract Go
-    echo "Downloading and extracting Go..."
-    wget https://go.dev/dl/go1.20.14.linux-amd64.tar.gz || { echo "Failed to download Go! Exiting..."; exit 1; }
-    sudo tar -C /usr/local -xzf go1.20.14.linux-amd64.tar.gz || { echo "Failed to extract Go! Exiting..."; exit 1; }
-    sudo rm go1.20.14.linux-amd64.tar.gz || { echo "Failed to remove downloaded archive! Exiting..."; exit 1; }
+# Step 3: Download and extract Go
+if [[ $(go version) == *"go1.20.1"[1-4]* ]]; then
+  echo "Correct version of Go is already installed, moving on..."
 else
-    echo "Go is already installed, skipping download and extraction."
+  echo "Installing the necessary version of Go..."
+  wget https://go.dev/dl/go1.20.14.linux-amd64.tar.gz || { echo "Failed to download Go! Exiting..."; exit 1; }
+  sudo tar -C /usr/local -xzf go1.20.14.linux-amd64.tar.gz || { echo "Failed to extract Go! Exiting..."; exit 1; }
+  sudo rm go1.20.14.linux-amd64.tar.gz || { echo "Failed to remove downloaded archive! Exiting..."; exit 1; }
 fi
 
-# Step 5: Set GO environment variables
-echo "Setting GO environment variables..."
+# Step 4: Set Go environment variables
+echo "Setting Go environment variables..."
 echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
 echo 'export GOPATH=$HOME/go' >> ~/.bashrc
 source ~/.bashrc
 sleep 1  # Add a 1-second delay
 
-# Step 6: Create swap space
+# Step 5: Create swap space
 if ! [ "$(sudo swapon -s)" ]; then
   echo "Creating swap space..."
   sudo mkdir /swap && sudo fallocate -l 24G /swap/swapfile && sudo chmod 600 /swap/swapfile || { echo "Failed to create swap space! Exiting..."; exit 1; }
@@ -47,37 +39,33 @@ if ! [ "$(sudo swapon -s)" ]; then
   sudo bash -c 'echo "/swap/swapfile swap swap defaults 0 0" >> /etc/fstab' || { echo "Failed to update /etc/fstab! Exiting..."; exit 1; }
 fi
 
-# Step 7: Adjust network buffer sizes
+# Step 6: Adjust network buffer sizes
 echo "Adjusting network buffer sizes..."
-echo -e "\n# Increase buffer sizes for better network performance\nnet.core.rmem_max=600000000\nnet.core.wmem_max=600000000" | sudo tee -a /etc/sysctl.conf > /dev/null && sudo sysctl -p || { echo "Failed to adjust network buffer sizes! Exiting..."; exit 1; }
+if [[ $(grep ^"net.core.rmem_max=600000000"$ /etc/sysctl.conf) ]]; then
+  echo "\net.core.rmem_max=600000000\" found inside /etc/sysctl.conf, skipping..."
+else
+  echo -e "\n# Change made to increase buffer sizes for better network performance for ceremonyclient\nnet.core.rmem_max=600000000" | sudo tee -a /etc/sysctl.conf > /dev/null
+fi
+if [[ $(grep ^"net.core.wmem_max=600000000"$ /etc/sysctl.conf) ]]; then
+  echo "\net.core.wmem_max=600000000\" found inside /etc/sysctl.conf, skipping..."
+else
+  echo -e "\n# Change made to increase buffer sizes for better network performance for ceremonyclient\nnet.core.wmem_max=600000000" | sudo tee -a /etc/sysctl.conf > /dev/null
+fi
+sudo sysctl -p
 
-
-# Step 8: Clone the repository
-echo "Cloning the repository..."
-cd "$HOME" || { echo "Failed to change directory to $HOME! Exiting..."; exit 1; }
-
-# Check if ceremonyclient directory exists
-if [ -d "ceremonyclient" ]; then
-    echo "ceremonyclient directory already exists, removing it..."
-    rm -rf ceremonyclient || { echo "Failed to remove existing ceremonyclient directory! Exiting..."; exit 1; }
+# Step 7: Install the node from the Github repo
+cd ~/ || { echo "Failed to change directory to $HOME! Exiting..."; exit 1; }
+if [[ -d "ceremonyclient" ]]; then
+  echo "ceremonyclient directory already exists. I don't want to overwrite your ceremonyclient, so I will skip the install..."
+else
+  echo "Downloading the node software..."
+  git clone https://github.com/QuilibriumNetwork/ceremonyclient.git || { echo "Failed to clone the repository! Exiting..."; exit 1; }
+  cd ceremonyclient/node
 fi
 
-# Clone the repository
-git clone https://github.com/QuilibriumNetwork/ceremonyclient.git || { echo "Failed to clone the repository! Exiting..."; exit 1; }
-cd ceremonyclient/node || { echo "Failed to change directory to ceremonyclient/node! Exiting..."; exit 1; }
-
-
-# Step 9: Run the node
-echo "Changing directory to $HOME/ceremonyclient/node..."
-cd "$HOME/ceremonyclient/node" || { echo "Failed to change directory to $HOME/ceremonyclient/node! Exiting..."; exit 1; }
-
-echo "Running the node..."
-GOEXPERIMENT=arenas /usr/local/go/bin/go run ./... > /dev/null 2>&1 &  # Redirect output to /dev/null
-GO_PID=$!
-
-# Step 10: Letting the node run for 3 minutes
-echo "Letting the node run for 3 minutes..."
-
+# Step 8: Letting the node run for 5 minutes
+echo "Running the node run for 5 minutes..."
+GOEXPERIMENT=arenas go run ./... > /dev/null 2>&1 &  # Redirect output to /dev/null
 countdown() {
     secs=$1         # Assign the input argument (180) to the variable 'secs'
     while [ $secs -gt 0 ]; do
@@ -87,11 +75,11 @@ countdown() {
     done
     printf "\nDone!\n" # After the countdown completes, print "Done!" on a new line
 }
+countdown 300 || { echo "Failed to wait! Exiting..."; exit 1; }
 
-countdown 180 || { echo "Failed to wait! Exiting..."; exit 1; }
-
-# Step 11: Prompt for reboot
-echo "Node installation is finished."
+# Step 9: Prompt for reboot
+echo "Node setup is finished."
 echo "Type 'sudo reboot' and press Enter to reboot your server."
-echo "Then login again and follow the instructions of the guide to restart your node."
-echo "Remember to download and keep safe your keys.yml and config.yml files!"
+echo "When you have logged back in, run 'cd ~/ceremonyclient/node/', open a new tmux session with 'tmux new-session -s \"ceremonyclient\"' and run 'bash poor_mans_cd.sh'."
+echo "Then detach from the tmux session without ceasing it by pressing Ctrl-B and then pressing D."
+echo "Remember to make backup copies of the keys folder ~/ceremonyclient/keys, and the ~/ceremonyclient/.config folder."
