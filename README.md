@@ -111,6 +111,12 @@ It will usually take 15-30 minutes before you will begin to see new log entries 
 
 The poor_mans_cd is a script used to run the node, it will also restart it if it gets killed and will auto-update it when there is a new version available.
 
+### Check node info
+Run this command from your root folder to check the node info (Node version, Peer ID, Quil balance)
+  ```
+cd /root/ceremonyclient/node && GOEXPERIMENT=arenas go run ./... -node-info
+  ```
+
 ## Backup your keys.yml and config.yml files
 After 15-30 minutes that then node has been running, it should have generated your keys and config files correctly.
 Use [WinSCP](https://winscp.net/eng/index.php) to navigate to the `root/ceremonyclient/node/.config`  folder. You may have to enable visibility for hidden files in WinSCP if you don't see the .config folder. Select Options, Preferences from the main menu, then the Panels tab, and check the option to Show hidden files (Ctrl+Alt+H).
@@ -132,26 +138,15 @@ If you need to migrate the node elsewhere, after installing the node from scratc
 ## Useful server commands
 
 <details>
-<summary>Check node version</summary>
+<summary>Check node info</summary>
+Run this command from your root folder to check the node info (Node version, Peer ID, Quil balance)
  
-```bash
-cat ~/ceremonyclient/node/config/version.go | grep -A 1 'func GetVersion() \[\]byte {' | grep -Eo '0x[0-9a-fA-F]+' | xargs printf '%d.%d.%d'
-```
+  ```
+cd /root/ceremonyclient/node && GOEXPERIMENT=arenas go run ./... -node-info
+  ```
 </details>
-<details>
-<summary>Get node peer ID</summary>
- 
-```bash
-cd ~/ceremonyclient/node && GOEXPERIMENT=arenas go run ./... -peer-id
-```
-</details>
-<details>
-<summary>Check QUIL balance</summary>
- 
-```bash
-cd ~/ceremonyclient/node && GOEXPERIMENT=arenas /root/go/bin/node -balance
-```
-</details>
+<br>
+
 <details>
 <summary>Attach to existing tmux session</summary>
  
