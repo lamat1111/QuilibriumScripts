@@ -34,7 +34,7 @@ Here are some pre-configured server options, take a look.
 
 
 
-## Node auto-installer: how to use the script
+## Node auto-installer: install your node in a few clicks
 ### Step 1
 If you are reinstalling your existing node, be sure to backup your keys.yml and config.yml files, they are in the root/ceremonyclient/node/.config folder. [How do I do this?](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#backup-your-keysyml-and-configyml-files)
 ### Step 2
