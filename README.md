@@ -42,8 +42,9 @@ Here are some pre-configured server options, take a look.
 **Rent a server with at least 6 cores, 16 GB RAM, 500 GB SSD space, and 50 Mbits bandwidth in and out**<br>
 *(After Quilibrium 1.5 min specs will be: 4 cores, 8 GB RAM, 250 GB SSD space, and 50 Mbits bandwidth in and out)*<br>
 If you can afford better specs than the minimum, your node will earn more rewards.
-VDS and dedicated servers are your best choiche. Using a VPS may give you issues as often the providers oversell the resources. The community had a really bad experience with both Contabo and Hostinger for instance.
 
+VDS (Virtual Dedicated Servers) and Bare Metal (Physical dedicated Servers) are your best choiche. Using a VPS (Virtual Private Server) may give you issues as often the providers oversell the resources. The community had a really bad experience with both Contabo and Hostinger for instance.<br>
+That being said, after 1.5 is out a VPS or a home machine may work just fine.
 ### Step 2
 **Install the OS Ubuntu 22.04.X.**<br>
 If your server has two disks, consider configuring them in "RAID 1" (typically offered by your provider). This setup mirrors one disk to the other, providing redundancy and safeguarding against data loss in case one disk fails.
