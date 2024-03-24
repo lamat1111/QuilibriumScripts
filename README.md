@@ -1,6 +1,7 @@
 
 
 
+
 ## This is a script to auto-install your Quilibrium node in the easiest way. 
 
 **&#x2661; Want to say thank you?**
@@ -120,39 +121,66 @@ If you need to migrate the node elsewhere, after installing the node from scratc
 
 <details>
 <summary>Check node version</summary>
-
+ 
 ```bash
 cat ~/ceremonyclient/node/config/version.go | grep -A 1 'func GetVersion() \[\]byte {' | grep -Eo '0x[0-9a-fA-F]+' | xargs printf '%d.%d.%d'
 ```
-
 </details>
-
 <details>
 <summary>Get node peer ID</summary>
-
+ 
 ```bash
 cd ~/ceremonyclient/node && GOEXPERIMENT=arenas go run ./... -peer-id
 ```
-
 </details>
-
 <details>
 <summary>Check QUIL balance</summary>
-
+ 
 ```bash
 cd ~/ceremonyclient/node && GOEXPERIMENT=arenas /root/go/bin/node -balance
 ```
-
 </details>
-
 <details>
 <summary>Attach to existing tmux session</summary>
-
+ 
 ```bash
 tmux a -t quil
 ```
-
 To detach from tmux press CTRL+B then release both keys and press D
+</details>
+<details>
+<summary>Create tmux session + run node + detach from session: 1 step command</summary>
+This is useful to quickly run then node in a session AFTER you have rebooted your server. Only RUN this after a reboot and if you have no tmux session already active.
+ 
+```bash
+cd ceremonyclient/node && tmux new-session -d -s quil './poor_mans_cd.sh' && tmux detach
+```
+ </details>
+ <details>
+<summary>Create cronjob to run the node automatically after a reboot</summary>
+You only have to run this command once. This will setup a cronjob that will create your tmux session and run the node automatically after every reboot of your server.
+Shoutout to Peter Jameson (Quilibrium Discord community creator) for the script.
+ 
+```bash
+(crontab -l ; echo "@reboot sleep 10 && bash -lc \"tmux new-session -d -s quil\" && tmux send-keys -t quil \"cd ~/ceremonyclient/node\" Enter && tmux send-keys -t quil \"./poor_mans_cd.sh\" Enter") | crontab -
+```
+ </details>
+<details>
+<summary>Kill node process</summary>
+Use this in case you need to stop the node and kill the process
+ 
+```bash
+pkill node && pkill -f "go run ./..."
+```
+</details>
+<details>
+<summary>Empty "store" folder</summary>
+CAREFUL: this will empty your "store" folder, only use it if you know what you are doing.
+Sometimes when you receive errors that you cannot debug, you can solve by killing the node process, emptying the store folder and starting the node again from scratch.
+ 
+```bash
+rm -r /root/ceremonyclient/node/.config/store
+```
 </details>
 
 ## Migrate node to a new server
