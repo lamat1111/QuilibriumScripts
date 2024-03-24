@@ -190,7 +190,7 @@ CAREFUL: this will empty your "store" folder, only use it if you know what you a
 Sometimes when you receive errors that you cannot debug, you can solve by killing the node process, emptying the store folder and starting the node again from scratch.
  
 ```bash
-rm -r /root/ceremonyclient/node/.config/store
+sudo rm -r /root/ceremonyclient/node/.config/store
 ```
 </details>
 
