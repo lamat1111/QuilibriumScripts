@@ -41,7 +41,7 @@ Here are some pre-configured server options, take a look.
 ### Step 1
 **Rent a server with at least 8 cores (best 12), 16 GB RAM (best 32), 250 GB SSD space (best 500), and 50 Mbits symmetric bandwidth**<br>
 *(After Quilibrium 1.5 min specs will be: 4 cores, 8 GB RAM, 250 GB SSD space, and 50 Mbits symmetric bandwidth)*<br>
-Also refer to [Quilibrium official docs](https://quilibrium.com/docs/noderunning){:target="_blank"}<br>
+Also refer to [Quilibrium official docs](https://quilibrium.com/docs/noderunning)<br>
 If you can afford better specs than the minimum, your node will earn more rewards.
 
 VDS (Virtual Dedicated Servers) and Bare Metal (Physical dedicated Servers) are your best choiche. Using a VPS (Virtual Private Server) may give you issues as often the providers oversell the resources. The community had a really bad experience with both Contabo and Hostinger for instance.<br>
@@ -132,9 +132,9 @@ If you need to migrate the node elsewhere, after installing the node from scratc
 ------
 
 ## Tools and resources
- - To manage your nodes use [Termius](https://termius.com/){:target="_blank"}, the coolest SSH client and terminal around :) 
- - To track your server uptime and  resources usage use [Hetrixtools.com](https://hetrixtools.com/){:target="_blank"}, you can track up to 15 servers for free and the setup is very easy
- - If you need help come to the [Quilibrium Community Discord](https://discord.gg/quilibrium){:target="_blank"}
+ - To manage your nodes use [Termius](https://termius.com/), the coolest SSH client and terminal around :) 
+ - To track your server uptime and  resources usage use [Hetrixtools.com](https://hetrixtools.com/), you can track up to 15 servers for free and the setup is very easy
+ - If you need help come to the [Quilibrium Community Discord](https://discord.gg/quilibrium)
 
 ## Useful server commands
 
