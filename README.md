@@ -39,9 +39,9 @@ Here are some pre-configured server options, take a look.
 *If you are reinstalling your existing node, be sure to backup your keys.yml and config.yml files, they are in the root/ceremonyclient/node/.config folder. [How do I do this?](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#backup-your-keysyml-and-configyml-files)*
 
 ### Step 1
-**Rent a server with at least 8 cores (best 12), 16 GB RAM (best 32), 250 GB SSD space (best 500), and 50 Mbits symmetric bandwidth**<br>
-*(After Quilibrium 1.5 min specs will be: 4 cores, 8 GB RAM, 250 GB SSD space, and 50 Mbits symmetric bandwidth)*<br>
-Also refer to [Quilibrium official docs](https://quilibrium.com/docs/noderunning)<br>
+**Rent a server with at least 8 cores (best 12), 16 GB RAM (best 32), 250 GB SSD space (best 500), and 50 Mbits symmetric bandwidth.**<br>
+*(After Quilibrium 1.5 min specs will be: 4 cores, 8 GB RAM, 250 GB SSD space, and 50 Mbits symmetric bandwidth).*<br>
+Also refer to the [Quilibrium official docs](https://quilibrium.com/docs/noderunning)<br>
 If you can afford better specs than the minimum, your node will earn more rewards.
 
 VDS (Virtual Dedicated Servers) and Bare Metal (Physical dedicated Servers) are your best choiche. Using a VPS (Virtual Private Server) may give you issues as often the providers oversell the resources. The community had a really bad experience with both Contabo and Hostinger for instance.<br>
