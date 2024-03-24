@@ -39,8 +39,9 @@ Here are some pre-configured server options, take a look.
 *If you are reinstalling your existing node, be sure to backup your keys.yml and config.yml files, they are in the root/ceremonyclient/node/.config folder. [How do I do this?](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#backup-your-keysyml-and-configyml-files)*
 
 ### Step 1
-**Rent a server with at least 6 cores, 16 GB RAM, 500 GB SSD space, and 50 Mbits bandwidth in and out**<br>
-*(After Quilibrium 1.5 min specs will be: 4 cores, 8 GB RAM, 250 GB SSD space, and 50 Mbits bandwidth in and out)*<br>
+**Rent a server with at least 8 cores (best 12), 16 GB RAM (best 32), 250 GB SSD space (best 500), and 50 Mbits symmetric bandwidth**<br>
+*(After Quilibrium 1.5 min specs will be: 4 cores, 8 GB RAM, 250 GB SSD space, and 50 Mbits symmetric bandwidth)*<br>
+Also refer to [Quilibrium official docs](https://quilibrium.com/docs/noderunning){:target="_blank"}<br>
 If you can afford better specs than the minimum, your node will earn more rewards.
 
 VDS (Virtual Dedicated Servers) and Bare Metal (Physical dedicated Servers) are your best choiche. Using a VPS (Virtual Private Server) may give you issues as often the providers oversell the resources. The community had a really bad experience with both Contabo and Hostinger for instance.<br>
@@ -131,9 +132,9 @@ If you need to migrate the node elsewhere, after installing the node from scratc
 ------
 
 ## Tools and resources
- - To manage your nodes use [Termius](https://termius.com/), the coolest SSH client and terminal around :) 
- - To track your server uptime and  resources usage use [Hetrixtools.com](https://hetrixtools.com/), you can track up to 15 servers for free and the setup is very easy
- - If you need help come to the [Quilibrium Community Discord](https://discord.gg/quilibrium)
+ - To manage your nodes use [Termius](https://termius.com/){:target="_blank"}, the coolest SSH client and terminal around :) 
+ - To track your server uptime and  resources usage use [Hetrixtools.com](https://hetrixtools.com/){:target="_blank"}, you can track up to 15 servers for free and the setup is very easy
+ - If you need help come to the [Quilibrium Community Discord](https://discord.gg/quilibrium){:target="_blank"}
 
 ## Useful server commands
 
