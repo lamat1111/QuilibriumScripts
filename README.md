@@ -39,8 +39,8 @@ Here are some pre-configured server options, take a look.
 *If you are reinstalling your existing node, be sure to backup your keys.yml and config.yml files, they are in the root/ceremonyclient/node/.config folder. [How do I do this?](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#backup-your-keysyml-and-configyml-files)*
 
 ### Step 1
-**Rent a server with at least 8 cores (best 12), 16 GB RAM (best 32), 250 GB SSD space (best 500), and 50 Mbits symmetric bandwidth.**<br>
-*(After Quilibrium 1.5 min specs will be: 4 cores, 8 GB RAM, 250 GB SSD space, and 50 Mbits symmetric bandwidth).*<br>
+**Rent a server with at least 8 cores (best 12), 16 GB RAM (best 32), 250 GB SSD space (best 500), and 400 Mbit/s symmetric bandwidth.**<br>
+*(After Quilibrium 1.5 min specs will be: 4 cores, 8 GB RAM. It is unclear what the new spces for space and bandwidth will be, but probably lower than now.*<br>
 Also refer to the [Quilibrium official docs](https://quilibrium.com/docs/noderunning)<br>
 If you can afford better specs than the minimum, your node will earn more rewards.
 
