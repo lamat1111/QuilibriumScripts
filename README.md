@@ -35,10 +35,20 @@ Here are some pre-configured server options, take a look.
 
 
 ## Node auto-installer: install your node in a few clicks
+
+*If you are reinstalling your existing node, be sure to backup your keys.yml and config.yml files, they are in the root/ceremonyclient/node/.config folder. [How do I do this?](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#backup-your-keysyml-and-configyml-files)*
+
 ### Step 1
-If you are reinstalling your existing node, be sure to backup your keys.yml and config.yml files, they are in the root/ceremonyclient/node/.config folder. [How do I do this?](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#backup-your-keysyml-and-configyml-files)
+**Rent a server with at least 4cores, 16 GB RAM, 500GB SSD space, and 50 Mbits bandwidth in and out**<br>
+If you can afford better specs thatn the minimum, your node will earn more rewards.
+VDS and dedicated servers are your best choiche. Using a VPS may give you issues as often the providers oversell the resources. The community had a really bad experience with both Contabo and Hostinger for instance.
+
 ### Step 2
-Run the auto-installer script on your server (OS must be Ubuntu 22.04.X)
+**Install the OS Ubuntu 22.04.X.**<br>
+If your server has two disks, consider configuring them in "RAID 1" (typically offered by your provider). This setup mirrors one disk to the other, providing redundancy and safeguarding against data loss in case one disk fails.
+
+### Step 3
+Run the auto-installer script on your server (OS must be Ubuntu 22.04.X). I suggest you to use [Termius](https://termius.com/) to login 
 ```
  wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/installer | bash
 ```
@@ -56,11 +66,11 @@ Run the auto-installer script on your server (OS must be Ubuntu 22.04.X)
 </details>
 </blockquote>
 
-### Step 3
-After installing the node and making some necessary edits, the script will run your node for 5 minutes and then you will be prompted to reboot the system, type "Y" and reboot.
 ### Step 4
-Wait 3 minutes, then login again in your server.
+After installing the node and making some necessary edits, the script will run your node for 5 minutes and then you will be prompted to reboot the system, type "Y" and reboot.
 ### Step 5
+Wait 3 minutes, then login again in your server.
+### Step 6
 Run the command below. This will go to the node folder, create a persistent shell (session), run the poor_mans_cd script and detach from the session again.
       
   ```
@@ -87,8 +97,8 @@ To reattach to the tmux session and see your node log, just use `tmux a -t quil`
 </details>
 </blockquote>
 
-### Step 6
-Now you can safely logout from your server and the node will keep running in its persistent shell.
+### Step 7
+You are done! Now you can safely logout from your server and the node will keep running in its persistent shell.
 </br>
 </br>
 If you want to see you node log you can reattach to the tmux session with `tmux a -t quil`
@@ -100,7 +110,7 @@ It will usually take 15-30 minutes before you will begin to see new log entries 
 The poor_mans_cd is a script used to run the node, it will also restart it if it gets killed and will auto-update it when there is a new version available.
 
 ## Backup your keys.yml and config.yml files
-After 15-30 minutes that then ode has been running, it shoudl ahve gnerated our keys and config files correctly.
+After 15-30 minutes that then node has been running, it should have generated your keys and config files correctly.
 Use [WinSCP](https://winscp.net/eng/index.php) to navigate to the `root/ceremonyclient/node/.config`  folder. You may have to enable visibility for hidden files in WinSCP if you don't see the .config folder. Select Options, Preferences from the main menu, then the Panels tab, and check the option to Show hidden files (Ctrl+Alt+H).
 
 Download locally your `keys.yml` and `config.yml` files. Keep them safe and do not share them with anyone!
