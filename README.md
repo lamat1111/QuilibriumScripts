@@ -250,20 +250,22 @@ sudo rm -rf /usr/local/go && sudo rm -rf /root/ceremonyclient
 ```
 </details>
 <details>
-<summary>poor_mans_cd: command not found</summary>
-If when running the poor_mans_cd.sh script in your tmux session you get this error
-
-./poor_mans_cd.sh: line 4: go: command not found
-
-then press CTRL+C and then run this command
+<summary>Command GO not found</summary>
+If you see the error *Command GO not found*, then try to run this command.
+ 
 ```bash
 export PATH=$PATH:/usr/local/go/bin:$HOME/go
 export GOEXPERIMENT=arenas
 ```
-then try to run again the script 
+<br><br>
+If you receive the error while trying to run your *poor_mans_cd* script in your tmux session, press CTRL+C to stop the process, then run 
+```bash
+export PATH=$PATH:/usr/local/go/bin:$HOME/go
+export GOEXPERIMENT=arenas
+```
+and finally try to run again the script 
 ```bash
 ./poor_mans_cd.sh
 ```
-This solution in general works everytime you receive the error: Command 'go' not found
 </details>
 
