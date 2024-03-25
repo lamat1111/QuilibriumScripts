@@ -74,7 +74,7 @@ After installing the node and making some necessary edits, the script will run y
 ### Step 5
 Wait 3 minutes, then login again in your server.
 ### Step 6
-Run the command below. This will go to the node folder, create a persistent shell (session), run the poor_mans_cd script and detach from the session again.
+Run the command below. This will go to the node folder, create a persistent shell (session), start the node via the *poor_mans_cd* script (more info about this script below) and detach from the session again.
       
   ```
   cd ceremonyclient/node && tmux new-session -d -s quil './poor_mans_cd.sh' && tmux detach
