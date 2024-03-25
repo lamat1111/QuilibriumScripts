@@ -213,6 +213,32 @@ wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-insta
 ```
 ## Troubleshooting
 <details>
+<summary>How to kill and restart the node</summary>
+Sometimes you may need to kill and restart the node. For instance if you made the mistake of starting 2 separate instances of the node.<br>
+You may also verify this by running the coomand `htop`. It will list all your runnig processes.
+
+<br><br>
+Go to your root folder
+
+```bash
+cd root
+```
+Kill all the node processes
+```bash
+pkill node && pkill -f "go run ./..."
+```
+Go into your tmux session and start again the node.
+  ```
+  tmux a -t quil
+  ```
+  
+  ```
+  ./poor_mans_cd.sh
+  ```
+To detach from tmux press CTRL+B then D.
+</details>
+
+<details>
 <summary>Errors on servers that already hosted a node</summary>
 If you've already attempted to install a node on your server and then ran the auto-install script, you may encounter errors. Execute these commands sequentially, and they should typically suffice for initiating a new installation.
  
