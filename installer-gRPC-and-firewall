@@ -1,20 +1,42 @@
 #!/bin/bash
 
+# Function to check if a line exists in a file
+line_exists() {
+    grep -qF "$1" "$2"
+}
+
+# Function to check if a UFW rule exists
+ufw_rule_exists() {
+    sudo ufw status numbered | grep -qF "$1"
+}
+
 # Step 1: Enable gRPC
 echo "Enabling gRPC..."
 cd "$HOME/ceremonyclient/node" || { echo "Failed to change directory to ~/ceremonyclient/node! Exiting..."; exit 1; }
-sudo sed -i 's#^listenGrpcMultiaddr:.*$#listenGrpcMultiaddr: /ip4/127.0.0.1/tcp/8337#' .config/config.yml || { echo "Failed to enable gRPC! Exiting..."; exit 1; }
+if ! line_exists "listenGrpcMultiaddr: /ip4/127.0.0.1/tcp/8337" .config/config.yml; then
+    sudo sed -i 's#^listenGrpcMultiaddr:.*$#listenGrpcMultiaddr: /ip4/127.0.0.1/tcp/8337#' .config/config.yml || { echo "Failed to enable gRPC! Exiting..."; exit 1; }
+else
+    echo "gRPC already enabled."
+fi
 
 # Step 2: Enable Stats Collection
 echo "Enabling Stats Collection..."
-sudo sed -i '/^ *engine:/a\  statsMultiaddr: "/dns/stats.quilibrium.com/tcp/443"' .config/config.yml || { echo "Failed to enable Stats Collection! Exiting..."; exit 1; }
+if ! line_exists "statsMultiaddr: \"/dns/stats.quilibrium.com/tcp/443\"" .config/config.yml; then
+    sudo sed -i '/^ *engine:/a\ statsMultiaddr: "/dns/stats.quilibrium.com/tcp/443"' .config/config.yml || { echo "Failed to enable Stats Collection! Exiting..."; exit 1; }
+else
+    echo "Stats Collection already enabled."
+fi
 
 # Step 3: Configure Firewall
 echo "Configuring firewall..."
 echo "y" | sudo ufw enable || { echo "Failed to enable firewall! Exiting..."; exit 1; }
-sudo ufw allow 22
-sudo ufw allow 8336
-sudo ufw allow 443
+
+for port in 22 8336 443; do
+    if ! ufw_rule_exists "${port}"; then
+        sudo ufw allow "${port}" || { echo "Error: Failed to allow port ${port}!" >&2; exit 1; }
+    fi
+done
+
 sudo ufw status
 
 # Message at the end
