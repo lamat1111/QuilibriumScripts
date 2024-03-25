@@ -141,7 +141,7 @@ If you need to migrate the node elsewhere, after installing the node from scratc
 <details>
 <summary>Check node info</summary>
 Run this command from your root folder to check the node info (Node version, Peer ID, Quil balance).<br>
-To go to the root folder just typoe `cd`.
+To go to the root folder just type  `cd`.
  
   ```
 cd /root/ceremonyclient/node && GOEXPERIMENT=arenas go run ./... -node-info
