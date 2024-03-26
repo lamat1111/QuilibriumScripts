@@ -2,6 +2,7 @@
 
 
 
+
 ## This is a script to auto-install your Quilibrium node in the easiest way. 
 
 **&#x2661; Want to say thank you?**
@@ -219,9 +220,13 @@ The command will move your keys.yml and config.yml to new server. For this to wo
 
 ## Troubleshooting
 <details>
+<summary>Panic: resource temporarily unavailable</summary>
+This error means you have an already running instance of the node. Follow the step below to kill all nodes and restart just one instance.
+</details>
+<details>
 <summary>How to kill and restart the node</summary>
 Sometimes you may need to kill and restart the node. For instance if you made the mistake of starting 2 separate instances of the node.<br>
-You may also verify this by running the coomand `htop`. It will list all your runnig processes.
+You may also verify this by running the command <code>ps -ef</code> . It will list all your running processes, look for ".../exe/node". There should be only one.
 
 <br><br>
 Go to your root folder
