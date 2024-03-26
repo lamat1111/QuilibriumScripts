@@ -17,10 +17,10 @@ Apart from using my referral links below for Cherryservers, you can buy me a cup
 - [Best Server to Run a Quilibrium Node](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#best-server-to-run-a-quilibrium-node)
 - [Node auto-installer: how to use the script](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#node-auto-installer-how-to-use-the-script)
 - [Backup Your keys.yml and config.yml Files](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#backup-your-keysyml-and-configyml-files)
+- [Setup the Firewall and gRPC Calls](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#setup-the-firewall-and-grpc-calls)
 - [Tools and resources](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#tools-and-resources)
 - [Useful Server Commands](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#useful-server-commands)
 - [Migrate Node to a New Server](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#migrate-node-to-a-new-server)
-- [Setup the Firewall and gRPC Calls](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#setup-the-firewall-and-grpc-calls)
 - [Troubleshooting](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#troubleshooting)
 
 
@@ -130,6 +130,12 @@ Is a good idea to put them in an encrypted folder using a free tool such as [Enc
 
 If you need to migrate the node elsewhere, after installing the node from scratch you just need to put these 2 files in the `root/ceremonyclient/node/.config`  folder (changing the ones automatically created by the node). Here is a [quick way to do this](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#migrate-node-to-a-new-server).
 
+## Setup the Firewall and gRPC calls
+After tour node has been running for 30 minutes, run the below script to setup the Firewall and gRPC calls automatically. You need to install the node first and let it run for 5 minutes in order to generat its .config folder.
+```bash
+wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/installer-gRPC-and-firewall | bash
+```
+
 ------
 ------
 ------
@@ -210,11 +216,6 @@ ATTENTION: The command will ovewrite any existing keys.yml and config.yml files 
 The command will move your keys.yml and config.yml to new server. For this to work the node must already be installed in the new server and the .config folder be generated.
 </blockquote>
 
-## Setup the Firewall and gRPC calls
-After tour node has been running for 30 minutes, run the below script to setup the Firewall and gRPC calls automatically. You need to install the node first and let it run for 5 minutes in order to generat its .config folder.
-```bash
-wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/installer-gRPC-and-firewall | bash
-```
 ## Troubleshooting
 <details>
 <summary>How to kill and restart the node</summary>
