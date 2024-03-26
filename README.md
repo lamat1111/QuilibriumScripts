@@ -101,25 +101,28 @@ To reattach to the tmux session and see your node log, just use `tmux a -t quil`
 </blockquote>
 
 ### Step 7
-You are done! Now you can safely logout from your server and the node will keep running in its persistent shell.
+**You are done!** Now you can safely logout from your server and the node will keep running in its persistent shell.
 </br>
 </br>
 If you want to see you node log you can reattach to the tmux session with `tmux a -t quil`
 
-Once you are in the tmux session a green bar will appear at the bottom of the screen, to detach from tmux press CTRL+B then D.
-
+Once you are in the tmux session a green bar will appear at the bottom of the screen, to detach from tmux press CTRL+B then D.<br>
 It will usually take 15-30 minutes before you will begin to see new log entries in the node log.
 
 The poor_mans_cd is a script used to run the node, it will also restart it if it gets killed and will auto-update it when there is a new version available.
 
+### Step 8
+Let you node run for at least 30 minutes, then proceed to [backup your your keys.yml and config.yml files](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#backup-your-keysyml-and-configyml-files), and [setup your gRPC calls](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#setup-the-firewall-and-grpc-calls)
+
 ### Check node info
-Run this command from your root folder to check the node info (Node version, Peer ID, Quil balance)
+After you node has been running for at least 30 minutes, run this command from your root folder to check the node info (Node version, Peer ID, Quil balance).<br>
+For this to work you need to [setup the gRPC calls](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#setup-the-firewall-and-grpc-calls) first.
   ```
 cd /root/ceremonyclient/node && GOEXPERIMENT=arenas go run ./... -node-info
   ```
 
 ## Backup your keys.yml and config.yml files
-After 15-30 minutes that then node has been running, it should have generated your keys and config files correctly.
+After 30 minutes that then node has been running, it should have generated your keys and config files correctly.
 Use [WinSCP](https://winscp.net/eng/index.php) to navigate to the `root/ceremonyclient/node/.config`  folder. You may have to enable visibility for hidden files in WinSCP if you don't see the .config folder. Select Options, Preferences from the main menu, then the Panels tab, and check the option to Show hidden files (Ctrl+Alt+H).
 
 Download locally your `keys.yml` and `config.yml` files. Keep them safe and do not share them with anyone!
@@ -208,7 +211,7 @@ The command will move your keys.yml and config.yml to new server. For this to wo
 </blockquote>
 
 ## Setup the Firewall and gRPC calls
-Run the below script to setup the Firewall and gRPC calls automatically. You need to install the node first and let it run for 5 minutes in order to generat its .config folder.
+After tour node has been running for 30 minutes, run the below script to setup the Firewall and gRPC calls automatically. You need to install the node first and let it run for 5 minutes in order to generat its .config folder.
 ```bash
 wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/installer-gRPC-and-firewall | bash
 ```
