@@ -149,8 +149,9 @@ wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-insta
 
 <details>
 <summary>Check node info</summary>
-Run this command from your root folder to check the node info (Node version, Peer ID, Quil balance).<br>
-To go to the root folder just type  `cd`.
+After you node has been running for at least 30 minutes, run this command from your root folder to check the node info (Node version, Peer ID, Quil balance).<br>
+For this to work you need to [setup the gRPC calls](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#setup-the-firewall-and-grpc-calls) first.<br>
+To go to the root folder just type cd .
  
   ```
 cd /root/ceremonyclient/node && GOEXPERIMENT=arenas go run ./... -node-info
