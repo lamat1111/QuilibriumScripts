@@ -161,7 +161,21 @@ cd /root/ceremonyclient/node && GOEXPERIMENT=arenas go run ./... -node-info
   ```
 </details>
 <br>
-
+<details>
+<summary>Check node version</summary>
+If the "Check node info" command above do not work, you can check the node version by running:
+ 
+  ```
+cat ~/ceremonyclient/node/config/version.go | grep -A 1 'func GetVersion() \[\]byte {' | grep -Eo '0x[0-9a-fA-F]+' | xargs printf '%d.%d.%d'
+  ```
+</details>
+<summary>Check node peer ID</summary>
+If the "Check node info" command above do not work, you can check the node peer ID by running:
+ 
+  ```
+cd ~/ceremonyclient/node && GOEXPERIMENT=arenas go run ./... -peer-id
+  ```
+</details>
 <details>
 <summary>Attach to existing tmux session</summary>
  
