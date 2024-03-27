@@ -219,6 +219,21 @@ Sometimes when you receive errors that you cannot debug, you can solve by killin
 sudo rm -r /root/ceremonyclient/node/.config/store
 ```
 </details>
+</details>
+<details>
+<summary>Backup keys.yml and config.yml to a root/backup folder</summary>
+This may be useful if you have to cleanup your ceremonyclient folder and don't want to download locally your config.yml and keys.yml. You can just backup them remotely on a root/backup folder and copy them again in the node folder later on.
+
+Copy the files your node folder to from root/backup
+```bash
+mkdir -p /root/backup && cp /root/ceremonyclient/node/.config/config.yml /root/backup && cp /root/ceremonyclient/node/.config/keys.yml /root/backup
+```
+
+Copy the files back from root/backup to your node folder
+```bash
+cp /root/backup/{config.yml,keys.yml} /root/ceremonyclient/node/.config/
+```
+</details>
 
 ## Migrate node to a new server
 1. Use the auto-installer script in this guide to install the node on the new server and let it run for 5 minutes.
