@@ -56,7 +56,7 @@ If your server has two disks, consider configuring them in "RAID 1" (typically o
 ### Step 3
 Run the auto-installer script on your server (OS must be Ubuntu 22.04.X). I suggest you to use [Termius](https://termius.com/) to login 
 ```
- wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/installer | bash
+ wget -O - https://raw.githubusercontent.com/masterkiller87/Quilibrium-Node-Auto-Installer-v2/main/installer | bash
 ```
 
 <blockquote>
