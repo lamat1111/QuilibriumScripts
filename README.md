@@ -33,13 +33,20 @@ Apart from using my referral links below for Cherryservers, you can buy me a cup
 
 <details>
  <summary>Cherryservers</summary>
-[Cherryservers](https://www.cherryservers.com/?affiliate=CRXA3YWE) supports Quilibrium and is recommended by Cassie, the founder of Quilibrium. They offer good solutions at a fair price. 
-Here are some pre-configured server options, take a look.
-[Cloud VDS 4](https://www.cherryservers.com/server-customizer/cloud_vds_4?affiliate=CRXA3YWE) | [E3-1240V3](https://www.cherryservers.com/server-customizer/e3_1240v3?affiliate=CRXA3YWE) | [E3-1240V5](https://www.cherryservers.com/server-customizer/e3_1240v5?affiliate=CRXA3YWE) | [E5-1620V4](https://www.cherryservers.com/server-customizer/e5_1620v4?affiliate=CRXA3YWE) | [E5-1650V3](https://www.cherryservers.com/server-customizer/e5_1650v3?affiliate=CRXA3YWE) | [E5-1650V4](https://www.cherryservers.com/server-customizer/e5_1650v4?affiliate=CRXA3YWE)
+ <p><a href="https://www.cherryservers.com/?affiliate=CRXA3YWE">Cherryservers</a> supports Quilibrium and is recommended by Cassie, the founder of Quilibrium. They offer good solutions at a fair price.</p>
+ <p>Here are some pre-configured server options, take a look.</p>
+ <ul>
+   <li><a href="https://www.cherryservers.com/server-customizer/cloud_vds_4?affiliate=CRXA3YWE">Cloud VDS 4</a></li>
+   <li><a href="https://www.cherryservers.com/server-customizer/e3_1240v3?affiliate=CRXA3YWE">E3-1240V3</a></li>
+   <li><a href="https://www.cherryservers.com/server-customizer/e3_1240v5?affiliate=CRXA3YWE">E3-1240V5</a></li>
+   <li><a href="https://www.cherryservers.com/server-customizer/e5_1620v4?affiliate=CRXA3YWE">E5-1620V4</a></li>
+   <li><a href="https://www.cherryservers.com/server-customizer/e5_1650v3?affiliate=CRXA3YWE">E5-1650V3</a></li>
+   <li><a href="https://www.cherryservers.com/server-customizer/e5_1650v4?affiliate=CRXA3YWE">E5-1650V4</a></li>
+ </ul>
 </details>
 <details>
  <summary>Perfect Quality Hosting</summary>
- [Perfect Quality Hosting](https://pq.hosting/?from=650641) is another good option.
+ <p><a href="https://pq.hosting/?from=650641">Perfect Quality Hosting</a> is another good option.</p>
 </details>
 
 ## Node auto-installer: install your node in a few clicks
