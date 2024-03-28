@@ -15,56 +15,52 @@ echo "Installing required packages..."
 sudo apt-get install git wget tmux tar -y || { echo "Failed to install required packages! Exiting..."; exit 1; }
 
 # Step 3: Download and extract Go
-if [[ $(go version) == *"go1.20.1"[1-4]* ]]; then
+GO_VERSION="1.20.14"
+GO_ARCH="amd64"
+if [ "$(go version 2>/dev/null | awk '{print $3}' | cut -d'.' -f1-2)" == "go$GO_VERSION" ]; then
   echo "Correct version of Go is already installed, moving on..."
 else
   echo "Installing the necessary version of Go..."
-  wget https://go.dev/dl/go1.20.14.linux-amd64.tar.gz || { echo "Failed to download Go! Exiting..."; exit 1; }
-  sudo tar -C /usr/local -xzf go1.20.14.linux-amd64.tar.gz || { echo "Failed to extract Go! Exiting..."; exit 1; }
-  sudo rm go1.20.14.linux-amd64.tar.gz || { echo "Failed to remove downloaded archive! Exiting..."; exit 1; }
+  GO_PACKAGE="go${GO_VERSION}.linux-${GO_ARCH}.tar.gz"
+  wget "https://go.dev/dl/${GO_PACKAGE}" || { echo "Failed to download Go! Exiting..."; exit 1; }
+  sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf "${GO_PACKAGE}" || { echo "Failed to extract Go! Exiting..."; exit 1; }
+  sudo rm "${GO_PACKAGE}" || { echo "Failed to remove downloaded archive! Exiting..."; exit 1; }
 fi
 
 # Step 4: Set Go environment variables
-echo "Setting Go environment variables..."
-echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
-echo 'export GOPATH=$HOME/go' >> ~/.bashrc
-source ~/.bashrc
-sleep 1  # Add a 1-second delay
+if ! grep -q "GOPATH=" ~/.bashrc; then
+  echo "Setting Go environment variables..."
+  echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
+  echo 'export GOPATH=$HOME/go' >> ~/.bashrc
+  source ~/.bashrc
+  sleep 1  # Add a 1-second delay
+fi
 
 # Step 5: Create swap space
 if ! [ "$(sudo swapon -s)" ]; then
   echo "Creating swap space..."
-  sudo mkdir /swap && sudo fallocate -l 24G /swap/swapfile && sudo chmod 600 /swap/swapfile || { echo "Failed to create swap space! Exiting..."; exit 1; }
+  sudo mkdir -p /swap && sudo fallocate -l 24G /swap/swapfile && sudo chmod 600 /swap/swapfile || { echo "Failed to create swap space! Exiting..."; exit 1; }
   sudo mkswap /swap/swapfile && sudo swapon /swap/swapfile || { echo "Failed to set up swap space! Exiting..."; exit 1; }
-  sudo bash -c 'echo "/swap/swapfile swap swap defaults 0 0" >> /etc/fstab' || { echo "Failed to update /etc/fstab! Exiting..."; exit 1; }
+  echo "/swap/swapfile swap swap defaults 0 0" | sudo tee -a /etc/fstab > /dev/null || { echo "Failed to update /etc/fstab! Exiting..."; exit 1; }
 fi
 
 # Step 6: Adjust network buffer sizes
 echo "Adjusting network buffer sizes..."
-if [[ $(grep ^"net.core.rmem_max=600000000"$ /etc/sysctl.conf) ]]; then
-  echo "\net.core.rmem_max=600000000\" found inside /etc/sysctl.conf, skipping..."
-else
-  echo -e "\n# Change made to increase buffer sizes for better network performance for ceremonyclient\nnet.core.rmem_max=600000000" | sudo tee -a /etc/sysctl.conf > /dev/null
-fi
-if [[ $(grep ^"net.core.wmem_max=600000000"$ /etc/sysctl.conf) ]]; then
-  echo "\net.core.wmem_max=600000000\" found inside /etc/sysctl.conf, skipping..."
-else
-  echo -e "\n# Change made to increase buffer sizes for better network performance for ceremonyclient\nnet.core.wmem_max=600000000" | sudo tee -a /etc/sysctl.conf > /dev/null
-fi
-sudo sysctl -p
+sudo sysctl -w net.core.rmem_max=600000000 || { echo "Failed to set rmem_max! Exiting..."; exit 1; }
+sudo sysctl -w net.core.wmem_max=600000000 || { echo "Failed to set wmem_max! Exiting..."; exit 1; }
 
 # Step 7: Install the node from the Github repo
 cd ~/ || { echo "Failed to change directory to $HOME! Exiting..."; exit 1; }
-if [[ -d "ceremonyclient" ]]; then
-  echo "ceremonyclient directory already exists. I don't want to overwrite your ceremonyclient, so I will skip the install..."
-else
-  echo "Downloading the node software..."
-  git clone https://github.com/QuilibriumNetwork/ceremonyclient.git || { echo "Failed to clone the repository! Exiting..."; exit 1; }
-  cd ceremonyclient/node
+if [ -d "ceremonyclient" ]; then
+  echo "Removing old ceremonyclient directory..."
+  rm -rf ceremonyclient || { echo "Failed to remove old ceremonyclient directory! Exiting..."; exit 1; }
 fi
+echo "Downloading the node software..."
+git clone https://github.com/QuilibriumNetwork/ceremonyclient.git || { echo "Failed to clone the repository! Exiting..."; exit 1; }
+cd ceremonyclient/node || { echo "Failed to change directory to ceremonyclient/node! Exiting..."; exit 1; }
 
 # Step 8: Letting the node run for 5 minutes
-echo "Running the node run for 5 minutes..."
+echo "Running the node for 5 minutes..."
 GOEXPERIMENT=arenas go run ./... > /dev/null 2>&1 &  # Redirect output to /dev/null
 countdown() {
     secs=$1         # Assign the input argument (180) to the variable 'secs'
@@ -76,10 +72,12 @@ countdown() {
     printf "\nDone!\n" # After the countdown completes, print "Done!" on a new line
 }
 countdown 300 || { echo "Failed to wait! Exiting..."; exit 1; }
+sudo killall go || true  # Kill the running node process
 
 # Step 9: Prompt for reboot
 echo "Node setup is finished."
 echo "Type 'sudo reboot' and press Enter to reboot your server."
 echo "When you have logged back in, run 'cd ~/ceremonyclient/node/', open a new tmux session with 'tmux new-session -s \"ceremonyclient\"' and run 'bash poor_mans_cd.sh'."
+echo "poor_mans_cd.sh is a script that runs the node in a continuous loop, automatically restarting it if it crashes."
 echo "Then detach from the tmux session without ceasing it by pressing Ctrl-B and then pressing D."
 echo "Remember to make backup copies of the keys folder ~/ceremonyclient/keys, and the ~/ceremonyclient/.config folder."
