@@ -123,6 +123,7 @@ For this to work you need to [setup the gRPC calls](https://github.com/lamat1111
   ```
 cd /root/ceremonyclient/node && GOEXPERIMENT=arenas go run ./... -node-info
   ```
+*If the above command does not work, or you have not set the gRPC calls, there are alternative commands to check you PeerID and node version, just look in [Useful Server Commands](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#useful-server-commands)*
 
 ## Backup your keys.yml and config.yml files
 After 30 minutes that then node has been running, it should have generated your keys and config files correctly.
