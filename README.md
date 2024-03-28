@@ -241,12 +241,12 @@ sudo rm -r /root/ceremonyclient/node/.config/store
 <summary>Backup keys.yml and config.yml to a root/backup folder</summary>
 This may be useful if you have to cleanup your ceremonyclient folder and don't want to download locally your config.yml and keys.yml. You can just backup them remotely on a root/backup folder and copy them again in the node folder later on.
 
-Copy the files your node folder to from root/backup
+Copy the files from your node folder to the root/backup folder
 ```bash
 mkdir -p /root/backup && cp /root/ceremonyclient/node/.config/config.yml /root/backup && cp /root/ceremonyclient/node/.config/keys.yml /root/backup
 ```
 
-Copy the files back from root/backup to your node folder
+Copy the files back from root/backup to your node folder (a copy will also remain in the root/backup folder)
 ```bash
 cp /root/backup/{config.yml,keys.yml} /root/ceremonyclient/node/.config/
 ```
