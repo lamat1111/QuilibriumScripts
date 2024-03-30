@@ -151,6 +151,21 @@ After your node has been running for 30 minutes, run the below script to setup t
 ```bash
 wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/installer-gRPC-calls | bash
 ```
+<blockquote>
+Some users have reported errors after running the above script. To be safe you can also update your config.yml manually to enable the gRPC calls.
+
+<details>
+ <summary>How to enable gRPC calls manually</summary>
+1. Open the file root/ceremonyclient/node/.config/config.yml on your local pc using WinSCP<br>
+ 
+2. Find <code>listenGrpcMultiaddr: “”</code> (end of the file) and replace it with  <code>listenGrpcMultiaddr: /ip4/127.0.0.1/tcp/8337</code><br>
+
+3. Find <code>engine:  </code>(about the middle of the file) and paste<code>  statsMultiaddr: "dns/stats.quilibrium.com/tcp/443"</code> right below it, with two empty spaces before the line<br>
+
+4. Save the file
+</details>
+ </blockquote>
+
 Now run the below script to setup the Firewall.
 ```bash
 wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/installer-firewall | bash
