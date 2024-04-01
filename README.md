@@ -10,7 +10,7 @@
 
 **&#x2661; Want to say thank you?**
 
-Apart from using my referral links below for Cherryservers, you can buy me a cup of something with a small donation, here is my ERC-20 address
+Apart from using my referral links below for Cherryservers and other providers, you can buy me a cup of something with a small donation, here is my ERC-20 address
 ```
 0x0fd383A1cfbcf4d1F493Dd71b798ebca89e8a013
 ```
