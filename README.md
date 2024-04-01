@@ -59,7 +59,7 @@ Apart from using my referral links below for Cherryservers and other providers, 
 Also refer to the [Quilibrium official docs](https://quilibrium.com/docs/noderunning).<br>
 If you can afford better specs than the minimum, your node will earn more rewards.
 
-VDS (Virtual Dedicated Servers) and Bare Metal (Physical dedicated Servers) are your best choiche. Using a VPS (Virtual Private Server) may give you issues as often the providers oversell the resources. The community had a really bad experience with both Contabo and Hostinger for instance.<br>
+VDS (Virtual Dedicated Servers) and Bare Metal (Physical dedicated Servers) are your best choiche. Using a VPS (Virtual Private Server) may give you issues as often the providers oversell the resources. The community had a really bad experience with Contabo for instance.<br>
 That being said, after 1.5 is out a VPS or a home machine may work just fine.
 ### Step 2
 **Install the OS Ubuntu 22.04.X.**<br>
