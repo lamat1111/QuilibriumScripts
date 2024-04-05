@@ -37,6 +37,10 @@ Here are some pre-configured server options: <a href="https://www.cherryservers.
 - **<a href="https://pq.hosting/?from=650641" target="_blank">Perfect Quality Hosting</a>**
 - **<a href="https://my.bluevps.com/aff.php?aff=713" target="_blank">Blue VPS</a>**
 
+**Some cheaper alternatives**
+*only use these VPS after Quilibrium version 1.5 to avoid issues*
+- **<a href="https://www.hostinger.com/?REFERRALCODE=1NICCOL65" target="_blank">Hostinger</a>**
+
 ## Node auto-installer: install your node in a few clicks
 
 *If you are reinstalling your existing node, be sure to backup your keys.yml and config.yml files, they are in the root/ceremonyclient/node/.config folder. [How do I do this?](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#backup-your-keysyml-and-configyml-files)*
