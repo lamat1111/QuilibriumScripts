@@ -247,7 +247,7 @@ Sometimes when you receive errors that you cannot debug, you can solve by killin
 sudo rm -r /root/ceremonyclient/node/.config/store
 ```
 </details>
-</details>
+
 <details>
 <summary>Backup keys.yml and config.yml to a root/backup folder</summary>
 This may be useful if you have to cleanup your ceremonyclient folder and don't want to download locally your config.yml and keys.yml. You can just backup them remotely on a root/backup folder and copy them again in the node folder later on.
@@ -260,6 +260,20 @@ mkdir -p /root/backup && cp /root/ceremonyclient/node/.config/config.yml /root/b
 Copy the files back from root/backup to your node folder (a copy will also remain in the root/backup folder)
 ```bash
 cp /root/backup/{config.yml,keys.yml} /root/ceremonyclient/node/.config/
+```
+</details>
+
+<details>
+<summary>Check total nodes connected to the network</summary>
+Install grpcURL
+ 
+```bash
+go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest
+```
+
+Run
+ ```bash
+/root/go/bin/grpcurl -plaintext -max-msg-sz 5000000 localhost:8337 quilibrium.node.node.pb.NodeService.GetPeerInfo | grep peerId | wc -l
 ```
 </details>
 
