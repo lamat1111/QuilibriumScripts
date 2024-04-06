@@ -77,7 +77,7 @@ Run the auto-installer script on your server (OS must be Ubuntu 22.04.X). I sugg
 </blockquote>
 
 ### Step 4
-After installing the node and making some necessary edits, the script will run your node for 5 minutes and then you will be prompted to reboot the system, type "Y" and reboot.
+After installing the node and making some necessary edits, the script will run your node for 10 minutes and then you will be prompted to reboot the system, type "Y" and reboot.
 ### Step 5
 Wait 3 minutes, then login again in your server.
 ### Step 6
@@ -88,7 +88,7 @@ Run the command below. This will go to the node folder, create a persistent shel
   ```
   <blockquote>
   <details>
-   <summary>Alternatve: step by step commands</summary>
+   <summary>Alternative: step by step commands</summary>
    You can also run these command one after the other if you prefer.
   
    ```
