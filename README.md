@@ -264,7 +264,7 @@ cp /root/backup/{config.yml,keys.yml} /root/ceremonyclient/node/.config/
 </details>
 
 ## Migrate node to a new server
-1. *OPTIONAL if you already have installed the node*. Use the auto-installer script in this guide to install the node on the new server and let it run for 5 minutes, then stop it with CTRL+C
+1. Use the auto-installer script in this guide to install the node on the new server and let it run for 10 minutes (or for the time necessary for the root/ceremonyclient/node/.config folder to appear) then stop it with CTRL+C . *This step is clearly optional if you have already installed the node*. 
 2. Grab your new server IP and password.
 3. Login to the old server and run this command.
 *Change <NEW_SERVER_IP> with your new server IP and enter the new server password when requested.*
