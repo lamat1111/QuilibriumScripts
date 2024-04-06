@@ -360,3 +360,11 @@ At this point use a tool such as Diffinity - https://truehumandesign.se/s_diffin
 
 The encryption keys will be different of course, and you may have some more lines in the "bootstrapPeers" section of one of the files, but you should easily see the lines you have added or if there is any typing error in the file you edited.
 </details>
+<details>
+<summary>Frame number: 0</summary>
+If you see *Frame number:0* in your node log for a long time, one way to debug is to check if access to the network is healthy and that port 8336 is accessible remotely.<br>
+1. From your local PC or a system other than the node:<br>
+2. Make sure you have netcat installed: <code>sudo apt install netcat</code><br>
+3. Confirm reachability of bootstrap: <code>nc -vzu YOUR_SERVER_IP 8336</code><br>
+<i>Replace YOUR_SERVER_IP with your node's IP*</i>
+</details>
