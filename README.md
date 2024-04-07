@@ -176,7 +176,15 @@ Some users have reported errors after running the above script. To be safe you c
 ## Tools and resources
  - To manage your nodes use [Termius](https://termius.com/), the coolest SSH client and terminal around :) 
  - To track your server uptime and  resources usage use [Hetrixtools.com](https://hetrixtools.com/), you can track up to 15 servers for free and the setup is very easy
- - If you need help come to the [Quilibrium Community Discord](https://discord.gg/quilibrium)
+ - If you need help come to the [Quilibrium Community Discord](https://discord.gg/quilibrium) or the [Quilibrium Telegram group](https://t.me/quilibrium).
+
+#### Quilibrium official stuff
+
+ - [Website](https://quilibrium.com/) and [Whitepaper](https://quilibrium.com/quilibrium.pdf)
+ - [Quilibrium channel on Warpcast](https://warpcast.com/~/channel/quilibrium)
+ - [Quilibrium "builders" channel on Warpcast](https://warpcast.com/~/channel/q-builders)
+ - [Quilibrium blog](https://paragraph.xyz/@quilibrium.com)
+ - [Founder blog](https://cassieheart.substack.com/)
 
 ## Useful server commands
 
