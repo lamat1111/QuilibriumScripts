@@ -109,16 +109,18 @@ To restart the node, from inside tmux run <code>./poor_mans_cd.sh</code>
 </details>
 </blockquote>
 
+*The poor_mans_cd is a script used to run the node. It will also restart it, if it gets killed and will auto-update it when there is a new version available.*
+
 ### Step 7
 **You are done!** Now you can safely logout from your server and the node will keep running in its persistent shell.
-</br>
-</br>
-If you want to see you node log you can reattach to the tmux session with `tmux a -t quil`
-
+</br><br>
+If you want to see you node log you can reattach to the tmux session with <code>tmux a -t quil</code><br>
 Once you are in the tmux session a green bar will appear at the bottom of the screen, to detach from tmux press CTRL+B then D.<br>
-It will usually take 15-30 minutes before you will begin to see new log entries in the node log.
+It will usually takes 15-30 minutes before you will begin to see new log entries in the node log.<br><br>
 
-The poor_mans_cd is a script used to run the node, it will also restart it if it gets killed and will auto-update it when there is a new version available.
+> [!NOTE]
+> If you inspect the node log you will usually see "0 frames" for up to 48 hours before the node is fully synced with the network. After a while you will see the "master_frame_head" value increase, while the "current_head_frame" stays to 0. This is normal until your "master_frame_head" reaches the latest frame in the network. If you suspect that your node is not connecting to the network check the server bandwidth with <code>speedtest-cli</code> and check the [Troubleshooting](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#troubleshooting) section wheer it says "frame 0".
+
 
 ### Step 8
 Let you node run for at least 30 minutes, then proceed to [backup your your keys.yml and config.yml files](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#backup-your-keysyml-and-configyml-files), and [setup your gRPC calls](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#setup-the-firewall-and-grpc-calls)
