@@ -102,8 +102,10 @@ Run the command below. This will go to the node folder, create a persistent shel
   ```
   ./poor_mans_cd.sh
   ```
-To detach from tmux press CTRL+B then D. Now you can safely logout from your server and the node will keep running in its persistent shell.
-To reattach to the tmux session and see your node log, just use `tmux a -t quil`
+To detach from tmux press CTRL+B then D. Now you can safely logout from your server and the node will keep running in its persistent shell.<br>
+To reattach to the tmux session and see your node log, just use `tmux a -t quil`. You can recognize when you are inside your tmux session because there will be a green bar at the bottom of the screen.<br>
+To stop the node, from inside tmux click CTRL+C <br>
+To restart the node, from inside tmux run <code>./poor_mans_cd.sh</code>
 </details>
 </blockquote>
 
