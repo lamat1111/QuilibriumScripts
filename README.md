@@ -174,8 +174,8 @@ wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-insta
 
 ## Tools and resources
  - To manage your nodes use [Termius](https://termius.com/), the coolest SSH client and terminal around :) 
- - To track your server uptime and  resources usage use [Hetrixtools.com](https://hetrixtools.com/), you can track up to 15 servers for free and the setup is very easy
- - If you need help come to the [Quilibrium Community Discord](https://discord.gg/quilibrium) or the [Quilibrium Telegram group](https://t.me/quilibrium).
+ - To track your server uptime and  resources usage use [Hetrixtools.com](https://hetrix.tools/u-862828), you can track up to 15 servers for free and the setup is very easy
+ - If you need help come to the [Quilibrium Community Discord](https://discord.gg/quilibrium) or the [Quilibrium Telegram group](https://t.me/quilibrium)
 
 #### Quilibrium official stuff
 
