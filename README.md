@@ -236,8 +236,12 @@ You only have to run this command once. This will setup a cronjob that will crea
 Shoutout to Peter Jameson (Quilibrium Discord community creator) for the script.
  
 ```bash
-(crontab -l ; echo "@reboot sleep 10 && bash -lc \"tmux new-session -d -s quil\" && tmux send-keys -t quil \"cd ~/ceremonyclient/node\" Enter && tmux send-keys -t quil \"./poor_mans_cd.sh\" Enter") | crontab -
+echo '@reboot sleep 10 && bash -lc "export PATH=$PATH:/usr/local/go/bin && cd ~/ceremonyclient/node && tmux new-session -d -s quil '\''./poor_mans_cd.sh'\''"' | crontab -
 ```
+
+If you need to delete the crontab:<br>
+Open the crontab file for editing with <code>crontab -e</code><br>
+Locate the line corresponding to the cron job you want to delete and delete it. Press CTRL+X, then Y to save, then ENTER
  </details>
 <details>
 <summary>Kill node process</summary>
