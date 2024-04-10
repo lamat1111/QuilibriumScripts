@@ -131,6 +131,10 @@ It will usually takes 15-30 minutes before you will begin to see new log entries
 ### Step 8
 Let you node run for at least 30 minutes, then proceed to [backup your your keys.yml and config.yml files](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#backup-your-keysyml-and-configyml-files), and [setup your gRPC calls](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#setup-the-firewall-and-grpc-calls)
 
+### Step 9
+This is optional, but recommended! Setup SSH keys to connect to your server and disable the password connection. Here is a [guide to do this](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#set-ssh-keys-to-connect-to-your-server)<br>
+To enhance even more your server security, you may install and setup *Fail2ban*, here is [a guide](https://www.digitalocean.com/community/tutorials/how-to-protect-ssh-with-fail2ban-on-ubuntu-20-04).
+
 ### Check node info
 After you node has been running for at least 30 minutes, run this command from your root folder to check the node info (Node version, Peer ID, Quil balance).<br>
 For this to work you need to [setup the gRPC calls](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#setup-the-firewall-and-grpc-calls) first.<br> If you have enabled the gRPC calls but you still get an error, it usually just means that your node needs to run some more in order to correctly connect to the newtork. Retry later.
@@ -298,7 +302,7 @@ Run
 
 ## Migrate node to a new server
 > [!NOTE]
-> This guide will only work if you use username and password to access yuor target server (which is not the best for security). If you use an SSH key, you will need to follow a more advanced method.
+> This guide will only work if you use username and password to access yuor target server (which is not the best for security). If you use an SSH key, you will need to follow a more advanced method. Or you can simply setup an SSH key AFTER you have migrated the files to the target server.
 1. Use the auto-installer script in this guide to install the node on the new server and let it run for 10 minutes (or for the time necessary for the root/ceremonyclient/node/.config folder to appear) then stop it with CTRL+C . *This step is clearly optional if you have already installed the node*. 
 2. Grab your new server IP and password.
 3. Login to the old server and run this command.
