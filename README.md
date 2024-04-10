@@ -4,6 +4,7 @@
 
 
 
+
 ## This is a script to auto-install your Quilibrium node in the easiest way. 
 
 *This guide is unofficial and made just to support the project*
@@ -313,6 +314,25 @@ The command will move your keys.yml and config.yml to new server. For this to wo
 
 ### Manual method
 Alternatively you can migrate the files manually. If you already have a local backup of the config.yml and keys.yml files, you just need to upload them to your new server in the folder `root/ceremonyclient/node/.config` . You can use use [WinSCP](https://winscp.net/eng/index.php) to do this.
+
+## Set SSH keys to connect to your server
+
+Usually, when you rent a server, you are given a username and password to connect to it. However, this poses a security risk as hackers can attempt to guess your password using brute force attacks. To mitigate this risk, you can disable password access to your server and use SSH keys instead.
+
+Here is a [comprehensive guide](https://www.digitalocean.com/community/tutorials/how-to-set-up-ssh-keys-on-ubuntu-22-04) on how to set up SSH keys on your server.
+
+**Alternatively, you can use Termius, which offers a simpler method as outlined below:**
+
+1. Install [Termius](https://termius.com/) and follow [this guide](https://support.termius.com/hc/en-us/articles/4401872025113-Keychain) to generate an SSH key. Remember to securely store your key, either in an encrypted folder on your computer or on an encrypted USB drive.
+2. Through Termius, you can easily export the SSH key to your host and create an identity as explained in the guide.
+3. Test that you can successfully connect to the server using this SSH key.
+4. If you have multiple nodes or servers, you can use the same SSH key for all of them.
+5. Once logged into your server, run `sudo nano /etc/ssh/sshd_config`.
+6. Scroll down using the down arrow until you locate the line `# PasswordAuthentication yes`. Uncomment the line (remove #) and set it to `no`, like so: `PasswordAuthentication no`.
+7. To save the changes, press CTRL+X, then Y, then ENTER.
+8. Restart your SSH service by running `sudo systemctl restart ssh`.
+
+Now, you should only be able to access the server via SSH key, and password-based access will no longer work.
 
 ## Troubleshooting
 <details>
