@@ -139,7 +139,7 @@ cd /root/ceremonyclient/node && GOEXPERIMENT=arenas go run ./... -node-info
 
 ## Backup your keys.yml and config.yml files
 After 30 minutes that then node has been running, it should have generated your keys and config files correctly.
-Use [WinSCP](https://winscp.net/eng/index.php) to navigate to the `root/ceremonyclient/node/.config`  folder. You may have to enable visibility for hidden files in WinSCP if you don't see the .config folder. Select Options, Preferences from the main menu, then the Panels tab, and check the option to Show hidden files (Ctrl+Alt+H).
+Use [WinSCP](https://winscp.net/eng/index.php) or [Termius SFTP feature](https://support.termius.com/hc/en-us/articles/4402367330201-SFTP) to navigate to the `root/ceremonyclient/node/.config`  folder. You may have to enable visibility for hidden files in WinSCP if you don't see the .config folder. Select Options, Preferences from the main menu, then the Panels tab, and check the option to Show hidden files (Ctrl+Alt+H).
 
 Download locally your `keys.yml` and `config.yml` files. Keep them safe and do not share them with anyone!
 Is a good idea to put them in an encrypted folder using a free tool such as [Encrypto](https://macpaw.com/encrypto)
@@ -295,6 +295,8 @@ Run
 </details>
 
 ## Migrate node to a new server
+> [!NOTE]
+> This guide will only work if you use username and password to access yuor target server (which is not the best for security). If you use an SSH key, you will need to follow a more advanced method.
 1. Use the auto-installer script in this guide to install the node on the new server and let it run for 10 minutes (or for the time necessary for the root/ceremonyclient/node/.config folder to appear) then stop it with CTRL+C . *This step is clearly optional if you have already installed the node*. 
 2. Grab your new server IP and password.
 3. Login to the old server and run this command.
