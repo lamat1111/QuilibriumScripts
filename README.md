@@ -5,7 +5,7 @@
 
 
 
-## This is a script to auto-install your Quilibrium node in the easiest way. 
+# This is a script to auto-install your Quilibrium node in the easiest way. 
 
 *This guide is unofficial and made just to support the project*
 
@@ -47,11 +47,11 @@ Here are some pre-configured server options: <a href="https://www.cherryservers.
 *These providers either don't supoort Quilibrium, blockchain nodes in general, or have been reported giving issues to users running nodes.*
 <br>Contabo VPS (EU location) / Alpenhost VPS / Netcup VPS
 
-## Node auto-installer: install your node in a few clicks
+# Node auto-installer: install your node in a few clicks
 
 *If you are reinstalling your existing node, be sure to backup your keys.yml and config.yml files, they are in the root/ceremonyclient/node/.config folder. [How do I do this?](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#backup-your-keysyml-and-configyml-files)*
 
-### Step 1
+## Step 1
 **Rent a server with at least 8 cores (best 12), 16 GB RAM (best 32), 250 GB SSD space (best 500), and 400 Mbit/s symmetric bandwidth.**<br>
 *(After Quilibrium 1.5 min specs will be: 4 cores, 8 GB RAM, and 400 Mbit/s symmetric bandwidth. Outbound traffic after 1.5 should be up to 5 TB per month ((raw approximation)), depending on how you set the node)*<br>
 Also refer to the [Quilibrium official docs](https://quilibrium.com/docs/noderunning).<br>
@@ -59,11 +59,11 @@ If you can afford better specs than the minimum, your node will earn more reward
 
 VDS (Virtual Dedicated Servers) and Bare Metal (Physical dedicated Servers) are your best choiche. Using a VPS (Virtual Private Server) may give you issues as often the providers oversell the resources. The community had a really bad experience with Contabo for instance.<br>
 That being said, after 1.5 is out a VPS or a home machine may work just fine.
-### Step 2
+## Step 2
 **Install the OS Ubuntu 22.04.X.**<br>
 If your server has two disks, consider configuring them in "RAID 1" (typically offered by your provider). This setup mirrors one disk to the other, providing redundancy and safeguarding against data loss in case one disk fails.
 
-### Step 3
+## Step 3
 Run the auto-installer script on your server (OS must be Ubuntu 22.04.X). I suggest you to use [Termius](https://termius.com/) to login 
 ```
  wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/installer | bash
@@ -82,12 +82,14 @@ Run the auto-installer script on your server (OS must be Ubuntu 22.04.X). I sugg
 </details>
 </blockquote>
 
-### Step 4
+## Step 4
 After installing the node and making some necessary edits, the script will run your node for 10 minutes and then you will be prompted to reboot the system, type "Y" and reboot.
-### Step 5
+## Step 5
 Wait 3 minutes, then login again in your server.
-### Step 6
-Run the command below. This will go to the node folder, create a persistent shell (session), start the node via the *poor_mans_cd* script (more info about this script below) and detach from the session again. You won't see any output after running the command, but you can move to Step 7.
+## Step 6
+Run the command below. This will go to the node folder, create a persistent shell (session), start the node via the *poor_mans_cd* script (more info about this script below) and detach from the session again. You won't see any output after running the command, but you can move to Step 7. 
+
+
       
   ```
   cd ceremonyclient/node && tmux new-session -d -s quil './poor_mans_cd.sh'
@@ -117,7 +119,10 @@ To restart the node, from inside tmux run <code>./poor_mans_cd.sh</code>
 
 *The poor_mans_cd is a script used to run the node. It will also restart it, if it gets killed and will auto-update it when there is a new version available.*
 
-### Step 7
+>[!NOTE]
+>If you ever reboot your server, you will need to go through this step 6 again to start the node from scratch (to avoid this, in [Useful Server Commands](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#useful-server-commands) there is a command to setup an automation (AKA cronjob) that will start your node automatically after any server reboot :-)
+
+## Step 7
 **You are done!** Now you can safely logout from your server and the node will keep running in its persistent shell.
 </br><br>
 If you want to see you node log you can reattach to the tmux session with <code>tmux a -t quil</code><br>
@@ -128,10 +133,10 @@ It will usually takes 15-30 minutes before you will begin to see new log entries
 > If you inspect the node log you will usually see "0 frames" for up to 48 hours before the node is fully synced with the network. After a while you will see the "master_frame_head" value increase, while the "current_head_frame" stays to 0. This is normal until your "master_frame_head" reaches the latest frame in the network. If you suspect that your node is not connecting to the network check the server bandwidth with <code>speedtest-cli</code> and check the [Troubleshooting](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#troubleshooting) section wheer it says "frame 0".
 
 
-### Step 8
+## Step 8
 Let you node run for at least 30 minutes, then proceed to [backup your your keys.yml and config.yml files](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#backup-your-keysyml-and-configyml-files), and [setup your gRPC calls](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#setup-the-firewall-and-grpc-calls)
 
-### Step 9
+## Step 9
 This is optional, but recommended! Setup SSH keys to connect to your server and disable the password connection. Here is a [guide to do this](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#set-ssh-keys-to-connect-to-your-server)<br>
 To enhance even more your server security, you may install and setup *Fail2ban*, here is [a guide](https://www.digitalocean.com/community/tutorials/how-to-protect-ssh-with-fail2ban-on-ubuntu-20-04).
 
@@ -182,12 +187,12 @@ wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-insta
 ------
 ------
 
-## Tools and resources
+# Tools and resources
  - To manage your nodes use [Termius](https://termius.com/), the coolest SSH client and terminal around :) 
  - To track your server uptime and  resources usage use [Hetrixtools.com](https://hetrix.tools/u-862828), you can track up to 15 servers for free and the setup is very easy
  - If you need help come to the [Quilibrium Community Discord](https://discord.gg/quilibrium) or the [Quilibrium Telegram group](https://t.me/quilibrium)
 
-#### Quilibrium official stuff
+### Quilibrium official stuff
 
  - [Website](https://quilibrium.com/) and [Whitepaper](https://quilibrium.com/quilibrium.pdf)
  - [Quilibrium channel on Warpcast](https://warpcast.com/~/channel/quilibrium)
@@ -195,7 +200,7 @@ wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-insta
  - [Quilibrium blog](https://paragraph.xyz/@quilibrium.com)
  - [Founder blog](https://cassieheart.substack.com/)
 
-## Useful server commands
+# Useful server commands
 
 <details>
 <summary>Check node info</summary>
@@ -300,7 +305,7 @@ Run
 ```
 </details>
 
-## Migrate node to a new server
+# Migrate node to a new server
 > [!NOTE]
 > This guide will only work if you use username and password to access yuor target server (which is not the best for security). If you use an SSH key, you will need to follow a more advanced method. Or you can simply setup an SSH key AFTER you have migrated the files to the target server.
 1. Use the auto-installer script in this guide to install the node on the new server and let it run for 10 minutes (or for the time necessary for the root/ceremonyclient/node/.config folder to appear) then stop it with CTRL+C . *This step is clearly optional if you have already installed the node*. 
@@ -320,7 +325,7 @@ The command will move your keys.yml and config.yml to new server. For this to wo
 ### Manual method
 Alternatively you can migrate the files manually. If you already have a local backup of the config.yml and keys.yml files, you just need to upload them to your new server in the folder `root/ceremonyclient/node/.config` . You can use use [WinSCP](https://winscp.net/eng/index.php) to do this.
 
-## Set SSH keys to connect to your server
+# Set SSH keys to connect to your server
 > [!NOTE]
 > Usually, when you rent a server, you are given a username and password to connect to it. However, this poses a security risk as hackers can attempt to guess your password using brute force attacks. To mitigate this risk, you can disable password access to your server and use SSH keys instead.
 
@@ -339,7 +344,7 @@ Here is a [comprehensive guide](https://www.digitalocean.com/community/tutorials
 
 Now, you should only be able to access the server via SSH key, and password-based access will no longer work.
 
-## Troubleshooting
+# Troubleshooting
 <details>
 <summary>Panic: resource temporarily unavailable</summary>
 This error means you have an already running instance of the node. Follow the step below to kill all nodes and restart just one instance.
