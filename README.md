@@ -387,8 +387,14 @@ sudo rm -rf /usr/local/go && sudo rm -rf /root/ceremonyclient
 ```
 </details>
 <details>
-<summary>Command GO not found</summary>
-If you see the error *Command GO not found*, then try to run this command.
+<summary>Command GO not found - add variables to your .bashrc</summary>
+If you see the error *Command GO not found*, then try to run this command. Thsi will add some variables to your .bashrc file
+
+```bash
+echo -e "\nexport PATH=\$PATH:/usr/local/go/bin\nexport GOPATH=\$HOME/go" >> ~/.bashrc
+```
+<br>
+Alternatively, you can temporarily add these variables using the command below. Please note that these changes will not persist after rebooting the server:
  
 ```bash
 export PATH=$PATH:/usr/local/go/bin:$HOME/go
