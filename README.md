@@ -44,9 +44,12 @@ Here are some pre-configured server options: <a href="https://www.cherryservers.
 *only use these VPS after Quilibrium version 1.5 to avoid issues*
 - **<a href="https://www.hostinger.com/?REFERRALCODE=1NICCOL65" target="_blank">Hostinger</a>**
 
-**Providers to avoid**<br>
-*These providers either don't supoort Quilibrium, blockchain nodes in general, or have been reported giving issues to users running nodes.*
-<br>Contabo VPS (EU location) / Alpenhost VPS / Netcup VPS
+>[!WARNING]
+> **Providers to avoid**<br>
+Contabo VPS (EU location) / Alpenhost VPS / Netcup VPS<br>
+*These providers either don't support Quilibrium, blockchain nodes in general, or have been reported giving issues to users running nodes.*
+
+
 
 # Node auto-installer: install your node in a few clicks
 
