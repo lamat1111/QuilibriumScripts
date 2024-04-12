@@ -31,4 +31,13 @@ else
     echo "Stats Collection already enabled."
 fi
 
+# Check if both lines were added successfully
+if line_exists "listenGrpcMultiaddr: /ip4/127.0.0.1/tcp/8337" .config/config.yml && line_exists "  statsMultiaddr: \"/dns/stats.quilibrium.com/tcp/443\"" .config/config.yml; then
+    echo "Success: The script successfully edited your config.yml file."
+else
+    echo "ERROR: The script failed to correctly edit your config.yml file."
+    echo "You may want to follow the online guide to do it manually."
+    exit 1
+fi
+
 echo "gRPC calls setup was successful."
