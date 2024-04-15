@@ -36,13 +36,17 @@ Apart from using my referral links below for Cherryservers and other providers, 
  - **<a href="https://www.cherryservers.com/?affiliate=CRXA3YWE" target="_blank">Cherryservers</a>**<br>
 They support Quilibrium and are recommended by Cassie, the founder of the project.<br>
 Here are some pre-configured server options: <a href="https://www.cherryservers.com/server-customizer/cloud_vds_4?affiliate=CRXA3YWE">Cloud VDS 4</a> / <a href="https://www.cherryservers.com/server-customizer/e3_1240v3?affiliate=CRXA3YWE">E3-1240V3</a> / <a href="https://www.cherryservers.com/server-customizer/e3_1240v5?affiliate=CRXA3YWE">E3-1240V5</a> / <a href="https://www.cherryservers.com/server-customizer/e5_1620v4?affiliate=CRXA3YWE">E5-1620V4</a> / <a href="https://www.cherryservers.com/server-customizer/e5_1650v3?affiliate=CRXA3YWE">E5-1650V3</a> / <a href="https://www.cherryservers.com/server-customizer/e5_1650v4?affiliate=CRXA3YWE">E5-1650V4</a>
+- **<a href="https://www.latitude.sh/r/FA9DEDA6" target="_blank">Latitude</a>**
 - **<a href="https://pq.hosting/?from=650641" target="_blank">Perfect Quality Hosting</a>**
 - **<a href="https://my.bluevps.com/aff.php?aff=713" target="_blank">Blue VPS</a>**
-- **<a href="https://www.latitude.sh/r/FA9DEDA6" target="_blank">Latitude</a>**
 
-**Some cheaper alternatives**<br>
-*only use these VPS after Quilibrium version 1.5 to avoid issues*
+
+### Some cheaper alternatives
+*Only use these VPS after Quilibrium version 1.5 to avoid issues*
+- **[Contabo (any location outside of EU) ](https://www.kqzyfj.com/click-101147005-15239531)**
 - **<a href="https://www.hostinger.com/?REFERRALCODE=1NICCOL65" target="_blank">Hostinger</a>**
+
+*Contabo and Hostinger got a lot of hate from the community (and for good reasons). These cheap VPS will never perform great, but they do work. After mainnet (1.5) the node resource consumption will be much lower, and you will be able to use these cheaper services without the risk of being throttled by the provider. On the other hand... lower specs nodes will also earn fewer rewards. Your choice!*
 
 >[!WARNING]
 > **Providers to avoid**<br>
