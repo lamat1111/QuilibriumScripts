@@ -217,7 +217,7 @@ For this to work you need to [setup the gRPC calls](https://github.com/lamat1111
 To go to the root folder just type cd .
  
   ```
-cd /root/ceremonyclient/node && GOEXPERIMENT=arenas go run ./... -node-info
+cd ~/ceremonyclient/node && GOEXPERIMENT=arenas go run ./... -node-info
   ```
 </details>
 <br>
@@ -235,6 +235,14 @@ If the "Check node info" command above do not work, you can check the node peer 
  
   ```
 cd ~/ceremonyclient/node && GOEXPERIMENT=arenas go run ./... -peer-id
+  ```
+</details>
+<details>
+<summary>Console</summary>
+Similar to "Node info", this will show basic info about your node.
+ 
+  ```
+cd ~/ceremonyclient/node && GOEXPERIMENT=arenas go run ./... --db-console
   ```
 </details>
 <details>
