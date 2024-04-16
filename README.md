@@ -188,8 +188,27 @@ wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-insta
 4. Save the file
 </details>
 
+## Install extra tools
 
+<details>
+<summary>vnstat - monitor bandwidth and data flow</summary>
+ 
+ ```bash
+sudo apt update && sudo apt install vnstat
+ ```
+To check the current bandwidth usage use <code>vnstat</code>. <br>
+To check hourly stats e use <code>vnstat -h</code>. <br>Daily: <code>vnstat -d</code>. Monthly: <code>vnstat -m</code>. Top 10 traffic days: <code>vnstat -t</code>. 
+</details>
 
+<details>
+<summary>speedtest - monitor bandwidth speed</summary>
+ 
+ ```bash
+sudo apt-get install curl
+curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | sudo bash
+sudo apt-get install speedtest
+ ```
+ </details>
 
 ------
 ------
