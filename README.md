@@ -210,6 +210,15 @@ sudo apt-get install speedtest
  ```
  </details>
 
+ <details>
+<summary>htop - monitor all processes and resources' consumption</summary>
+ 
+ ```bash
+sudo apt update && sudo apt install htop
+ ```
+To use it just type <code>htop</code>
+ </details>
+
 ------
 ------
 ------
