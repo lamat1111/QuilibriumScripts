@@ -26,8 +26,10 @@ fi
 
 # Step 4: Set Go environment variables
 echo "Setting Go environment variables..."
-echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
-echo 'export GOPATH=$HOME/go' >> ~/.bashrc
+echo 'export GOROOT=/usr/local/go' >> ~/.bashrc
+echo "export GOPATH=$HOME/go" >> ~/.bashrc
+echo 'export PATH=$GOPATH/bin:$GOROOT/bin:$PATH' >> ~/.bashrc
+echo 'export GOEXPERIMENT=arenas' >> ~/.bashrc
 source ~/.bashrc
 sleep 1  # Add a 1-second delay
 
