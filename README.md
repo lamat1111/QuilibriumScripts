@@ -27,6 +27,7 @@ Apart from using my referral links below for Cherryservers and other providers, 
 - [Setup the Firewall and gRPC Calls](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#setup-the-firewall-and-grpc-calls)
 - [Tools and resources](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#tools-and-resources)
 - [Useful Server Commands](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#useful-server-commands)
+- [Commands for token transfers](https://github.com/lamat1111/Quilibrium-Node-Auto-Installer/blob/main/tokens-cli-commands.md)
 - [Migrate Node to a New Server](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#migrate-node-to-a-new-server)
 - [Set SSH keys](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#set-ssh-keys-to-connect-to-your-server)
 - [Troubleshooting](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#troubleshooting)
@@ -239,6 +240,9 @@ To use it just type <code>htop</code>
  - [Founder blog](https://cassieheart.substack.com/)
 
 # Useful server commands
+
+>[!NOTE]
+> If you are looking for commands to transfer QUIL tokens, please [look here](https://github.com/lamat1111/Quilibrium-Node-Auto-Installer/blob/main/tokens-cli-commands.md)
 
 <details>
 <summary>Check node info</summary>
