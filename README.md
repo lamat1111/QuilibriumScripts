@@ -5,9 +5,10 @@
 
 
 
-# Quilibrium node auto-installer script + useful tools and info to manage your node.
+# Quilibrium node guide and auto-installer script
+## *This guide contains all the info you need to install and manage a Quilibrium node, plus a special script to install it ina few clicks*
 
-*This guide is unofficial and made just to support the project*
+*The script and the guide are unofficial and made just to support the project*
 
 **&#x2661; Want to say thank you?**
 
