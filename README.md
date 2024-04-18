@@ -5,7 +5,7 @@
 
 
 
-# This is a script to auto-install your Quilibrium node in the easiest way. 
+# Quilibrium node auto-installer script + useful tools and info to manage your node.
 
 *This guide is unofficial and made just to support the project*
 
