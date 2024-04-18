@@ -6,10 +6,11 @@
 
 
 # Quilibrium node guide and auto-installer script
-## *This guide contains all the info you need to install and manage a Quilibrium node, plus a special script to install it with a few clicks*
+### *This guide contains all the info you need to install and manage a Quilibrium node, plus a special script to install it with a few clicks*
 
-*The script and the guide are unofficial and made just to support the project*
+Created by **LaMAt** - connect with me on [Farcaster](https://warpcast.com/~/invite-page/373160?id=67559391) or [Twitter](https://twitter.com/LaMat1111)
 
+---
 **&#x2661; Want to say thank you?**
 
 Apart from using my referral links below for Cherryservers and other providers, you can buy me a cup of something with a small donation, here is my ERC-20 address
@@ -482,3 +483,7 @@ If you see *Frame number:0* in your node log for a long time, one way to debug i
 3. Confirm reachability of bootstrap: <code>nc -vzu YOUR_SERVER_IP 8336</code><br>
 <i>Replace YOUR_SERVER_IP with your node's IP*</i>
 </details>
+
+---
+
+*This guide and the script are unofficial and made just to support the project*
