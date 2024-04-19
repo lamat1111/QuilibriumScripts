@@ -1,4 +1,5 @@
 #!/bin/bash
+# This script is deprecated - do not run directly - only use for research
 
 # Step 0: Check sudo availability
 if ! [ -x "$(command -v sudo)" ]; then
