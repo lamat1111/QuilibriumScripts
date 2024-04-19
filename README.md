@@ -463,6 +463,16 @@ and finally try to run again the script
 ```bash
 ./poor_mans_cd.sh
 ```
+---
+The issue could also be caused by these variables having been added more than once. Open your <code>root/.bashrc</code> file with Termius SFTP or WinSCP and scroll down until you see
+```bash
+export GOROOT=/usr/local/go
+export GOPATH=$HOME/go
+export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
+export GOEXPERIMENT=arenas
+```
+If there are duplicates, delete them and save. If something is missing, you can add manually the missing lines and save.
+
 </details>
 
 <details>
