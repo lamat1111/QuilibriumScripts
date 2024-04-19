@@ -71,7 +71,7 @@ Run the auto-installer script on your server (OS must be Ubuntu 22.04.X). I sugg
 ```
  wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/installer | bash
 ```
-
+<!--
 <blockquote>
 <details>
  <summary>Auto-installer script for Almalinux 8 (untested)</summary>
@@ -84,6 +84,7 @@ Run the auto-installer script on your server (OS must be Ubuntu 22.04.X). I sugg
 
 </details>
 </blockquote>
+-->
 
 > [!NOTE]
 > If the script fails and stops, you can try to run it again (if you understand why it stopped, then try to solve the issue first, of course). If you still receive an error, you may want to proceed manually, step by step, instead of using the auto-installer. [Here is another guide](https://github.com/demipoet/quilibrium-guide) you can follow. It will run the node in a different way than mine, but it will still work.
