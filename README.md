@@ -58,10 +58,10 @@ Contabo VPS (EU location) / Alpenhost VPS / Netcup VPS<br>
 **Rent a server with at least 8 cores (best 12), 16 GB RAM (best 32), 250 GB SSD space (best 500), and 400 Mbit/s symmetric bandwidth.**<br>
 *(After Quilibrium 1.5 min specs will be: 4 cores, 8 GB RAM, and 400 Mbit/s symmetric bandwidth. Outbound traffic after 1.5 should be up to 5 TB per month ((raw approximation)), depending on how you set the node)*<br>
 Also refer to the [Quilibrium official docs](https://quilibrium.com/docs/noderunning).<br>
-If you can afford better specs than the minimum, your node will earn more rewards. The ratio for optimal rewards from 1.5 on theoretically will be 1:2:4 (core:ram in GB:disk in GB). Your bandwidth will also matter, and can set a ceiling for this optimum.<br>
+If you can afford better specs than the minimum, your node will earn more rewards. The ratio for optimal rewards from 1.5 on theoretically will be 1:2:4 (core:ram in GB:disk in GB). Your bandwidth will also matter.<br>
 
-VDS (Virtual Dedicated Servers) and Bare Metal (Physical dedicated Servers) are your best choiche. Using a VPS (Virtual Private Server) may give you issues as often the providers oversell the resources. The community had a really bad experience with Contabo for instance.<br>
-That being said, after 1.5 is out a VPS or a home machine may work just fine.
+VDS (Virtual Dedicated Servers) and Bare Metal (Physical dedicated Servers) are your best choiche. Using a VPS (Virtual Private Server) may give you issues as often the providers oversell the resources.<br>
+That being said, after 1.5 is out a VPS or a home machine may work just fine if you don't care about absolutely maximizing your rewards.
 ## Step 2
 **Install the OS Ubuntu 22.04.X.**<br>
 If your server has two disks, consider configuring them in "RAID 1" (typically offered by your provider). This setup mirrors one disk to the other, providing redundancy and safeguarding against data loss in case one disk fails.
