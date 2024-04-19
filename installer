@@ -35,33 +35,20 @@ fi
 # Step 4: Set Go environment variables
 echo "Setting Go environment variables..."
 
-# Check if variables are already set
-if grep -q 'export GOROOT=/usr/local/go' ~/.bashrc; then
-    echo "GOROOT already set in ~/.bashrc."
+# Check if PATH is already set
+if grep -q 'export PATH=$PATH:/usr/local/go/bin' ~/.bashrc; then
+    echo "PATH already set in ~/.bashrc."
 else
-    echo 'export GOROOT=/usr/local/go' >> ~/.bashrc
-    echo "GOROOT set in ~/.bashrc."
+    echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
+    echo "PATH set in ~/.bashrc."
 fi
 
+# Check if GOPATH is already set
 if grep -q "export GOPATH=$HOME/go" ~/.bashrc; then
     echo "GOPATH already set in ~/.bashrc."
 else
     echo "export GOPATH=$HOME/go" >> ~/.bashrc
     echo "GOPATH set in ~/.bashrc."
-fi
-
-if grep -q 'export PATH=$GOPATH/bin:$GOROOT/bin:$PATH' ~/.bashrc; then
-    echo "PATH already set in ~/.bashrc."
-else
-    echo 'export PATH=$GOPATH/bin:$GOROOT/bin:$PATH' >> ~/.bashrc
-    echo "PATH set in ~/.bashrc."
-fi
-
-if grep -q 'export GOEXPERIMENT=arenas' ~/.bashrc; then
-    echo "GOEXPERIMENT already set in ~/.bashrc."
-else
-    echo 'export GOEXPERIMENT=arenas' >> ~/.bashrc
-    echo "GOEXPERIMENT set in ~/.bashrc."
 fi
 
 # Source .bashrc to apply changes
