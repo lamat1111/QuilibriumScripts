@@ -72,10 +72,10 @@ else
   git clone https://github.com/QuilibriumNetwork/ceremonyclient.git || { echo "Failed to clone the repository! Exiting..."; exit_message; exit 1; }
 fi
 
-# Build the client
-echo "Building the client..."
-cd ceremonyclient/client
-go build -o qclient || { echo "Failed to build the client! Exiting..."; exit_message; exit 1; }
+# Build the client - gives errors - needs debugging
+#echo "Building the client..."
+#cd ceremonyclient/client
+#go build -o qclient || { echo "Failed to build the client! Exiting..."; exit_message; exit 1; }
 
 # Change directory to the node directory
 echo "Changing directory to node..."
