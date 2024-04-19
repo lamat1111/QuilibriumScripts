@@ -1,23 +1,11 @@
-
-
-
-
-
-
-
 # Quilibrium node guide and auto-installer script
 ### *This guide contains all the info you need to install and manage a Quilibrium node, plus a special script to install it with a few clicks*
 
 Created by **LaMAt** - connect with me on [Farcaster](https://warpcast.com/~/invite-page/373160?id=67559391) or [Twitter](https://twitter.com/LaMat1111)
 
+*This guide and the script are not official and made just to support the project*
+
 ---
-**&#x2661; Want to say thank you?**
-
-Apart from using my referral links below for Cherryservers and other providers, you can buy me a cup of something with a small donation, here is my ERC-20 address
-```
-0x0fd383A1cfbcf4d1F493Dd71b798ebca89e8a013
-```
-
 
 ## Table of Contents
 
@@ -43,19 +31,19 @@ Here are some pre-configured server options: <a href="https://www.cherryservers.
 - **<a href="https://pq.hosting/?from=650641" target="_blank">Perfect Quality Hosting</a>**
 - **<a href="https://my.bluevps.com/aff.php?aff=713" target="_blank">Blue VPS</a>**
 
+<details>
+<summary>Cheaper providers</summary>
+ - <a href="https://www.kqzyfj.com/click-101147005-15239531" target="_blank">Contabo (any location outside of EU)</a><br>
+- <a href="https://www.hostinger.com/?REFERRALCODE=1NICCOL65" target="_blank">Hostinger</a><br><br>
+<i>Only use these VPS after Quilibrium version 1.5 to avoid issues.</i><br>
+<i>Both Contabo and Hostinger got a lot of hate from the community (and for good reasons). These cheap VPS will never perform great, but they do work. After mainnet (1.5) the node resource consumption will be much lower, and you will be able to use these cheaper services without the risk of being throttled by the provider. On the other hand... lower specs nodes will also earn fewer rewards. Your choice!</i><br><br>
 
-### Some cheaper alternatives
-*Only use these VPS after Quilibrium version 1.5 to avoid issues*
-- **[Contabo (any location outside of EU) ](https://www.kqzyfj.com/click-101147005-15239531)**
-- **<a href="https://www.hostinger.com/?REFERRALCODE=1NICCOL65" target="_blank">Hostinger</a>**
-
-*Contabo and Hostinger got a lot of hate from the community (and for good reasons). These cheap VPS will never perform great, but they do work. After mainnet (1.5) the node resource consumption will be much lower, and you will be able to use these cheaper services without the risk of being throttled by the provider. On the other hand... lower specs nodes will also earn fewer rewards. Your choice!*
+</details>
 
 >[!WARNING]
 > **Providers to avoid**<br>
 Contabo VPS (EU location) / Alpenhost VPS / Netcup VPS<br>
 *These providers either don't support Quilibrium, blockchain nodes in general, or have been reported giving issues to users running nodes.*
-
 
 
 # Node auto-installer: install your node in a few clicks
@@ -490,4 +478,9 @@ If you see *Frame number:0* in your node log for a long time, one way to debug i
 
 ---
 
-*This guide and the script are unofficial and made just to support the project*
+**&#x2661; Want to say thank you?**
+
+Apart from using my referral links in the guide for Cherryservers and other providers, you can buy me a cup of something with a small donation, here is my ERC-20 address
+```
+0x0fd383A1cfbcf4d1F493Dd71b798ebca89e8a013
+```
