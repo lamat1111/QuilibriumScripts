@@ -50,6 +50,8 @@ Contabo VPS (EU location) / Alpenhost VPS / Netcup VPS<br>
 
 *If you are reinstalling your existing node, be sure to backup your keys.yml and config.yml files, they are in the root/ceremonyclient/node/.config folder. [How do I do this?](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#backup-your-keysyml-and-configyml-files)*
 
+*This script is simply packing all the necessary steps to install your node and the required applications in a one-click solution. You can inspect the source code [here](https://github.com/lamat1111/Quilibrium-Node-Auto-Installer/blob/main/installer). If you are not familiar with code, you can simply copy/paste the whole code in a chatbot such as ChatGPT (or any open-source alternative ;-) and ask them to explain it to you step by step.*
+
 ## Step 1
 **Rent a server with at least 8 cores (best 12), 16 GB RAM (best 32), 250 GB SSD space (best 500), and 400 Mbit/s symmetric bandwidth.**<br>
 *(After Quilibrium 1.5 min specs will be: 4 cores, 8 GB RAM, and 400 Mbit/s symmetric bandwidth. Outbound traffic after 1.5 should be up to 5 TB per month ((raw approximation)), depending on how you set the node)*<br>
