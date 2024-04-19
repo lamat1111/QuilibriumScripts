@@ -46,21 +46,20 @@ $ qclient token coins
 
 Quilibrium's token application has two modes: a two-stage transfer/accept (or reject), or a single-stage mutual transfer.  
   
-Command:
+Command (2 options: *Amount* or *OfCoin*)
 
 ```
 qclient token transfer <ToAccount> <RefundAccount> <Amount|OfCoin>
 ```
 
 Response:  
-To perform a two-stage transfer, you have two options:
-
+*Amount* option
 ```
 $ qclient token transfer <ToAccount> <RefundAccount> <Amount>
 <Amount> QUIL (Pending Transaction 0x0382e4da0c7c0133a1b53453b05096272b80c1575c6828d0211c4e371f7c81bb)
 ```
 
-or
+*OfCoin* option
 ```
 $ qclient token transfer <ToAccount> <RefundAccount> <OfCoin>
 <Amount> QUIL (Pending Transaction 0x0382e4da0c7c0133a1b53453b05096272b80c1575c6828d0211c4e371f7c81bb)
