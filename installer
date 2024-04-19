@@ -1,27 +1,35 @@
 #!/bin/bash
 
+# Define a function for displaying exit messages
+exit_message() {
+    echo "There was an error during the script execution and the process stopped. No worries!"
+    echo "You can try to run the script from scratch again."
+    echo "If you still receive an error, you may want to proceed manually instead, step by step instead of using the auto-installer."
+}
+
 # Step 0: Check sudo availability
 if ! [ -x "$(command -v sudo)" ]; then
   echo "Sudo is not installed! This script requires sudo to run. Exiting..." >&2
+  exit_message
   exit 1
 fi
 
 # Step 1: Update package lists
 echo "Updating package lists..."
-sudo apt -q update || { echo "Failed to update package lists! Exiting..."; exit 1; }
+sudo apt -q update || { echo "Failed to update package lists! Exiting..."; exit_message; exit 1; }
 
 # Step 2: Install required packages
 echo "Installing required packages..."
-sudo apt-get install git wget tmux tar -y || { echo "Failed to install required packages! Exiting..."; exit 1; }
+sudo apt-get install git wget tmux tar -y || { echo "Failed to install required packages! Exiting..."; exit_message; exit 1; }
 
 # Step 3: Download and extract Go
 if [[ $(go version) == *"go1.20.1"[1-4]* ]]; then
   echo "Correct version of Go is already installed, moving on..."
 else
   echo "Installing the necessary version of Go..."
-  wget https://go.dev/dl/go1.20.14.linux-amd64.tar.gz || { echo "Failed to download Go! Exiting..."; exit 1; }
-  sudo tar -C /usr/local -xzf go1.20.14.linux-amd64.tar.gz || { echo "Failed to extract Go! Exiting..."; exit 1; }
-  sudo rm go1.20.14.linux-amd64.tar.gz || { echo "Failed to remove downloaded archive! Exiting..."; exit 1; }
+  wget https://go.dev/dl/go1.20.14.linux-amd64.tar.gz || { echo "Failed to download Go! Exiting..."; exit_message; exit 1; }
+  sudo tar -C /usr/local -xzf go1.20.14.linux-amd64.tar.gz || { echo "Failed to extract Go! Exiting..."; exit_message; exit 1; }
+  sudo rm go1.20.14.linux-amd64.tar.gz || { echo "Failed to remove downloaded archive! Exiting..."; exit_message; exit 1; }
 fi
 
 # Step 4: Set Go environment variables
@@ -36,9 +44,9 @@ sleep 1  # Add a 1-second delay
 # Step 5: Create swap space
 if ! [ "$(sudo swapon -s)" ]; then
   echo "Creating swap space..."
-  sudo mkdir /swap && sudo fallocate -l 24G /swap/swapfile && sudo chmod 600 /swap/swapfile || { echo "Failed to create swap space! Exiting..."; exit 1; }
-  sudo mkswap /swap/swapfile && sudo swapon /swap/swapfile || { echo "Failed to set up swap space! Exiting..."; exit 1; }
-  sudo bash -c 'echo "/swap/swapfile swap swap defaults 0 0" >> /etc/fstab' || { echo "Failed to update /etc/fstab! Exiting..."; exit 1; }
+  sudo mkdir /swap && sudo fallocate -l 24G /swap/swapfile && sudo chmod 600 /swap/swapfile || { echo "Failed to create swap space! Exiting..."; exit_message; exit 1; }
+  sudo mkswap /swap/swapfile && sudo swapon /swap/swapfile || { echo "Failed to set up swap space! Exiting..."; exit_message; exit 1; }
+  sudo bash -c 'echo "/swap/swapfile swap swap defaults 0 0" >> /etc/fstab' || { echo "Failed to update /etc/fstab! Exiting..."; exit_message; exit 1; }
 fi
 
 # Step 6: Adjust network buffer sizes
@@ -56,22 +64,22 @@ fi
 sudo sysctl -p
 
 # Step 7: Install the node and the client from the Github repo
-cd ~/ || { echo "Failed to change directory to $HOME! Exiting..."; exit 1; }
+cd ~/ || { echo "Failed to change directory to $HOME! Exiting..."; exit_message; exit 1; }
 if [[ -d "ceremonyclient" ]]; then
   echo "ceremonyclient directory already exists. I don't want to overwrite your ceremonyclient, so I will skip the install..."
 else
   echo "Downloading the node software..."
-  git clone https://github.com/QuilibriumNetwork/ceremonyclient.git || { echo "Failed to clone the repository! Exiting..."; exit 1; }
+  git clone https://github.com/QuilibriumNetwork/ceremonyclient.git || { echo "Failed to clone the repository! Exiting..."; exit_message; exit 1; }
 fi
 
 # Build the client
 echo "Building the client..."
 cd ceremonyclient/client
-go build -o qclient || { echo "Failed to build the client! Exiting..."; exit 1; }
+go build -o qclient || { echo "Failed to build the client! Exiting..."; exit_message; exit 1; }
 
 # Change directory to the node directory
 echo "Changing directory to node..."
-cd ../node || { echo "Failed to change directory to node! Exiting..."; exit 1; }
+cd ../node || { echo "Failed to change directory to node! Exiting..."; exit_message; exit 1; }
 
 # Step 8: Letting the node run for 10 minutes
 echo "Running the node for 10 minutes..."
@@ -85,8 +93,7 @@ countdown() {
     done
     printf "\nDone!\n" # After the countdown completes, print "Done!" on a new line
 }
-countdown 600 || { echo "Failed to wait! Exiting..."; exit 1; }
-
+countdown 600 || { echo "Failed to wait! Exiting..."; exit_message; exit 1; }
 
 # Step 9: Prompt for reboot
 echo "Node setup is finished."
