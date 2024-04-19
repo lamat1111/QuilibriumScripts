@@ -85,6 +85,9 @@ Run the auto-installer script on your server (OS must be Ubuntu 22.04.X). I sugg
 </details>
 </blockquote>
 
+> [!NOTE]
+> If the script fails and stops, you can try to run it again (if you understand why it stopped, then try to solve the issue first, of course). If you still receive an error, you may want to proceed manually, step by step, instead of using the auto-installer. [Here is another guide](https://github.com/demipoet/quilibrium-guide) you can follow. It will run the node in a different way than mine, but it will still work.
+
 ## Step 4
 After installing the node and making some necessary edits, the script will run your node for 10 minutes and then you will be prompted to reboot the system, type "Y" and reboot.
 ## Step 5
