@@ -33,10 +33,12 @@ Here are some pre-configured server options: <a href="https://www.cherryservers.
 
 <details>
 <summary>Cheaper providers</summary>
- - <a href="https://www.kqzyfj.com/click-101147005-15239531" target="_blank">Contabo (any location outside of EU)</a><br>
+- <a href="https://www.kqzyfj.com/click-101147005-15239531" target="_blank">Contabo (any location outside of EU)</a><br>
 - <a href="https://www.hostinger.com/?REFERRALCODE=1NICCOL65" target="_blank">Hostinger</a><br><br>
 <i>Only use these VPS after Quilibrium version 1.5 to avoid issues.</i><br>
 <i>Both Contabo and Hostinger got a lot of hate from the community (and for good reasons). These cheap VPS will never perform great, but they do work. After mainnet (1.5) the node resource consumption will be much lower, and you will be able to use these cheaper services without the risk of being throttled by the provider. On the other hand... lower specs nodes will also earn fewer rewards. Your choice!</i><br><br>
+
+<i>UPDATE: I have been testing Contabo for some time. Even locations outside of EU may give you issues. My take is that they are throttling the access to the network when in a VPS location there are too many nodes running. So you may have no issues for a while and then suddendly find out that your data flow has become very low. This is just my speculation, but if you choose to use the cheap Contabo servers... keep a close eye on them.</i>
 
 </details>
 
