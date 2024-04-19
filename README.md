@@ -3,7 +3,7 @@
 
 Created by **LaMAt** - connect with me on [Farcaster](https://warpcast.com/~/invite-page/373160?id=67559391) or [Twitter](https://twitter.com/LaMat1111)
 
-*This guide and the script are not official and made just to support the project*
+*This guide and script are unofficial and have been created solely to support the project.*
 
 ---
 
