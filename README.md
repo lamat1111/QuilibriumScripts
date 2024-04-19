@@ -147,13 +147,14 @@ To enhance even more your server security, you may install and setup *Fail2ban*,
 After you node has been running for at least 30 minutes, run this command from your root folder to check the node info (Node version, Peer ID, Quil balance).<br>
 For this to work you need to [setup the gRPC calls](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#setup-the-firewall-and-grpc-calls) first.<br> If you have enabled the gRPC calls but you still get an error, it usually just means that your node needs to run some more in order to correctly connect to the newtork. Retry later.
   ```
-cd /root/ceremonyclient/node && GOEXPERIMENT=arenas go run ./... -node-info
+cd ~/ceremonyclient/node && GOEXPERIMENT=arenas go run ./... -node-info
+
   ```
 *If the above command does not work, or you have not set the gRPC calls, there are alternative commands to check you PeerID and node version, just look in [Useful Server Commands](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#useful-server-commands)*
 
 ### Check your QUIL balance and address (after 1.5)
   ```
-cd ceremonyclient/client && ./qclient token balance
+cd ~/ceremonyclient/client && ./qclient token balance
   ```
 *All the commands to transfer QUIL tokens are [here](https://github.com/lamat1111/Quilibrium-Node-Auto-Installer/blob/main/tokens-cli-commands.md).*
 
@@ -290,7 +291,7 @@ To detach from tmux press CTRL+B then release both keys and press D
 This is useful to quickly run then node in a session AFTER you have rebooted your server. Only RUN this after a reboot and if you have no tmux session already active.
  
 ```bash
-cd ceremonyclient/node && tmux new-session -d -s quil './poor_mans_cd.sh' && tmux detach
+cd ~/ceremonyclient/node && tmux new-session -d -s quil './poor_mans_cd.sh' && tmux detach
 ```
  </details>
  <details>
@@ -320,7 +321,7 @@ CAREFUL: this will empty your "store" folder, only use it if you know what you a
 Sometimes when you receive errors that you cannot debug, you can solve by killing the node process, emptying the store folder and starting the node again from scratch.
  
 ```bash
-sudo rm -r /root/ceremonyclient/node/.config/store
+sudo rm -r ~/ceremonyclient/node/.config/store
 ```
 </details>
 
@@ -362,7 +363,7 @@ Run
 *Change <NEW_SERVER_IP> with your new server IP and enter the new server password when requested.*
 
 ```bash
-scp -f /root/ceremonyclient/node/.config/keys.yml /root/ceremonyclient/node/.config/config.yml root@<NEW_SERVER_IP>:/root/ceremonyclient/node/.config/
+scp -f ~/ceremonyclient/node/.config/keys.yml ~/ceremonyclient/node/.config/config.yml root@<NEW_SERVER_IP>:/root/ceremonyclient/node/.config/
 ```
 <blockquote>
 ATTENTION: The command will ovewrite any existing keys.yml and config.yml files in the target server with no confirmation.
