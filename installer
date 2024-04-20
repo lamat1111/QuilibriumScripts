@@ -102,23 +102,41 @@ else
 fi
 
 # Step 9: Setup Firewall
+#!/bin/bash
+
 # Function to check if a UFW rule exists
 ufw_rule_exists() {
     sudo ufw status numbered | grep -qF "$1"
 }
 
+# Step 3: Install and Configure Firewall
+echo "Installing ufw (Uncomplicated Firewall)..."
+sudo apt-get update
+sudo apt-get install ufw -y || { echo "Failed to install ufw! Moving on to the next step..."; }
+
+# Attempt to enable ufw
 echo "Configuring firewall..."
-echo "y" | sudo ufw enable || { echo "Failed to enable firewall! No worries, you can do it later manually."; }
+if command -v ufw >/dev/null 2>&1; then
+    echo "y" | sudo ufw enable || { echo "Failed to enable firewall! No worries, you can do it later manually."; }
+else
+    echo "ufw (Uncomplicated Firewall) is not installed. Skipping firewall configuration."
+fi
 
-for port in 22 8336 443; do
-    if ! ufw_rule_exists "${port}"; then
-        sudo ufw allow "${port}" || echo "Error: Failed to allow port ${port}! You will need to allow port 8336 manually for the node to connect."
-    fi
-done
+# Check if ufw is available and configured
+if command -v ufw >/dev/null 2>&1 && sudo ufw status | grep -q "Status: active"; then
+    # Allow required ports
+    for port in 22 8336 443; do
+        if ! ufw_rule_exists "${port}"; then
+            sudo ufw allow "${port}" || echo "Error: Failed to allow port ${port}! You will need to allow port 8336 manually for the node to connect."
+        fi
+    done
 
-# Display firewall status
-sudo ufw status
-echo "Firewall setup was successful."
+    # Display firewall status
+    sudo ufw status
+    echo "Firewall setup was successful."
+else
+    echo "Failed to configure firewall or ufw is not installed. No worries, you can do it later manually.  Moving on to the next step..."
+fi
 
 # Change directory to the node directory
 echo "Changing directory to node..."
