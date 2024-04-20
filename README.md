@@ -171,14 +171,9 @@ Is a good idea to put them in an encrypted folder using a free tool such as [Enc
 
 If you need to migrate the node elsewhere, after installing the node from scratch you just need to put these 2 files in the `root/ceremonyclient/node/.config`  folder (changing the ones automatically created by the node). Here is a [quick way to do this](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#migrate-node-to-a-new-server).
 
-## Setup the Firewall and gRPC calls
-*These steps are recommended but not required for the node to work. Even if you receive errors, your node should not be affected and keep running normally.*
-### Setup the Firewall
-Run the below script to setup the Firewall.
-```bash
-wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/installer-firewall | bash
-```
-### Setup the gRPC calls
+## Setup the gRPC calls
+*This step is not required for the node to work. Even if you receive errors, your node should not be affected and keep running normally.*
+
 After your node has been running for 30 minutes, run the below script to setup the gRPC calls.
 ```bash
 wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/installer-gRPC-calls | bash
