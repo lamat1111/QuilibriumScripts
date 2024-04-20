@@ -86,16 +86,45 @@ else
   git clone https://github.com/QuilibriumNetwork/ceremonyclient.git || { echo "Failed to clone the repository! Exiting..."; exit_message; exit 1; }
 fi
 
-# Build the client - gives errors - needs debugging
-#echo "Building the client..."
-#cd ceremonyclient/client
-#go build -o qclient || { echo "Failed to build the client! Exiting..."; exit_message; exit 1; }
+# Set Go environment variables temporarily - redundant but it fixes the GO command not found error
+export PATH=$PATH:/usr/local/go/bin 
+export GOPATH=~/go
+
+# Step 8: Build the client
+echo "Building the client..."
+cd ceremonyclient/client
+
+# Check if the client binary already exists
+if [ -f qclient ]; then
+    echo "Client already built. Skipping..."
+else
+    go build -o qclient || echo "Failed to build the client! You will have to do it manually later."
+fi
+
+# Step 9: Setup Firewall
+# Function to check if a UFW rule exists
+ufw_rule_exists() {
+    sudo ufw status numbered | grep -qF "$1"
+}
+
+echo "Configuring firewall..."
+echo "y" | sudo ufw enable || { echo "Failed to enable firewall! No worries, you can do it later manually."; }
+
+for port in 22 8336 443; do
+    if ! ufw_rule_exists "${port}"; then
+        sudo ufw allow "${port}" || echo "Error: Failed to allow port ${port}! You will need to allow port 8336 manually for the node to connect."
+    fi
+done
+
+# Display firewall status
+sudo ufw status
+echo "Firewall setup was successful."
 
 # Change directory to the node directory
 echo "Changing directory to node..."
 cd ../node || { echo "Failed to change directory to node! Exiting..."; exit_message; exit 1; }
 
-# Step 8: Letting the node run for 10 minutes
+# Step 10: Letting the node run for 10 minutes
 echo "Running the node for 10 minutes..."
 GOEXPERIMENT=arenas go run ./... > /dev/null 2>&1 &  # Redirect output to /dev/null
 countdown() {
