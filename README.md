@@ -24,27 +24,30 @@ Created by **LaMAt** /// connect with me on [Farcaster](https://warpcast.com/~/i
 ## Best server to run a Quilibrium node
 *Here some good options. This section is still under construction as I collect reviews from others. Thank you for using my referral links and supporting my work :-)*
 
+### High quality
  - **<a href="https://www.cherryservers.com/?affiliate=CRXA3YWE" target="_blank">Cherryservers</a>**<br>
 They support Quilibrium and are recommended by Cassie, the founder of the project.<br>
 Here are some pre-configured server options: <a href="https://www.cherryservers.com/server-customizer/cloud_vds_4?affiliate=CRXA3YWE">Cloud VDS 4</a> / <a href="https://www.cherryservers.com/server-customizer/e3_1240v3?affiliate=CRXA3YWE">E3-1240V3</a> / <a href="https://www.cherryservers.com/server-customizer/e3_1240v5?affiliate=CRXA3YWE">E3-1240V5</a> / <a href="https://www.cherryservers.com/server-customizer/e5_1620v4?affiliate=CRXA3YWE">E5-1620V4</a> / <a href="https://www.cherryservers.com/server-customizer/e5_1650v3?affiliate=CRXA3YWE">E5-1650V3</a> / <a href="https://www.cherryservers.com/server-customizer/e5_1650v4?affiliate=CRXA3YWE">E5-1650V4</a>
 - **<a href="https://www.latitude.sh/r/FA9DEDA6" target="_blank">Latitude</a>**
+
+### Medium quality
 - **<a href="https://pq.hosting/?from=650641" target="_blank">Perfect Quality Hosting</a>**
 - **<a href="https://my.bluevps.com/aff.php?aff=713" target="_blank">Blue VPS</a>**
 
-<details>
-<summary>Cheaper providers</summary>
+### Low quality
+<i>Only use these VPS after Quilibrium version 1.5 to avoid issues.</i><br>
 - <a href="https://www.kqzyfj.com/click-101147005-15239531" target="_blank">Contabo (any location outside of EU)</a><br>
 - <a href="https://www.hostinger.com/?REFERRALCODE=1NICCOL65" target="_blank">Hostinger</a><br><br>
-<i>Only use these VPS after Quilibrium version 1.5 to avoid issues.</i><br>
+<details>
+<summary>Important notes on low quality providers</summary>
 <i>Both Contabo and Hostinger got a lot of hate from the community (and for good reasons). These cheap VPS will never perform great, but they do work. After mainnet (1.5) the node resource consumption will be much lower, and you will be able to use these cheaper services without the risk of being throttled by the provider. On the other hand... lower specs nodes will also earn fewer rewards. Your choice!</i><br><br>
 
 <i>UPDATE: I have been testing Contabo for some time. Even locations outside of EU may give you issues. My take is that they are throttling the access to the network when in a VPS location there are too many nodes running. So you may have no issues for a while and then suddendly find out that your data flow has become very low. This is just my speculation, but if you choose to use the cheap Contabo servers... keep a close eye on them.</i>
-
 </details>
 
 >[!WARNING]
 > **Providers to avoid**<br>
-Contabo VPS (EU location) / Alpenhost VPS / Netcup VPS<br>
+Contabo VPS (EU location) / Alpenhost / Netcup / Hetzner<br>
 *These providers either don't support Quilibrium, blockchain nodes in general, or have been reported giving issues to users running nodes.*
 
 
