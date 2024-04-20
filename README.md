@@ -24,17 +24,17 @@ Created by **LaMAt** /// connect with me on [Farcaster](https://warpcast.com/~/i
 ## Best server to run a Quilibrium node
 *Here some good options. This section is still under construction as I collect reviews from others. Thank you for using my referral links and supporting my work :-)*
 
-### High quality
+### High quality $$$
  - **<a href="https://www.cherryservers.com/?affiliate=CRXA3YWE" target="_blank">Cherryservers</a>**<br>
 They support Quilibrium and are recommended by Cassie, the founder of the project.<br>
 Here are some pre-configured server options: <a href="https://www.cherryservers.com/server-customizer/cloud_vds_4?affiliate=CRXA3YWE">Cloud VDS 4</a> / <a href="https://www.cherryservers.com/server-customizer/e3_1240v3?affiliate=CRXA3YWE">E3-1240V3</a> / <a href="https://www.cherryservers.com/server-customizer/e3_1240v5?affiliate=CRXA3YWE">E3-1240V5</a> / <a href="https://www.cherryservers.com/server-customizer/e5_1620v4?affiliate=CRXA3YWE">E5-1620V4</a> / <a href="https://www.cherryservers.com/server-customizer/e5_1650v3?affiliate=CRXA3YWE">E5-1650V3</a> / <a href="https://www.cherryservers.com/server-customizer/e5_1650v4?affiliate=CRXA3YWE">E5-1650V4</a>
 - **<a href="https://www.latitude.sh/r/FA9DEDA6" target="_blank">Latitude</a>**
 
-### Medium quality
+### Medium quality $$
 - **<a href="https://pq.hosting/?from=650641" target="_blank">Perfect Quality Hosting</a>**
 - **<a href="https://my.bluevps.com/aff.php?aff=713" target="_blank">Blue VPS</a>**
 
-### Low quality
+### Low quality $
 <i>Only use these VPS after Quilibrium version 1.5 to avoid issues.</i><br>
 - <a href="https://www.kqzyfj.com/click-101147005-15239531" target="_blank">Contabo (any location outside of EU)</a><br>
 - <a href="https://www.hostinger.com/?REFERRALCODE=1NICCOL65" target="_blank">Hostinger</a><br><br>
