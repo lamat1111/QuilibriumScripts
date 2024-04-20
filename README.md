@@ -35,7 +35,7 @@ Here are some pre-configured server options: <a href="https://www.cherryservers.
 - **<a href="https://my.bluevps.com/aff.php?aff=713" target="_blank">Blue VPS</a>**
 
 ### Low quality $
-<i>Only use these VPS after Quilibrium version 1.5 to avoid issues.</i><br>
+<i>Only use these VPS after Quilibrium version 1.5 to avoid issues. And read the notes below!</i><br>
 - <a href="https://www.kqzyfj.com/click-101147005-15239531" target="_blank">Contabo (any location outside of EU)</a><br>
 - <a href="https://www.hostinger.com/?REFERRALCODE=1NICCOL65" target="_blank">Hostinger</a><br><br>
 <details>
