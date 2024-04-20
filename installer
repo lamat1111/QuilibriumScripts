@@ -4,7 +4,7 @@
 exit_message() {
     echo "There was an error during the script execution and the process stopped. No worries!"
     echo "You can try to run the script from scratch again."
-    echo "If you still receive an error, you may want to proceed manually instead, step by step instead of using the auto-installer."
+    echo "If you still receive an error, you may want to proceed manually, step by step instead of using the auto-installer."
 }
 
 # Step 0: Check sudo availability
