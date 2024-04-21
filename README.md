@@ -27,11 +27,11 @@
 
 ### High quality $$$
  - **<a href="https://www.cherryservers.com/?affiliate=CRXA3YWE" target="_blank">Cherryservers</a>**<br>
-They support Quilibrium and are recommended by Cassie, the founder of the project.<br>
+They officially support Quilibrium and are recommended by Cassie, the project's founder. Probably the best product and support available at the moment. In both the Quilibrium Discord and Telegram communities, there is 'Lili,' she works for them and can provide advice and assistance. Their servers sell out fast these days, so there is a chanche they will be out of stock, but you can join the waiting list.
 Here are some pre-configured server options: <a href="https://www.cherryservers.com/server-customizer/cloud_vds_4?affiliate=CRXA3YWE">Cloud VDS 4</a> / <a href="https://www.cherryservers.com/server-customizer/e3_1240v3?affiliate=CRXA3YWE">E3-1240V3</a> / <a href="https://www.cherryservers.com/server-customizer/e3_1240v5?affiliate=CRXA3YWE">E3-1240V5</a> / <a href="https://www.cherryservers.com/server-customizer/e5_1620v4?affiliate=CRXA3YWE">E5-1620V4</a> / <a href="https://www.cherryservers.com/server-customizer/e5_1650v3?affiliate=CRXA3YWE">E5-1650V3</a> / <a href="https://www.cherryservers.com/server-customizer/e5_1650v4?affiliate=CRXA3YWE">E5-1650V4</a>
-- **<a href="https://www.latitude.sh/r/FA9DEDA6" target="_blank">Latitude</a>**
 
 ### Medium quality $$
+- **<a href="https://www.latitude.sh/r/FA9DEDA6" target="_blank">Latitude</a>**
 - **<a href="https://pq.hosting/?from=650641" target="_blank">Perfect Quality Hosting</a>**
 - **<a href="https://my.bluevps.com/aff.php?aff=713" target="_blank">Blue VPS</a>**
 
