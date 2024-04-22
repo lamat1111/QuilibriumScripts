@@ -156,9 +156,8 @@ After you node has been running for at least 30 minutes, run this command from y
 For this to work you need to [setup the gRPC calls](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#setup-the-firewall-and-grpc-calls) first.<br> If you have enabled the gRPC calls but you still get an error, it usually just means that your node needs to run some more in order to correctly connect to the newtork. Retry later.
   ```
 cd ~/ceremonyclient/node && GOEXPERIMENT=arenas go run ./... -node-info
-
   ```
-*If the above command does not work, or you have not set the gRPC calls, there are alternative commands to check you PeerID and node version, just look in [Useful Server Commands](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#useful-server-commands)*
+*If the above command does not work, or you have not set the gRPC calls, there are alternative commands to check your PeerID and node version, just look in [Useful Server Commands](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#useful-server-commands)*
 
 ### Check your QUIL balance and address (after 1.5)
   ```
