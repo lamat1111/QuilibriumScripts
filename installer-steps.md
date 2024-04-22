@@ -56,7 +56,7 @@ cd ceremonyclient/node
 ```
 Create  a session named "quil"
 ```
-new-session -s quil
+tmux new-session -s quil
 ```
 Run the node via the ./poor_mans_cd.sh script
 ```
