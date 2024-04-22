@@ -164,7 +164,8 @@ cd ~/ceremonyclient/node && GOEXPERIMENT=arenas go run ./... -node-info
   ```
 cd ~/ceremonyclient/client && ./qclient token balance
   ```
-*All the commands to transfer QUIL tokens are [here](https://github.com/lamat1111/Quilibrium-Node-Auto-Installer/blob/main/tokens-cli-commands.md).*
+> [!NOTE]
+> All the commands to transfer QUIL tokens are [here](https://github.com/lamat1111/Quilibrium-Node-Auto-Installer/blob/main/tokens-cli-commands.md).
 
 ## Backup your keys.yml and config.yml files
 After 30 minutes that then node has been running, it should have generated your keys and config files correctly.
