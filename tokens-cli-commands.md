@@ -1,6 +1,7 @@
 # CLI Commands in Quilibrium 1.5.0 - for token transfers
+
 >[!NOTE]
->The text below has been extracted from this [official article](https://paragraph.xyz/@quilibrium.com/the-storm-before-the-calm#h-cli-commands-in-150).
+>If you need to install your Quilibrium node please refer to [this guide](https://github.com/lamat1111/quilibrium-node-auto-installer)<br>The text below has been extracted from this [official article](https://paragraph.xyz/@quilibrium.com/the-storm-before-the-calm#h-cli-commands-in-150).
 
 With the release of Quilibrium 1.5.0, the node application will come with the _/client_ folder for you to have better visibility on your node's conditions, earned rewards and perform transfer transactions.
 
