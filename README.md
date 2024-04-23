@@ -586,6 +586,12 @@ If you see *Frame number:0* in your node log for a long time, one way to debug i
 3. Confirm reachability of bootstrap: <code>nc -vzu YOUR_SERVER_IP 8336</code><br>
 <i>Replace YOUR_SERVER_IP with your node's IP*</i>
 </details>
+<details>
+<summary>Panic: get parent data clock frame: item not found</summary>
+If you imported an external "store" folder to kickstart your node syncronization, you may see this error, while the node keeps crashing.<br>
+Stop the node, delete the "SELF_TEST" file from your ".config" folder, and restart the node. If this doesn't solve, try to  import in the ".config" folder the "REPAIR" file form another working node, and delete the existing one.<br>
+Give the node 10-15 minutes to see if everything works correctly.
+</details>
 
 ---
 
