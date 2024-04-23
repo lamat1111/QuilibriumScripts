@@ -13,7 +13,7 @@
 - [Best Server to Run a Quilibrium Node](#best-server-to-run-a-quilibrium-node)
 - [Node auto-installer: how to use the script](#node-auto-installer-how-to-use-the-script)
 - [Backup Your keys.yml and config.yml Files](#backup-your-keysyml-and-configyml-files)
-- [Setup the Firewall and gRPC Calls](#setup-the-firewall-and-grpc-calls)
+- [Setup the Firewall and gRPC Calls](#setup-the-grpc-calls)
 - [Tools and resources](#tools-and-resources)
 - [Useful Server Commands](#useful-server-commands)
 - [Commands for token transfers](https://github.com/lamat1111/Quilibrium-Node-Auto-Installer/blob/main/tokens-cli-commands.md)
@@ -146,7 +146,7 @@ It will usually takes 15-30 minutes before you will begin to see new log entries
 
 
 ## Step 8
-Let you node run for at least 30 minutes, then proceed to [backup your your keys.yml and config.yml files](#backup-your-keysyml-and-configyml-files), and [setup your gRPC calls](#setup-the-firewall-and-grpc-calls)
+Let you node run for at least 30 minutes, then proceed to [backup your your keys.yml and config.yml files](#backup-your-keysyml-and-configyml-files), and [setup your gRPC calls](#setup-the-grpc-calls)
 
 ## Step 9
 This is optional, but recommended! Setup SSH keys to connect to your server and disable the password connection. Here is a [guide to do this](#set-ssh-keys-to-connect-to-your-server)<br>
@@ -154,7 +154,7 @@ To enhance even more your server security, you may install and setup *Fail2ban*,
 
 ### Check node info
 After you node has been running for at least 30 minutes, run this command from your root folder to check the node info (Node version, Peer ID, Quil balance).<br>
-For this to work you need to [setup the gRPC calls](#setup-the-firewall-and-grpc-calls) first.<br> If you have enabled the gRPC calls but you still get an error, it usually just means that your node needs to run some more in order to correctly connect to the newtork. Retry later.
+For this to work you need to [setup the gRPC calls](#setup-the-grpc-calls) first.<br> If you have enabled the gRPC calls but you still get an error, it usually just means that your node needs to run some more in order to correctly connect to the newtork. Retry later.
   ```
 cd ~/ceremonyclient/node && GOEXPERIMENT=arenas go run ./... -node-info
   ```
@@ -251,7 +251,7 @@ To use it just type <code>htop</code>
 <details>
 <summary>Check node info</summary>
 After you node has been running for at least 30 minutes, run this command from your root folder to check the node info (Node version, Peer ID, Quil balance).<br>
-For this to work you need to [setup the gRPC calls](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#setup-the-firewall-and-grpc-calls) first.<br>
+For this to work you need to [setup the gRPC calls](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#setup-the-grpc-calls) first.<br>
 To go to the root folder just type cd .
  
   ```
