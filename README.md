@@ -10,16 +10,16 @@
 
 ## Table of Contents
 
-- [Best Server to Run a Quilibrium Node](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#best-server-to-run-a-quilibrium-node)
-- [Node auto-installer: how to use the script](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#node-auto-installer-how-to-use-the-script)
-- [Backup Your keys.yml and config.yml Files](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#backup-your-keysyml-and-configyml-files)
-- [Setup the Firewall and gRPC Calls](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#setup-the-firewall-and-grpc-calls)
-- [Tools and resources](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#tools-and-resources)
-- [Useful Server Commands](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#useful-server-commands)
+- [Best Server to Run a Quilibrium Node](#best-server-to-run-a-quilibrium-node)
+- [Node auto-installer: how to use the script](#node-auto-installer-how-to-use-the-script)
+- [Backup Your keys.yml and config.yml Files](#backup-your-keysyml-and-configyml-files)
+- [Setup the Firewall and gRPC Calls](#setup-the-firewall-and-grpc-calls)
+- [Tools and resources](#tools-and-resources)
+- [Useful Server Commands](#useful-server-commands)
 - [Commands for token transfers](https://github.com/lamat1111/Quilibrium-Node-Auto-Installer/blob/main/tokens-cli-commands.md)
-- [Migrate Node to a New Server](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#migrate-node-to-a-new-server)
-- [Set SSH keys](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#set-ssh-keys-to-connect-to-your-server)
-- [Troubleshooting](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#troubleshooting)
+- [Migrate Node to a New Server](#migrate-node-to-a-new-server)
+- [Set SSH keys](#set-ssh-keys-to-connect-to-your-server)
+- [Troubleshooting](#troubleshooting)
 
 
 ## Best server to run a Quilibrium node
@@ -132,7 +132,7 @@ To restart the node, from inside tmux run <code>./poor_mans_cd.sh</code>
 *The poor_mans_cd is a script used to run the node. It will also restart it, if it gets killed and will auto-update it when there is a new version available.*
 
 >[!NOTE]
->If you ever reboot your server, you will need to go through this step 6 again to start the node from scratch (to avoid this, in [Useful Server Commands](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#useful-server-commands) there is a command to setup an automation (AKA cronjob) that will start your node automatically after any server reboot :-)
+>If you ever reboot your server, you will need to go through this step 6 again to start the node from scratch (to avoid this, in [Useful Server Commands](d#useful-server-commands) there is a command to setup an automation (AKA cronjob) that will start your node automatically after any server reboot :-)
 
 ## Step 7
 **You are done!** Now you can safely logout from your server and the node will keep running in its persistent shell.
@@ -142,23 +142,23 @@ Once you are in the tmux session a green bar will appear at the bottom of the sc
 It will usually takes 15-30 minutes before you will begin to see new log entries in the node log.<br><br>
 
 > [!NOTE]
-> If you inspect the node log you will usually see "0 frames" for up to 48 hours before the node is fully synced with the network. After a while you will see the "master_frame_head" value increase, while the "current_head_frame" stays to 0. This is normal until your "master_frame_head" reaches the latest frame in the network. If you suspect that your node is not connecting to the network check the server bandwidth with <code>speedtest-cli</code> and check the [Troubleshooting](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#troubleshooting) section wheer it says "frame 0".
+> If you inspect the node log you will usually see "0 frames" for up to 48 hours before the node is fully synced with the network. After a while you will see the "master_frame_head" value increase, while the "current_head_frame" stays to 0. This is normal until your "master_frame_head" reaches the latest frame in the network. If you suspect that your node is not connecting to the network check the server bandwidth with <code>speedtest-cli</code> and check the [Troubleshooting](#troubleshooting) section wheer it says "frame 0".
 
 
 ## Step 8
-Let you node run for at least 30 minutes, then proceed to [backup your your keys.yml and config.yml files](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#backup-your-keysyml-and-configyml-files), and [setup your gRPC calls](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#setup-the-firewall-and-grpc-calls)
+Let you node run for at least 30 minutes, then proceed to [backup your your keys.yml and config.yml files](#backup-your-keysyml-and-configyml-files), and [setup your gRPC calls](#setup-the-firewall-and-grpc-calls)
 
 ## Step 9
-This is optional, but recommended! Setup SSH keys to connect to your server and disable the password connection. Here is a [guide to do this](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#set-ssh-keys-to-connect-to-your-server)<br>
+This is optional, but recommended! Setup SSH keys to connect to your server and disable the password connection. Here is a [guide to do this](#set-ssh-keys-to-connect-to-your-server)<br>
 To enhance even more your server security, you may install and setup *Fail2ban*, here is [a guide](https://www.digitalocean.com/community/tutorials/how-to-protect-ssh-with-fail2ban-on-ubuntu-20-04).
 
 ### Check node info
 After you node has been running for at least 30 minutes, run this command from your root folder to check the node info (Node version, Peer ID, Quil balance).<br>
-For this to work you need to [setup the gRPC calls](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#setup-the-firewall-and-grpc-calls) first.<br> If you have enabled the gRPC calls but you still get an error, it usually just means that your node needs to run some more in order to correctly connect to the newtork. Retry later.
+For this to work you need to [setup the gRPC calls](#setup-the-firewall-and-grpc-calls) first.<br> If you have enabled the gRPC calls but you still get an error, it usually just means that your node needs to run some more in order to correctly connect to the newtork. Retry later.
   ```
 cd ~/ceremonyclient/node && GOEXPERIMENT=arenas go run ./... -node-info
   ```
-*If the above command does not work, or you have not set the gRPC calls, there are alternative commands to check your PeerID and node version, just look in [Useful Server Commands](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#useful-server-commands)*
+*If the above command does not work, or you have not set the gRPC calls, there are alternative commands to check your PeerID and node version, just look in [Useful Server Commands](#useful-server-commands)*
 
 ### Check your QUIL balance and address (after 1.5)
   ```
@@ -175,7 +175,7 @@ Use [WinSCP](https://winscp.net/eng/index.php) or [Termius SFTP feature](https:/
 Download locally your `keys.yml` and `config.yml` files. Keep them safe and do not share them with anyone!
 Is a good idea to put them in an encrypted folder using a free tool such as [Encrypto](https://macpaw.com/encrypto)
 
-If you need to migrate the node elsewhere, after installing the node from scratch you just need to put these 2 files in the `root/ceremonyclient/node/.config`  folder (changing the ones automatically created by the node). Here is a [quick way to do this](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#migrate-node-to-a-new-server).
+If you need to migrate the node elsewhere, after installing the node from scratch you just need to put these 2 files in the `root/ceremonyclient/node/.config`  folder (changing the ones automatically created by the node). Here is a [quick way to do this](#migrate-node-to-a-new-server).
 
 ## Setup the gRPC calls
 *This step is not required for the node to work. Even if you receive errors, your node should not be affected and keep running normally.*
