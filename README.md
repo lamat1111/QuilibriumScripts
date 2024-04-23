@@ -165,6 +165,7 @@ cd ~/ceremonyclient/node && GOEXPERIMENT=arenas go run ./... -node-info
 cd ~/ceremonyclient/client && ./qclient token balance
   ```
 > [!NOTE]
+> If you get a "No such file or directory" error, run <code>cd ceremonyclient/client && go build -o qclient</code> to try and rebuild the client.<br>
 > All the commands to transfer QUIL tokens are [here](https://github.com/lamat1111/Quilibrium-Node-Auto-Installer/blob/main/tokens-cli-commands.md).
 
 ## Backup your keys.yml and config.yml files
