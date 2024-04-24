@@ -143,7 +143,13 @@ It will usually takes 15-30 minutes before you will begin to see new log entries
 
 
 ## Step 8
-Let you node run for at least 30 minutes, then proceed to [backup your your keys.yml and config.yml files](#backup-your-keysyml-and-configyml-files), and [setup your gRPC calls](#setup-the-grpc-calls)
+Let you node run for at least 30 minutes, then check if you keys.yml file has been completely generated. Run the command:
+  ```
+wc -c /root/ceremonyclient/node/.config/keys.yml
+  ```
+The response should be <code>1252 /root/ceremonyclient/node/.config/keys.yml</code>. <br>If the number is lower, you need to keep the node running a bit more. You can also [check here](#backup-your-keysyml-and-configyml-files) to see how the correct file should look like.
+
+When your keys.yml has been genearted, proceed to [backup your your keys.yml and config.yml files](#backup-your-keysyml-and-configyml-files), and [setup your gRPC calls](#setup-the-grpc-calls)
 
 ## Step 9
 This is optional, but recommended! Setup SSH keys to connect to your server and disable the password connection. Here is a [guide to do this](#set-ssh-keys-to-connect-to-your-server)<br>
