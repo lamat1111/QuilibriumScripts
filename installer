@@ -51,9 +51,26 @@ else
     echo "GOPATH set in ~/.bashrc."
 fi
 
+# Check if GO111MODULE is already set
+if grep -q "export GO111MODULE=on" ~/.bashrc; then
+    echo "GO111MODULE already set in ~/.bashrc."
+else
+    echo "export GO111MODULE=on" >> ~/.bashrc
+    echo "GO111MODULE set in ~/.bashrc."
+fi
+
+# Check if GOPROXY is already set
+if grep -q "export GOPROXY=https://goproxy.cn,direct" ~/.bashrc; then
+    echo "GOPROXY already set in ~/.bashrc."
+else
+    echo "export GOPROXY=https://goproxy.cn,direct" >> ~/.bashrc
+    echo "GOPROXY set in ~/.bashrc."
+fi
+
 # Source .bashrc to apply changes
 source ~/.bashrc
 sleep 1  # Add a 1-second delay
+
 
 # Step 5: Create swap space
 if ! [ "$(sudo swapon -s)" ]; then
