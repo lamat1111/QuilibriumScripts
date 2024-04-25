@@ -173,10 +173,25 @@ countdown() {
 }
 countdown 600 || { echo "Failed to wait! Exiting..."; exit_message; exit 1; }
 
-# Step 9: Prompt for reboot
+#!/bin/bash
+
+# Step 11: Creating some folders that may be useful
+# Create /root/backup/ folder if it doesn't exist already
+echo "Creating /root/backup/ folder..."
+mkdir -p /root/backup/
+echo "Done."
+
+# Create /root/scripts/ folder if it doesn't exist already
+echo "Creating /root/scripts/ folder..."
+mkdir -p /root/scripts/
+echo "Done."
+
+# Create /root/scripts/log/ folder if it doesn't exist already
+echo "Creating /root/scripts/log/ folder..."
+mkdir -p /root/scripts/log/
+echo "Done."
+
+# Step 12: Prompt for reboot
 echo "Node setup is finished."
-echo "Type 'sudo reboot' and press Enter to reboot your server."
-echo "When you have logged back in, run 'cd ~/ceremonyclient/node/', open a new tmux session with 'tmux new-session -s quil' and run 'bash poor_mans_cd.sh'."
-echo "Then detach from the tmux session without ceasing it by pressing Ctrl-B and then pressing D."
-echo "Remember to make backup copies of the keys.yml and config.yml files, folder ~/ceremonyclient/node/.config."
-echo "Always check the online guide for useful commands and troubleshooting guides."
+echo "Type 'sudo reboot' and press ENTER to reboot your server."
+echo "Then follow the online guide for the next steps: github.com/lamat1111/Quilibrium-Node-Auto-Installer"
