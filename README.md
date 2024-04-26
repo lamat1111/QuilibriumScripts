@@ -95,7 +95,7 @@ Run the auto-installer script on your server (OS must be Ubuntu 22.04.X). I sugg
 > If the script fails and stops, you can try to run it again (if you understand why it stopped, then try to solve the issue first, of course). If you still receive an error, you may want to proceed manually, step by step, instead of using the auto-installer. Here is the [step by step guide](https://github.com/lamat1111/Quilibrium-Node-Auto-Installer/blob/main/installer-steps.md) you can follow.
 
 ## Step 4
-After installing the node and the necessary applications, you will be prompted to reboot the system. Type "Y" and reboot. Wait 3 minutes, then login again in your server.
+After installing the node and the necessary applications, you will be prompted to reboot the system. Type <code>sudo reboot</code> and ENTER. Wait 3 minutes, then login again in your server.
 
 ## Step 5
 Run the command below. This will go to the node folder, create a persistent shell (session), start the node via the *poor_mans_cd* script (more info about this script below) and detach from the session again. You won't see any output after running the command, but you can move to Step 7. 
