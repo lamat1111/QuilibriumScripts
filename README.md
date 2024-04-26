@@ -95,10 +95,9 @@ Run the auto-installer script on your server (OS must be Ubuntu 22.04.X). I sugg
 > If the script fails and stops, you can try to run it again (if you understand why it stopped, then try to solve the issue first, of course). If you still receive an error, you may want to proceed manually, step by step, instead of using the auto-installer. Here is the [step by step guide](https://github.com/lamat1111/Quilibrium-Node-Auto-Installer/blob/main/installer-steps.md) you can follow.
 
 ## Step 4
-After installing the node and making some necessary edits, the script will run your node for 10 minutes and then you will be prompted to reboot the system, type "Y" and reboot.
+After installing the node and the necessary applications, you will be prompted to reboot the system. Type <code>sudo reboot</code> and ENTER. Wait 3 minutes, then login again in your server.
+
 ## Step 5
-Wait 3 minutes, then login again in your server.
-## Step 6
 Run the command below. This will go to the node folder, create a persistent shell (session), start the node via the *poor_mans_cd* script (more info about this script below) and detach from the session again. You won't see any output after running the command, but you can move to Step 7. 
   ```
   cd ceremonyclient/node && tmux new-session -d -s quil './poor_mans_cd.sh'
@@ -131,18 +130,18 @@ To restart the node, from inside tmux run <code>./poor_mans_cd.sh</code>
 >[!NOTE]
 >If you ever reboot your server, you will need to go through this step 6 again to start the node from scratch (to avoid this, in [Useful Server Commands](d#useful-server-commands) there is a command to setup an automation (AKA cronjob) that will start your node automatically after any server reboot :-)
 
-## Step 7
+## Step 6
 **You are done!** Now you can safely logout from your server and the node will keep running in its persistent shell.
 </br><br>
 If you want to see you node log you can reattach to the tmux session with <code>tmux a -t quil</code><br>
 Once you are in the tmux session a green bar will appear at the bottom of the screen, to detach from tmux press CTRL+B then D.<br>
-It will usually takes 15-30 minutes before you will begin to see new log entries in the node log.<br><br>
+It will usually takes 10 minutes before you will begin to see new log entries in the node log. And it will take  up to 30 minutes before your private keys will be created correctly, so that you can backup them.<br><br>
 
 > [!NOTE]
-> If you inspect the node log you will usually see "0 frames" for up to 48 hours before the node is fully synced with the network. After a while you will see the "master_frame_head" value increase, while the "current_head_frame" stays to 0. This is normal until your "master_frame_head" reaches the latest frame in the network. If you suspect that your node is not connecting to the network check the server bandwidth with <code>speedtest-cli</code> and check the [Troubleshooting](#troubleshooting) section wheer it says "frame 0".
+> If you inspect the node log you will usually see "0 frames" for up to 72 hours before the node is fully synced with the network. After a while you will see the "master_frame_head" value increase, while the "current_head_frame" stays to 0. This is normal until your "master_frame_head" reaches the latest frame in the network. If you suspect that your node is not connecting to the network check the server bandwidth with <code>speedtest-cli</code> and check the [Troubleshooting](#troubleshooting) section wheer it says "frame 0".
 
 
-## Step 8
+## Step 7
 Let you node run for at least 30 minutes, then check if you keys.yml file has been completely generated. Run the command:
   ```
 wc -c /root/ceremonyclient/node/.config/keys.yml
@@ -151,7 +150,7 @@ The response should be <code>1252 /root/ceremonyclient/node/.config/keys.yml</co
 
 When your keys.yml has been genearted, proceed to [backup your your keys.yml and config.yml files](#backup-your-keysyml-and-configyml-files), and [setup your gRPC calls](#setup-the-grpc-calls)
 
-## Step 9
+## Step 8
 This is optional, but recommended! Setup SSH keys to connect to your server and disable the password connection. Here is a [guide to do this](#set-ssh-keys-to-connect-to-your-server)<br>
 To enhance even more your server security, you may install and setup *Fail2ban*, here is [a guide](https://www.digitalocean.com/community/tutorials/how-to-protect-ssh-with-fail2ban-on-ubuntu-20-04).
 
