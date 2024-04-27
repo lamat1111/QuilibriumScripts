@@ -126,7 +126,6 @@ ufw_rule_exists() {
     sudo ufw status numbered | grep -qF "$1"
 }
 
-# Step 3: Install and Configure Firewall
 echo "Installing ufw (Uncomplicated Firewall)..."
 sudo apt-get update
 sudo apt-get install ufw -y || { echo "Failed to install ufw! Moving on to the next step..."; }
@@ -155,33 +154,29 @@ else
     echo "Failed to configure firewall or ufw is not installed. No worries, you can do it later manually.  Moving on to the next step..."
 fi
 
-# -----------------------------------------
-# RUNNING THE NODE BEFORE REBOOT
-# IS REDUNDANT - commented out
-# -----------------------------------------
 
 # Change directory to the node directory
-# echo "Changing directory to node..."
-# cd ../node || { echo "Failed to change directory to node! Exiting..."; exit_message; exit 1; }
+ echo "Changing directory to node..."
+ cd ../node || { echo "Failed to change directory to node! Exiting..."; exit_message; exit 1; }
 
-# Step 10: Letting the node run for 10 minutes
-# echo "Running the node for 10 minutes..."
-# GOEXPERIMENT=arenas go run ./... > /dev/null 2>&1 &  # Redirect output to /dev/null
-# countdown() {
-#     secs=$1         # Assign the input argument (600) to the variable 'secs'
-#     while [ $secs -gt 0 ]; do
-#         printf "\r%02d:%02d remaining" $(($secs/60)) $(($secs%60)) # Print the remaining time (mm:ss) with a carriage return (\r) to overwrite the previous line
-#         sleep 1     # Wait for 1 second
-#         ((secs--))  # Decrement the 'secs' variable by 1
-#     done
-#     printf "\nDone!\n" # After the countdown completes, print "Done!" on a new line
-# }
-# countdown 600 || { echo "Failed to wait! Exiting..."; exit_message; exit 1; }
+# Step 10: Letting the node run for 5 minutes
+ echo "Running the node for 5 minutes..."
+ GOEXPERIMENT=arenas go run ./... > /dev/null 2>&1 &  # Redirect output to /dev/null
+ countdown() {
+     secs=$1         # Assign the input argument (300) to the variable 'secs'
+     while [ $secs -gt 0 ]; do
+         printf "\r%02d:%02d remaining" $(($secs/60)) $(($secs%60)) # Print the remaining time (mm:ss) with a carriage return (\r) to overwrite the previous line
+         sleep 1     # Wait for 1 second
+         ((secs--))  # Decrement the 'secs' variable by 1
+     done
+     printf "\nDone!\n" # After the countdown completes, print "Done!" on a new line
+ }
+ countdown 300 || { echo "Failed to wait! Exiting..."; exit_message; exit 1; }
 
 
 #!/bin/bash
 
-# Step 10: Creating some folders that may be useful
+# Step 11: Creating some folders that may be useful
 # Create /root/backup/ folder if it doesn't exist already
 echo "Creating /root/backup/ folder..."
 mkdir -p /root/backup/
@@ -197,7 +192,7 @@ echo "Creating /root/scripts/log/ folder..."
 mkdir -p /root/scripts/log/
 echo "Done."
 
-# Step 11: Prompt for reboot
+# Step 12: Prompt for reboot
 echo "Node setup is finished."
 echo "Type 'sudo reboot' and press ENTER to reboot your server."
 echo "Then follow the online guide for the next steps: github.com/lamat1111/Quilibrium-Node-Auto-Installer"
