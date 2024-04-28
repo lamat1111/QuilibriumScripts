@@ -138,7 +138,27 @@ echo "Creating /root/scripts/log/ folder..."
 mkdir -p /root/scripts/log/
 echo "Done."
 
-# Step 9: Prompt for reboot
+# Step 9: Create qnode_restart.sh script and set permissions
+echo "Creating qnode_restart.sh script..."
+
+# Check if the file already exists
+if [ ! -f "/root/scripts/qnode_restart.sh" ]; then
+    # Attempt to download the script
+    sudo wget -O /root/scripts/qnode_restart.sh https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/qnode_restart
+
+    # Check the exit status of wget
+    if [ $? -eq 0 ]; then
+        sudo chmod +x /root/scripts/qnode_restart.sh
+        echo "qnode_restart.sh script created and permissions set."
+    else
+        echo "Failed to download qnode_restart.sh script. You will have to do this manually later. Moving on to the next step..."
+    fi
+else
+    echo "qnode_restart.sh script already exists. Skipping download."
+fi
+
+# Step 10: Prompt for reboot
 echo "Server setup is finished"
 echo "Type 'sudo reboot' and press ENTER to reboot your server."
 echo "Then follow the online guide for the next steps to install your Quilibrium node: github.com/lamat1111/Quilibrium-Node-Auto-Installer"
+
