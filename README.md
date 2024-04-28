@@ -1,6 +1,6 @@
 # Quilibrium node guide and auto-installer script
 >[!WARNING]
->Do not use this autoinstaller script after version 1.5 of Quilibrium, as many things will change and there will an alternative (and more secure) release method outside of Github.
+>Do not use this autoinstaller script after version 1.5 of Quilibrium, as many things will change and there will be an alternative (and more secure) release method outside of Github.
 
 >[!TIP]
 > This guide contains all the info you need to install and manage a Quilibrium node, plus a special script to install it with a few clicks.<br>The guide and the script are unofficial and have been created solely to support the project.
