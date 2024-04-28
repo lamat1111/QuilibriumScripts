@@ -1,9 +1,7 @@
-# Quilibrium node guide and auto-installer script
->[!WARNING]
->Do not use this autoinstaller script after version 1.5 of Quilibrium, as many things will change and there will an alternative (and more secure) release method outside of Github.
+# Quilibrium node setup guide and auto-installer script
 
 >[!TIP]
-> This guide contains all the info you need to install and manage a Quilibrium node, plus a special script to install it with a few clicks.<br>The guide and the script are unofficial and have been created solely to support the project.
+> This guide contains all the info you need to install and manage a Quilibrium node, plus a special script to prepare your Ubuntu server and install the necessary applications.<br>The guide and the script are unofficial and have been created solely to support the project.
 
 > Created by **LaMAt** /// connect with me on [Farcaster](https://warpcast.com/~/invite-page/373160?id=67559391) or [Twitter](https://twitter.com/LaMat1111) /// &#x2661; [Donations](#-want-to-say-thank-you)
 
@@ -56,11 +54,9 @@ Contabo VPS (EU location) / Alpenhost / Netcup / Hetzner<br>
 *These providers either don't support Quilibrium, blockchain nodes in general, or have been reported giving issues to users running nodes.*
 
 
-# Node auto-installer: install your node in a few clicks
+# Auto-installer script: prepare your server for the Quilibrium node
 
-*If you are reinstalling your existing node, be sure to backup your keys.yml and config.yml files, they are in the root/ceremonyclient/node/.config folder. [How do I do this?](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#backup-your-keysyml-and-configyml-files)*
-
-*This script is simply packing all the necessary steps to install your node and the required applications in a one-click solution. You can inspect the source code [here](https://github.com/lamat1111/Quilibrium-Node-Auto-Installer/blob/main/installer). If you are not familiar with code, you can simply copy/paste the whole code in a chatbot such as ChatGPT (or any open-source alternative ;-) and ask them to explain it to you step by step.*
+*This script is simply packing all the necessary steps and the required applications in a one-click solution. It won't install your node (you will need to do it manually for security reasons), but it will prepare your server very quickly. You can inspect the source code [here](https://github.com/lamat1111/Quilibrium-Node-Auto-Installer/blob/main/installer). If you are not familiar with code, you can simply copy/paste the whole code in a chatbot such as ChatGPT (or any open-source alternative ;-) and ask them to explain it to you step by step.*
 
 ## Step 1
 **Rent a server with at least 8 cores (best 12), 16 GB RAM (best 32), 250 GB SSD space (best 500), and 400 Mbit/s symmetric bandwidth.**<br>
@@ -97,13 +93,18 @@ Run the auto-installer script on your server (OS must be Ubuntu 22.04.X). I sugg
 > [!NOTE]
 > If the script fails and stops, you can try to run it again (if you understand why it stopped, then try to solve the issue first, of course). If you still receive an error, you may want to proceed manually, step by step, instead of using the auto-installer. Here is the [step by step guide](https://github.com/lamat1111/Quilibrium-Node-Auto-Installer/blob/main/installer-steps.md) you can follow.
 
+After this step is recommended to reboot your server and login again.
+
 ## Step 4
-After installing the node and the necessary applications, the node will run for 5 minutes (in order to generate its ceremonyclient/node/.config and ceremonyclient/node/.config/store folders), then you will be prompted to reboot the system. Type <code>sudo reboot</code> and ENTER. Wait 3 minutes, then login again in your server.
+Install your Quilibrium node
+  ```
+  wget here?
+  ```
 
 ## Step 5
-Run the command below. This will go to the node folder, create a persistent shell (session), start the node via the *poor_mans_cd* script (more info about this script below) and detach from the session again. You won't see any output after running the command, but you can move to Step 7. 
+Run the command below. This will go to the node folder, create a persistent shell (session), start the node via the *qnode_restart* script (more info about this script below) and detach from the session again. You won't see any output after running the command, but you can move to Step 7. 
   ```
-  cd ceremonyclient/node && tmux new-session -d -s quil './poor_mans_cd.sh'
+  tmux new-session -d -s quil 'export PATH=$PATH:/usr/local/go/bin && cd ~/ceremonyclient/node && ~/scripts/qnode_restart.sh'
   ```
   <blockquote>
   <details>
@@ -119,7 +120,7 @@ Run the command below. This will go to the node folder, create a persistent shel
   ```
   
   ```
-  ./poor_mans_cd.sh
+  ~/scripts/qnode_restart.sh
   ```
 To detach from tmux press CTRL+B then D. Now you can safely logout from your server and the node will keep running in its persistent shell.<br>
 To reattach to the tmux session and see your node log, just use `tmux a -t quil`. You can recognize when you are inside your tmux session because there will be a green bar at the bottom of the screen.<br>
@@ -128,7 +129,7 @@ To restart the node, from inside tmux run <code>./poor_mans_cd.sh</code>
 </details>
 </blockquote>
 
-*The poor_mans_cd is a script used to run the node. It will also restart it, if it gets killed and will auto-update it when there is a new version available.*
+*The qnode_restart.sh is a script used to run the node. It will restart it automatically if it gets killed.*
 
 >[!NOTE]
 >If you ever reboot your server, you will need to go through this step 6 again to start the node from scratch (to avoid this, in [Useful Server Commands](d#useful-server-commands) there is a command to setup an automation (AKA cronjob) that will start your node automatically after any server reboot :-)
@@ -384,9 +385,12 @@ To detach from tmux press CTRL+B then release both keys and press D
 <details>
 <summary>Create tmux session + run node + detach from session: 1 step command</summary>
 This is useful to quickly run then node in a session AFTER you have rebooted your server. Only RUN this after a reboot and if you have no tmux session already active.
+
+
+//////////////////UPDATED UP TO HERE//////////////////////
  
 ```bash
-cd ~/ceremonyclient/node && tmux new-session -d -s quil './poor_mans_cd.sh' && tmux detach
+tmux new-session -d -s quil 'export PATH=$PATH:/usr/local/go/bin && cd ~/ceremonyclient/node && ~/scripts/qnode_restart.sh'
 ```
  </details>
  <details>
