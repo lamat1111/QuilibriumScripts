@@ -27,6 +27,8 @@ Update PATH and GOPATH environment variables in ~/.bashrc.
 ```
 echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
 echo 'export GOPATH=$HOME/go' >> ~/.bashrc
+echo 'export GO111MODULE=on' >> ~/.bashrc
+echo 'export GOPROXY=https://goproxy.cn,direct' >> ~/.bashrc
 source ~/.bashrc
 ```
 Create and configure swap space
@@ -41,32 +43,14 @@ sudo bash -c 'echo -e "\nnet.core.rmem_max=600000000" >> /etc/sysctl.conf'
 sudo bash -c 'echo -e "\nnet.core.wmem_max=600000000" >> /etc/sysctl.conf'
 sudo sysctl -p
 ```
-Clone Quilibrium node GitHub repository
+Create some useful folders
 ```
-git clone https://github.com/QuilibriumNetwork/ceremonyclient.git
+mkdir -p /root/backup/ /root/scripts/ /root/scripts/log/
 ```
-Build the client binary
+Create /root/scripts/qnode_restart.sh (simple script to start the node and restart it automatically if it stops)
 ```
-cd ceremonyclient/client
-go build -o qclient
+sudo wget -O /root/scripts/qnode_restart.sh -N https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/qnode_restart && sudo chmod +x /root/scripts/qnode_restart.sh
 ```
-Go to node folder
-```
-cd ceremonyclient/node
-```
-Create  a session named "quil"
-```
-tmux new-session -s quil
-```
-Run the node via the ./poor_mans_cd.sh script
-```
-./poor_mans_cd.sh
-```
-
-Let the node run for 10 minutes (you will see the node log beginning to flow). 
-
-Detach from the session  by pressing CTRL+B then D and ENTER. 
-
 Reboot your server.
 ```
 sudo reboot
