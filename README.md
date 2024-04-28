@@ -384,10 +384,8 @@ To detach from tmux press CTRL+B then release both keys and press D
 </details>
 <details>
 <summary>Create tmux session + run node + detach from session: 1 step command</summary>
-This is useful to quickly run then node in a session AFTER you have rebooted your server. Only RUN this after a reboot and if you have no tmux session already active.
-
-
-//////////////////UPDATED UP TO HERE//////////////////////
+This is useful to quickly run then node in a session AFTER you have rebooted your server. Only RUN this after a reboot and if you have no tmux session already active.<br>
+The last part <code>~/scripts/qnode_restart.sh</code> will only work if you have run the autoinstaller in this guide. Otherwise you have to use <code>GOEXPERIMENT=arenas go run ./...</code>
  
 ```bash
 tmux new-session -d -s quil 'export PATH=$PATH:/usr/local/go/bin && cd ~/ceremonyclient/node && ~/scripts/qnode_restart.sh'
@@ -396,10 +394,11 @@ tmux new-session -d -s quil 'export PATH=$PATH:/usr/local/go/bin && cd ~/ceremon
  <details>
 <summary>Create cronjob to run the node automatically after a reboot</summary>
 You only have to run this command once. This will setup a cronjob that will create your tmux session and run the node automatically after every reboot of your server.
-Shoutout to Peter Jameson (Quilibrium Discord community creator) for the script.
+Shoutout to Peter Jameson (Quilibrium Discord community creator) for the script.<br>
+The last part <code>~/scripts/qnode_restart.sh</code> will only work if you have run the autoinstaller in this guide. Otherwise you have to use <code>GOEXPERIMENT=arenas go run ./...</code>
  
 ```bash
-echo '@reboot sleep 10 && bash -lc "export PATH=$PATH:/usr/local/go/bin && cd ~/ceremonyclient/node && tmux new-session -d -s quil '\''./poor_mans_cd.sh'\''"' | crontab -
+echo "@reboot sleep 10 && tmux new-session -d -s quil 'export PATH=\$PATH:/usr/local/go/bin && cd ~/ceremonyclient/node && ~/scripts/qnode_restart.sh'" | crontab -
 ```
 
 If you need to delete the crontab:<br>
@@ -512,13 +511,13 @@ Kill all the node processes
 ```bash
 pkill node && pkill -f "go run ./..."
 ```
-Go into your tmux session and start again the node.
+Go into your tmux session and start again the node. <br><code>~/scripts/qnode_restart.sh</code> will only work if you have run the autoinstaller in this guide. Otherwise you have to use <code>GOEXPERIMENT=arenas go run ./...</code>
   ```
   tmux a -t quil
   ```
   
   ```
-  ./poor_mans_cd.sh
+  ~/scripts/qnode_restart.sh
   ```
 To detach from tmux press CTRL+B then D.
 </details>
