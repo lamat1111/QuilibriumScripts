@@ -59,13 +59,13 @@ Contabo VPS (EU location) / Alpenhost / Netcup / Hetzner<br>
 *This script is simply packing all the necessary steps and the required applications in a one-click solution. It won't install your node (you will need to do it manually for security reasons), but it will prepare your server very quickly. You can inspect the source code [here](https://github.com/lamat1111/Quilibrium-Node-Auto-Installer/blob/main/installer). If you are not familiar with code, you can simply copy/paste the whole code in a chatbot such as ChatGPT (or any open-source alternative ;-) and ask them to explain it to you step by step.*
 
 ## Step 1
-**Rent a server with at least 8 cores (best 12), 16 GB RAM (best 32), 250 GB SSD space (best 500), and 400 Mbit/s symmetric bandwidth.**<br>
-*(After Quilibrium 1.5 min specs will be: 4 cores, 8 GB RAM, and 400 Mbit/s symmetric bandwidth. Outbound traffic after 1.5 should be up to 5 TB per month ((raw approximation)), depending on how you set the node)*<br>
-Also refer to the [Quilibrium official docs](https://quilibrium.com/docs/noderunning).<br>
-If you can afford better specs than the minimum, your node will earn more rewards. The ratio for optimal rewards from 1.5 on theoretically will be 1:2:4 (core:ram in GB:disk in GB). Your bandwidth will also matter.<br>
+**Rent or use a server with at least 4 cores, 8 GB RAM, 250 GB SSD space, and 400 Mbit/s symmetric bandwidth.**<br>
+*Outbound traffic after 1.5 should be up to 5 TB per month (raw approximation), depending on how you set the node.*<br>
+You can also refer to the [Quilibrium official docs](https://quilibrium.com/docs/noderunning).<br>
+Keep in mind that nodes with better specs will earn more rewards. The ratio for optimal rewards from 1.5 on theoretically will be 1:2:4 (core:ram in GB:disk in GB). Your bandwidth will also matter.<br>
 
 VDS (Virtual Dedicated Servers) and Bare Metal (Physical dedicated Servers) are your best choiche. Using a VPS (Virtual Private Server) may give you issues as often the providers oversell the resources.<br>
-That being said, after 1.5 is out a VPS or a home machine may work just fine if you don't care about absolutely maximizing your rewards.
+That being said, using a VPS or a home machine may work just fine if you don't care about absolutely maximizing your rewards.
 ## Step 2
 **Install the OS Ubuntu 22.04.X.**<br>
 If your server has two disks, consider configuring them in "RAID 1" (typically offered by your provider). This setup mirrors one disk to the other, providing redundancy and safeguarding against data loss in case one disk fails.
