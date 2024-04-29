@@ -12,7 +12,7 @@
 ## Table of Contents
 
 - [Best Server to Run a Quilibrium Node](#best-server-to-run-a-quilibrium-node)
-- [Node auto-installer: how to use the script](#node-auto-installer-install-your-node-in-a-few-clicks)
+- [Auto-installer script](#auto-installer-script-prepare-your-server-for-the-Quilibrium-node)
 - [Backup Your keys.yml and config.yml Files](#backup-your-keysyml-and-configyml-files)
 - [Setup the Firewall and gRPC Calls](#setup-the-grpc-calls)
 - [Tools and resources](#tools-and-resources)
@@ -96,13 +96,17 @@ Run the auto-installer script on your server (OS must be Ubuntu 22.04.X). I sugg
 After this step is recommended to reboot your server and login again.
 
 ## Step 4
-Install your Quilibrium node
+Install your Quilibrium node 
   ```
   wget here?
   ```
+Build the Quilibrium client (for transferring tokens)
+  ```
+  cd ~/ceremonyclient/client && go build -o qclient
+  ```
 
 ## Step 5
-Run the command below. This will go to the node folder, create a persistent shell (session), start the node via the *qnode_restart* script (more info about this script below) and detach from the session again. You won't see any output after running the command, but you can move to Step 7. 
+Run the command below. This will go to the node folder, create a persistent shell (session), start the node via the *qnode_restart* script (more info about this script below) and detach from the session again. You won't see any output after running the command, but you can move to Step 6. 
   ```
   tmux new-session -d -s quil 'export PATH=$PATH:/usr/local/go/bin && cd ~/ceremonyclient/node && ~/scripts/qnode_restart.sh'
   ```
@@ -168,7 +172,7 @@ cd ~/ceremonyclient/node && GOEXPERIMENT=arenas go run ./... -node-info
 
 ### Check your QUIL balance and address (after 1.5)
   ```
-cd ~/ceremonyclient/client && ./qclient token balance
+cd ~/ceremonyclient/client && qclient token balance
   ```
 > [!NOTE]
 > If you get a "No such file or directory" error, run <code>cd ceremonyclient/client && go build -o qclient</code> to try and rebuild the client.<br>
