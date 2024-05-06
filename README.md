@@ -5,7 +5,7 @@
 >[!TIP]
 > This guide contains all the info you need to install and manage a Quilibrium node, plus a special script to install it with a few clicks.<br>The guide and the script are unofficial and have been created solely to support the project.
 
-> Created by **LaMAt** /// connect with me on [Farcaster](https://warpcast.com/~/invite-page/373160?id=67559391) or [Twitter](https://twitter.com/LaMat1111) /// &#x2661; [Donations](#-want-to-say-thank-you)
+> Created by **LaMat** /// connect with me on [Farcaster](https://warpcast.com/~/invite-page/373160?id=67559391) or [Twitter](https://twitter.com/LaMat1111) /// &#x2661; [Donations](#-want-to-say-thank-you)
 
 
 
