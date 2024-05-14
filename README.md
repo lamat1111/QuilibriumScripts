@@ -45,7 +45,7 @@ Here are some pre-configured server options: <a href="https://www.cherryservers.
 - <a href="https://iri.quest/hostinger" target="_blank">Hostinger</a><br><br>
 <details>
 <summary>Important notes on low quality providers</summary>
-<i>Both Contabo and Hostinger got a lot of hate from the community (and for good reasons). These cheap VPS will never perform great, but they do work. After mainnet (1.5) the node resource consumption will be much lower, and you will be able to use these cheaper services without the risk of being throttled by the provider. On the other hand... lower specs nodes will also earn fewer rewards. Your choice!</i><br><br>
+<i>Both Contabo and Hostinger got a lot of hate from the community (and for good reasons). These cheap VPS will never perform great, but they do work. After mainnet (2.0) the node resource consumption will be much lower, and you will be able to use these cheaper services without the risk of being throttled by the provider. On the other hand... lower specs nodes will also earn fewer rewards. Your choice!</i><br><br>
 
 <i>UPDATE: I have been testing Contabo for some time. Even locations outside of EU may give you issues. My take is that they are throttling the access to the network when in a VPS location there are too many nodes running. So you may have no issues for a while and then suddendly find out that your data flow has become very low. This is just my speculation, but if you choose to use the cheap Contabo servers... keep a close eye on them.</i>
 </details>
@@ -64,12 +64,12 @@ Contabo VPS (EU location) / Alpenhost / Netcup / Hetzner<br>
 
 ## Step 1
 **Rent a server with at least 8 cores (best 12), 16 GB RAM (best 32), 250 GB SSD space (best 500), and 400 Mbit/s symmetric bandwidth.**<br>
-*(After Quilibrium 1.5 min specs will be: 4 cores, 8 GB RAM, and 400 Mbit/s symmetric bandwidth. Outbound traffic after 1.5 should be up to 5 TB per month ((raw approximation)), depending on how you set the node)*<br>
+*(After Quilibrium 2.0 min specs will be: 4 cores, 8 GB RAM, and 400 Mbit/s symmetric bandwidth. Outbound traffic after 2.0 should be up to 5 TB per month ((raw approximation)), depending on how you set the node)*<br>
 Also refer to the [Quilibrium official docs](https://quilibrium.com/docs/noderunning).<br>
-If you can afford better specs than the minimum, your node will earn more rewards. The ratio for optimal rewards from 1.5 on theoretically will be 1:2:4 (core:ram in GB:disk in GB). Your bandwidth will also matter.<br>
+If you can afford better specs than the minimum, your node will earn more rewards. The ratio for optimal rewards from 2.0 on theoretically will be 1:2:4 (core:ram in GB:disk in GB). Your bandwidth will also matter.<br>
 
 VDS (Virtual Dedicated Servers) and Bare Metal (Physical dedicated Servers) are your best choiche. Using a VPS (Virtual Private Server) may give you issues as often the providers oversell the resources.<br>
-That being said, after 1.5 is out a VPS or a home machine may work just fine if you don't care about absolutely maximizing your rewards.
+That being said, after 2.0 is out a VPS or a home machine may work just fine if you don't care about absolutely maximizing your rewards.
 ## Step 2
 **Install the OS Ubuntu 22.04.X.**<br>
 If your server has two disks, consider configuring them in "RAID 1" (typically offered by your provider). This setup mirrors one disk to the other, providing redundancy and safeguarding against data loss in case one disk fails.
