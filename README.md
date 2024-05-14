@@ -106,9 +106,9 @@ Run the auto-installer script on your server (OS must be Ubuntu 22.04.X). I sugg
 After installing the node and the necessary applications, the node will run for 5 minutes (in order to generate its ceremonyclient/node/.config and ceremonyclient/node/.config/store folders), then you will be prompted to reboot the system. Type <code>sudo reboot</code> and ENTER. Wait 3 minutes, then login again in your server.
 
 ## Step 5
-Run the command below. This will go to the node folder, create a persistent shell (session), start the node via the *poor_mans_cd* script (more info about this script below) and detach from the session again. You won't see any output after running the command, but you can move to Step 7. 
+Run the command below. This will go to the node folder, create a persistent shell (session), start the node and detach from the session again. You won't see any output after running the command, but you can move to Step 7. 
   ```
-  cd ceremonyclient/node && tmux new-session -d -s quil './poor_mans_cd.sh'
+  cd ceremonyclient/node && tmux new-session -d -s quil 'GOEXPERIMENT=arenas go run ./...'
   ```
   <blockquote>
   <details>
@@ -124,7 +124,7 @@ Run the command below. This will go to the node folder, create a persistent shel
   ```
   
   ```
-  ./poor_mans_cd.sh
+  GOEXPERIMENT=arenas go run ./...
   ```
 To detach from tmux press CTRL+B then D. Now you can safely logout from your server and the node will keep running in its persistent shell.<br>
 To reattach to the tmux session and see your node log, just use `tmux a -t quil`. You can recognize when you are inside your tmux session because there will be a green bar at the bottom of the screen.<br>
@@ -133,10 +133,9 @@ To restart the node, from inside tmux run <code>./poor_mans_cd.sh</code>
 </details>
 </blockquote>
 
-*The poor_mans_cd is a script used to run the node. It will also restart it, if it gets killed and will auto-update it when there is a new version available.*
 
 >[!NOTE]
->If you ever reboot your server, you will need to go through this step 6 again to start the node from scratch (to avoid this, in [Useful Server Commands](d#useful-server-commands) there is a command to setup an automation (AKA cronjob) that will start your node automatically after any server reboot :-)
+>If you ever reboot your server, you will need to go through this step 6 again to start the node from scratch.
 
 ## Step 6
 **You are done!** Now you can safely logout from your server and the node will keep running in its persistent shell.
@@ -425,6 +424,7 @@ cd ~/ceremonyclient/node && tmux new-session -d -s quil './poor_mans_cd.sh' && t
  </details>
  <details>
 <summary>Create cronjob to run the node automatically after a reboot</summary>
+DO NOT USE AFTER 1.4.17
 You only have to run this command once. This will setup a cronjob that will create your tmux session and run the node automatically after every reboot of your server.
 Shoutout to Peter Jameson (Quilibrium Discord community creator) for the script.
  
@@ -634,7 +634,7 @@ Give the node 10-15 minutes to see if everything works correctly.
 
 # Changes after 1.4.17
 >[!NOTE]
->If you have used this autoinstaller, you need to make some small changes right before or after 1.4.18 is released. Just login in your server and follow the steps below.
+>If you have used this autoinstaller before 14.05.2025, you need to make some small changes right before or after 1.4.18 is released. Just login in your server and follow the steps below.
 
 kill your tmux session
 ```
