@@ -15,7 +15,7 @@
 - [Auto-installer script](#auto-installer-script-prepare-your-server-for-the-Quilibrium-node)
 - [Backup Your keys.yml and config.yml Files](#backup-your-keysyml-and-configyml-files)
 - [Setup the Firewall and gRPC Calls](#setup-the-grpc-calls)
-- [Tools and resources](#tools-and-resources)
+- [Tools and links](#tools-and-links)
 - [Useful Server Commands](#useful-server-commands)
 - [Commands for token transfers](https://github.com/lamat1111/Quilibrium-Node-Auto-Installer/blob/main/tokens-cli-commands.md)
 - [Migrate Node to a New Server](#migrate-node-to-a-new-server)
@@ -325,18 +325,45 @@ To use it just type <code>htop</code>
 ------
 ------
 
-# Tools and resources
+# Tools and links
  - To manage your nodes use [Termius](https://termius.com/), the coolest SSH client and terminal around :) 
  - To track your server uptime and  resources usage use [Hetrixtools.com](https://hetrix.tools/u-862828), you can track up to 15 servers for free and the setup is very easy
- - If you need help come to the [Quilibrium Community Discord](https://discord.gg/quilibrium) or the [Quilibrium Telegram group](https://t.me/quilibrium)
+ - If you need help with your node come to the [Quilibrium Community Discord](https://discord.gg/quilibrium) or the [Quilibrium Telegram group](https://t.me/quilibrium)
 
-### Quilibrium official stuff
+<details>
+<summary>Community links</summary>
+- <a href="https://discord.gg/quilibrium">Discord</a><br>
+- <a href="https://docs.quilibrium.space/">Documentation</a><br>
+- <a href="https://t.me/quilibrium">Telegram</a><br>
+- <a href="https://twitter.com/Quilibrium_xyz">Twitter</a>
+</details>
 
- - [Website](https://quilibrium.com/) and [Whitepaper](https://quilibrium.com/quilibrium.pdf)
- - [Quilibrium channel on Warpcast](https://warpcast.com/~/channel/quilibrium)
- - [Quilibrium "builders" channel on Warpcast](https://warpcast.com/~/channel/q-builders)
- - [Quilibrium blog](https://paragraph.xyz/@quilibrium.com)
- - [Founder blog](https://cassieheart.substack.com/)
+<details>
+<summary>Official links</summary>
+- <a href="https://quilibrium.com/">Website</a><br>
+- <a href="https://warpcast.com/~/channel/quilibrium">Warpcast</a><br>
+- <a href="https://quilibrium.com/quilibrium.pdf">Whitepaper</a><br>
+- <a href="https://github.com/quilibriumnetwork/">Github</a><br>
+<br>
+- <a href="https://opensea.io/collection/long-live-the-internet">NFT</a><br>
+- <a href="https://paragraph.xyz/@quilibrium.com">Blog</a><br>
+- <a href="https://cassieheart.substack.com/">Cassies's (lead dev) blog</a>
+</details>
+
+<details>
+<summary>Buy token (wQUIL ERC-20)</summary>
+- <a href="0x8143182a775c54578c8b7b3ef77982498866945d">Contract</a><br>
+- <a href="https://discord.gg/quilibrium">OTC (Community Discord)</a><br>
+- <a href="https://app.uniswap.org/swap?inputCurrency=ETH&outputCurrency=0x8143182a775c54578c8b7b3ef77982498866945d">Uniswap</a><br>
+- <a href="https://www.dextools.io/app/en/ether/pair-explorer/0x43e7ade137b86798654d8e78c36d5a556a647224">Dextools</a>
+</details>
+
+<details>
+<summary>Videos</summary>
+- <a href="https://www.youtube.com/watch?v=GeuZsX6dC08">The "Alternative" Thesis of Consumer Crypto (backstory)</a><br>
+- <a href="https://www.youtube.com/watch?v=_mO07gDTX7Q">Quilibrium Overview: How does it tick? (technical)</a><br>
+- <a href="https://www.youtube.com/watch?v=Ye677-FkgXE">Quilibrium Q&A, Roadmap, High Level Explainer (technical)</a>
+</details>
 
 # Useful server commands
 
