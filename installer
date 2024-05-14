@@ -144,7 +144,8 @@ echo "Creating qnode_restart.sh script..."
 # Check if the file already exists
 if [ ! -f "/root/scripts/qnode_restart.sh" ]; then
     # Attempt to download the script
-    sudo wget -O /root/scripts/qnode_restart.sh https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/qnode_restart
+   #Change 1.5 to master when ready
+    sudo wget -O /root/scripts/qnode_restart.sh https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/1.5/qnode_restart
 
     # Check the exit status of wget
     if [ $? -eq 0 ]; then
