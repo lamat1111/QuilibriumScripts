@@ -1,7 +1,7 @@
 # Quilibrium node guide and auto-installer script
 >[!WARNING]
 >Do not use this autoinstaller script after version 1.4.18 of Quilibrium, as some things will change and there will be an alternative (and more secure) release method outside of Github.
->If the current version is 1.4.17, the autoinstaller will still work, but you will need some manual changes right befor or after 1.4.18 is released.
+>If the current version is 1.4.17, the autoinstaller will still work, but you will need to do some small manual changes right before or after 1.4.18 is released.
 
 >[!TIP]
 > This guide contains all the info you need to install and manage a Quilibrium node, plus a special script to install it with a few clicks.<br>The guide and the script are unofficial and have been created solely to support the project.
@@ -78,7 +78,7 @@ If your server has two disks, consider configuring them in "RAID 1" (typically o
 ## Step 3
 >[!WARNING]
 >Do not use this autoinstaller script after version 1.4.18 of Quilibrium, as some things will change and there will be an alternative (and more secure) release method outside of Github.
->If the current version is 1.4.17, the autoinstaller will still work, but you will need some manual changes right befor or after 1.4.18 is released.
+>If the current version is 1.4.17, the autoinstaller will still work, but you will need to do some small manual changes right before or after 1.4.18 is released.
 
 Run the auto-installer script on your server (OS must be Ubuntu 22.04.X). I suggest you to use [Termius](https://termius.com/) to login. Be sure that you are logging in via port 22 (default with most server providers).
 ```
