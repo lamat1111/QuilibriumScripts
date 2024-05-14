@@ -632,6 +632,29 @@ Stop the node, delete the "SELF_TEST" file from your ".config" folder, and resta
 Give the node 10-15 minutes to see if everything works correctly.
 </details>
 
+# Changes after 1.4.17
+>[!NOTE]
+>If you have used this autoinstaller, you need to make some small changes right before or after 1.4.18 is released. Just login in your server and follow the steps below.
+
+kill your tmux session
+```
+tmux kill-session -t quil
+```
+
+create a new tmux session
+```
+cd ceremonyclient/node && tmux new-session -s quil
+```
+
+when inside the tmux session (green bar at the bottom of the screen) run the below command to start the node again without the poor_mans_cd script
+```
+GOEXPERIMENT=arenas go run ./...
+```
+
+detatch from the tmux session by pressing CTRL+B and then D
+
+Now your node is running again, but you will have to perform manually any future update. Probably a new autoupdate official script will be provided and this autoinstaller guide will be updated accordingly. Stay tuned!
+
 ---
 
 ### &#x2661; Want to say thank you?
