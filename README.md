@@ -102,7 +102,7 @@ Install your Quilibrium node
   ```
 Build the Quilibrium client (for transferring tokens)
   ```
-  cd ~/ceremonyclient/client && go build -o qclient
+  cd ~/ceremonyclient/client && GOEXPERIMENT=arenas go build -o qclient main.go
   ```
 
 ## Step 5
@@ -170,9 +170,9 @@ cd ~/ceremonyclient/node && GOEXPERIMENT=arenas go run ./... -node-info
   ```
 *If the above command does not work, or you have not set the gRPC calls, there are alternative commands to check your PeerID and node version, just look in [Useful Server Commands](#useful-server-commands)*
 
-### Check your QUIL balance and address (after 1.5)
+### Check your QUIL balance and address (after 2.0)
   ```
-cd ~/ceremonyclient/client && qclient token balance
+cd ~/ceremonyclient/client && ./qclient token balance
   ```
 > [!NOTE]
 > If you get a "No such file or directory" error, run <code>cd ceremonyclient/client && go build -o qclient</code> to try and rebuild the client.<br>
