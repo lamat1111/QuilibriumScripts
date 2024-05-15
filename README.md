@@ -3,7 +3,7 @@
 >[!TIP]
 > This guide contains all the info you need to install and manage a Quilibrium node, plus a special script to prepare your Ubuntu server and install the necessary applications.<br>The guide and the script are unofficial and have been created solely to support the project.
 
-> Created by **LaMAt** /// connect with me on [Farcaster](https://warpcast.com/~/invite-page/373160?id=67559391) or [Twitter](https://twitter.com/LaMat1111) /// &#x2661; [Donations](#-want-to-say-thank-you)
+> Created by **LaMat** /// connect with me on [Farcaster](https://warpcast.com/~/invite-page/373160?id=67559391) or [Twitter](https://twitter.com/LaMat1111) /// &#x2661; [Donations](#-want-to-say-thank-you)
 
 
 
@@ -43,7 +43,7 @@ Here are some pre-configured server options: <a href="https://www.cherryservers.
 - <a href="https://iri.quest/hostinger" target="_blank">Hostinger</a><br><br>
 <details>
 <summary>Important notes on low quality providers</summary>
-<i>Both Contabo and Hostinger got a lot of hate from the community (and for good reasons). These cheap VPS will never perform great, but they do work. After mainnet (1.5) the node resource consumption will be much lower, and you will be able to use these cheaper services without the risk of being throttled by the provider. On the other hand... lower specs nodes will also earn fewer rewards. Your choice!</i><br><br>
+<i>Both Contabo and Hostinger got a lot of hate from the community (and for good reasons). These cheap VPS will never perform great, but they do work. After mainnet (2.0) the node resource consumption will be much lower, and you will be able to use these cheaper services without the risk of being throttled by the provider. On the other hand... lower specs nodes will also earn fewer rewards. Your choice!</i><br><br>
 
 <i>UPDATE: I have been testing Contabo for some time. Even locations outside of EU may give you issues. My take is that they are throttling the access to the network when in a VPS location there are too many nodes running. So you may have no issues for a while and then suddendly find out that your data flow has become very low. This is just my speculation, but if you choose to use the cheap Contabo servers... keep a close eye on them.</i>
 </details>
@@ -66,29 +66,17 @@ Keep in mind that nodes with better specs will earn more rewards. The ratio for 
 
 VDS (Virtual Dedicated Servers) and Bare Metal (Physical dedicated Servers) are your best choiche. Using a VPS (Virtual Private Server) may give you issues as often the providers oversell the resources.<br>
 That being said, using a VPS or a home machine may work just fine if you don't care about absolutely maximizing your rewards.
+
 ## Step 2
 **Install the OS Ubuntu 22.04.X.**<br>
 If your server has two disks, consider configuring them in "RAID 1" (typically offered by your provider). This setup mirrors one disk to the other, providing redundancy and safeguarding against data loss in case one disk fails.
 
 ## Step 3
+
 Run the auto-installer script on your server (OS must be Ubuntu 22.04.X). I suggest you to use [Termius](https://termius.com/) to login. Be sure that you are logging in via port 22 (default with most server providers).
 ```
  wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/installer | bash
 ```
-<!--
-<blockquote>
-<details>
- <summary>Auto-installer script for Almalinux 8 (untested)</summary>
- The below script has not been tested yet, run it at you own risk!
- 
- 
- ```
- wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/installer-ubuntu-almalinux | bash
-```
-
-</details>
-</blockquote>
--->
 
 > [!NOTE]
 > If the script fails and stops, you can try to run it again (if you understand why it stopped, then try to solve the issue first, of course). If you still receive an error, you may want to proceed manually, step by step, instead of using the auto-installer. Here is the [step by step guide](https://github.com/lamat1111/Quilibrium-Node-Auto-Installer/blob/main/installer-steps.md) you can follow.
@@ -125,6 +113,7 @@ Run the command below. This will go to the node folder, create a persistent shel
   
   ```
   ~/scripts/qnode_restart.sh
+
   ```
 To detach from tmux press CTRL+B then D. Now you can safely logout from your server and the node will keep running in its persistent shell.<br>
 To reattach to the tmux session and see your node log, just use `tmux a -t quil`. You can recognize when you are inside your tmux session because there will be a green bar at the bottom of the screen.<br>
@@ -135,8 +124,9 @@ To restart the node, from inside tmux run <code>./poor_mans_cd.sh</code>
 
 *The qnode_restart.sh is a script used to run the node. It will restart it automatically if it gets killed.*
 
+
 >[!NOTE]
->If you ever reboot your server, you will need to go through this step 6 again to start the node from scratch (to avoid this, in [Useful Server Commands](d#useful-server-commands) there is a command to setup an automation (AKA cronjob) that will start your node automatically after any server reboot :-)
+>If you ever reboot your server, you will need to go through this step 6 again to start the node from scratch.
 
 ## Step 6
 **You are done!** Now you can safely logout from your server and the node will keep running in its persistent shell.
@@ -364,6 +354,34 @@ To use it just type <code>htop</code>
 - <a href="https://www.youtube.com/watch?v=_mO07gDTX7Q">Quilibrium Overview: How does it tick? (technical)</a><br>
 - <a href="https://www.youtube.com/watch?v=Ye677-FkgXE">Quilibrium Q&A, Roadmap, High Level Explainer (technical)</a>
 </details>
+=======
+
+<details>
+<summary>Official links</summary>
+- <a href="https://quilibrium.com/">Website</a><br>
+- <a href="https://warpcast.com/~/channel/quilibrium">Warpcast</a><br>
+- <a href="https://quilibrium.com/quilibrium.pdf">Whitepaper</a><br>
+- <a href="https://github.com/quilibriumnetwork/">Github</a><br>
+<br>
+- <a href="https://opensea.io/collection/long-live-the-internet">NFT</a><br>
+- <a href="https://paragraph.xyz/@quilibrium.com">Blog</a><br>
+- <a href="https://cassieheart.substack.com/">Cassies's (lead dev) blog</a>
+</details>
+
+<details>
+<summary>Buy token (wQUIL ERC-20)</summary>
+- <a href="0x8143182a775c54578c8b7b3ef77982498866945d">Contract</a><br>
+- <a href="https://discord.gg/quilibrium">OTC (Community Discord)</a><br>
+- <a href="https://app.uniswap.org/swap?inputCurrency=ETH&outputCurrency=0x8143182a775c54578c8b7b3ef77982498866945d">Uniswap</a><br>
+- <a href="https://www.dextools.io/app/en/ether/pair-explorer/0x43e7ade137b86798654d8e78c36d5a556a647224">Dextools</a>
+</details>
+
+<details>
+<summary>Videos</summary>
+- <a href="https://www.youtube.com/watch?v=GeuZsX6dC08">The "Alternative" Thesis of Consumer Crypto (backstory)</a><br>
+- <a href="https://www.youtube.com/watch?v=_mO07gDTX7Q">Quilibrium Overview: How does it tick? (technical)</a><br>
+- <a href="https://www.youtube.com/watch?v=Ye677-FkgXE">Quilibrium Q&A, Roadmap, High Level Explainer (technical)</a>
+</details>
 
 # Useful server commands
 
@@ -424,6 +442,7 @@ tmux new-session -d -s quil 'export PATH=$PATH:/usr/local/go/bin && cd ~/ceremon
  </details>
  <details>
 <summary>Create cronjob to run the node automatically after a reboot</summary>
+DO NOT USE AFTER 1.4.17
 You only have to run this command once. This will setup a cronjob that will create your tmux session and run the node automatically after every reboot of your server.
 Shoutout to Peter Jameson (Quilibrium Discord community creator) for the script.<br>
 The last part <code>~/scripts/qnode_restart.sh</code> will only work if you have run the autoinstaller in this guide. Otherwise you have to use <code>GOEXPERIMENT=arenas go run ./...</code>
@@ -631,6 +650,29 @@ If you imported an external "store" folder to kickstart your node syncronization
 Stop the node, delete the "SELF_TEST" file from your ".config" folder, and restart the node. If this doesn't solve, try to  import in the ".config" folder the "REPAIR" file form another working node, and delete the existing one.<br>
 Give the node 10-15 minutes to see if everything works correctly.
 </details>
+
+# Changes after 1.4.17
+>[!NOTE]
+>If you have used this autoinstaller before 14.05.2025, you need to make some small changes right before or after 1.4.18 is released. Just login in your server and follow the steps below.
+
+kill your tmux session
+```
+tmux kill-session -t quil
+```
+
+create a new tmux session
+```
+cd ceremonyclient/node && tmux new-session -s quil
+```
+
+when inside the tmux session (green bar at the bottom of the screen) run the below command to start the node again without the poor_mans_cd script
+```
+GOEXPERIMENT=arenas go run ./...
+```
+
+detatch from the tmux session by pressing CTRL+B and then D
+
+Now your node is running again, but you will have to perform manually any future update. Probably a new autoupdate official script will be provided and this autoinstaller guide will be updated accordingly. Stay tuned!
 
 ---
 
