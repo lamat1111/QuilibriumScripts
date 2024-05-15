@@ -71,7 +71,6 @@ fi
 source ~/.bashrc
 sleep 1  # Add a 1-second delay
 
-
 # Step 5: Create swap space
 if ! [ "$(sudo swapon -s)" ]; then
   echo "Creating swap space..."
@@ -94,38 +93,7 @@ else
 fi
 sudo sysctl -p
 
-# Step 7: Install the node and the client from the Github repo
-cd ~/ || { echo "Failed to change directory to $HOME! Exiting..."; exit_message; exit 1; }
-if [[ -d "ceremonyclient" ]]; then
-  echo "ceremonyclient directory already exists. I don't want to overwrite your ceremonyclient, so I will skip the install..."
-else
-  echo "Downloading the node software..."
-  git clone https://github.com/QuilibriumNetwork/ceremonyclient.git || { echo "Failed to clone the repository! Exiting..."; exit_message; exit 1; }
-fi
-
-# Set Go environment variables temporarily - redundant but it fixes the GO command not found error
-export PATH=$PATH:/usr/local/go/bin 
-export GOPATH=~/go
-
-# Step 8: Build the client
-echo "Building the client..."
-cd ceremonyclient/client
-
-# Check if the client binary already exists
-if [ -f qclient ]; then
-    echo "Client already built. Skipping..."
-else
-    go build -o qclient || echo "Failed to build the client! You will have to do it manually later."
-fi
-
-# Step 9: Setup Firewall
-#!/bin/bash
-
-# Function to check if a UFW rule exists
-ufw_rule_exists() {
-    sudo ufw status numbered | grep -qF "$1"
-}
-
+# Step 7: Install ufw and configure firewall
 echo "Installing ufw (Uncomplicated Firewall)..."
 sudo apt-get update
 sudo apt-get install ufw -y || { echo "Failed to install ufw! Moving on to the next step..."; }
@@ -154,29 +122,7 @@ else
     echo "Failed to configure firewall or ufw is not installed. No worries, you can do it later manually.  Moving on to the next step..."
 fi
 
-
-# Change directory to the node directory
- echo "Changing directory to node..."
- cd ../node || { echo "Failed to change directory to node! Exiting..."; exit_message; exit 1; }
-
-# Step 10: Letting the node run for 5 minutes
- echo "Running the node for 5 minutes..."
- GOEXPERIMENT=arenas go run ./... > /dev/null 2>&1 &  # Redirect output to /dev/null
- countdown() {
-     secs=$1         # Assign the input argument (300) to the variable 'secs'
-     while [ $secs -gt 0 ]; do
-         printf "\r%02d:%02d remaining" $(($secs/60)) $(($secs%60)) # Print the remaining time (mm:ss) with a carriage return (\r) to overwrite the previous line
-         sleep 1     # Wait for 1 second
-         ((secs--))  # Decrement the 'secs' variable by 1
-     done
-     printf "\nDone!\n" # After the countdown completes, print "Done!" on a new line
- }
- countdown 300 || { echo "Failed to wait! Exiting..."; exit_message; exit 1; }
-
-
-#!/bin/bash
-
-# Step 11: Creating some folders that may be useful
+# Step 8: Creating some useful folders
 # Create /root/backup/ folder if it doesn't exist already
 echo "Creating /root/backup/ folder..."
 mkdir -p /root/backup/
@@ -192,7 +138,28 @@ echo "Creating /root/scripts/log/ folder..."
 mkdir -p /root/scripts/log/
 echo "Done."
 
-# Step 12: Prompt for reboot
-echo "Node setup is finished."
+# Step 9: Create qnode_restart.sh script and set permissions
+echo "Creating qnode_restart.sh script..."
+
+# Check if the file already exists
+if [ ! -f "/root/scripts/qnode_restart.sh" ]; then
+    # Attempt to download the script
+   #Change 1.5 to master when ready
+    sudo wget -O /root/scripts/qnode_restart.sh https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/1.5/qnode_restart
+
+    # Check the exit status of wget
+    if [ $? -eq 0 ]; then
+        sudo chmod +x /root/scripts/qnode_restart.sh
+        echo "qnode_restart.sh script created and permissions set."
+    else
+        echo "Failed to download qnode_restart.sh script. You will have to do this manually later. Moving on to the next step..."
+    fi
+else
+    echo "qnode_restart.sh script already exists. Skipping download."
+fi
+
+# Step 10: Prompt for reboot
+echo "Server setup is finished"
 echo "Type 'sudo reboot' and press ENTER to reboot your server."
-echo "Then follow the online guide for the next steps: github.com/lamat1111/Quilibrium-Node-Auto-Installer"
+echo "Then follow the online guide for the next steps to install your Quilibrium node: github.com/lamat1111/Quilibrium-Node-Auto-Installer"
+

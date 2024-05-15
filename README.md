@@ -1,12 +1,7 @@
-# Quilibrium node guide and auto-installer script
-<!--
->[!WARNING]
->Do not use this autoinstaller script after version 1.4.18 of Quilibrium, as some things will change and there will be an alternative (and more secure) release method outside of Github.
->If the current version is 1.4.17, the autoinstaller will still work, but you will need to do some small manual changes right before or after 1.4.18 is released.
--->
+# Quilibrium node setup guide and auto-installer script
 
 >[!TIP]
-> This guide contains all the info you need to install and manage a Quilibrium node, plus a special script to install it with a few clicks.<br>The guide and the script are unofficial and have been created solely to support the project.
+> This guide contains all the info you need to install and manage a Quilibrium node, plus a special script to prepare your Ubuntu server and install the necessary applications.<br>The guide and the script are unofficial and have been created solely to support the project.
 
 > Created by **LaMat** /// connect with me on [Farcaster](https://warpcast.com/~/invite-page/373160?id=67559391) or [Twitter](https://twitter.com/LaMat1111) /// &#x2661; [Donations](#-want-to-say-thank-you)
 
@@ -17,7 +12,7 @@
 ## Table of Contents
 
 - [Best Server to Run a Quilibrium Node](#best-server-to-run-a-quilibrium-node)
-- [Node auto-installer: how to use the script](#node-auto-installer-install-your-node-in-a-few-clicks)
+- [Auto-installer script](#auto-installer-script-prepare-your-server-for-the-Quilibrium-node)
 - [Backup Your keys.yml and config.yml Files](#backup-your-keysyml-and-configyml-files)
 - [Setup the Firewall and gRPC Calls](#setup-the-grpc-calls)
 - [Tools and links](#tools-and-links)
@@ -59,60 +54,49 @@ Contabo VPS (EU location) / Alpenhost / Netcup / Hetzner<br>
 *These providers either don't support Quilibrium, blockchain nodes in general, or have been reported giving issues to users running nodes.*
 
 
-# Node auto-installer: install your node in a few clicks
+# Auto-installer script: prepare your server for the Quilibrium node
 
-*If you are reinstalling your existing node, be sure to backup your keys.yml and config.yml files, they are in the root/ceremonyclient/node/.config folder. [How do I do this?](https://github.com/lamat1111/quilibrium-node-auto-installer/blob/main/README.md#backup-your-keysyml-and-configyml-files)*
-
-*This script is simply packing all the necessary steps to install your node and the required applications in a one-click solution. You can inspect the source code [here](https://github.com/lamat1111/Quilibrium-Node-Auto-Installer/blob/main/installer). If you are not familiar with code, you can simply copy/paste the whole code in a chatbot such as ChatGPT (or any open-source alternative ;-) and ask them to explain it to you step by step.*
+*This script is simply packing all the necessary steps and the required applications in a one-click solution. It won't install your node (you will need to do it manually for security reasons), but it will prepare your server very quickly. You can inspect the source code [here](https://github.com/lamat1111/Quilibrium-Node-Auto-Installer/blob/main/installer). If you are not familiar with code, you can simply copy/paste the whole code in a chatbot such as ChatGPT (or any open-source alternative ;-) and ask them to explain it to you step by step.*
 
 ## Step 1
-**Rent a server with at least 8 cores (best 12), 16 GB RAM (best 32), 250 GB SSD space (best 500), and 400 Mbit/s symmetric bandwidth.**<br>
-*(After Quilibrium 2.0 min specs will be: 4 cores, 8 GB RAM, and 400 Mbit/s symmetric bandwidth. Outbound traffic after 2.0 should be up to 5 TB per month ((raw approximation)), depending on how you set the node)*<br>
-Also refer to the [Quilibrium official docs](https://quilibrium.com/docs/noderunning).<br>
-If you can afford better specs than the minimum, your node will earn more rewards. The ratio for optimal rewards from 2.0 on theoretically will be 1:2:4 (core:ram in GB:disk in GB). Your bandwidth will also matter.<br>
+**Rent or use a server with at least 4 cores, 8 GB RAM, 250 GB SSD space, and 400 Mbit/s symmetric bandwidth.**<br>
+*Outbound traffic after 1.5 should be up to 5 TB per month (raw approximation), depending on how you set the node.*<br>
+You can also refer to the [Quilibrium official docs](https://quilibrium.com/docs/noderunning).<br>
+Keep in mind that nodes with better specs will earn more rewards. The ratio for optimal rewards from 1.5 on theoretically will be 1:2:4 (core:ram in GB:disk in GB). Your bandwidth will also matter.<br>
 
 VDS (Virtual Dedicated Servers) and Bare Metal (Physical dedicated Servers) are your best choiche. Using a VPS (Virtual Private Server) may give you issues as often the providers oversell the resources.<br>
-That being said, after 2.0 is out a VPS or a home machine may work just fine if you don't care about absolutely maximizing your rewards.
+That being said, using a VPS or a home machine may work just fine if you don't care about absolutely maximizing your rewards.
+
 ## Step 2
 **Install the OS Ubuntu 22.04.X.**<br>
 If your server has two disks, consider configuring them in "RAID 1" (typically offered by your provider). This setup mirrors one disk to the other, providing redundancy and safeguarding against data loss in case one disk fails.
 
 ## Step 3
-<!--
->[!WARNING]
->Do not use this autoinstaller script after version 1.4.18 of Quilibrium, as some things will change and there will be an alternative (and more secure) release method outside of Github.
->If the current version is 1.4.17, the autoinstaller will still work, but you will need to do some small manual changes right before or after 1.4.18 is released.
--->
 
 Run the auto-installer script on your server (OS must be Ubuntu 22.04.X). I suggest you to use [Termius](https://termius.com/) to login. Be sure that you are logging in via port 22 (default with most server providers).
 ```
  wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/installer | bash
 ```
-<!--
-<blockquote>
-<details>
- <summary>Auto-installer script for Almalinux 8 (untested)</summary>
- The below script has not been tested yet, run it at you own risk!
- 
- 
- ```
- wget -O - https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/installer-ubuntu-almalinux | bash
-```
-
-</details>
-</blockquote>
--->
 
 > [!NOTE]
 > If the script fails and stops, you can try to run it again (if you understand why it stopped, then try to solve the issue first, of course). If you still receive an error, you may want to proceed manually, step by step, instead of using the auto-installer. Here is the [step by step guide](https://github.com/lamat1111/Quilibrium-Node-Auto-Installer/blob/main/installer-steps.md) you can follow.
 
+After this step is recommended to reboot your server and login again.
+
 ## Step 4
-After installing the node and the necessary applications, the node will run for 5 minutes (in order to generate its ceremonyclient/node/.config and ceremonyclient/node/.config/store folders), then you will be prompted to reboot the system. Type <code>sudo reboot</code> and ENTER. Wait 3 minutes, then login again in your server.
+Install your Quilibrium node 
+  ```
+  wget here?
+  ```
+Build the Quilibrium client (for transferring tokens)
+  ```
+  cd ~/ceremonyclient/client && GOEXPERIMENT=arenas go build -o qclient main.go
+  ```
 
 ## Step 5
-Run the command below. This will go to the node folder, create a persistent shell (session), start the node and detach from the session again. You won't see any output after running the command, but you can move to Step 7. 
+Run the command below. This will go to the node folder, create a persistent shell (session), start the node via the *qnode_restart* script (more info about this script below) and detach from the session again. You won't see any output after running the command, but you can move to Step 6. 
   ```
-  cd ceremonyclient/node && tmux new-session -d -s quil 'GOEXPERIMENT=arenas go run ./...'
+  tmux new-session -d -s quil 'export PATH=$PATH:/usr/local/go/bin && cd ~/ceremonyclient/node && ~/scripts/qnode_restart.sh'
   ```
   <blockquote>
   <details>
@@ -128,7 +112,8 @@ Run the command below. This will go to the node folder, create a persistent shel
   ```
   
   ```
-  GOEXPERIMENT=arenas go run ./...
+  ~/scripts/qnode_restart.sh
+
   ```
 To detach from tmux press CTRL+B then D. Now you can safely logout from your server and the node will keep running in its persistent shell.<br>
 To reattach to the tmux session and see your node log, just use `tmux a -t quil`. You can recognize when you are inside your tmux session because there will be a green bar at the bottom of the screen.<br>
@@ -136,6 +121,8 @@ To stop the node, from inside tmux click CTRL+C <br>
 To restart the node, from inside tmux run <code>./poor_mans_cd.sh</code>
 </details>
 </blockquote>
+
+*The qnode_restart.sh is a script used to run the node. It will restart it automatically if it gets killed.*
 
 
 >[!NOTE]
@@ -173,7 +160,7 @@ cd ~/ceremonyclient/node && GOEXPERIMENT=arenas go run ./... -node-info
   ```
 *If the above command does not work, or you have not set the gRPC calls, there are alternative commands to check your PeerID and node version, just look in [Useful Server Commands](#useful-server-commands)*
 
-### Check your QUIL balance and address (after 1.5)
+### Check your QUIL balance and address (after 2.0)
   ```
 cd ~/ceremonyclient/client && ./qclient token balance
   ```
@@ -367,8 +354,34 @@ To use it just type <code>htop</code>
 - <a href="https://www.youtube.com/watch?v=_mO07gDTX7Q">Quilibrium Overview: How does it tick? (technical)</a><br>
 - <a href="https://www.youtube.com/watch?v=Ye677-FkgXE">Quilibrium Q&A, Roadmap, High Level Explainer (technical)</a>
 </details>
+=======
 
+<details>
+<summary>Official links</summary>
+- <a href="https://quilibrium.com/">Website</a><br>
+- <a href="https://warpcast.com/~/channel/quilibrium">Warpcast</a><br>
+- <a href="https://quilibrium.com/quilibrium.pdf">Whitepaper</a><br>
+- <a href="https://github.com/quilibriumnetwork/">Github</a><br>
+<br>
+- <a href="https://opensea.io/collection/long-live-the-internet">NFT</a><br>
+- <a href="https://paragraph.xyz/@quilibrium.com">Blog</a><br>
+- <a href="https://cassieheart.substack.com/">Cassies's (lead dev) blog</a>
+</details>
 
+<details>
+<summary>Buy token (wQUIL ERC-20)</summary>
+- <a href="0x8143182a775c54578c8b7b3ef77982498866945d">Contract</a><br>
+- <a href="https://discord.gg/quilibrium">OTC (Community Discord)</a><br>
+- <a href="https://app.uniswap.org/swap?inputCurrency=ETH&outputCurrency=0x8143182a775c54578c8b7b3ef77982498866945d">Uniswap</a><br>
+- <a href="https://www.dextools.io/app/en/ether/pair-explorer/0x43e7ade137b86798654d8e78c36d5a556a647224">Dextools</a>
+</details>
+
+<details>
+<summary>Videos</summary>
+- <a href="https://www.youtube.com/watch?v=GeuZsX6dC08">The "Alternative" Thesis of Consumer Crypto (backstory)</a><br>
+- <a href="https://www.youtube.com/watch?v=_mO07gDTX7Q">Quilibrium Overview: How does it tick? (technical)</a><br>
+- <a href="https://www.youtube.com/watch?v=Ye677-FkgXE">Quilibrium Q&A, Roadmap, High Level Explainer (technical)</a>
+</details>
 
 # Useful server commands
 
@@ -420,20 +433,22 @@ To detach from tmux press CTRL+B then release both keys and press D
 </details>
 <details>
 <summary>Create tmux session + run node + detach from session: 1 step command</summary>
-This is useful to quickly run then node in a session AFTER you have rebooted your server. Only RUN this after a reboot and if you have no tmux session already active.
+This is useful to quickly run then node in a session AFTER you have rebooted your server. Only RUN this after a reboot and if you have no tmux session already active.<br>
+The last part <code>~/scripts/qnode_restart.sh</code> will only work if you have run the autoinstaller in this guide. Otherwise you have to use <code>GOEXPERIMENT=arenas go run ./...</code>
  
 ```bash
-cd ~/ceremonyclient/node && tmux new-session -d -s quil './poor_mans_cd.sh' && tmux detach
+tmux new-session -d -s quil 'export PATH=$PATH:/usr/local/go/bin && cd ~/ceremonyclient/node && ~/scripts/qnode_restart.sh'
 ```
  </details>
  <details>
 <summary>Create cronjob to run the node automatically after a reboot</summary>
 DO NOT USE AFTER 1.4.17
 You only have to run this command once. This will setup a cronjob that will create your tmux session and run the node automatically after every reboot of your server.
-Shoutout to Peter Jameson (Quilibrium Discord community creator) for the script.
+Shoutout to Peter Jameson (Quilibrium Discord community creator) for the script.<br>
+The last part <code>~/scripts/qnode_restart.sh</code> will only work if you have run the autoinstaller in this guide. Otherwise you have to use <code>GOEXPERIMENT=arenas go run ./...</code>
  
 ```bash
-echo '@reboot sleep 10 && bash -lc "export PATH=$PATH:/usr/local/go/bin && cd ~/ceremonyclient/node && tmux new-session -d -s quil '\''./poor_mans_cd.sh'\''"' | crontab -
+echo "@reboot sleep 10 && tmux new-session -d -s quil 'export PATH=\$PATH:/usr/local/go/bin && cd ~/ceremonyclient/node && ~/scripts/qnode_restart.sh'" | crontab -
 ```
 
 If you need to delete the crontab:<br>
@@ -546,13 +561,13 @@ Kill all the node processes
 ```bash
 pkill node && pkill -f "go run ./..."
 ```
-Go into your tmux session and start again the node.
+Go into your tmux session and start again the node. <br><code>~/scripts/qnode_restart.sh</code> will only work if you have run the autoinstaller in this guide. Otherwise you have to use <code>GOEXPERIMENT=arenas go run ./...</code>
   ```
   tmux a -t quil
   ```
   
   ```
-  ./poor_mans_cd.sh
+  ~/scripts/qnode_restart.sh
   ```
 To detach from tmux press CTRL+B then D.
 </details>
