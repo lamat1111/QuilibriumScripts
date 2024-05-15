@@ -160,5 +160,5 @@ fi
 # Step 10: Prompt for reboot
 echo "Server setup is finished"
 echo "Type 'sudo reboot' and press ENTER to reboot your server."
-echo "Then follow the online guide for the next steps to install your Quilibrium node: github.com/lamat1111/Quilibrium-Node-Auto-Installer"
+echo "Then follow the online guide for the next steps to install your Quilibrium node: https://iri.quest/quilibrium-node-guide"
 
