@@ -7,6 +7,12 @@ exit_message() {
     echo "If you still receive an error, you may want to proceed manually, step by step instead of using the auto-installer."
 }
 
+# Function to check if a UFW rule exists
+ufw_rule_exists() {
+    local rule="$1"
+    sudo ufw status | grep -q "$rule"
+}
+
 # Step 0: Check sudo availability
 if ! [ -x "$(command -v sudo)" ]; then
   echo "Sudo is not installed! This script requires sudo to run. Exiting..." >&2
@@ -23,7 +29,7 @@ echo "Installing required packages..."
 sudo apt-get install git wget tmux tar -y || { echo "Failed to install required packages! Exiting..."; exit_message; exit 1; }
 
 # Step 3: Download and extract Go
-if [[ $(go version) == *"go1.20.1"[1-4]* ]]; then
+if [[ $(go version) == *"go1.20.1"* || $(go version) == *"go1.20.2"* || $(go version) == *"go1.20.3"* || $(go version) == *"go1.20.4"* ]]; then
   echo "Correct version of Go is already installed, moving on..."
 else
   echo "Installing the necessary version of Go..."
@@ -81,13 +87,13 @@ fi
 
 # Step 6: Adjust network buffer sizes
 echo "Adjusting network buffer sizes..."
-if [[ $(grep ^"net.core.rmem_max=600000000"$ /etc/sysctl.conf) ]]; then
-  echo "\net.core.rmem_max=600000000\" found inside /etc/sysctl.conf, skipping..."
+if grep -q "^net.core.rmem_max=600000000$" /etc/sysctl.conf; then
+  echo "net.core.rmem_max=600000000 found inside /etc/sysctl.conf, skipping..."
 else
   echo -e "\n# Change made to increase buffer sizes for better network performance for ceremonyclient\nnet.core.rmem_max=600000000" | sudo tee -a /etc/sysctl.conf > /dev/null
 fi
-if [[ $(grep ^"net.core.wmem_max=600000000"$ /etc/sysctl.conf) ]]; then
-  echo "\net.core.wmem_max=600000000\" found inside /etc/sysctl.conf, skipping..."
+if grep -q "^net.core.wmem_max=600000000$" /etc/sysctl.conf; then
+  echo "net.core.wmem_max=600000000 found inside /etc/sysctl.conf, skipping..."
 else
   echo -e "\n# Change made to increase buffer sizes for better network performance for ceremonyclient\nnet.core.wmem_max=600000000" | sudo tee -a /etc/sysctl.conf > /dev/null
 fi
@@ -161,4 +167,3 @@ fi
 echo "Server setup is finished"
 echo "Type 'sudo reboot' and press ENTER to reboot your server."
 echo "Then follow the online guide for the next steps to install your Quilibrium node: https://iri.quest/quilibrium-node-guide"
-
