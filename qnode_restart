@@ -25,7 +25,8 @@ kill_process() {
 }
 
 # Move to the directory where the script resides
-cd /root/ceremonyclient/node || exit
+cd ~/ceremonyclient/node || exit
+
 
 kill_process
 start_process
