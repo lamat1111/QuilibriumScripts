@@ -15,7 +15,7 @@ trap exit_message ERR
 
 # Step 0: Welcome
 echo "This script will install your Quilibrium node as a service and start it."
-echo "Made by LaMat with 0xOzgur.eth help"
+echo "Made with 🔥 by LaMat with 0xOzgur.eth help"
 echo "Processing..."
 sleep 5  # Add a 5-second delay
 
