@@ -20,6 +20,7 @@ echo "Processing..."
 sleep 5  # Add a 5-second delay
 
 # Build binary file
+echo "Building binary file"
 cd ~/ceremonyclient/node
 GOEXPERIMENT=arenas go install ./...
 
