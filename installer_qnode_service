@@ -19,6 +19,17 @@ echo "Made with 🔥 by LaMat (with 0xOzgur.eth help)"
 echo "Processing..."
 sleep 7  # Add a 7-second delay
 
+# Ensure Go is available
+export GOPATH=$HOME/go
+export GOROOT=/usr/local/go  # Adjust this path to where Go is installed
+export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
+
+# Check if Go is installed
+if ! command -v go &> /dev/null; then
+    echo "Go is not installed. Please install Go and try again."
+    exit 1
+fi
+
 # Download Ceremonyclient
 echo "Downloading Ceremonyclient"
 sleep 1  # Add a 1-second delay
