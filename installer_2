@@ -1,8 +1,8 @@
 #!/bin/bash  -i
 
 # Step 0: Welcome
-echo "This script will install your Quilibrium node and start it."
-echo "Made by LaMat with 0xOzgur.eth help"
+echo "This script will prepare your server for the Quilibrium node installation."
+echo "Made with 🔥 by LaMat"
 echo "Processing..."
 sleep 5  # Add a 5-second delay
 
