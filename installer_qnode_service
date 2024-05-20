@@ -1,11 +1,5 @@
 #!/bin/bash
 
-# Step 0: Welcome
-echo "This script will install your node and run it as a service"
-echo "Made with 🔥 by LaMat"
-echo "Processing..."
-sleep 7  # Add a 7-second delay
-
 # Exit on any error
 set -e
 
@@ -21,7 +15,7 @@ trap exit_message ERR
 
 # Step 0: Welcome
 echo "This script will install your Quilibrium node as a service and start it."
-echo "Made with 🔥 by LaMat with 0xOzgur.eth help"
+echo "Made with 🔥 by LaMat (with 0xOzgur.eth help)"
 echo "Processing..."
 sleep 5  # Add a 5-second delay
 
