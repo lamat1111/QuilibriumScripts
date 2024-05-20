@@ -1,1 +1,79 @@
+#!/bin/bash
 
+# Exit on any error
+set -e
+
+# Define a function for displaying exit messages
+exit_message() {
+    echo "There was an error during the script execution and the process stopped. No worries!"
+    echo "You can try to run the script from scratch again."
+    echo "If you still receive an error, you may want to proceed manually, step by step instead of using the auto-installer."
+}
+
+# Set a trap to call exit_message on any error
+trap exit_message ERR
+
+# Step 0: Welcome
+echo "This script will install your Quilibrium node as a service and start it."
+echo "Made by LaMat with 0xOzgur.eth help"
+echo "Processing..."
+sleep 5  # Add a 5-second delay
+
+# Download Ceremonyclient
+echo "Downloading Ceremonyclient"
+sleep 1  # Add a 1-second delay
+cd ~
+git clone https://github.com/QuilibriumNetwork/ceremonyclient.git
+
+# Build Ceremonyclient
+echo "Building Ceremonyclient"
+sleep 1  # Add a 1-second delay
+cd ~/ceremonyclient/node
+GOEXPERIMENT=arenas go install ./...
+
+# Build Ceremonyclient qClient
+echo "Building qClient"
+sleep 1  # Add a 1-second delay
+cd ~/ceremonyclient/client
+GOEXPERIMENT=arenas go build -o qclient main.go
+
+# Create Ceremonyclient Service
+echo "Creating Ceremonyclient Service"
+sleep 1  # Add a 1-second delay
+sudo tee /lib/systemd/system/ceremonyclient.service > /dev/null <<EOF
+[Unit]
+Description=Ceremony Client Go App Service
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=5s
+WorkingDirectory=/root/ceremonyclient/node
+Environment=GOEXPERIMENT=arenas
+ExecStart=/root/go/bin/node ./...
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Start the ceremonyclient service
+echo "Starting Ceremonyclient Service"
+sleep 1  # Add a 1-second delay
+sudo systemctl enable ceremonyclient
+sudo systemctl start ceremonyclient
+
+# Final messages
+echo "Now your node is starting!"
+echo "Let it run for at least 30 minutes to generate your keys"
+echo ""
+echo "You can logout of your server if you want and login again later"
+echo "After 30 minutes backup your keys.yml and config.yml files"
+echo "More info about this in the online guide: https://iri.quest/quilibrium-node-guide"
+echo ""
+echo "Now I will show below the node log..."
+echo "To exit the log just type CTRL +C"
+
+# See the logs of the ceremonyclient service
+sleep 5  # Add a 5-second delay
+sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
+ bugs in 
