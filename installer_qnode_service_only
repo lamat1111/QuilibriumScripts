@@ -19,10 +19,22 @@ echo "Made with 🔥 by LaMat with 0xOzgur.eth help"
 echo "Processing..."
 sleep 5  # Add a 5-second delay
 
+# Ensure Go is available
+export PATH=$GOPATH/bin:$GOROOT/bin:$PATH  # Adjust this path to where Go is installed
+export GOPATH=$HOME/go
+export GOROOT=/usr/local/go  # Adjust this path to where Go is installed
+
 # Build binary file
 echo "Building binary file"
 cd ~/ceremonyclient/node
 GOEXPERIMENT=arenas go install ./...
+
+# Verify that the node executable exists
+NODE_EXECUTABLE="$GOPATH/bin/node"
+if [ ! -f "$NODE_EXECUTABLE" ]; then
+    echo "Error: The node executable was not found at $NODE_EXECUTABLE"
+    exit 1
+fi
 
 # Create Ceremonyclient Service
 echo "Creating Ceremonyclient Service"
