@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 # Exit on any error
@@ -52,7 +51,7 @@ sudo systemctl start ceremonyclient
 echo "Now your node is running as a service!"
 echo ""
 echo "Now I will show below the node log..."
-echo "To exit the log just type CTRL +C"
+echo "To exit the log just type CTRL + C"
 
 # See the logs of the ceremonyclient service
 sleep 5  # Add a 5-second delay
