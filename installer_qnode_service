@@ -56,6 +56,9 @@ ExecStart=/root/go/bin/node ./...
 WantedBy=multi-user.target
 EOF
 
+# Reload systemd manager configuration
+sudo systemctl daemon-reload
+
 # Start the ceremonyclient service
 echo "Starting Ceremonyclient Service"
 sleep 1  # Add a 1-second delay
