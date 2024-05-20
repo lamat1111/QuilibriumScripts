@@ -17,7 +17,7 @@ trap exit_message ERR
 echo "This script will install your Quilibrium node as a service and start it."
 echo "Made with 🔥 by LaMat"
 echo "Processing..."
-sleep 5  # Add a 5-second delay
+sleep 7  # Add a 7-second delay
 
 # Ensure Go is available
 export GOPATH=$HOME/go
