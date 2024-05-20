@@ -19,6 +19,12 @@ echo "Made with 🔥 by LaMat with 0xOzgur.eth help"
 echo "Processing..."
 sleep 5  # Add a 5-second delay
 
+Build the node binary file;
+
+# Build binary file
+cd ~/ceremonyclient/node
+GOEXPERIMENT=arenas go install ./...
+
 # Create Ceremonyclient Service
 echo "Creating Ceremonyclient Service"
 sleep 1  # Add a 1-second delay
