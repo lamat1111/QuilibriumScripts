@@ -4,7 +4,7 @@
 echo "This script will prepare your server for the Quilibrium node installation."
 echo "Made with 🔥 by LaMat"
 echo "Processing..."
-sleep 5  # Add a 5-second delay
+sleep 7  # Add a 7-second delay
 
 # Define a function for displaying exit messages
 exit_message() {
