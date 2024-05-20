@@ -76,4 +76,3 @@ echo "To exit the log just type CTRL +C"
 # See the logs of the ceremonyclient service
 sleep 5  # Add a 5-second delay
 sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
- bugs in 
