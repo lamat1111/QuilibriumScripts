@@ -15,14 +15,20 @@ trap exit_message ERR
 
 # Step 0: Welcome
 echo "This script will install your Quilibrium node as a service and start it."
-echo "Made with 🔥 by LaMat with 0xOzgur.eth help"
+echo "Made with 🔥 by LaMat"
 echo "Processing..."
 sleep 5  # Add a 5-second delay
 
 # Ensure Go is available
-export PATH=$GOPATH/bin:$GOROOT/bin:$PATH  # Adjust this path to where Go is installed
 export GOPATH=$HOME/go
 export GOROOT=/usr/local/go  # Adjust this path to where Go is installed
+export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
+
+# Check if Go is installed
+if ! command -v go &> /dev/null; then
+    echo "Go is not installed. Please install Go and try again."
+    exit 1
+fi
 
 # Build binary file
 echo "Building binary file"
@@ -49,7 +55,7 @@ Restart=always
 RestartSec=5s
 WorkingDirectory=/root/ceremonyclient/node
 Environment=GOEXPERIMENT=arenas
-ExecStart=/root/go/bin/node ./...
+ExecStart=$NODE_EXECUTABLE ./...
 
 [Install]
 WantedBy=multi-user.target
