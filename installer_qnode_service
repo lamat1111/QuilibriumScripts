@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Step 0: Welcome
+echo "This script will install your node and run it as a service"
+echo "Made with 🔥 by LaMat"
+echo "Processing..."
+sleep 7  # Add a 7-second delay
+
 # Exit on any error
 set -e
 
