@@ -17,7 +17,7 @@ trap exit_message ERR
 echo "This script will install your Quilibrium node as a service and start it."
 echo "Made with 🔥 by LaMat (with 0xOzgur.eth help)"
 echo "Processing..."
-sleep 5  # Add a 5-second delay
+sleep 7  # Add a 7-second delay
 
 # Download Ceremonyclient
 echo "Downloading Ceremonyclient"
