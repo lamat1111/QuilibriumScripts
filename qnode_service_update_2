@@ -1,0 +1,94 @@
+#!/bin/bash
+
+set -e  # Exit immediately if a command exits with a non-zero status
+
+echo "Fetching updates from the remote repository..."
+if git fetch origin; then
+    echo "Updates fetched successfully."
+else
+    echo "Error fetching updates from remote repository." >&2
+    exit 1
+fi
+
+# Check if there are updates to merge
+LOCAL=$(git rev-parse HEAD)
+REMOTE=$(git rev-parse origin/$(git rev-parse --abbrev-ref HEAD))
+
+if [ $LOCAL = $REMOTE ]; then
+    echo "No updates to merge. Exiting script."
+    exit 0
+else
+    echo "Updates available. Proceeding with the script."
+fi
+sleep 1
+
+echo "Stopping the ceremonyclient service..."
+if service ceremonyclient stop; then
+    echo "Service stopped successfully."
+else
+    echo "Error stopping the ceremonyclient service." >&2
+    exit 1
+fi
+sleep 1
+
+echo "Switching to the ~/ceremonyclient directory..."
+if cd ~/ceremonyclient; then
+    echo "Switched to ~/ceremonyclient directory."
+else
+    echo "Error switching to ~/ceremonyclient directory." >&2
+    exit 1
+fi
+sleep 1
+
+echo "Merging updates from the remote repository..."
+if git merge origin; then
+    echo "Updates merged successfully."
+else
+    echo "Error merging updates from remote repository." >&2
+    exit 1
+fi
+sleep 1
+
+echo "Switching to the ~/ceremonyclient/node directory..."
+if cd ~/ceremonyclient/node; then
+    echo "Switched to ~/ceremonyclient/node directory."
+else
+    echo "Error switching to ~/ceremonyclient/node directory." >&2
+    exit 1
+fi
+sleep 1
+
+echo "Cleaning and reinstalling node..."
+if GOEXPERIMENT=arenas go clean -v -n -a ./...; then
+    echo "Node cleaned successfully."
+else
+    echo "Error cleaning node." >&2
+    exit 1
+fi
+sleep 1
+
+if rm /root/go/bin/node; then
+    echo "/root/go/bin/node removed successfully."
+else
+    echo "Error removing /root/go/bin/node." >&2
+    exit 1
+fi
+sleep 1
+
+if GOEXPERIMENT=arenas go install ./...; then
+    echo "Node reinstalled successfully."
+else
+    echo "Error reinstalling node." >&2
+    exit 1
+fi
+sleep 1
+
+echo "Starting the ceremonyclient service..."
+if service ceremonyclient start; then
+    echo "Service started successfully."
+else
+    echo "Error starting the ceremonyclient service." >&2
+    exit 1
+fi
+
+echo "Script completed successfully."
