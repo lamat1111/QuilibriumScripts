@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Step 0: Welcome
+echo "This script will update your Qnode. The node must be runing as a service."
+echo "Made with 🔥 by LaMat"
+echo "Processing..."
+sleep 7  # Add a 7-second delay
+
 set -e  # Exit immediately if a command exits with a non-zero status
 
 echo "Stopping the ceremonyclient service..."
