@@ -106,5 +106,6 @@ else
     echo "Error starting the ceremonyclient service." >&2
     exit 1
 fi
-
-echo "Script completed successfully."
+echo ""
+echo ""
+echo "🌟Your Qnode is now updated and running."
