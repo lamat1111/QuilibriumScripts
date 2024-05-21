@@ -6,7 +6,37 @@ echo "Made with 🔥 by LaMat"
 echo "Processing..."
 sleep 7  # Add a 7-second delay
 
+#!/bin/bash
+
 set -e  # Exit immediately if a command exits with a non-zero status
+
+echo "Switching to the ~/ceremonyclient directory..."
+if cd ~/ceremonyclient; then
+    echo "Switched to ~/ceremonyclient directory."
+else
+    echo "Error switching to ~/ceremonyclient directory." >&2
+    exit 1
+fi
+
+echo "Fetching updates from the remote repository..."
+if git fetch origin; then
+    echo "Updates fetched successfully."
+else
+    echo "Error fetching updates from remote repository." >&2
+    exit 1
+fi
+
+# Check if there are updates to merge
+LOCAL=$(git rev-parse HEAD)
+REMOTE=$(git rev-parse origin/$(git rev-parse --abbrev-ref HEAD))
+
+if [ $LOCAL = $REMOTE ]; then
+    echo "No updates to merge. Exiting script."
+    exit 0
+else
+    echo "Updates available. Proceeding with the script."
+fi
+sleep 1
 
 echo "Stopping the ceremonyclient service..."
 if service ceremonyclient stop; then
@@ -22,15 +52,6 @@ if cd ~/ceremonyclient; then
     echo "Switched to ~/ceremonyclient directory."
 else
     echo "Error switching to ~/ceremonyclient directory." >&2
-    exit 1
-fi
-sleep 1
-
-echo "Fetching updates from the remote repository..."
-if git fetch origin; then
-    echo "Updates fetched successfully."
-else
-    echo "Error fetching updates from remote repository." >&2
     exit 1
 fi
 sleep 1
