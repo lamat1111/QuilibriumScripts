@@ -2,6 +2,14 @@
 
 set -e  # Exit immediately if a command exits with a non-zero status
 
+echo "Switching to the ~/ceremonyclient directory..."
+if cd ~/ceremonyclient; then
+    echo "Switched to ~/ceremonyclient directory."
+else
+    echo "Error switching to ~/ceremonyclient directory." >&2
+    exit 1
+fi
+
 echo "Fetching updates from the remote repository..."
 if git fetch origin; then
     echo "Updates fetched successfully."
