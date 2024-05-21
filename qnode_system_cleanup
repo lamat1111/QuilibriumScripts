@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Step 0: Welcome
+echo "This script will clean up your system."
+echo "Made with 🔥 by LaMat"
+echo "Processing..."
+sleep 7  # Add a 7-second delay
+
 # Function to print a separator line
 print_separator() {
     echo "======================================================================"
