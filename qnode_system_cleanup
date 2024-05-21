@@ -1,7 +1,5 @@
 #!/bin/bash
 
-#The script does not remove the STORE folder
-
 # Function to print a separator line
 print_separator() {
     echo "======================================================================"
@@ -23,8 +21,11 @@ vacuum_journal_logs() {
 clean_system() {
     echo "Cleaning system caches and temporary files..."
     sudo apt-get clean
+    sudo apt-get autoclean  # Remove obsolete deb-packages
     sudo rm -rf /var/cache/apt/archives
     sudo rm -rf /tmp/*
+    sudo rm -rf /var/tmp/*
+    sudo rm -rf ~/.cache/*
     echo "System cleanup complete."
     print_separator
 }
@@ -67,7 +68,7 @@ main() {
     # Start ceremonyclient service
     start_ceremonyclient_service
 
-    echo "Cleanup process completed successfully."
+    echo "🌟 Cleanup process completed successfully."
 }
 
 # Call the main function
