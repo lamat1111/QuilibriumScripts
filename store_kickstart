@@ -40,6 +40,13 @@ handle_error() {
 # Trap errors and call the handle_error function
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
+# Check if store.zip already exists and overwrite if it does
+if [ -f ~/ceremonyclient/node/.config/store.zip ]; then
+    echo "⚠️ store.zip already exists. Overwriting..."
+    rm ~/ceremonyclient/node/.config/store.zip
+    echo "✅ Previous store.zip deleted successfully."
+fi
+
 # Download store from the internet
 echo "🌐 Downloading store from the internet..."
 wget -P ~/ceremonyclient/node/.config https://snapshots.cherryservers.com/quilibrium/store.zip
