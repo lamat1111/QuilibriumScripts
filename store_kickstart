@@ -76,10 +76,12 @@ unzip store.zip -d . > /dev/null
 # unzip store.zip -d store > /dev/null - this creates a nested store/store folder
 echo "✅ Archive extracted successfully."
 
-# Delete store.zip file
-echo "🗑️ Deleting store.zip file..."
+# Delete store.zip and store-original
+echo "🗑️ Deleting store.zip and store-original..."
 rm ~/ceremonyclient/node/.config/store.zip
 echo "✅ store.zip deleted successfully."
+rm ~/ceremonyclient/node/.config/store-original
+echo "✅ store-original deleted successfully."
 sleep 3
 
 # Restart node service
@@ -88,7 +90,8 @@ service ceremonyclient start
 echo "✅ Node service started successfully."
 
 echo -e "\n📜 I will now show the node log (CTRL+C to detach)"
-echo "💡 Remember to manually remove the store-original (backup of your original store folder) if everything went well."
+echo ""
+echo ""
 
 # Show node log
 sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
