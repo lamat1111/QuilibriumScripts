@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# Step 0: Welcome
+echo "✨ Welcome! This script will changed your Qnode store folder with another one for fast syncing. ✨"
+echo "You must be running the node as a service, otherwise the script won't work"
+echo "If you are not running as a service, follow the step by step process at https://iri.quest/qnode-store" 
+echo "Made with 🔥 by LaMat"
+echo ""
+echo "Processing... ⏳"
+sleep 7  # Add a 7-second delay
+
 # Function to handle errors and exit the script
 handle_error() {
     echo "❌ Error occurred in script at line: $1"
