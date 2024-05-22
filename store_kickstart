@@ -38,10 +38,14 @@ wget -P ~/ceremonyclient/node/.config https://snapshots.cherryservers.com/quilib
 echo "✅ Download completed successfully."
 sleep 1
 
-# Stop node service
-echo "🛑 Stopping node service..."
-service ceremonyclient stop
-echo "✅ Node service stopped successfully."
+# Stop node service if it's not already stopped
+if systemctl is-active --quiet ceremonyclient; then
+    echo "🛑 Stopping node service..."
+    sudo service ceremonyclient stop
+    echo "✅ Node service stopped successfully."
+else
+    echo "🟢 Node service is already stopped. Moving on..."
+fi
 sleep 1
 
 # Rename store to store-original
