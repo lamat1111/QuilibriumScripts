@@ -9,6 +9,14 @@ echo ""
 echo "Processing... ⏳"
 sleep 7  # Add a 7-second delay
 
+# Check if ceremonyclient service exists
+if ! systemctl list-unit-files | grep -q 'ceremonyclient.service'; then
+    echo "❌ The 'ceremonyclient' service does not exist."
+    echo "Please make sure you are running the node as a service."
+    echo "If you are not running as a service, follow the step-by-step process at https://iri.quest/qnode-store"
+    exit 1
+fi
+
 # Check if zip and unzip are installed
 if ! command -v zip &> /dev/null; then
     echo "🚨 Zip utility is not installed. Installing..."
