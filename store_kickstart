@@ -63,10 +63,14 @@ else
 fi
 sleep 1
 
-# Rename store to store-original
-echo "🔄 Renaming store to store-original..."
-mv ~/ceremonyclient/node/.config/store ~/ceremonyclient/node/.config/store-original
-echo "✅ Store renamed successfully."
+# Rename store to store-original if it exists
+echo "🔄 Renaming store to store-original if it exists..."
+if [ -d ~/ceremonyclient/node/.config/store ]; then
+    mv ~/ceremonyclient/node/.config/store ~/ceremonyclient/node/.config/store-original
+    echo "✅ Store renamed successfully."
+else
+    echo "🟢 'store' folder not found. Skipping renaming."
+fi
 sleep 1
 
 # Extract archive in store folder without showing output
@@ -76,13 +80,20 @@ unzip store.zip -d . > /dev/null
 # unzip store.zip -d store > /dev/null - this creates a nested store/store folder
 echo "✅ Archive extracted successfully."
 
-# Delete store.zip and store-original
-echo "🗑️ Deleting store.zip and store-original..."
+# Delete store.zip
+echo "🗑️ Deleting store.zip"
 rm ~/ceremonyclient/node/.config/store.zip
 echo "✅ store.zip deleted successfully."
-rm -rf ~/ceremonyclient/node/.config/store-original
-echo "✅ store-original deleted successfully."
-sleep 3
+
+# Delete store-original if it exists
+echo "🗑️ Deleting store-original if it exists..."
+if [ -d ~/ceremonyclient/node/.config/store-original ]; then
+    rm -rf ~/ceremonyclient/node/.config/store-original
+    echo "✅ 'store-original' folder deleted successfully."
+else
+    echo "🟢 'store-original' folder not found. Skipping deletion."
+fi
+sleep 1
 
 # Restart node service
 echo "🔄 Restarting node service..."
