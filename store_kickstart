@@ -9,6 +9,19 @@ echo ""
 echo "Processing... ⏳"
 sleep 7  # Add a 7-second delay
 
+# Check if zip and unzip are installed
+if ! command -v zip &> /dev/null; then
+    echo "🚨 Zip utility is not installed. Installing..."
+    sudo apt-get update && sudo apt-get install -y zip || handle_error $LINENO "Failed to install zip utility."
+    echo "✅ Zip utility installed successfully."
+fi
+
+if ! command -v unzip &> /dev/null; then
+    echo "🚨 Unzip utility is not installed. Installing..."
+    sudo apt-get update && sudo apt-get install -y unzip || handle_error $LINENO "Failed to install unzip utility."
+    echo "✅ Unzip utility installed successfully."
+fi
+
 # Function to handle errors and exit the script
 handle_error() {
     echo "❌ Error occurred in script at line: $1"
