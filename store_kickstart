@@ -2,8 +2,8 @@
 
 # Function to handle errors and exit the script
 handle_error() {
-    echo "Error occurred in script at line: $1"
-    echo "Error message: $2"
+    echo "❌ Error occurred in script at line: $1"
+    echo "ℹ️ Error message: $2"
     exit 1
 }
 
@@ -11,43 +11,42 @@ handle_error() {
 trap 'handle_error $LINENO "$BASH_COMMAND"' ERR
 
 # Download store from the internet
-echo "Downloading store from the internet..."
-wget -P /root/ceremonyclient/node/.config https://accademiainfinita.it/store_kickstart.tar.gz
-echo "Download completed successfully."
+echo "🌐 Downloading store from the internet..."
+wget -P ~/ceremonyclient/node/.config https://snapshots.cherryservers.com/quilibrium/store.zip
+echo "✅ Download completed successfully."
 sleep 1
 
 # Stop node service
-echo "Stopping node service..."
+echo "🛑 Stopping node service..."
 service ceremonyclient stop
-echo "Node service stopped successfully."
+echo "✅ Node service stopped successfully."
 sleep 1
 
 # Rename store to store-original
-echo "Renaming store to store-original..."
-mv /root/ceremonyclient/node/.config/store /root/ceremonyclient/node/.config/store-original
-echo "Store renamed successfully."
-sleep 1
-
-# Create new store folder
-echo "Creating new store folder..."
-mkdir -p /root/ceremonyclient/node/.config/store
-echo "New store folder created successfully."
+echo "🔄 Renaming store to store-original..."
+mv ~/ceremonyclient/node/.config/store ~/ceremonyclient/node/.config/store-original
+echo "✅ Store renamed successfully."
 sleep 1
 
 # Extract archive in store folder without showing output
-echo "Extracting archive in store folder..."
-cd /root/ceremonyclient/node/.config
-tar -xvf store_kickstart.tar.gz -C store > /dev/null
-echo "Archive extracted successfully."
+echo "📦 Extracting archive in store folder..."
+cd ~/ceremonyclient/node/.config
+unzip store.zip -d store > /dev/null
+echo "✅ Archive extracted successfully."
+
+# Delete store.zip file
+echo "🗑️ Deleting store.zip file..."
+rm ~/ceremonyclient/node/.config/store.zip
+echo "✅ store.zip deleted successfully."
 sleep 3
 
 # Restart node service
-echo "Restarting node service..."
+echo "🔄 Restarting node service..."
 service ceremonyclient start
-echo "Node service started successfully."
+echo "✅ Node service started successfully."
 
-echo "I will now show the node log (CTRL+C to detach)"
-echo "Remember to remove the store archive and the store-original folders if everything went well."
+echo -e "\n📜 I will now show the node log (CTRL+C to detach)"
+echo "💡 Remember to manually remove the store-original (backup of your original store folder) if everything went well."
 
 # Show node log
 sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
