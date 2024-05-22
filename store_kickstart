@@ -80,7 +80,7 @@ echo "✅ Archive extracted successfully."
 echo "🗑️ Deleting store.zip and store-original..."
 rm ~/ceremonyclient/node/.config/store.zip
 echo "✅ store.zip deleted successfully."
-rm ~/ceremonyclient/node/.config/store-original
+rm -rf ~/ceremonyclient/node/.config/store-original
 echo "✅ store-original deleted successfully."
 sleep 3
 
