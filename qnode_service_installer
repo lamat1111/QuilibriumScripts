@@ -15,33 +15,42 @@ trap exit_message ERR
 
 # Step 3: Welcome
 echo "✨ This script will install your Quilibrium node as a service and start it. ✨"
-echo "Made with 🔥 by LaMat (with 0xOzgur.eth help)"
+echo "Made with ❤️ by  0xOzgur.eth (edited by LaMat)"
 echo "Processing... ⏳"
 sleep 7  # Add a 7-second delay
 
-# Step 4: Download Ceremonyclient
-echo "⏳ Downloading Ceremonyclient..."
+# Step 8:Download Ceremonyclient
+echo "⏳ Downloading Ceremonyclient"
 sleep 1  # Add a 1-second delay
 cd ~
 git clone https://github.com/QuilibriumNetwork/ceremonyclient.git
+git checkout release
 
-cd ~/ceremonyclient/node
+# Step 9: Build Ceremonyclient qClient
+echo "⏳ Building qCiient"
+sleep 1  # Add a 1-second delay
+cd ~/ceremonyclient/client
+GOEXPERIMENT=arenas go build -o qclient main.go
 
-# Step 5: Download Binary
-echo "⏳ Downloading Binary"
+# Get the system architecture
+ARCH=$(uname -m)
+
+# Step10.1:Determine the ExecStart line based on the architecture
+if [ "$ARCH" = "x86_64" ]; then
+    EXEC_START="/root/ceremonyclient/node/node-1.4.18-linux-amd64"
+elif [ "$ARCH" = "aarch64" ]; then
+    EXEC_START="/root/ceremonyclient/node/node-1.4.18-linux-arm64"
+elif [ "$ARCH" = "arm64" ]; then
+    EXEC_START="/root/ceremonyclient/node/node-1.4.18-darwin-arm64"
+else
+    echo "Unsupported architecture: $ARCH"
+    exit 1
+fi
+
+# Step10.2:Create Ceremonyclient Service
+echo "⏳ Re-Creating Ceremonyclient Service"
 sleep 2  # Add a 2-second delay
-wget https://github.com/QuilibriumNetwork/ceremonyclient/releases/download/v1.4.17/node-1.4.17-linux-amd64.bin
-ls
-mv node*.bin node
-
-# Step 6: Make the file executable
-echo "⏳ Making the Binary executable"
-sleep 2  # Add a 2-second delay
-chmod +x node
-
-# Step 7: Create Ceremonyclient Service
-echo "⏳ Creating Ceremonyclient Service"
-sleep 2  # Add a 2-second delay
+rm /lib/systemd/system/ceremonyclient.service
 sudo tee /lib/systemd/system/ceremonyclient.service > /dev/null <<EOF
 [Unit]
 Description=Ceremony Client Go App Service
@@ -51,16 +60,16 @@ Type=simple
 Restart=always
 RestartSec=5s
 WorkingDirectory=/root/ceremonyclient/node
-ExecStart=/root/ceremonyclient/node/node
+ExecStart=$EXEC_START
 
 [Install]
 WantedBy=multi-user.target
 EOF
-
-# Step 8: Start the ceremonyclient service
-echo "✅ Starting Ceremonyclient Service"
-sleep 2  # Add a 2-second delay
 systemctl enable ceremonyclient
+
+# Start the ceremonyclient service
+echo "✅Starting Ceremonyclient Service"
+sleep 1  # Add a 1-second delay
 service ceremonyclient start
 
 # Step 9: Final messages
