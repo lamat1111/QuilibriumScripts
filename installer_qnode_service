@@ -3,54 +3,43 @@
 # Exit on any error
 set -e
 
-# Define a function for displaying exit messages
+# Step 1: Define a function for displaying exit messages
 exit_message() {
     echo "❌ Oops! There was an error during the script execution and the process stopped. No worries!"
     echo "🔄 You can try to run the script from scratch again."
     echo "🛠️ If you still receive an error, you may want to proceed manually, step by step instead of using the auto-installer."
 }
 
-# Set a trap to call exit_message on any error
+# Step 2: Set a trap to call exit_message on any error
 trap exit_message ERR
 
-# Welcome
+# Step 3: Welcome
 echo "✨ This script will install your Quilibrium node as a service and start it. ✨"
 echo "Made with 🔥 by LaMat (with 0xOzgur.eth help)"
 echo "Processing... ⏳"
 sleep 7  # Add a 7-second delay
 
-# Ensure Go is available
-export GOPATH=$HOME/go
-export GOROOT=/usr/local/go  # Adjust this path to where Go is installed
-export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
-
-# Check if Go is installed
-if ! command -v go &> /dev/null; then
-    echo "⚠️ Go is not installed. Please install Go and try again."
-    exit 1
-fi
-
-# Download Ceremonyclient
-echo "⬇⏳ Downloading Ceremonyclient..."
+# Step 4: Download Ceremonyclient
+echo "⏳ Downloading Ceremonyclient..."
 sleep 1  # Add a 1-second delay
 cd ~
 git clone https://github.com/QuilibriumNetwork/ceremonyclient.git
 
 cd ~/ceremonyclient/node
 
-# Step 4:Download Binary
+# Step 5: Download Binary
 echo "⏳ Downloading Binary"
 sleep 2  # Add a 2-second delay
 wget https://github.com/QuilibriumNetwork/ceremonyclient/releases/download/v1.4.17/node-1.4.17-linux-amd64.bin
 ls
 mv node*.bin node
 
-# Step 5:Make the file executable
+# Step 6: Make the file executable
 echo "⏳ Making the Binary executable"
 sleep 2  # Add a 2-second delay
 chmod +x node
 
-# Step 6:Create Ceremonyclient Service
+# Step 7: Create Ceremonyclient Service
 echo "⏳ Creating Ceremonyclient Service"
 sleep 2  # Add a 2-second delay
 sudo tee /lib/systemd/system/ceremonyclient.service > /dev/null <<EOF
@@ -68,13 +57,13 @@ ExecStart=/root/ceremonyclient/node/node
 WantedBy=multi-user.target
 EOF
 
-# Step 7:Start the ceremonyclient service
+# Step 8: Start the ceremonyclient service
 echo "✅ Starting Ceremonyclient Service"
 sleep 2  # Add a 2-second delay
 systemctl enable ceremonyclient
 service ceremonyclient start
 
-# Final messages
+# Step 9: Final messages
 echo "🎉 Now your node is starting!"
 echo "🕒 Let it run for at least 30 minutes to generate your keys."
 echo ""
@@ -85,6 +74,6 @@ echo ""
 echo "📜 Now I will show the node log below..."
 echo "To exit the log, just type CTRL +C."
 
-# See the logs of the ceremonyclient service
+# Step 10: See the logs of the ceremonyclient service
 sleep 5  # Add a 5-second delay
 sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
