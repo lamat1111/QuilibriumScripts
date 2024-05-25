@@ -2,43 +2,12 @@
 
 # Step 0: Welcome
 echo "This script will update your Qnode. The node must be running as a service."
-echo "Made with 🔥 by LaMat"
+echo "Made with ❤️ by 0xOzgur.eth (edited by LaMat)"
 echo "Processing..."
 sleep 7  # Add a 7-second delay
 
-#!/bin/bash
-
-set -e  # Exit immediately if a command exits with a non-zero status
-
-echo "Switching to the ~/ceremonyclient directory..."
-if cd ~/ceremonyclient; then
-    echo "Switched to ~/ceremonyclient directory."
-else
-    echo "Error switching to ~/ceremonyclient directory." >&2
-    exit 1
-fi
-
-echo "Fetching updates from the remote repository..."
-if git fetch origin; then
-    echo "Updates fetched successfully."
-else
-    echo "Error fetching updates from remote repository." >&2
-    exit 1
-fi
-
-# Check if there are updates to merge
-LOCAL=$(git rev-parse HEAD)
-REMOTE=$(git rev-parse origin/$(git rev-parse --abbrev-ref HEAD))
-
-if [ $LOCAL = $REMOTE ]; then
-    echo "No updates to merge. Exiting script."
-    exit 0
-else
-    echo "Updates available. Proceeding with the script."
-fi
-sleep 1
-
-echo "Stopping the ceremonyclient service..."
+# Step 1: Stop the ceremonyclient service
+echo "Step 1: Stopping the ceremonyclient service..."
 if service ceremonyclient stop; then
     echo "Service stopped successfully."
 else
@@ -47,65 +16,61 @@ else
 fi
 sleep 1
 
-echo "Switching to the ~/ceremonyclient directory..."
-if cd ~/ceremonyclient; then
-    echo "Switched to ~/ceremonyclient directory."
+# Step 2: Download Binary
+echo "Step 2: ⏳ Downloading New Release v1.4.18"
+cd ~/ceremonyclient || { echo "Error: Directory ~/ceremonyclient does not exist."; exit 1; }
+if git pull && git checkout release; then
+    echo "✅ Downloaded and checked out release branch successfully."
 else
-    echo "Error switching to ~/ceremonyclient directory." >&2
+    echo "❌ Error: Failed to download and checkout release branch." >&2
     exit 1
 fi
-sleep 1
 
-echo "Merging updates from the remote repository..."
-if git merge origin; then
-    echo "Updates merged successfully."
-else
-    echo "Error merging updates from remote repository." >&2
-    exit 1
-fi
-sleep 1
+# Step 3: Get the system architecture
+ARCH=$(uname -m)
 
-echo "Switching to the ~/ceremonyclient/node directory..."
-if cd ~/ceremonyclient/node; then
-    echo "Switched to ~/ceremonyclient/node directory."
+# Determine the ExecStart line based on the architecture
+if [ "$ARCH" = "x86_64" ]; then
+    EXEC_START="/root/ceremonyclient/node/node-1.4.18-linux-amd64"
+elif [ "$ARCH" = "aarch64" ]; then
+    EXEC_START="/root/ceremonyclient/node/node-1.4.18-linux-arm64"
+elif [ "$ARCH" = "arm64" ]; then
+    EXEC_START="/root/ceremonyclient/node/node-1.4.18-darwin-arm64"
 else
-    echo "Error switching to ~/ceremonyclient/node directory." >&2
+    echo "❌ Unsupported architecture: $ARCH"
     exit 1
 fi
-sleep 1
 
-echo "Cleaning and reinstalling node..."
-if GOEXPERIMENT=arenas go clean -v -n -a ./...; then
-    echo "Node cleaned successfully."
-else
-    echo "Error cleaning node." >&2
-    exit 1
-fi
-sleep 1
+# Step 4: Re-Create Ceremonyclient Service
+echo "⏳ Re-Creating Ceremonyclient Service"
+sleep 2  # Add a 2-second delay
+rm /lib/systemd/system/ceremonyclient.service
+sudo tee /lib/systemd/system/ceremonyclient.service > /dev/null <<EOF
+[Unit]
+Description=Ceremony Client Go App Service
 
-if rm /root/go/bin/node; then
-    echo "/root/go/bin/node removed successfully."
-else
-    echo "Error removing /root/go/bin/node." >&2
-    exit 1
-fi
-sleep 1
+[Service]
+Type=simple
+Restart=always
+RestartSec=5s
+WorkingDirectory=/root/ceremonyclient/node
+ExecStart=$EXEC_START
 
-if GOEXPERIMENT=arenas go install ./...; then
-    echo "Node reinstalled successfully."
-else
-    echo "Error reinstalling node." >&2
-    exit 1
-fi
-sleep 1
+[Install]
+WantedBy=multi-user.target
+EOF
 
-echo "Starting the ceremonyclient service..."
-if service ceremonyclient start; then
-    echo "Service started successfully."
-else
-    echo "Error starting the ceremonyclient service." >&2
-    exit 1
-fi
+# Step 5: Start the ceremonyclient service
+echo "✅ Starting Ceremonyclient Service"
+sleep 2  # Add a 2-second delay
+systemctl daemon-reload
+systemctl enable ceremonyclient
+service ceremonyclient start
+
+# Showing the node logs
+echo "🌟Your Qnode is now updated to 1.4.18"
+echo "⏳ I will now show the node log (CTRL+C to detatch from the log flow)"
 echo ""
 echo ""
-echo "🌟Your Qnode is now updated and running."
+sleep 3  # Add a 5-second delay
+sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
