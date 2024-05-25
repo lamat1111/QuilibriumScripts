@@ -47,6 +47,7 @@ echo "⏳ Downloading Ceremonyclient..."
 sleep 1  # Add a 1-second delay
 cd ~
 git clone https://github.com/QuilibriumNetwork/ceremonyclient.git
+cd ~/ceremonyclient/
 git checkout release
 
 # Step 9: Build Ceremonyclient qClient
