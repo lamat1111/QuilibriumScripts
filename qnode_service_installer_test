@@ -19,6 +19,29 @@ echo "Made with ❤️ by 0xOzgur.eth (edited by LaMat)"
 echo "Processing... ⏳"
 sleep 7  # Add a 7-second delay
 
+# Step 3.1: Check if directory ~/ceremonyclient exists
+if [ -d ~/ceremonyclient ]; then
+    # Check if backup directory ~/backup/qnode_keys exists, if not create it
+    if [ ! -d ~/backup/qnode_keys ]; then
+        mkdir -p ~/backup/qnode_keys
+    fi
+    
+    # Check if files exist, then backup
+    if [ -f ~/ceremonyclient/node/.config/keys.yml ]; then
+        cp ~/ceremonyclient/node/.config/keys.yml ~/backup/qnode_keys/
+        echo "✅ Backup of keys.yml created in ~/backup/qnode_keys folder"
+    fi
+    
+    if [ -f ~/ceremonyclient/node/.config/config.yml ]; then
+        cp ~/ceremonyclient/node/.config/config.yml ~/backup/qnode_keys/
+        echo "✅ Backup of config.yml created in ~/backup/qnode_keys folder"
+    fi
+    
+    # Remove existing directory ~/ceremonyclient
+    echo "🗑️ Removing existing directory ~/ceremonyclient..."
+    rm -rf ~/ceremonyclient
+fi
+
 # Step 4: Download Ceremonyclient
 echo "⏳ Downloading Ceremonyclient..."
 sleep 1  # Add a 1-second delay
@@ -27,7 +50,7 @@ git clone https://github.com/QuilibriumNetwork/ceremonyclient.git
 git checkout release
 
 # Step 9: Build Ceremonyclient qClient
-echo "⏳Building qCiient"
+echo "⏳ Building qCiient"
 sleep 1  # Add a 1-second delay
 cd ~/ceremonyclient/client
 GOEXPERIMENT=arenas go build -o qclient main.go
