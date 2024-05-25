@@ -97,11 +97,19 @@ sudo sysctl -p
 # Step 7: Install gRPCurl
 echo "📦 Installing gRPCurl..."
 sleep 1  # Add a 1-second delay
-if sudo apt-get install grpcurl -y; then
-    echo "✅ gRPCurl installed successfully."
+
+# Try installing gRPCurl using go install
+if go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest; then
+    echo "✅ gRPCurl installed successfully via go install."
 else
-    echo "❌ Failed to install gRPCurl! Moving on to the next step..."
-    # Optionally, perform additional error handling here
+    echo "⚠️ Failed to install gRPCurl via go install. Trying apt-get..."
+    # Try installing gRPCurl using apt-get
+    if sudo apt-get install grpcurl -y; then
+        echo "✅ gRPCurl installed successfully via apt-get."
+    else
+        echo "❌ Failed to install gRPCurl via apt-get! Moving on to the next step..."
+        # Optionally, perform additional error handling here
+    fi
 fi
 
 
