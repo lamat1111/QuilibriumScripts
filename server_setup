@@ -29,7 +29,13 @@ sudo apt-get upgrade -y
 
 # Step 4: Install required packages
 echo "🔧 Installing useful packages..."
-sudo apt-get install git wget tmux tar -y || { echo "❌ Failed to install useful packages! Exiting..."; exit_message; exit 1; }
+sudo apt-get install git wget tmux unzip tar htop vnstat -y
+if [ $? -eq 0 ]; then
+    echo "✅ Useful packages installed successfully."
+else
+    echo "❌ Failed to install useful packages! Moving on to the next step..."
+    # Optionally, perform additional error handling here
+fi
 
 # Step 5: Adjust network buffer sizes
 echo "🌐 Adjusting network buffer sizes..."
@@ -48,7 +54,12 @@ sudo sysctl -p
 # Step 6: Install gRPCurl
 echo "📦 Installing gRPCurl..."
 sleep 1  # Add a 1-second delay
-sudo apt-get install grpcurl -y || { echo "❌ Failed to install gRPCurl! Exiting..."; exit_message; exit 1; }
+if sudo apt-get install grpcurl -y; then
+    echo "✅ gRPCurl installed successfully."
+else
+    echo "❌ Failed to install gRPCurl! Moving on to the next step..."
+    # Optionally, perform additional error handling here
+fi
 
 # Function to check if a UFW rule exists
 ufw_rule_exists() {
