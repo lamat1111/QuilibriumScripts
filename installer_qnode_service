@@ -13,7 +13,7 @@ exit_message() {
 # Set a trap to call exit_message on any error
 trap exit_message ERR
 
-# Step 0: Welcome
+# Welcome
 echo "✨ This script will install your Quilibrium node as a service and start it. ✨"
 echo "Made with 🔥 by LaMat (with 0xOzgur.eth help)"
 echo "Processing... ⏳"
@@ -31,26 +31,28 @@ if ! command -v go &> /dev/null; then
 fi
 
 # Download Ceremonyclient
-echo "⬇️ Downloading Ceremonyclient..."
+echo "⬇⏳ Downloading Ceremonyclient..."
 sleep 1  # Add a 1-second delay
 cd ~
 git clone https://github.com/QuilibriumNetwork/ceremonyclient.git
 
-# Build Ceremonyclient
-echo "🔧 Building Ceremonyclient..."
-sleep 1  # Add a 1-second delay
 cd ~/ceremonyclient/node
-GOEXPERIMENT=arenas go install ./...
 
-# Build Ceremonyclient qClient
-echo "🔨 Building qClient..."
-sleep 1  # Add a 1-second delay
-cd ~/ceremonyclient/client
-GOEXPERIMENT=arenas go build -o qclient main.go
+# Step 4:Download Binary
+echo "⏳ Downloading Binary"
+sleep 2  # Add a 2-second delay
+wget https://github.com/QuilibriumNetwork/ceremonyclient/releases/download/v1.4.17/node-1.4.17-linux-amd64.bin
+ls
+mv node*.bin node
 
-# Create Ceremonyclient Service
-echo "🛠️ Creating Ceremonyclient Service..."
-sleep 1  # Add a 1-second delay
+# Step 5:Make the file executable
+echo "⏳ Making the Binary executable"
+sleep 2  # Add a 2-second delay
+chmod +x node
+
+# Step 6:Create Ceremonyclient Service
+echo "⏳ Creating Ceremonyclient Service"
+sleep 2  # Add a 2-second delay
 sudo tee /lib/systemd/system/ceremonyclient.service > /dev/null <<EOF
 [Unit]
 Description=Ceremony Client Go App Service
@@ -60,21 +62,17 @@ Type=simple
 Restart=always
 RestartSec=5s
 WorkingDirectory=/root/ceremonyclient/node
-Environment=GOEXPERIMENT=arenas
-ExecStart=/root/go/bin/node ./...
+ExecStart=/root/ceremonyclient/node/node
 
 [Install]
 WantedBy=multi-user.target
 EOF
 
-# Reload systemd manager configuration
-sudo systemctl daemon-reload
-
-# Start the ceremonyclient service
-echo "🚀 Starting Ceremonyclient Service..."
-sleep 1  # Add a 1-second delay
-sudo systemctl enable ceremonyclient
-sudo systemctl start ceremonyclient
+# Step 7:Start the ceremonyclient service
+echo "✅ Starting Ceremonyclient Service"
+sleep 2  # Add a 2-second delay
+systemctl enable ceremonyclient
+service ceremonyclient start
 
 # Final messages
 echo "🎉 Now your node is starting!"
