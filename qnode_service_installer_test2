@@ -19,6 +19,12 @@ echo "Made with 🔥 by LaMat (with 0xOzgur.eth help)"
 echo "Processing... ⏳"
 sleep 7  # Add a 7-second delay
 
+# Step 3.1: Check if directory ~/ceremonyclient exists
+if [ -d ~/ceremonyclient ]; then
+    echo "🗑️ Removing existing directory ~/ceremonyclient..."
+    rm -rf ~/ceremonyclient
+fi
+
 # Step 4: Download Ceremonyclient
 echo "⏳ Downloading Ceremonyclient..."
 sleep 1  # Add a 1-second delay
