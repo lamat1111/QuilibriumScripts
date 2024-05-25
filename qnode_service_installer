@@ -19,6 +19,12 @@ echo "Made with 🔥 by LaMat (with 0xOzgur.eth help)"
 echo "Processing... ⏳"
 sleep 7  # Add a 7-second delay
 
+# Step 3.1: Check if directory ~/ceremonyclient exists
+if [ -d ~/ceremonyclient ]; then
+    echo "🗑️ Removing existing directory ~/ceremonyclient..."
+    rm -rf ~/ceremonyclient
+fi
+
 # Step 4: Download Ceremonyclient
 echo "⏳ Downloading Ceremonyclient..."
 sleep 1  # Add a 1-second delay
@@ -57,23 +63,6 @@ ExecStart=/root/ceremonyclient/node/node
 WantedBy=multi-user.target
 EOF
 
-# Step 8: Start the ceremonyclient service
-echo "✅ Starting Ceremonyclient Service"
-sleep 2  # Add a 2-second delay
-systemctl enable ceremonyclient
-service ceremonyclient start
-
-# Step 9: Final messages
-echo "🎉 Now your node is starting!"
-echo "🕒 Let it run for at least 30 minutes to generate your keys."
-echo ""
-echo "🔐 You can logout of your server if you want and login again later."
-echo "🔒 After 30 minutes, backup your keys.yml and config.yml files."
-echo "ℹ️ More info about this in the online guide: https://iri.quest/quilibrium-node-guide"
-echo ""
-echo "📜 Now I will show the node log below..."
-echo "To exit the log, just type CTRL +C."
-
-# Step 10: See the logs of the ceremonyclient service
-sleep 5  # Add a 5-second delay
-sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
+# Step 8: Updating the node to v1.4.18
+echo "⏳ Updating the node to v1.4.18"
+wget -O - https://raw.githubusercontent.com/0xOzgur/QuilibriumTools/v1.4.18/update.sh | bash
