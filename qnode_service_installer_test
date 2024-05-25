@@ -50,10 +50,10 @@ git clone https://github.com/QuilibriumNetwork/ceremonyclient.git
 git checkout release
 
 # Step 9: Build Ceremonyclient qClient
-echo "⏳ Building qCiient"
-sleep 1  # Add a 1-second delay
-cd ~/ceremonyclient/client
-GOEXPERIMENT=arenas go build -o qclient main.go
+#echo "⏳ Building qCiient"
+#sleep 1  # Add a 1-second delay
+#cd ~/ceremonyclient/client
+#GOEXPERIMENT=arenas go build -o qclient main.go
 
 # Get the system architecture
 ARCH=$(uname -m)
