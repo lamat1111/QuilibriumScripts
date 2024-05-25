@@ -19,14 +19,14 @@ echo "Made with ❤️ by  0xOzgur.eth (edited by LaMat)"
 echo "Processing... ⏳"
 sleep 7  # Add a 7-second delay
 
-# Step 8:Download Ceremonyclient
+# Step 4:Download Ceremonyclient
 echo "⏳ Downloading Ceremonyclient"
 sleep 1  # Add a 1-second delay
 cd ~
 git clone https://github.com/QuilibriumNetwork/ceremonyclient.git
 git checkout release
 
-# Step 9: Build Ceremonyclient qClient
+# Step 5: Build Ceremonyclient qClient
 echo "⏳ Building qCiient"
 sleep 1  # Add a 1-second delay
 cd ~/ceremonyclient/client
@@ -35,7 +35,7 @@ GOEXPERIMENT=arenas go build -o qclient main.go
 # Get the system architecture
 ARCH=$(uname -m)
 
-# Step10.1:Determine the ExecStart line based on the architecture
+# Step 6:Determine the ExecStart line based on the architecture
 if [ "$ARCH" = "x86_64" ]; then
     EXEC_START="/root/ceremonyclient/node/node-1.4.18-linux-amd64"
 elif [ "$ARCH" = "aarch64" ]; then
@@ -47,7 +47,7 @@ else
     exit 1
 fi
 
-# Step10.2:Create Ceremonyclient Service
+# Step 7:Create Ceremonyclient Service
 echo "⏳ Re-Creating Ceremonyclient Service"
 sleep 2  # Add a 2-second delay
 rm /lib/systemd/system/ceremonyclient.service
@@ -65,26 +65,7 @@ ExecStart=$EXEC_START
 [Install]
 WantedBy=multi-user.target
 EOF
-systemctl enable ceremonyclient
 
-# Start the ceremonyclient service
-echo "✅Starting Ceremonyclient Service"
-sleep 1  # Add a 1-second delay
-service ceremonyclient start
-
-# Step 9: Final messages
-echo "🎉 Now your node is starting!"
-echo "🕒 Let it run for at least 30 minutes to generate your keys."
-echo ""
-echo "🔐 You can logout of your server if you want and login again later."
-echo "🔒 After 30 minutes, backup your keys.yml and config.yml files."
-echo "ℹ️ More info about this in the online guide: https://iri.quest/quilibrium-node-guide"
-echo ""
-echo "📜 Now I will show the node log below..."
-echo "To exit the log, just type CTRL +C."
-echo ""
-echo ""
-
-# Step 10: See the logs of the ceremonyclient service
-sleep 5  # Add a 5-second delay
-sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
+# Step 8: Updating the node to v1.4.18
+echo "⏳ Updating the node to v1.4.18"
+wget -O - https://raw.githubusercontent.com/0xOzgur/QuilibriumTools/v1.4.18/update.sh | bash
