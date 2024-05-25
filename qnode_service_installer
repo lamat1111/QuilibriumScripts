@@ -82,6 +82,8 @@ echo "ℹ️ More info about this in the online guide: https://iri.quest/quilibr
 echo ""
 echo "📜 Now I will show the node log below..."
 echo "To exit the log, just type CTRL +C."
+echo ""
+echo ""
 
 # Step 10: See the logs of the ceremonyclient service
 sleep 5  # Add a 5-second delay
