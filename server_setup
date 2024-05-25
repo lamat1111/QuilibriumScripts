@@ -31,6 +31,55 @@ sudo apt-get upgrade -y
 echo "🔧 Installing useful packages..."
 sudo apt-get install git wget tmux tar -y || { echo "❌ Failed to install useful packages! Exiting..."; exit_message; exit 1; }
 
+# Step 4: Download and extract Go
+if [[ $(go version) == *"go1.20.1"* || $(go version) == *"go1.20.2"* || $(go version) == *"go1.20.3"* || $(go version) == *"go1.20.4"* ]]; then
+  echo "✅ Correct version of Go is already installed, moving on..."
+else
+  echo "⬇️ Installing the necessary version of Go..."
+  wget -4 https://go.dev/dl/go1.20.14.linux-amd64.tar.gz || { echo "❌ Failed to download Go! Exiting..."; exit_message; exit 1; }
+  sudo tar -C /usr/local -xzf go1.20.14.linux-amd64.tar.gz || { echo "❌ Failed to extract Go! Exiting..."; exit_message; exit 1; }
+  sudo rm go1.20.14.linux-amd64.tar.gz || { echo "❌ Failed to remove downloaded archive! Exiting..."; exit_message; exit 1; }
+fi
+
+# Step 5: Set Go environment variables
+echo "🌍 Setting Go environment variables..."
+
+# Check if PATH is already set
+if grep -q 'export PATH=$PATH:/usr/local/go/bin' ~/.bashrc; then
+    echo "✅ PATH already set in ~/.bashrc."
+else
+    echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
+    echo "✅ PATH set in ~/.bashrc."
+fi
+
+# Check if GOPATH is already set
+if grep -q "export GOPATH=$HOME/go" ~/.bashrc; then
+    echo "✅ GOPATH already set in ~/.bashrc."
+else
+    echo "export GOPATH=$HOME/go" >> ~/.bashrc
+    echo "✅ GOPATH set in ~/.bashrc."
+fi
+
+# Check if GO111MODULE is already set
+if grep -q "export GO111MODULE=on" ~/.bashrc; then
+    echo "✅ GO111MODULE already set in ~/.bashrc."
+else
+    echo "export GO111MODULE=on" >> ~/.bashrc
+    echo "✅ GO111MODULE set in ~/.bashrc."
+fi
+
+# Check if GOPROXY is already set
+if grep -q "export GOPROXY=https://goproxy.cn,direct" ~/.bashrc; then
+    echo "✅ GOPROXY already set in ~/.bashrc."
+else
+    echo "export GOPROXY=https://goproxy.cn,direct" >> ~/.bashrc
+    echo "✅ GOPROXY set in ~/.bashrc."
+fi
+
+# Source .bashrc to apply changes
+source ~/.bashrc
+sleep 1  # Add a 1-second delay
+
 # Step 6: Adjust network buffer sizes
 echo "🌐 Adjusting network buffer sizes..."
 if grep -q "^net.core.rmem_max=600000000$" /etc/sysctl.conf; then
