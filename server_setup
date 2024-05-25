@@ -13,12 +13,18 @@ exit_message() {
     echo "🛠️ If you still receive an error, you may want to proceed manually, step by step instead of using the auto-installer."
 }
 
+# Function to add a 2-second delay between steps
+delay() {
+    sleep 2
+}
+
 # Step 2: Check sudo availability
 if ! [ -x "$(command -v sudo)" ]; then
   echo "⚠️ Sudo is not installed! This script requires sudo to run. Exiting..."
   exit_message
   exit 1
 fi
+delay
 
 # Step 3: Update and Upgrade the Machine
 echo "🔄 Updating the machine..."
@@ -26,6 +32,7 @@ echo "Processing... ⏳"
 sleep 2  # Add a 2-second delay
 sudo apt-get update
 sudo apt-get upgrade -y
+delay
 
 # Step 4: Install required packages
 echo "🔧 Installing useful packages..."
@@ -36,6 +43,7 @@ else
     echo "❌ Failed to install useful packages! Moving on to the next step..."
     # Optionally, perform additional error handling here
 fi
+delay
 
 # Step 5: Adjust network buffer sizes
 echo "🌐 Adjusting network buffer sizes..."
@@ -50,6 +58,7 @@ else
   echo -e "\n# Change made to increase buffer sizes for better network performance for ceremonyclient\nnet.core.wmem_max=600000000" | sudo tee -a /etc/sysctl.conf > /dev/null
 fi
 sudo sysctl -p
+delay
 
 # Step 6: Install gRPCurl
 echo "📦 Installing gRPCurl..."
@@ -60,16 +69,12 @@ else
     echo "❌ Failed to install gRPCurl! Moving on to the next step..."
     # Optionally, perform additional error handling here
 fi
-
-# Function to check if a UFW rule exists
-ufw_rule_exists() {
-    local rule="$1"
-    sudo ufw status | grep -q "$rule"
-}
+delay
 
 # Step 7: Install ufw and configure firewall
 echo "🛡️ Installing ufw (Uncomplicated Firewall)..."
 sudo apt-get install ufw -y || { echo "❌ Failed to install ufw! Moving on to the next step..."; }
+delay
 
 # Attempt to enable ufw
 echo "🛡️ Configuring firewall..."
@@ -78,6 +83,7 @@ if command -v ufw >/dev/null 2>&1; then
 else
     echo "⚠️ ufw (Uncomplicated Firewall) is not installed. Skipping firewall configuration."
 fi
+delay
 
 # Check if ufw is available and configured
 if command -v ufw >/dev/null 2>&1 && sudo ufw status | grep -q "Status: active"; then
@@ -94,6 +100,7 @@ if command -v ufw >/dev/null 2>&1 && sudo ufw status | grep -q "Status: active";
 else
     echo "⚠️ Failed to configure firewall or ufw is not installed. No worries, you can do it later manually. Moving on to the next step..."
 fi
+delay
 
 # Step 8: Creating some useful folders
 echo "📂 Creating /root/backup/ folder..."
@@ -107,6 +114,7 @@ echo "✅ Done."
 echo "📂 Creating /root/scripts/log/ folder..."
 sudo mkdir -p /root/scripts/log/
 echo "✅ Done."
+delay
 
 # Step 9: Prompt for reboot
 echo "🎉 Server setup is finished!"
