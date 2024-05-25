@@ -58,7 +58,6 @@ ufw_rule_exists() {
 
 # Step 7: Install ufw and configure firewall
 echo "🛡️ Installing ufw (Uncomplicated Firewall)..."
-sudo apt-get update
 sudo apt-get install ufw -y || { echo "❌ Failed to install ufw! Moving on to the next step..."; }
 
 # Attempt to enable ufw
