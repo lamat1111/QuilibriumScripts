@@ -50,32 +50,35 @@ git clone https://github.com/QuilibriumNetwork/ceremonyclient.git
 cd ~/ceremonyclient/
 git checkout release
 
-# Step 9: Build Ceremonyclient qClient
-#echo "⏳ Building qCiient"
-#sleep 1  # Add a 1-second delay
-#cd ~/ceremonyclient/client
-#GOEXPERIMENT=arenas go build -o qclient main.go
+# Step 4.1: Set the version number
+VERSION="1.4.18"
 
-# Get the system architecture
+# Step 4.2: Get the system architecture
 ARCH=$(uname -m)
 
-# Step10.1:Determine the ExecStart line based on the architecture
+# Step 5: Determine the ExecStart line based on the architecture
+# Get the current user's home directory
+HOME=$(eval echo ~$HOME_DIR)
+
+# Step 6: Use the home directory in the path
+NODE_PATH="$HOME/ceremonyclient/node"
+
 if [ "$ARCH" = "x86_64" ]; then
-    EXEC_START="/root/ceremonyclient/node/node-1.4.18-linux-amd64"
+    EXEC_START="$NODE_PATH/node-$VERSION-linux-amd64"
 elif [ "$ARCH" = "aarch64" ]; then
-    EXEC_START="/root/ceremonyclient/node/node-1.4.18-linux-arm64"
+    EXEC_START="$NODE_PATH/node-$VERSION-linux-arm64"
 elif [ "$ARCH" = "arm64" ]; then
-    EXEC_START="/root/ceremonyclient/node/node-1.4.18-darwin-arm64"
+    EXEC_START="$NODE_PATH/node-$VERSION-darwin-arm64"
 else
     echo "Unsupported architecture: $ARCH"
     exit 1
 fi
 
-# Step10.2:Create Ceremonyclient Service
+# Step 7: Create Ceremonyclient Service
 echo "⏳ Re-Creating Ceremonyclient Service"
 sleep 2  # Add a 2-second delay
 
-# Check if the file exists before attempting to remove it
+# Step 7.1: Check if the file exists before attempting to remove it
 if [ -f "/lib/systemd/system/ceremonyclient.service" ]; then
     # If the file exists, remove it
     rm /lib/systemd/system/ceremonyclient.service
@@ -103,6 +106,7 @@ EOF
 # Step 8: Start the ceremonyclient service
 echo "✅ Starting Ceremonyclient Service"
 sleep 2  # Add a 2-second delay
+sudo systemctl daemon-reload
 systemctl enable ceremonyclient
 service ceremonyclient start
 
