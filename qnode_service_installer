@@ -57,10 +57,10 @@ VERSION="1.4.18"
 ARCH=$(uname -m)
 
 # Step 5: Determine the ExecStart line based on the architecture
-# Get the current user's home directory
+# Step 5.1: Get the current user's home directory
 HOME=$(eval echo ~$HOME_DIR)
 
-# Step 6: Use the home directory in the path
+# Step 5.2: Use the home directory in the path
 NODE_PATH="$HOME/ceremonyclient/node"
 
 if [ "$ARCH" = "x86_64" ]; then
@@ -74,11 +74,11 @@ else
     exit 1
 fi
 
-# Step 7: Create Ceremonyclient Service
+# Step 6: Create Ceremonyclient Service
 echo "⏳ Re-Creating Ceremonyclient Service"
 sleep 2  # Add a 2-second delay
 
-# Step 7.1: Check if the file exists before attempting to remove it
+# Step 6.1: Check if the file exists before attempting to remove it
 if [ -f "/lib/systemd/system/ceremonyclient.service" ]; then
     # If the file exists, remove it
     rm /lib/systemd/system/ceremonyclient.service
@@ -103,14 +103,14 @@ ExecStart=$EXEC_START
 WantedBy=multi-user.target
 EOF
 
-# Step 8: Start the ceremonyclient service
+# Step 7: Start the ceremonyclient service
 echo "✅ Starting Ceremonyclient Service"
 sleep 2  # Add a 2-second delay
 sudo systemctl daemon-reload
 systemctl enable ceremonyclient
 service ceremonyclient start
 
-# Step 9: Final messages
+# Step 8: Final messages
 echo "🎉 Now your node is starting!"
 echo "🕒 Let it run for at least 30 minutes to generate your keys."
 echo ""
@@ -121,6 +121,6 @@ echo ""
 echo "📜 Now I will show the node log below..."
 echo "To exit the log, just type CTRL +C."
 
-# Step 10: See the logs of the ceremonyclient service
+# Step 9: See the logs of the ceremonyclient service
 sleep 5  # Add a 5-second delay
 sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
