@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Step 3: Welcome
+echo "✨ This script will edit your .config/config.yml file and setup the gRPC calls. ✨"
+echo "Made with 🔥 by LaMat"
+echo "Processing... ⏳"
+sleep 7  # Add a 7-second delay
+
 # Function to check if a line exists in a file
 line_exists() {
     grep -qF "$1" "$2"
@@ -38,4 +44,7 @@ fi
 
 sleep 1
 
+echo""
 echo "✅ gRPC, REST, and Stats Collection setup was successful."
+echo""
+echo "✅ If you want to check manually just run sudo nano .config/config.yml"
