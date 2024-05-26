@@ -63,9 +63,6 @@ else
   # Remove the downloaded archive
   sudo rm $(basename $GO_URL) || { echo "❌ Failed to remove downloaded archive! Exiting..."; exit_message; exit 1; }
 
-  # Update the PATH in .bashrc (or other shell configuration file)
-  echo "export PATH=\$PATH:/usr/local/go/bin" >> ~/.bashrc
-  source ~/.bashrc
 fi
 
 
@@ -112,9 +109,14 @@ else
     echo "✅ GOPROXY set in ~/.bashrc."
 fi
 
+# Step 5.1: Temporarily add variables - redundant but it help solving the command go not found error
+export GOROOT=/usr/local/go
+export GOPATH=$HOME/go
+export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
+
 # Source the ~/.bashrc to apply changes
 source ~/.bashrc
-sleep 1  # Add a 1-second delay
+sleep 2  # Add a 2-second delay
 
 # Step 6: Adjust network buffer sizes
 echo "🌐 Adjusting network buffer sizes..."
