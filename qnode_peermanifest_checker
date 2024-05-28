@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# This script installs grpcurl, jq, and base58 if they are not already installed,
+# then retrieves peer information from a Quilibrium node.
+
+# Function to install a package if it's not already installed
+install_package() {
+    if ! command -v $1 &> /dev/null; then
+        echo "❌ Error: $1 is required but it cannot be installed automatically."
+        echo "❌ Please install $1 manually and try running the script again."
+        exit 1
+    fi
+}
+
+# Install necessary packages
+echo "📦 Installing required packages..."
+install_package grpcurl
+install_package jq
+install_package base58
+
+# Command to retrieve peer information
+get_peer_info_command="peer_id_base64=\$(grpcurl -plaintext localhost:8337 quilibrium.node.node.pb.NodeService.GetNodeInfo | jq -r .peerId | base58 -d | base64) && grpcurl -plaintext localhost:8337 quilibrium.node.node.pb.NodeService.GetPeerManifests | grep -A 15 -B 1 \"\$peer_id_base64\""
+
+# Execute the command
+echo "🚀 Retrieving peer information..."
+eval $get_peer_info_command
+
+# Check for errors
+if [ $? -ne 0 ]; then
+    echo "❌ Error: Failed to retrieve peer information. Please make sure your Quilibrium node is running and accessible."
+    exit 1
+fi
+
+echo "🎉 Peer information retrieved successfully!"
