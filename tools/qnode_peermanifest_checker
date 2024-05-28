@@ -11,20 +11,39 @@ echo ""
 sleep 7  # Add a 7-second delay
 
 
-# Function to install a package if it's not already installed
-install_package() {
-    if ! command -v $1 &> /dev/null; then
-        echo "❌ Error: $1 is required but it cannot be installed automatically."
-        echo "❌ Please install $1 manually and try running the script again."
-        exit 1
-    fi
-}
+# Install gRPCurl if not installed
+echo "📦 Installing gRPCurl..."
+sleep 1  # Add a 1-second delay
 
-# Install necessary packages
-echo "📦 Installing required packages..."
-install_package grpcurl
-install_package jq
-install_package base58
+if command_exists grpcurl; then
+    echo "✅ gRPCurl is already installed."
+else
+    # Try installing gRPCurl using go install
+    if go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest; then
+        echo "✅ gRPCurl installed successfully via go install."
+    else
+        echo "⚠️ Failed to install gRPCurl via go install. Trying apt-get..."
+        # Try installing gRPCurl using apt-get
+        if sudo apt-get install grpcurl -y; then
+            echo "✅ gRPCurl installed successfully via apt-get."
+        else
+            echo "❌ Failed to install gRPCurl via apt-get! Please install it manually."
+            exit 1
+        fi
+    fi
+fi
+
+# Install jq if not installed
+if ! command_exists jq; then
+    echo "📦 Installing jq..."
+    sudo apt-get install -y jq
+fi
+
+# Install base58 if not installed
+if ! command_exists base58; then
+    echo "📦 Installing base58..."
+    sudo apt-get install -y base58
+fi
 
 # Command to retrieve peer information
 get_peer_info_command="peer_id_base64=\$(grpcurl -plaintext localhost:8337 quilibrium.node.node.pb.NodeService.GetNodeInfo | jq -r .peerId | base58 -d | base64) && grpcurl -plaintext localhost:8337 quilibrium.node.node.pb.NodeService.GetPeerManifests | grep -A 15 -B 1 \"\$peer_id_base64\""
