@@ -3,6 +3,14 @@
 # This script installs grpcurl, jq, and base58 if they are not already installed,
 # then retrieves peer information from a Quilibrium node.
 
+# Welcome
+echo "✨ This script will retrieve your Qnode peer manifest ✨"
+echo "Made with 🔥 by LaMat"
+echo "Processing... ⏳"
+echo ""
+sleep 7  # Add a 7-second delay
+
+
 # Function to install a package if it's not already installed
 install_package() {
     if ! command -v $1 &> /dev/null; then
