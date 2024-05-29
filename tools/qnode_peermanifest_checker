@@ -3,13 +3,13 @@
 # This script installs grpcurl, jq, and base58 if they are not already installed,
 # then retrieves peer information from a Quilibrium node.
 
-# Welcome
-echo "✨ This script will retrieve your Qnode peer manifest ✨"
-echo "Made with 🔥 by LaMat"
-echo "Processing... ⏳"
+# Step 0: Welcome
+echo "✨ Welcome! This script will retrieve your Qnode peer manifest  ✨"
+echo "Made with 🔥 by LaMat - https://quilibrium.one"
+echo "====================================================================================="
 echo ""
+echo "Processing... ⏳"
 sleep 7  # Add a 7-second delay
-
 
 # Install gRPCurl if not installed
 echo "📦 Installing gRPCurl..."
