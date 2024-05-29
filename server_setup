@@ -2,7 +2,9 @@
 
 # Step 0: Welcome
 echo "✨ Welcome! This script will prepare your server for the Quilibrium node installation. ✨"
-echo "Made with 🔥 by LaMat"
+echo "Made with 🔥 by LaMat - https://quilibrium.one"
+echo "====================================================================================="
+echo ""
 echo "Processing... ⏳"
 sleep 7  # Add a 7-second delay
 
@@ -169,6 +171,7 @@ echo "✅ Done."
 
 # Step 10: Prompt for reboot
 echo "🎉 Server setup is finished!"
-echo "🔄 Type 'sudo reboot' and press ENTER to reboot your server."
-echo "🔗 Then follow the online guide for the next steps"
-echo " to install your Quilibrium node as a service: https://iri.quest/quilibrium-node-guide" 
+echo "Type 'sudo reboot' and press ENTER to reboot your server."
+echo ""
+echo "Then follow the online guide for the next steps"
+echo "to install your Quilibrium node as a service: https://docs.quilibrium.one" 
