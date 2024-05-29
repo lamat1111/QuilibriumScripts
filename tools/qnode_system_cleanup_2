@@ -3,7 +3,7 @@
 # Step 0: Welcome
 echo "✨ Welcome! This script will clean up your system from temporary files and old log entries ✨"
 echo "It will stop/start the Quilibrium node service as well."
-echo""
+echo ""
 echo "Made with 🔥 by LaMat - https://quilibrium.one"
 echo "====================================================================================="
 echo ""
