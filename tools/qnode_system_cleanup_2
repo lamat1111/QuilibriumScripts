@@ -1,9 +1,13 @@
 #!/bin/bash
 
 # Step 0: Welcome
-echo "This script will clean up your system. It will stop/start the Qnode as well."
-echo "Made with 🔥 by LaMat"
-echo "Processing..."
+echo "✨ Welcome! This script will clean up your system from temporary files and old log entries ✨"
+echo "It will stop/start the Quilibrium node service as well."
+echo""
+echo "Made with 🔥 by LaMat - https://quilibrium.one"
+echo "====================================================================================="
+echo ""
+echo "Processing... ⏳"
 sleep 7  # Add a 7-second delay
 
 # Function to print a separator line
