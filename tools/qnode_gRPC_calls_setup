@@ -1,8 +1,10 @@
 #!/bin/bash
 
-# Step 3: Welcome
-echo "✨ This script will edit your .config/config.yml file and setup the gRPC calls. ✨"
-echo "Made with 🔥 by LaMat"
+# Step 0: Welcome
+echo "✨ Welcome! This script will edit your .config/config.yml file and setup the gRPC calls.✨"
+echo "Made with 🔥 by LaMat - https://quilibrium.one"
+echo "====================================================================================="
+echo ""
 echo "Processing... ⏳"
 sleep 7  # Add a 7-second delay
 
