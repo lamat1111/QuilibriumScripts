@@ -17,7 +17,7 @@ fi
 sleep 1
 
 # Step 2: Download Binary
-echo "Step 2: ⏳ Downloading New Release v1.4.18"
+echo "Step 2: ⏳ Downloading New Release"
 cd ~/ceremonyclient || { echo "Error: Directory ~/ceremonyclient does not exist."; exit 1; }
 if git pull && git checkout release; then
     echo "✅ Downloaded and checked out release branch successfully."
@@ -26,22 +26,14 @@ else
     exit 1
 fi
 
-# Step 3: Get the system architecture
-ARCH=$(uname -m)
+# Get the current user's home directory
+HOME=$(eval echo ~$HOME_DIR)
 
-# Determine the ExecStart line based on the architecture
-if [ "$ARCH" = "x86_64" ]; then
-    EXEC_START="/root/ceremonyclient/node/node-1.4.18-linux-amd64"
-elif [ "$ARCH" = "aarch64" ]; then
-    EXEC_START="/root/ceremonyclient/node/node-1.4.18-linux-arm64"
-elif [ "$ARCH" = "arm64" ]; then
-    EXEC_START="/root/ceremonyclient/node/node-1.4.18-darwin-arm64"
-else
-    echo "❌ Unsupported architecture: $ARCH"
-    exit 1
-fi
+# Use the home directory in the path
+NODE_PATH="$HOME/ceremonyclient/node"
+EXEC_START="$NODE_PATH/release_autorun.sh"
 
-# Step 4: Re-Create Ceremonyclient Service
+# Step 3:Re-Create Ceremonyclient Service
 echo "⏳ Re-Creating Ceremonyclient Service"
 sleep 2  # Add a 2-second delay
 rm /lib/systemd/system/ceremonyclient.service
@@ -53,12 +45,13 @@ Description=Ceremony Client Go App Service
 Type=simple
 Restart=always
 RestartSec=5s
-WorkingDirectory=/root/ceremonyclient/node
+WorkingDirectory=$NODE_PATH
 ExecStart=$EXEC_START
 
 [Install]
 WantedBy=multi-user.target
 EOF
+
 
 # Step 5: Start the ceremonyclient service
 echo "✅ Starting Ceremonyclient Service"
