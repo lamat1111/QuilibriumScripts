@@ -19,75 +19,37 @@ echo "Made with ❤️ by 0xOzgur.eth (edited by LaMat)"
 echo "Processing... ⏳"
 sleep 7  # Add a 7-second delay
 
-# Step 3.1: Check if directory ~/ceremonyclient exists
-if [ -d ~/ceremonyclient ]; then
-    # Check if backup directory ~/backup/qnode_keys exists, if not create it
-    if [ ! -d ~/backup/qnode_keys ]; then
-        mkdir -p ~/backup/qnode_keys
-    fi
-    
-    # Check if files exist, then backup
-    if [ -f ~/ceremonyclient/node/.config/keys.yml ]; then
-        cp ~/ceremonyclient/node/.config/keys.yml ~/backup/qnode_keys/
-        echo "✅ Backup of keys.yml created in ~/backup/qnode_keys folder"
-    fi
-    
-    if [ -f ~/ceremonyclient/node/.config/config.yml ]; then
-        cp ~/ceremonyclient/node/.config/config.yml ~/backup/qnode_keys/
-        echo "✅ Backup of config.yml created in ~/backup/qnode_keys folder"
-    fi
-    
-    # Remove existing directory ~/ceremonyclient
-    echo "🗑️ Removing existing directory ~/ceremonyclient..."
-    rm -rf ~/ceremonyclient
-fi
-
 # Step 4: Download Ceremonyclient
-echo "⏳ Downloading Ceremonyclient..."
+echo "⏳Downloading Ceremonyclient"
 sleep 1  # Add a 1-second delay
 cd ~
-git clone https://github.com/QuilibriumNetwork/ceremonyclient.git
+if [ -d "ceremonyclient" ]; then
+  echo "Directory ceremonyclient already exists, skipping git clone..."
+else
+  until git clone https://github.com/QuilibriumNetwork/ceremonyclient.git; do
+    echo "Git clone failed, retrying..."
+    sleep 2
+  done
+fi
 cd ~/ceremonyclient/
 git checkout release
 
-# Step 4.1: Set the version number
-VERSION="1.4.18"
+# Step 4.1: Build Ceremonyclient qClient
+echo "⏳ Building qCiient..."
+sleep 1  # Add a 1-second delay
+cd ~/ceremonyclient/client
+GOEXPERIMENT=arenas go build -o qclient main.go
 
-# Step 4.2: Get the system architecture
-ARCH=$(uname -m)
-
-# Step 5: Determine the ExecStart line based on the architecture
-# Step 5.1: Get the current user's home directory
+# Step 5:Determine the ExecStart line based on the architecture
+# Get the current user's home directory
 HOME=$(eval echo ~$HOME_DIR)
-
-# Step 5.2: Use the home directory in the path
+# Use the home directory in the path
 NODE_PATH="$HOME/ceremonyclient/node"
+EXEC_START="$NODE_PATH/release_autorun.sh
 
-if [ "$ARCH" = "x86_64" ]; then
-    EXEC_START="$NODE_PATH/node-$VERSION-linux-amd64"
-elif [ "$ARCH" = "aarch64" ]; then
-    EXEC_START="$NODE_PATH/node-$VERSION-linux-arm64"
-elif [ "$ARCH" = "arm64" ]; then
-    EXEC_START="$NODE_PATH/node-$VERSION-darwin-arm64"
-else
-    echo "Unsupported architecture: $ARCH"
-    exit 1
-fi
-
-# Step 6: Create Ceremonyclient Service
-echo "⏳ Re-Creating Ceremonyclient Service"
-sleep 2  # Add a 2-second delay
-
-# Step 6.1: Check if the file exists before attempting to remove it
-if [ -f "/lib/systemd/system/ceremonyclient.service" ]; then
-    # If the file exists, remove it
-    rm /lib/systemd/system/ceremonyclient.service
-    echo "ceremonyclient.service file removed."
-else
-    # If the file does not exist, inform the user
-    echo "ceremonyclient.service file does not exist. No action taken."
-fi
-
+# Create Ceremonyclient Service
+echo "⏳Creating Ceremonyclient Service"
+sleep 1  # Add a 1-second delay
 sudo tee /lib/systemd/system/ceremonyclient.service > /dev/null <<EOF
 [Unit]
 Description=Ceremony Client Go App Service
@@ -96,7 +58,7 @@ Description=Ceremony Client Go App Service
 Type=simple
 Restart=always
 RestartSec=5s
-WorkingDirectory=/root/ceremonyclient/node
+WorkingDirectory=$NODE_PATH
 ExecStart=$EXEC_START
 
 [Install]
@@ -105,6 +67,7 @@ EOF
 
 # Step 7: Start the ceremonyclient service
 echo "✅ Starting Ceremonyclient Service"
+
 sleep 2  # Add a 2-second delay
 sudo systemctl daemon-reload
 systemctl enable ceremonyclient
