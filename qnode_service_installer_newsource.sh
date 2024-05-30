@@ -52,6 +52,11 @@ cd ~/ceremonyclient/
 git remote set-url origin https://source.quilibrium.com/quilibrium/ceremonyclient.git
 git checkout release
 
+# Set up environment variables (redundant but solves the command go not found error)
+export GOROOT=/usr/local/go
+export GOPATH=$HOME/go
+export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
+
 # Step 4.1: Build Ceremonyclient qClient
 echo "⏳ Building qCiient..."
 sleep 1  # Add a 1-second delay
