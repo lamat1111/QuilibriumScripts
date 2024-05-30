@@ -3,7 +3,9 @@
 # This version overwrites local changes to node/release_autorun.sh
 
 # Step 0: Welcome
-echo "✨ Welcome! This script will prepare your server for the Quilibrium node installation. ✨"
+echo "✨ Welcome! This script will update your Quilibrium node if you are running it as a service. ✨"
+echo "This script is tailored for Ubuntu machines. Please verify compatibility if using another OS."
+echo "This version overwrites any local change to node/release_autorun.sh"
 echo ""
 echo "Made with 🔥 by LaMat - https://quilibrium.one"
 echo "Helped by 0xOzgur.eth - https://quilibrium.space"
