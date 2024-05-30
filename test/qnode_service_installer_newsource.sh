@@ -30,11 +30,24 @@ cd ~
 if [ -d "ceremonyclient" ]; then
   echo "Directory ceremonyclient already exists, skipping git clone..."
 else
-  until git clone https://source.quilibrium.com/quilibrium/ceremonyclient.git; do
-    echo "Git clone failed, retrying..."
-    sleep 2
+  attempts=0
+  while [ $attempts -lt 5 ]; do  # Loop for a maximum of 5 attempts
+    if git clone https://source.quilibrium.com/quilibrium/ceremonyclient.git; then
+      echo "✅ Successfully cloned the repository."
+      break  # Exit the loop if cloning is successful
+    else
+      ((attempts++))
+      echo "⚠️ Git clone failed, retrying attempt $attempts..."
+      sleep 2
+    fi
   done
+  
+  if [ $attempts -eq 5 ]; then
+    echo "❌ Maximum retry attempts reached. Exiting."
+    exit 1
+  fi
 fi
+
 cd ~/ceremonyclient/
 git checkout release
 
