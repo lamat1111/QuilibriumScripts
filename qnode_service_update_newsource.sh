@@ -18,11 +18,17 @@ sleep 1
 
 # Step 2: Download Binary
 echo "Step 2: ⏳ Downloading New Release"
+
+# Change to the ceremonyclient directory
 cd ~/ceremonyclient || { echo "Error: Directory ~/ceremonyclient does not exist."; exit 1; }
-if git pull && git checkout release; then
-    echo "✅ Downloaded and checked out release branch successfully."
+
+# Set the remote URL and pull the latest changes
+if git remote set-url origin https://source.quilibrium.com/quilibrium/ceremonyclient.git && \
+   git pull; 
+then
+    echo "✅ Downloaded the latest changes successfully."
 else
-    echo "❌ Error: Failed to download and checkout release branch." >&2
+    echo "❌ Error: Failed to download the latest changes." >&2
     exit 1
 fi
 
