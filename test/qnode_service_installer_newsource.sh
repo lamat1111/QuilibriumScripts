@@ -49,6 +49,7 @@ else
 fi
 
 cd ~/ceremonyclient/
+git remote set-url origin https://source.quilibrium.com/quilibrium/ceremonyclient.git
 git checkout release
 
 # Step 4.1: Build Ceremonyclient qClient
