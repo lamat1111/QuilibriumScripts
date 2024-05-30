@@ -22,14 +22,13 @@ echo "Step 2: ⏳ Downloading New Release"
 # Change to the ceremonyclient directory
 cd ~/ceremonyclient || { echo "Error: Directory ~/ceremonyclient does not exist."; exit 1; }
 
-# Set the remote URL and pull the latest changes
-if git remote set-url origin https://source.quilibrium.com/quilibrium/ceremonyclient.git && git pull; 
-then
-    echo "✅ Downloaded the latest changes successfully."
-else
-    echo "❌ Error: Failed to download the latest changes." >&2
-    exit 1
-fi
+# Set the remote URL
+git remote set-url origin https://source.quilibrium.com/quilibrium/ceremonyclient.git || { echo "❌ Error: Failed to set remote URL." >&2; exit 1; }
+
+# Pull the latest changes
+git pull || { echo "❌ Error: Failed to download the latest changes." >&2; exit 1; }
+
+echo "✅ Downloaded the latest changes successfully."
 
 # Get the current user's home directory
 HOME=$(eval echo ~$HOME_DIR)
