@@ -23,8 +23,7 @@ echo "Step 2: ⏳ Downloading New Release"
 cd ~/ceremonyclient || { echo "Error: Directory ~/ceremonyclient does not exist."; exit 1; }
 
 # Set the remote URL and pull the latest changes
-if git remote set-url origin https://source.quilibrium.com/quilibrium/ceremonyclient.git && \
-   git pull; 
+if git remote set-url origin https://source.quilibrium.com/quilibrium/ceremonyclient.git && git pull; 
 then
     echo "✅ Downloaded the latest changes successfully."
 else
