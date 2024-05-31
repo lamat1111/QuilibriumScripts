@@ -1,7 +1,11 @@
 #!/bin/bash
 
+# This version overwrites local changes to node/release_autorun.sh
+
 # Step 0: Welcome
-echo "✨ Welcome! This script will prepare your server for the Quilibrium node installation. ✨"
+echo "✨ Welcome! This script will update your Quilibrium node if you are running it as a service. ✨"
+echo "This script is tailored for Ubuntu machines. Please verify compatibility if using another OS."
+echo "This version overwrites any local change to node/release_autorun.sh"
 echo ""
 echo "Made with 🔥 by LaMat - https://quilibrium.one"
 echo "Helped by 0xOzgur.eth - https://quilibrium.space"
@@ -52,6 +56,12 @@ cd ~/ceremonyclient/
 git remote set-url origin https://source.quilibrium.com/quilibrium/ceremonyclient.git
 git checkout release
 
+# Discard local changes to node/release_autorun.sh
+git checkout -- node/release_autorun.sh
+
+# Pull the latest changes
+git pull
+
 # Set up environment variables (redundant but solves the command go not found error)
 export GOROOT=/usr/local/go
 export GOPATH=$HOME/go
@@ -63,7 +73,7 @@ sleep 1  # Add a 1-second delay
 cd ~/ceremonyclient/client
 GOEXPERIMENT=arenas go build -o qclient main.go
 
-# Step 5:Determine the ExecStart line based on the architecture
+# Step 5: Determine the ExecStart line based on the architecture
 # Get the current user's home directory
 HOME=$(eval echo ~$HOME_DIR)
 # Use the home directory in the path

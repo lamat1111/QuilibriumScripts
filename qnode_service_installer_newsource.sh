@@ -23,6 +23,25 @@ exit_message() {
 # Step 2: Set a trap to call exit_message on any error
 trap exit_message ERR
 
+# Step 3: Check if directory ~/ceremonyclient exists, download from github 
+if [ -d ~/ceremonyclient ]; then
+    # Check if backup directory ~/backup/qnode_keys exists, if not create it
+    if [ ! -d ~/backup/qnode_keys ]; then
+        mkdir -p ~/backup/qnode_keys
+    fi
+    
+    # Check if files exist, then backup
+    if [ -f ~/ceremonyclient/node/.config/keys.yml ]; then
+        cp ~/ceremonyclient/node/.config/keys.yml ~/backup/qnode_keys/
+        echo "✅ Backup of keys.yml created in ~/backup/qnode_keys folder"
+    fi
+    
+    if [ -f ~/ceremonyclient/node/.config/config.yml ]; then
+        cp ~/ceremonyclient/node/.config/config.yml ~/backup/qnode_keys/
+        echo "✅ Backup of config.yml created in ~/backup/qnode_keys folder"
+    fi
+fi
+
 # Step 4: Download Ceremonyclient
 echo "⏳Downloading Ceremonyclient"
 sleep 1  # Add a 1-second delay
@@ -30,26 +49,12 @@ cd ~
 if [ -d "ceremonyclient" ]; then
   echo "Directory ceremonyclient already exists, skipping git clone..."
 else
-  attempts=0
-  while [ $attempts -lt 5 ]; do  # Loop for a maximum of 5 attempts
-    if git clone https://source.quilibrium.com/quilibrium/ceremonyclient.git; then
-      echo "✅ Successfully cloned the repository."
-      break  # Exit the loop if cloning is successful
-    else
-      ((attempts++))
-      echo "⚠️ Git clone failed, retrying attempt $attempts..."
-      sleep 2
-    fi
+  until git clone https://source.quilibrium.com/quilibrium/ceremonyclient.git || git clone https://git.quilibrium-mirror.ch/agostbiro/ceremonyclient.git; do
+    echo "Git clone failed, retrying..."
+    sleep 2
   done
-  
-  if [ $attempts -eq 5 ]; then
-    echo "❌ Maximum retry attempts reached. Exiting."
-    exit 1
-  fi
 fi
-
 cd ~/ceremonyclient/
-git remote set-url origin https://source.quilibrium.com/quilibrium/ceremonyclient.git
 git checkout release
 
 # Set up environment variables (redundant but solves the command go not found error)
@@ -66,13 +71,25 @@ GOEXPERIMENT=arenas go build -o qclient main.go
 # Step 5:Determine the ExecStart line based on the architecture
 # Get the current user's home directory
 HOME=$(eval echo ~$HOME_DIR)
+
 # Use the home directory in the path
 NODE_PATH="$HOME/ceremonyclient/node"
 EXEC_START="$NODE_PATH/release_autorun.sh"
 
-# Create Ceremonyclient Service
-echo "⏳Creating Ceremonyclient Service"
-sleep 1  # Add a 1-second delay
+# Step 6:Create Ceremonyclient Service
+echo "⏳ Creating Ceremonyclient Service"
+sleep 2  # Add a 2-second delay
+
+# Check if the file exists before attempting to remove it
+if [ -f "/lib/systemd/system/ceremonyclient.service" ]; then
+    # If the file exists, remove it
+    rm /lib/systemd/system/ceremonyclient.service
+    echo "ceremonyclient.service file removed."
+else
+    # If the file does not exist, inform the user
+    echo "ceremonyclient.service file does not exist. No action taken."
+fi
+
 sudo tee /lib/systemd/system/ceremonyclient.service > /dev/null <<EOF
 [Unit]
 Description=Ceremony Client Go App Service
