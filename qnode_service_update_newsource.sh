@@ -23,7 +23,7 @@ echo "Step 2: ⏳ Downloading New Release"
 cd ~/ceremonyclient || { echo "Error: Directory ~/ceremonyclient does not exist."; exit 1; }
 
 # Set the remote URL
-git remote set-url origin https://source.quilibrium.com/quilibrium/ceremonyclient.git || { echo "❌ Error: Failed to set remote URL." >&2; exit 1; }
+git remote set-url origin https://source.quilibrium.com/quilibrium/ceremonyclient.git || git remote set-url origin https://git.quilibrium-mirror.ch/agostbiro/ceremonyclient.git || { echo "❌ Error: Failed to set remote URL." >&2; exit 1; }
 
 # Pull the latest changes
 git pull || { echo "❌ Error: Failed to download the latest changes." >&2; exit 1; }
