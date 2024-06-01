@@ -20,8 +20,6 @@ else
 fi
 sleep 1
 
-#!/bin/bash
-
 # Function to install a package if it is not already installed
 install_package() {
     if ! dpkg -l | grep -qw $1; then
@@ -95,7 +93,7 @@ EOF
 else
     echo "🔍 Checking existing ceremonyclient service file..."
     
-   # Check if the required lines exist, if they are different, or if CPUQuota exists
+     # Check if the required lines exist, if they are different, or if CPUQuota exists
     if ! grep -q "WorkingDirectory=$NODE_PATH" "$SERVICE_FILE" || ! grep -q "ExecStart=$EXEC_START" "$SERVICE_FILE" || grep -q '^CPUQuota=[0-9]*%' "$SERVICE_FILE"; then
         echo "🔄 Updating existing ceremonyclient service file..."
         # Replace the existing lines with new values
