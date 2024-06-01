@@ -23,27 +23,15 @@ exit_message() {
 # Step 2: Set a trap to call exit_message on any error
 trap exit_message ERR
 
-# Step 3: Check if directory ~/ceremonyclient exists, download from github 
+# Step 3: Backup existing configuration files if they exist
 if [ -d ~/ceremonyclient ]; then
-    # Check if backup directory ~/backup/qnode_keys exists, if not create it
-    if [ ! -d ~/backup/qnode_keys ]; then
-        mkdir -p ~/backup/qnode_keys
-    fi
-    
-    # Check if files exist, then backup
-    if [ -f ~/ceremonyclient/node/.config/keys.yml ]; then
-        cp ~/ceremonyclient/node/.config/keys.yml ~/backup/qnode_keys/
-        echo "✅ Backup of keys.yml created in ~/backup/qnode_keys folder"
-    fi
-    
-    if [ -f ~/ceremonyclient/node/.config/config.yml ]; then
-        cp ~/ceremonyclient/node/.config/config.yml ~/backup/qnode_keys/
-        echo "✅ Backup of config.yml created in ~/backup/qnode_keys folder"
-    fi
+    mkdir -p ~/backup/qnode_keys
+    [ -f ~/ceremonyclient/node/.config/keys.yml ] && cp ~/ceremonyclient/node/.config/keys.yml ~/backup/qnode_keys/ && echo "✅ Backup of keys.yml created in ~/backup/qnode_keys folder"
+    [ -f ~/ceremonyclient/node/.config/config.yml ] && cp ~/ceremonyclient/node/.config/config.yml ~/backup/qnode_keys/ && echo "✅ Backup of config.yml created in ~/backup/qnode_keys folder"
 fi
 
 # Step 4: Download Ceremonyclient
-echo "⏳Downloading Ceremonyclient"
+echo "⏳ Downloading Ceremonyclient"
 sleep 1  # Add a 1-second delay
 cd ~
 if [ -d "ceremonyclient" ]; then
@@ -74,7 +62,6 @@ else
   fi
 fi
 
-
 cd ~/ceremonyclient/
 git checkout release
 
@@ -84,30 +71,28 @@ export GOPATH=$HOME/go
 export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
 
 # Step 4.1: Build Ceremonyclient qClient
-echo "⏳ Building qCiient..."
+echo "⏳ Building qClient..."
 sleep 1  # Add a 1-second delay
 cd ~/ceremonyclient/client
 GOEXPERIMENT=arenas go build -o qclient main.go
 
-# Step 5:Determine the ExecStart line based on the architecture
+# Step 5: Determine the ExecStart line based on the architecture
 # Get the current user's home directory
-HOME=$(eval echo ~$HOME_DIR)
+HOME=$(eval echo ~$USER)
 
 # Use the home directory in the path
 NODE_PATH="$HOME/ceremonyclient/node"
 EXEC_START="$NODE_PATH/release_autorun.sh"
 
-# Step 6:Create Ceremonyclient Service
+# Step 6: Create Ceremonyclient Service
 echo "⏳ Creating Ceremonyclient Service"
 sleep 2  # Add a 2-second delay
 
 # Check if the file exists before attempting to remove it
 if [ -f "/lib/systemd/system/ceremonyclient.service" ]; then
-    # If the file exists, remove it
     rm /lib/systemd/system/ceremonyclient.service
     echo "ceremonyclient.service file removed."
 else
-    # If the file does not exist, inform the user
     echo "ceremonyclient.service file does not exist. No action taken."
 fi
 
@@ -131,8 +116,8 @@ echo "✅ Starting Ceremonyclient Service"
 
 sleep 2  # Add a 2-second delay
 sudo systemctl daemon-reload
-systemctl enable ceremonyclient
-service ceremonyclient start
+sudo systemctl enable ceremonyclient
+sudo service ceremonyclient start
 
 # Step 8: Final messages
 echo "🎉 Now your node is starting!"
@@ -148,4 +133,3 @@ echo "To exit the log, just type CTRL +C."
 # Step 9: See the logs of the ceremonyclient service
 sleep 5  # Add a 5-second delay
 sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
-
