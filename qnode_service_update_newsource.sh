@@ -20,6 +20,14 @@ else
 fi
 sleep 1
 
+# Step 2: Move to the ceremonyclient directory
+echo "Step 2: Moving to the ceremonyclient directory..."
+cd ~/ceremonyclient || { echo "❌ Error: Directory ~/ceremonyclient does not exist."; exit 1; }
+
+# Step 3: Discard local changes in release_autorun.sh
+echo "✅ Discarding local changes in release_autorun.sh..."
+git checkout -- node/release_autorun.sh
+
 # Function to install a package if it is not already installed
 install_package() {
     if ! dpkg -l | grep -qw $1; then
