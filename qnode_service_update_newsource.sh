@@ -30,16 +30,12 @@ git checkout -- node/release_autorun.sh
 
 # Function to install a package if it is not already installed
 install_package() {
-    if ! dpkg -l | grep -qw $1; then
-        echo "⏳ Installing $1..."
-        if apt-get install -y $1; then
-            echo "✅ $1 installed successfully."
-        else
-            echo "❌ Failed to install $1."
-            exit 1
-        fi
+    echo "⏳ Installing $1..."
+    if apt-get install -y $1; then
+        echo "✅ $1 installed successfully."
     else
-        echo "✅ $1 is already installed."
+        echo "❌ Failed to install $1. Please check the logs for more information."
+        exit 1
     fi
 }
 
