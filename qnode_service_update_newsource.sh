@@ -1,9 +1,13 @@
 #!/bin/bash
 
 # Step 0: Welcome
-echo "This script will update your Qnode. The node must be running as a service."
-echo "Made with ❤️ by 0xOzgur.eth (edited by LaMat)"
-echo "Processing..."
+echo "✨ Welcome! This script will update your Quilibrium node when running it as a service. ✨"
+echo ""
+echo "Made with 🔥 by LaMat - https://quilibrium.one"
+echo "Helped by 0xOzgur.eth - https://quilibrium.space"
+echo "====================================================================================="
+echo ""
+echo "Processing... ⏳"
 sleep 7  # Add a 7-second delay
 
 # Step 1: Stop the ceremonyclient service
