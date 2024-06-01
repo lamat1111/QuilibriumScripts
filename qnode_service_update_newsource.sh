@@ -10,13 +10,13 @@ echo ""
 echo "Processing... ⏳"
 sleep 7  # Add a 7-second delay
 
-# Step 1: Stop the ceremonyclient service
-echo "⏳ Stopping the ceremonyclient service..."
-if service ceremonyclient stop; then
+
+# Step 1: Stop the ceremonyclient service if it exists
+echo "⏳ Stopping the ceremonyclient service if it exists..."
+if systemctl is-active --quiet ceremonyclient && service ceremonyclient stop; then
     echo "🔴 Service stopped successfully."
 else
-    echo "❌ Error stopping the ceremonyclient service." >&2
-    exit 1
+    echo "❌ Ceremonyclient service either does not exist or could not be stopped." >&2
 fi
 sleep 1
 
