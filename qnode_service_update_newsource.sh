@@ -11,7 +11,7 @@ echo "Processing... ⏳"
 sleep 7  # Add a 7-second delay
 
 # Step 1: Stop the ceremonyclient service
-echo "Step 1: Stopping the ceremonyclient service..."
+echo "⏳ Stopping the ceremonyclient service..."
 if service ceremonyclient stop; then
     echo "🔴 Service stopped successfully."
 else
@@ -23,7 +23,7 @@ sleep 1
 # Function to install a package if it is not already installed
 install_package() {
     if ! dpkg -l | grep -qw $1; then
-        echo "Installing $1..."
+        echo "⏳ Installing $1..."
         if apt-get install -y $1; then
             echo "✅ $1 installed successfully."
         else
@@ -41,14 +41,14 @@ install_package cpulimit
 # Install gawk
 install_package gawk
 
-echo "cpulimit and gawk are installed and up to date."
+echo "✅ cpulimit and gawk are installed and up to date."
 
 
 # Step 2: Download Binary
-echo "Step 2: ⏳ Downloading New Release"
+echo "⏳ Downloading New Release..."
 
 # Change to the ceremonyclient directory
-cd ~/ceremonyclient || { echo "Error: Directory ~/ceremonyclient does not exist."; exit 1; }
+cd ~/ceremonyclient || { echo "❌ Error: Directory ~/ceremonyclient does not exist."; exit 1; }
 
 # Set the remote URL
 git remote set-url origin https://source.quilibrium.com/quilibrium/ceremonyclient.git || git remote set-url origin https://git.quilibrium-mirror.ch/agostbiro/ceremonyclient.git || { echo "❌ Error: Failed to set remote URL." >&2; exit 1; }
@@ -118,8 +118,8 @@ systemctl enable ceremonyclient
 service ceremonyclient start
 
 # Showing the node logs
-echo "🌟Your Qnode is now updated to 1.4.18"
-echo "⏳ I will now show the node log (CTRL+C to detatch from the log flow)"
+echo "🌟Your Qnode is now updated!"
+echo "⏳ Showing the node log... (CTRL+C to exit)"
 echo ""
 echo ""
 sleep 3  # Add a 5-second delay
