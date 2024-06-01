@@ -34,8 +34,7 @@ install_package() {
     if apt-get install -y $1; then
         echo "✅ $1 installed successfully."
     else
-        echo "❌ Failed to install $1. Please check the logs for more information."
-        exit 1
+        echo "❌ Failed to install $1. You will have to do this manually."
     fi
 }
 
