@@ -20,6 +20,25 @@ exit_message() {
     echo "🛠️ If you still receive an error, you may want to proceed manually, step by step instead of using the auto-installer."
 }
 
+# Function to install a package if it is not already installed
+install_package() {
+    echo "⏳ Installing $1..."
+    if apt-get install -y $1; then
+        echo "✅ $1 installed successfully."
+    else
+        echo "❌ Failed to install $1. You will have to do this manually."
+    fi
+}
+
+# Install cpulimit
+install_package cpulimit
+
+# Install gawk
+install_package gawk
+
+echo "✅ cpulimit and gawk are installed and up to date."
+
+
 # Step 2: Set a trap to call exit_message on any error
 trap exit_message ERR
 
