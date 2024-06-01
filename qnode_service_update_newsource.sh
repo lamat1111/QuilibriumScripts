@@ -9,12 +9,38 @@ sleep 7  # Add a 7-second delay
 # Step 1: Stop the ceremonyclient service
 echo "Step 1: Stopping the ceremonyclient service..."
 if service ceremonyclient stop; then
-    echo "Service stopped successfully."
+    echo "🔴 Service stopped successfully."
 else
-    echo "Error stopping the ceremonyclient service." >&2
+    echo "❌ Error stopping the ceremonyclient service." >&2
     exit 1
 fi
 sleep 1
+
+#!/bin/bash
+
+# Function to install a package if it is not already installed
+install_package() {
+    if ! dpkg -l | grep -qw $1; then
+        echo "Installing $1..."
+        if apt-get install -y $1; then
+            echo "✅ $1 installed successfully."
+        else
+            echo "❌ Failed to install $1."
+            exit 1
+        fi
+    else
+        echo "✅ $1 is already installed."
+    fi
+}
+
+# Install cpulimit
+install_package cpulimit
+
+# Install gawk
+install_package gawk
+
+echo "cpulimit and gawk are installed and up to date."
+
 
 # Step 2: Download Binary
 echo "Step 2: ⏳ Downloading New Release"
@@ -64,12 +90,19 @@ EOF
     fi
 else
     echo "🔍 Checking existing ceremonyclient service file..."
-    # Check if the required lines exist and if they are different
-    if ! grep -q "WorkingDirectory=$NODE_PATH" "$SERVICE_FILE" || ! grep -q "ExecStart=$EXEC_START" "$SERVICE_FILE"; then
+    
+   # Check if the required lines exist, if they are different, or if CPUQuota exists
+    if ! grep -q "WorkingDirectory=$NODE_PATH" "$SERVICE_FILE" || ! grep -q "ExecStart=$EXEC_START" "$SERVICE_FILE" || grep -q '^CPUQuota=[0-9]*%' "$SERVICE_FILE"; then
         echo "🔄 Updating existing ceremonyclient service file..."
         # Replace the existing lines with new values
         sudo sed -i "s|WorkingDirectory=.*|WorkingDirectory=$NODE_PATH|" "$SERVICE_FILE"
         sudo sed -i "s|ExecStart=.*|ExecStart=$EXEC_START|" "$SERVICE_FILE"
+        # Remove any line containing CPUQuota=x%
+        if grep -q '^CPUQuota=[0-9]*%' "$SERVICE_FILE"; then
+            echo "✅ CPUQuota line found. Deleting..."
+            sudo sed -i '/^CPUQuota=[0-9]*%/d' "$SERVICE_FILE"
+            echo "✅ CPUQuota line deleted. You don't need this anymore!"
+        fi
     else
         echo "✅ No changes needed."
     fi
