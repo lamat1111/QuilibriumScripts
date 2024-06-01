@@ -33,6 +33,25 @@ sudo apt-get upgrade -y
 echo "🔧 Installing useful packages..."
 sudo apt-get install git wget tmux tar -y || { echo "❌ Failed to install useful packages! Exiting..."; exit_message; exit 1; }
 
+# Function to install a package if it is not already installed
+install_package() {
+    echo "⏳ Installing $1..."
+    if apt-get install -y $1; then
+        echo "✅ $1 installed successfully."
+    else
+        echo "❌ Failed to install $1. You will have to do this manually."
+    fi
+}
+
+# Install cpulimit
+install_package cpulimit
+
+# Install gawk
+install_package gawk
+
+echo "✅ cpulimit and gawk are installed and up to date."
+
+
 # Step 4: Download and extract Go
 if [[ $(go version) == *"go1.20.1"* || $(go version) == *"go1.20.2"* || $(go version) == *"go1.20.3"* || $(go version) == *"go1.20.4"* ]]; then
   echo "✅ Correct version of Go is already installed, moving on..."
