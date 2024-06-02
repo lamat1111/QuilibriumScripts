@@ -1,6 +1,3 @@
-Sure, I’ll correct the step numbering for you. Here’s the updated script with the correct step numbers:
-
-```bash
 #!/bin/bash
 
 # Step 0: Welcome
