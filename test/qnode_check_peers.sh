@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Step 5.1: Temporarily add variables - redundant but it help solving the command go not found error
+# Step 5.1: Temporarily add variables - redundant but it helps solve the command go not found error
 export GOROOT=/usr/local/go
 export GOPATH=$HOME/go
 export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
@@ -31,7 +31,13 @@ if ! command_exists jq; then
 fi
 
 # Retrieve the network information from the node
-network_info=$(grpcurl -plaintext localhost:8337 quilibrium.node.node.pb.NodeService.GetNetworkInfo)
+network_info=$(grpcurl -plaintext localhost:8337 quilibrium.node.node.pb.NodeService.GetNetworkInfo 2>&1)
+
+# Check if grpcurl encountered an error
+if [[ "$network_info" == *"command not found"* ]]; then
+  echo "Error: grpcurl command not found. Please install grpcurl manually." >&2
+  exit 1
+fi
 
 # Extract peerIds and peerScores
 peer_ids=$(echo "$network_info" | jq -r '.networkInfo[].peerId')
