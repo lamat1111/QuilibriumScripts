@@ -116,6 +116,15 @@ else
     echo "ceremonyclient.service file does not exist. No action taken."
 fi
 
+# Calculate the number of vCores
+vCORES=$(nproc)
+
+# Set CPU limit percent
+CPU_LIMIT_PERCENT=70
+
+# Calculate the CPUQuota value
+CPU_QUOTA=$(($CPU_LIMIT_PERCENT * $vCORES))
+
 sudo tee /lib/systemd/system/ceremonyclient.service > /dev/null <<EOF
 [Unit]
 Description=Ceremony Client Go App Service
@@ -126,6 +135,7 @@ Restart=always
 RestartSec=5s
 WorkingDirectory=$NODE_PATH
 ExecStart=$EXEC_START
+CPUQuota='${CPU_QUOTA}'%
 
 [Install]
 WantedBy=multi-user.target
@@ -133,13 +143,19 @@ EOF
 
 # Step 11: Start the ceremonyclient service
 echo "✅ Starting Ceremonyclient Service"
-
-sleep 2  # Add a 2-second delay
+sleep 2
 sudo systemctl daemon-reload
-sudo systemctl enable ceremonyclient
-sudo systemctl start ceremonyclient
+sudo systemctl enable ceremonyclient && sudo systemctl start ceremonyclient
+if [ $? -eq 0 ]; then
+    echo "✅ Ceremonyclient Service started successfully."
+else
+    echo "❌ Failed to start Ceremonyclient Service."
+fi
 
 # Step 12: Final messages
+echo "✅ A CPU limit of $CPU_LIMIT_PERCENT % has been automatically applied"
+echo "✅ You can change this manually later in your service file if you need"
+echo ""
 echo "🎉 Now your node is starting!"
 echo "🕒 Let it run for at least 30 minutes to generate your keys."
 echo ""
@@ -147,9 +163,8 @@ echo "🔐 You can logout of your server if you want and login again later."
 echo "🔒 After 30 minutes, backup your keys.yml and config.yml files."
 echo "ℹ️ More info about this in the online guide: https://docs.quilibrium.one"
 echo ""
-echo "📜 Now I will show the node log below..."
-echo "To exit the log, just type CTRL +C."
-
+echo "📜 Showing the node log...(CTRL +C to exit)"
+echo ""
 # Step 13: See the logs of the ceremonyclient service
 sleep 5  # Add a 5-second delay
 sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
