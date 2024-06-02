@@ -97,6 +97,9 @@ Restart=always
 RestartSec=5s
 WorkingDirectory="$NODE_PATH"
 ExecStart="$EXEC_START"
+
+[Install]
+WantedBy=multi-user.target
 EOF
     then
         echo "❌ Error: Failed to create ceremonyclient service file." >&2
