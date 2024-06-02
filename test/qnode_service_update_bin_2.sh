@@ -10,6 +10,10 @@ echo ""
 echo "Processing... ⏳"
 sleep 7  # Add a 7-second delay
 
+# Set service file path
+SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
+# Set CPU limit percent
+CPU_LIMIT_PERCENT=70
 
 # Step 1: Stop the ceremonyclient service if it exists
 echo "⏳ Stopping the ceremonyclient service if it exists..."
@@ -81,7 +85,6 @@ fi
 # Step 8: Re-Create or Update Ceremonyclient Service
 echo "🔧 Rebuilding Ceremonyclient Service..."
 sleep 2  # Add a 2-second delay
-SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
 if [ ! -f "$SERVICE_FILE" ]; then
     echo "📝 Creating new ceremonyclient service file..."
     if ! sudo tee "$SERVICE_FILE" > /dev/null <<EOF
@@ -94,9 +97,6 @@ Restart=always
 RestartSec=5s
 WorkingDirectory="$NODE_PATH"
 ExecStart="$EXEC_START"
-
-[Install]
-WantedBy=multi-user.target
 EOF
     then
         echo "❌ Error: Failed to create ceremonyclient service file." >&2
@@ -120,7 +120,25 @@ else
     else
         echo "✅ No changes needed."
     fi
+    
+sleep 1  # Add a 1-second delay
+
+# Calculate the number of vCores
+vCORES=$(nproc)
+# Calculate the CPUQuota value
+CPU_QUOTA=$(($CPU_LIMIT_PERCENT * $vCORES))
+
+# Check if CPUQuota exists, if not, insert it after [Service]
+if ! grep -q "CPUQuota=" "$SERVICE_FILE"; then
+    echo "➕ Adding CPUQuota to ceremonyclient service file..."
+    if ! sudo sed -i "/\[Service\]/a\CPUQuota='${CPU_QUOTA}'%" "$SERVICE_FILE"; then
+        echo "❌ Error: Failed to add CPUQuota to ceremonyclient service file." >&2
+        exit 1
+    else
+        echo "✅ A CPU limit of $CPU_LIMIT_PERCENT % has been applied"
+    fi
 fi
+sleep 1  # Add a 1-second delay
 
 # Step 9: Start the ceremonyclient service
 echo "✅ Starting Ceremonyclient Service"
@@ -131,6 +149,8 @@ service ceremonyclient start
 
 # Showing the node logs
 echo "🌟Your Qnode is now updated to $VERSION!"
+echo "✅ You can change this manually later in your service file if you need"
+echo ""
 echo "⏳ Showing the node log... (CTRL+C to exit)"
 echo ""
 echo ""
