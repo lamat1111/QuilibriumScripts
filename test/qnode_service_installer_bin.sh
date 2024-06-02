@@ -94,21 +94,16 @@ ARCH=$(uname -m)
 HOME=$(eval echo ~$USER)
 NODE_PATH="$HOME/ceremonyclient/node"
 
-case "$ARCH" in
-    x86_64)
-        EXEC_START="$NODE_PATH/node-$VERSION-linux-amd64"
-        ;;
-    aarch64)
-        EXEC_START="$NODE_PATH/node-$VERSION-linux-arm64"
-        ;;
-    arm64)
-        EXEC_START="$NODE_PATH/node-$VERSION-darwin-arm64"
-        ;;
-    *)
-        echo "Unsupported architecture: $ARCH"
-        exit 1
-        ;;
-esac
+if [ "$ARCH" = "x86_64" ]; then
+    EXEC_START="$NODE_PATH/node-$VERSION-linux-amd64"
+elif [ "$ARCH" = "aarch64" ]; then
+    EXEC_START="$NODE_PATH/node-$VERSION-linux-arm64"
+elif [ "$ARCH" = "arm64" ]; then
+    EXEC_START="$NODE_PATH/node-$VERSION-darwin-arm64"
+else
+    echo "Unsupported architecture: $ARCH"
+    exit 1
+fi
 
 # Step 10: Create Ceremonyclient Service
 echo "⏳ Creating Ceremonyclient Service"
