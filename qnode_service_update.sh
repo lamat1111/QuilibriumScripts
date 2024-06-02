@@ -47,21 +47,26 @@ install_package gawk
 echo "✅ cpulimit and gawk are installed and up to date."
 
 
-# Step 2: Download Binary
+# Step 4: Download Binary
 echo "⏳ Downloading New Release..."
 
 # Change to the ceremonyclient directory
 cd ~/ceremonyclient || { echo "❌ Error: Directory ~/ceremonyclient does not exist."; exit 1; }
 
-# Set the remote URL
-if git remote set-url origin https://source.quilibrium.com/quilibrium/ceremonyclient.git; then
-    echo "✅ Remote URL set to https://source.quilibrium.com/quilibrium/ceremonyclient.git"
-elif git remote set-url origin https://git.quilibrium-mirror.ch/agostbiro/ceremonyclient.git; then
-    echo "✅ Remote URL set to https://git.quilibrium-mirror.ch/agostbiro/ceremonyclient.git"
-elif git remote set-url origin https://github.com/QuilibriumNetwork/ceremonyclient.git; then
-    echo "✅ Remote URL set to https://github.com/QuilibriumNetwork/ceremonyclient.git"
-else
-    echo "❌ Error: Failed to set remote URL." >&2
+# Set the remote URL and verify access
+for url in \
+    "https://source.quilibrium.com/quilibrium/ceremonyclient.git" \
+    "https://git.quilibrium-mirror.ch/agostbiro/ceremonyclient.git" \
+    "https://github.com/QuilibriumNetwork/ceremonyclient.git"; do
+    if git remote set-url origin "$url" && git fetch origin; then
+        echo "✅ Remote URL set to $url"
+        break
+    fi
+done
+
+# Check if the URL was set and accessible
+if ! git remote -v | grep -q origin; then
+    echo "❌ Error: Failed to set and access remote URL." >&2
     exit 1
 fi
 
@@ -78,7 +83,7 @@ HOME=$(eval echo ~$HOME_DIR)
 NODE_PATH="$HOME/ceremonyclient/node"
 EXEC_START="$NODE_PATH/release_autorun.sh"
 
-# Step 3: Re-Create or Update Ceremonyclient Service
+# Step 5: Re-Create or Update Ceremonyclient Service
 echo "🔧 Rebuilding Ceremonyclient Service..."
 sleep 2  # Add a 2-second delay
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
@@ -122,7 +127,7 @@ else
     fi
 fi
 
-# Step 5: Start the ceremonyclient service
+# Step 6: Start the ceremonyclient service
 echo "✅ Starting Ceremonyclient Service"
 sleep 2  # Add a 2-second delay
 systemctl daemon-reload
