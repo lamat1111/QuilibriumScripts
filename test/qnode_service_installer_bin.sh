@@ -10,6 +10,9 @@ echo ""
 echo "Processing... ⏳"
 sleep 7  # Add a 7-second delay
 
+# Set CPU limit percent
+CPU_LIMIT_PERCENT=70
+
 # Exit on any error
 set -e
 
@@ -118,9 +121,6 @@ fi
 
 # Calculate the number of vCores
 vCORES=$(nproc)
-
-# Set CPU limit percent
-CPU_LIMIT_PERCENT=70
 
 # Calculate the CPUQuota value
 CPU_QUOTA=$(($CPU_LIMIT_PERCENT * $vCORES))
