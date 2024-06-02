@@ -161,6 +161,3 @@ echo "To exit the log, just type CTRL +C."
 # Step 13: See the logs of the ceremonyclient service
 sleep 5  # Add a 5-second delay
 sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
-```
-
-This should ensure the step numbers are sequential and correctly aligned with the tasks being performed.
