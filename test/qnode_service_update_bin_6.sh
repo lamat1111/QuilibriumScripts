@@ -123,7 +123,24 @@ else
     else
         echo "✅ No changes needed."
     fi
-    
+fi  
+sleep 1  # Add a 1-second delay
+
+# Calculate the number of vCores
+vCORES=$(nproc)
+# Calculate the CPUQuota value
+CPU_QUOTA=$(($CPU_LIMIT_PERCENT * $vCORES))
+
+# Check if CPUQuota exists, if not, insert it after [Service]
+if ! grep -q "CPUQuota=" "$SERVICE_FILE"; then
+    echo "➕ Adding CPUQuota to ceremonyclient service file..."
+    if ! sudo sed -i "/\[Service\]/a CPUQuota='${CPU_QUOTA}'%" "$SERVICE_FILE"; then
+        echo "❌ Error: Failed to add CPUQuota to ceremonyclient service file." >&2
+        exit 1
+    else
+        echo "✅ A CPU limit of $CPU_LIMIT_PERCENT % has been applied"
+    fi
+fi
 sleep 1  # Add a 1-second delay
 
 # Step 9: Start the ceremonyclient service
