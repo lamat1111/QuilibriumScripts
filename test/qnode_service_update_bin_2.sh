@@ -57,15 +57,15 @@ git checkout release || { echo "❌ Error: Failed to checkout release." >&2; exi
 
 echo "✅ Downloaded the latest changes successfully."
 
-# Step 5: Set the version number
-VERSION=$(cat config/version.go | grep -A 1 "func GetVersion() \[\]byte {" | grep -Eo '0x[0-9a-fA-F]+' | xargs printf "%d.%d.%d")
-
-# Step 6: Get the system architecture
-ARCH=$(uname -m)
-
-# Step 7: Determine the ExecStart line based on the architecture
+# Step 5: Determine the ExecStart line based on the architecture
 HOME=$(eval echo ~$USER)
 NODE_PATH="$HOME/ceremonyclient/node"
+
+# Step 6: Set the version number
+VERSION=$(cat $NODE_PATH/config/version.go | grep -A 1 "func GetVersion() \[\]byte {" | grep -Eo '0x[0-9a-fA-F]+' | xargs printf "%d.%d.%d")
+
+# Step 7: Get the system architecture
+ARCH=$(uname -m)
 
 if [ "$ARCH" = "x86_64" ]; then
     EXEC_START="$NODE_PATH/node-$VERSION-linux-amd64"
