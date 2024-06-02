@@ -28,27 +28,12 @@ fi
 # Retrieve the network information from the node
 network_info=$(grpcurl -plaintext localhost:8337 quilibrium.node.node.pb.NodeService.GetNetworkInfo)
 
-# Extract peerIds and peerScores
+# Extract peerIds
 peer_ids=$(echo "$network_info" | jq -r '.networkInfo[].peerId')
-peer_scores=$(echo "$network_info" | jq -r '.networkInfo[] | select(.peerScore) | .peerScore')
 
 # Count the total number of peers
 peer_count=$(echo "$peer_ids" | wc -l)
 
-# Initialize variable for counting peers with peerScore of -10000
-peer_score_count=0
-
-# Loop through each peerScore and count occurrences of -10000
-while IFS= read -r score; do
-  if [ "$score" == "-10000" ]; then
-    ((peer_score_count++))
-  fi
-done <<< "$peer_scores"
-
 # Output the results
 echo ""
 echo "You are connected to $peer_count peers on the network"
-if [ "$peer_score_count" -gt 0 ]; then
-  echo "$peer_score_count peers have a peerScore of -10000"
-fi
-echo ""
