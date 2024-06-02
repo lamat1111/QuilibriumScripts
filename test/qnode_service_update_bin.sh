@@ -139,6 +139,7 @@ if ! grep -q "CPUQuota=" "$SERVICE_FILE"; then
         exit 1
     else
         echo "✅ A CPU limit of $CPU_LIMIT_PERCENT % has been applied"
+        echo "You can change this manually later in your service file if you need"
     fi
 fi
 sleep 1  # Add a 1-second delay
@@ -151,8 +152,8 @@ systemctl enable ceremonyclient
 service ceremonyclient start
 
 # Showing the node logs
+echo ""
 echo "🌟Your Qnode is now updated to $VERSION!"
-echo "✅ You can change this manually later in your service file if you need"
 echo ""
 echo "⏳ Showing the node log... (CTRL+C to exit)"
 echo ""
