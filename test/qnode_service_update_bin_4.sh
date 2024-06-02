@@ -134,7 +134,7 @@ CPU_QUOTA=$(($CPU_LIMIT_PERCENT * $vCORES))
 # Check if CPUQuota exists, if not, insert it after [Service]
 if ! grep -q "CPUQuota=" "$SERVICE_FILE"; then
     echo "➕ Adding CPUQuota to ceremonyclient service file..."
-    if ! sudo sed -i "/\[Service\]/a\CPUQuota='${CPU_QUOTA}'%" "$SERVICE_FILE"; then
+    if ! sudo sed -i "/\[Service\]/a CPUQuota='${CPU_QUOTA}'%" "$SERVICE_FILE"; then
         echo "❌ Error: Failed to add CPUQuota to ceremonyclient service file." >&2
         exit 1
     else
