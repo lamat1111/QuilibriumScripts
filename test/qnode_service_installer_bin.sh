@@ -20,25 +20,6 @@ exit_message() {
     echo "🛠️ If you still receive an error, you may want to proceed manually, step by step instead of using the auto-installer."
 }
 
-# Function to install a package if it is not already installed
-install_package() {
-    echo "⏳ Installing $1..."
-    if apt-get install -y $1; then
-        echo "✅ $1 installed successfully."
-    else
-        echo "❌ Failed to install $1. You will have to do this manually."
-    fi
-}
-
-# Install cpulimit
-install_package cpulimit
-
-# Install gawk
-install_package gawk
-
-echo "✅ cpulimit and gawk are installed and up to date."
-
-
 # Step 2: Set a trap to call exit_message on any error
 trap exit_message ERR
 
@@ -95,13 +76,30 @@ sleep 1  # Add a 1-second delay
 cd ~/ceremonyclient/client
 GOEXPERIMENT=arenas go build -o qclient main.go
 
+
+# Set the version number
+VERSION="1.4.18"
+
+# Get the system architecture
+ARCH=$(uname -m)
+
 # Step 5: Determine the ExecStart line based on the architecture
 # Get the current user's home directory
 HOME=$(eval echo ~$USER)
 
 # Use the home directory in the path
 NODE_PATH="$HOME/ceremonyclient/node"
-EXEC_START="$NODE_PATH/release_autorun.sh"
+
+if [ "$ARCH" = "x86_64" ]; then
+    EXEC_START="$NODE_PATH/node-$VERSION-linux-amd64"
+elif [ "$ARCH" = "aarch64" ]; then
+    EXEC_START="$NODE_PATH/node-$VERSION-linux-arm64"
+elif [ "$ARCH" = "arm64" ]; then
+    EXEC_START="$NODE_PATH/node-$VERSION-darwin-arm64"
+else
+    echo "Unsupported architecture: $ARCH"
+    exit 1
+fi
 
 # Step 6: Create Ceremonyclient Service
 echo "⏳ Creating Ceremonyclient Service"
