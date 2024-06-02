@@ -28,21 +28,26 @@ cd ~/ceremonyclient || { echo "❌ Error: Directory ~/ceremonyclient does not ex
 echo "✅ Discarding local changes in release_autorun.sh..."
 git checkout -- node/release_autorun.sh
 
-# Step 2: Download Binary
+# Step 4: Download Binary
 echo "⏳ Downloading New Release..."
 
 # Change to the ceremonyclient directory
 cd ~/ceremonyclient || { echo "❌ Error: Directory ~/ceremonyclient does not exist."; exit 1; }
 
-# Set the remote URL
-if git remote set-url origin https://source.quilibrium.com/quilibrium/ceremonyclient.git; then
-    echo "✅ Remote URL set to https://source.quilibrium.com/quilibrium/ceremonyclient.git"
-elif git remote set-url origin https://git.quilibrium-mirror.ch/agostbiro/ceremonyclient.git; then
-    echo "✅ Remote URL set to https://git.quilibrium-mirror.ch/agostbiro/ceremonyclient.git"
-elif git remote set-url origin https://github.com/QuilibriumNetwork/ceremonyclient.git; then
-    echo "✅ Remote URL set to https://github.com/QuilibriumNetwork/ceremonyclient.git"
-else
-    echo "❌ Error: Failed to set remote URL." >&2
+# Set the remote URL and verify access
+for url in \
+    "https://source.quilibrium.com/quilibrium/ceremonyclient.git" \
+    "https://git.quilibrium-mirror.ch/agostbiro/ceremonyclient.git" \
+    "https://github.com/QuilibriumNetwork/ceremonyclient.git"; do
+    if git remote set-url origin "$url" && git fetch origin; then
+        echo "✅ Remote URL set to $url"
+        break
+    fi
+done
+
+# Check if the URL was set and accessible
+if ! git remote -v | grep -q origin; then
+    echo "❌ Error: Failed to set and access remote URL." >&2
     exit 1
 fi
 
@@ -52,13 +57,13 @@ git checkout release || { echo "❌ Error: Failed to checkout release." >&2; exi
 
 echo "✅ Downloaded the latest changes successfully."
 
-# Step 7: Set the version number
+# Step 5: Set the version number
 VERSION=$(cat config/version.go | grep -A 1 "func GetVersion() \[\]byte {" | grep -Eo '0x[0-9a-fA-F]+' | xargs printf "%d.%d.%d")
 
-# Step 8: Get the system architecture
+# Step 6: Get the system architecture
 ARCH=$(uname -m)
 
-# Step 9: Determine the ExecStart line based on the architecture
+# Step 7: Determine the ExecStart line based on the architecture
 HOME=$(eval echo ~$USER)
 NODE_PATH="$HOME/ceremonyclient/node"
 
@@ -73,7 +78,7 @@ else
     exit 1
 fi
 
-# Step 3: Re-Create or Update Ceremonyclient Service
+# Step 8: Re-Create or Update Ceremonyclient Service
 echo "🔧 Rebuilding Ceremonyclient Service..."
 sleep 2  # Add a 2-second delay
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
@@ -117,7 +122,7 @@ else
     fi
 fi
 
-# Step 5: Start the ceremonyclient service
+# Step 9: Start the ceremonyclient service
 echo "✅ Starting Ceremonyclient Service"
 sleep 2  # Add a 2-second delay
 systemctl daemon-reload
