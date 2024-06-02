@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Step 5.1: Temporarily add variables - redundant but it help solving the command go not found error
+export GOROOT=/usr/local/go
+export GOPATH=$HOME/go
+export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
+
 # Function to check if a command exists
 command_exists() {
   command -v "$1" >/dev/null 2>&1
