@@ -36,13 +36,12 @@ peer_scores=$(echo "$network_info" | jq -r '.networkInfo[] | select(.peerScore) 
 peer_count=$(echo "$peer_ids" | wc -l)
 
 # Count the number of peers with a peerScore of -10000
-peer_score_count=0
-if [ -n "$peer_scores" ]; then
-  peer_score_count=$(echo "$peer_scores" | grep -c '-10000')
-fi
+peer_score_count=$(echo "$peer_scores" | grep -c '-10000' || true)
 
 # Output the results
+echo ""
 echo "You are connected to $peer_count peers on the network"
-if [ "$peer_score_count" -gt 0 ]; then
+if [ -n "$peer_score_count" ] && [ "$peer_score_count" -gt 0 ]; then
   echo "$peer_score_count peers have a peerScore of -10000"
 fi
+echo ""
