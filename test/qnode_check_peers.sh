@@ -35,8 +35,15 @@ peer_scores=$(echo "$network_info" | jq -r '.networkInfo[] | select(.peerScore) 
 # Count the total number of peers
 peer_count=$(echo "$peer_ids" | wc -l)
 
-# Count the number of peers with a peerScore of -10000
-peer_score_count=$(echo "$peer_scores" | grep -c '-10000' || echo 0)
+# Initialize variable for counting peers with peerScore of -10000
+peer_score_count=0
+
+# Loop through each peerScore and count occurrences of -10000
+while IFS= read -r score; do
+  if [ "$score" == "-10000" ]; then
+    ((peer_score_count++))
+  fi
+done <<< "$peer_scores"
 
 # Output the results
 echo ""
