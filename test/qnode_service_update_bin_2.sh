@@ -1,6 +1,3 @@
-#!/bin/bash
-
-# Step 0: Welcome
 echo "✨ Welcome! This script will update your Quilibrium node when running it as a service. ✨"
 echo ""
 echo "Made with 🔥 by LaMat - https://quilibrium.one"
@@ -10,29 +7,124 @@ echo ""
 echo "Processing... ⏳"
 sleep 7  # Add a 7-second delay
 
+#===========================
+# Set variables
+#===========================
 # Set service file path
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
-# Set CPU limit percent
-CPU_LIMIT_PERCENT=70
+# User working folder
+HOME=$(eval echo ~$USER)
+# Node path
+NODE_PATH="$HOME/ceremonyclient/node"
 
-# Step 1: Stop the ceremonyclient service if it exists
-echo "⏳ Stopping the ceremonyclient service if it exists..."
-if systemctl is-active --quiet ceremonyclient && service ceremonyclient stop; then
-    echo "🔴 Service stopped successfully."
-else
-    echo "❌ Ceremonyclient service either does not exist or could not be stopped." >&2
+#===========================
+# Check if ceremonyclient directory exists
+#===========================
+HOME=$(eval echo ~$USER)
+CEREMONYCLIENT_DIR="$HOME/ceremonyclient"
+
+if [ ! -d "$CEREMONYCLIENT_DIR" ]; then
+    echo "❌ Error: You don't have a node installed yet. Nothing to update. Exiting..."
+    exit 1
 fi
-sleep 1
 
-# Step 2: Move to the ceremonyclient directory
-echo "Step 2: Moving to the ceremonyclient directory..."
+#===========================
+# CPU limit check
+#===========================
+# Check if CPUQuota exists
+if grep -q "CPUQuota=" "$SERVICE_FILE"; then
+    echo "🔄 CPUQuota is already set. I will not change it. Skipping..."
+    exit 0
+else
+    while true; do
+        read -p "Enter the CPU limit percentage (0-100) - enter 0 for no limit: " CPU_LIMIT_PERCENT
+
+        # Validate the input
+        if [[ "$CPU_LIMIT_PERCENT" =~ ^[0-9]+$ ]] && [ "$CPU_LIMIT_PERCENT" -ge 0 ] && [ "$CPU_LIMIT_PERCENT" -le 100 ]; then
+            break  # Break out of the loop if the input is valid
+        else
+            echo "❌ Invalid input. Please enter a number between 0 and 100."
+        fi
+    done
+
+    if [ "$CPU_LIMIT_PERCENT" -eq 0 ]; then
+        echo "⚠️ No CPUQuota will be set."
+        exit 0
+    fi
+
+    echo "✅ CPU limit percentage set to: $CPU_LIMIT_PERCENT%"
+    sleep 1
+
+    # Calculate the number of vCores
+    vCORES=$(nproc)
+    echo "☑️ Your server has $vCORES vCores"
+    sleep 1
+
+    # Calculate the CPUQuota value
+    CPU_QUOTA=$(( ($CPU_LIMIT_PERCENT * $vCORES) / 100 ))
+    echo "☑️ Your CPUQuota value will be $CPU_LIMIT_PERCENT% of $vCORES vCores = $CPU_QUOTA%"
+    sleep 1
+
+    # Add CPUQuota to the service file
+    echo "➕ Adding CPUQuota to ceremonyclient service file..."
+    if ! sudo sed -i "/\[Service\]/a CPUQuota=${CPU_QUOTA}%" "$SERVICE_FILE"; then
+        echo "❌ Error: Failed to add CPUQuota to ceremonyclient service file." >&2
+        exit 1
+    else
+        echo "✅ A CPU limit of $CPU_LIMIT_PERCENT% has been applied"
+        echo "You can change this manually later in your service file if you need"
+    fi
+    sleep 1  # Add a 1-second delay
+fi
+
+#===========================
+# Stop the ceremonyclient service if it exists
+#===========================
+echo "⏳ Stopping the ceremonyclient service if it exists..."
+if systemctl is-active --quiet ceremonyclient; then
+    if sudo systemctl stop ceremonyclient; then
+        echo "🔴 Service stop command issued."
+    else
+        echo "❌ Failed to issue stop command for ceremonyclient service." >&2
+    fi
+
+    sleep 1
+
+    # Verify the service has stopped
+    if systemctl is-active --quiet ceremonyclient; then
+        echo "⚠️ Service is still running. Attempting to stop it forcefully..."
+        if sudo systemctl kill ceremonyclient; then
+            sleep 1
+            if systemctl is-active --quiet ceremonyclient; then
+                echo "❌ Service could not be stopped forcefully." >&2
+            else
+                echo "✅ Service stopped forcefully."
+            fi
+        else
+            echo "❌ Failed to force stop the ceremonyclient service." >&2
+        fi
+    else
+        echo "✅ Service stopped successfully."
+    fi
+else
+    echo "ℹ️ Ceremonyclient service is not running or does not exist."
+fi
+
+#===========================
+# Move to the ceremonyclient directory
+#===========================
+echo "Moving to the ceremonyclient directory..."
 cd ~/ceremonyclient || { echo "❌ Error: Directory ~/ceremonyclient does not exist."; exit 1; }
 
-# Step 3: Discard local changes in release_autorun.sh
+#===========================
+# Discard local changes in release_autorun.sh
+#===========================
 echo "✅ Discarding local changes in release_autorun.sh..."
 git checkout -- node/release_autorun.sh
 
-# Step 4: Download Binary
+#===========================
+# Download Binary
+#===========================
 echo "⏳ Downloading New Release..."
 
 # Change to the ceremonyclient directory
@@ -61,14 +153,13 @@ git checkout release || { echo "❌ Error: Failed to checkout release." >&2; exi
 
 echo "✅ Downloaded the latest changes successfully."
 
-# Step 5: Determine the ExecStart line based on the architecture
-HOME=$(eval echo ~$USER)
-NODE_PATH="$HOME/ceremonyclient/node"
-
-# Step 6: Set the version number
+#===========================
+# Determine the ExecStart line based on the architecture
+#===========================
+# Set the version number
 VERSION=$(cat $NODE_PATH/config/version.go | grep -A 1 "func GetVersion() \[\]byte {" | grep -Eo '0x[0-9a-fA-F]+' | xargs printf "%d.%d.%d")
 
-# Step 7: Get the system architecture
+# Get the system architecture
 ARCH=$(uname -m)
 
 if [ "$ARCH" = "x86_64" ]; then
@@ -82,7 +173,9 @@ else
     exit 1
 fi
 
-# Step 8: Re-Create or Update Ceremonyclient Service
+#===========================
+# Re-Create or Update Ceremonyclient Service
+#===========================
 echo "🔧 Rebuilding Ceremonyclient Service..."
 sleep 2  # Add a 2-second delay
 if [ ! -f "$SERVICE_FILE" ]; then
@@ -126,37 +219,45 @@ else
 fi  
 sleep 1  # Add a 1-second delay
 
-# Calculate the number of vCores
-vCORES=$(nproc)
-# Calculate the CPUQuota value
-CPU_QUOTA=$(($CPU_LIMIT_PERCENT * $vCORES))
-
-# Check if CPUQuota exists, if not, insert it after [Service]
-if ! grep -q "CPUQuota=" "$SERVICE_FILE"; then
-    echo "➕ Adding CPUQuota to ceremonyclient service file..."
-    if ! sudo sed -i "/\[Service\]/a CPUQuota=${CPU_QUOTA}%" "$SERVICE_FILE"; then
-        echo "❌ Error: Failed to add CPUQuota to ceremonyclient service file." >&2
-        exit 1
+#===========================
+# Remove the SELF_TEST file
+#===========================
+if [ -f "$NODE_PATH/.config/SELF_TEST" ]; then
+    echo "🗑️ Removing SELF_TEST file..."
+    if rm "$NODE_PATH/.config/SELF_TEST"; then
+        echo "✅ SELF_TEST file removed successfully."
     else
-        echo "✅ A CPU limit of $CPU_LIMIT_PERCENT % has been applied"
-        echo "You can change this manually later in your service file if you need"
+        echo "❌ Error: Failed to remove SELF_TEST file." >&2
+        exit 1
     fi
+else
+    echo "ℹ️ No SELF_TEST file found at $NODE_PATH/.config/SELF_TEST."
 fi
 sleep 1  # Add a 1-second delay
 
-# Step 9: Start the ceremonyclient service
+#===========================
+# Start the ceremonyclient service
+#===========================
 echo "✅ Starting Ceremonyclient Service"
 sleep 2  # Add a 2-second delay
 systemctl daemon-reload
 systemctl enable ceremonyclient
 service ceremonyclient start
 
+#===========================
 # Showing the node logs
+#===========================
 echo ""
 echo "🌟Your Qnode is now updated to $VERSION!"
 echo ""
-echo "⏳ Showing the node log... (CTRL+C to exit)"
-echo ""
-echo ""
-sleep 3  # Add a 5-second delay
-sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
+echo "⏳ Showing the node log... (
+
+Hit Ctrl+C to exit log)"
+sleep 1
+journalctl -u ceremonyclient -f
+
+#===========================
+# Done
+#===========================
+echo "Script execution completed."
+```
