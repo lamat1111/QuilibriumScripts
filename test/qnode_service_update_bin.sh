@@ -13,7 +13,7 @@ sleep 7  # Add a 7-second delay
 # Set variables
 #===========================
 # Set sCPU limit
-CPU_LIMIT_PERCENT=99
+CPU_LIMIT_PERCENT=70
 # Set service file path
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
 # User working folder
