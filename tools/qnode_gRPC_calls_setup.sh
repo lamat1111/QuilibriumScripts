@@ -49,4 +49,4 @@ sleep 1
 echo""
 echo "✅ gRPC, REST, and Stats Collection setup was successful."
 echo""
-echo "✅ If you want to check manually just run: cd /root/ceremonyclient/node/.config/ && sudo nano config.yml"
+echo "✅ If you want to check manually just run: cd /root/ceremonyclient/node/.config/ && cat config.yml"
