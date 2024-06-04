@@ -53,8 +53,9 @@ if ! sudo sed -i "/\[Service\]/a CPUQuota=${CPU_QUOTA}%" "$SERVICE_FILE"; then
     exit 1
 else
     echo "➕ Added CPUQuota=${CPU_QUOTA}% to service file."
+    echo " This will limit your CPU by $CPU_LIMIT_PERCENT %"
 fi
-
+sleep 1
 #===========================
 # Stop the ceremonyclient service if it exists
 #===========================
@@ -87,6 +88,8 @@ if systemctl is-active --quiet ceremonyclient; then
 else
     echo "ℹ️ Ceremonyclient service is not running or does not exist."
 fi
+
+sleep 1
 
 #===========================
 # Move to the ceremonyclient directory
@@ -131,6 +134,7 @@ git checkout release || { echo "❌ Error: Failed to checkout release." >&2; exi
 
 echo "✅ Downloaded the latest changes successfully."
 
+sleep 1
 #===========================
 # Determine the ExecStart line based on the architecture
 #===========================
@@ -151,6 +155,7 @@ else
     exit 1
 fi
 
+sleep 1
 #===========================
 # Re-Create or Update Ceremonyclient Service
 #===========================
