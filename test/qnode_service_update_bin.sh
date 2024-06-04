@@ -168,7 +168,7 @@ elif [ "$ARCH" = "aarch64" ]; then
 elif [ "$ARCH" = "arm64" ]; then
     EXEC_START="$NODE_PATH/node-$VERSION-darwin-arm64"
 else
-    echo "Unsupported architecture: $ARCH"
+    echo "❌ Unsupported architecture: $ARCH"
     exit 1
 fi
 
@@ -249,14 +249,8 @@ service ceremonyclient start
 echo ""
 echo "🌟Your Qnode is now updated to $VERSION!"
 echo ""
-echo "⏳ Showing the node log... (
-
-Hit Ctrl+C to exit log)"
+echo "⏳ Showing the node log... (Hit Ctrl+C to exit log)"
 sleep 1
-journalctl -u ceremonyclient -f
+sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
 
-#===========================
-# Done
-#===========================
-echo "Script execution completed."
-```
+
