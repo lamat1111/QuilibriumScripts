@@ -1,6 +1,6 @@
 #!/bin/bash
 SERVICE_FILE=/lib/systemd/system/ceremonyclient.service
-CPU_LIMIT_PERCENT=85
+CPU_LIMIT_PERCENT=90
 
 echo "✨ Welcome! ✨"
 echo "✨ This script will disable HT (HyperThreading) and set a new CPUQuota limit of $CPU_LIMIT_PERCEN%"
