@@ -46,6 +46,18 @@ fi
 
 sleep 1
 
+# Step 3: Check and modify listenMultiaddr
+echo "🔍 Checking listenMultiaddr..."
+if line_exists "listenMultiaddr: /ip4/0.0.0.0/udp/8336/quic" .config/config.yml; then
+    echo "🛠️ Modifying listenMultiaddr..."
+    sudo sed -i 's|^ *listenMultiaddr:/ip4/0.0.0.0/udp/8336/quic *$|listenMultiaddr:/ip4/0.0.0.0/tcp/8336|' .config/config.yml || { echo "❌ Failed to modify listenMultiaddr! Exiting..."; exit 1; }
+    echo "✅ listenMultiaddr modified."
+else
+    echo "✅ listenMultiaddr already modified."
+fi
+
+sleep 1
+
 echo""
 echo "✅ gRPC, REST, and Stats Collection setup was successful."
 echo""
