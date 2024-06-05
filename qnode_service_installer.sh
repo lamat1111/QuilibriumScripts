@@ -1,11 +1,30 @@
 #!/bin/bash
 
 # Step 0: Welcome
-echo "✨ Welcome! This script will prepare your server for the Quilibrium node installation. ✨"
+
+cat <<'EOF'
+		
+ .d88888b.           d8b 888 d8b 888              d8b                                                       
+d88P" "Y88b          Y8P 888 Y8P 888              Y8P                                                       
+888     888              888     888                                                                        
+888     888 888  888 888 888 888 88888b.  888d888 888 888  888 88888b.d88b.       .d88b.  88888b.   .d88b.  
+888     888 888  888 888 888 888 888 "88b 888P"   888 888  888 888 "888 "88b     d88""88b 888 "88b d8P  Y8b 
+888 Y8b 888 888  888 888 888 888 888  888 888     888 888  888 888  888  888     888  888 888  888 88888888 
+Y88b.Y8b88P Y88b 888 888 888 888 888 d88P 888     888 Y88b 888 888  888  888 d8b Y88..88P 888  888 Y8b.     
+ "Y888888"   "Y88888 888 888 888 88888P"  888     888  "Y88888 888  888  888 Y8P  "Y88P"  888  888  "Y8888  
+       Y8b                                                                                                  
+EOF
+echo ""
+echo ""
+echo "==================================================================="
+echo "                ✨ QNODE SERVICE INSTALLER ✨"
+echo "==================================================================="
+echo "This script will install your Quilibrum node as a service."
+echo "Be sure to run the 'Server Setup' script first."
+echo "Follow the guide at https://docs.quilibrium.one"
 echo ""
 echo "Made with 🔥 by LaMat - https://quilibrium.one"
-echo "Helped by 0xOzgur.eth - https://quilibrium.space"
-echo "====================================================================================="
+echo "===================================================================="
 echo ""
 echo "Processing... ⏳"
 sleep 7  # Add a 7-second delay
