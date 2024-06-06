@@ -71,7 +71,7 @@ check_visibility() {
 
 node_info() {
     echo "Displaying information about Quilibrium Node..."
-    cd $EXEC_START && ./node-info
+    cd "$NODE_PATH" && "$EXEC_START" -node-info
 }
 
 node_logs() {
