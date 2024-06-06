@@ -37,6 +37,11 @@ EOF
 
 sleep 5  # Add a 7-second delay
 
+# Export some variables ot solve the gRPCurl not found error
+export GOROOT=/usr/local/go
+export GOPATH=$HOME/go
+export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
+
 # Install gRPCurl if not installed
 if which grpcurl >/dev/null; then
     echo "✅ gRPCurl is installed."
@@ -60,11 +65,6 @@ else
         fi
     fi
 fi
-
-# Set up environment variables (redundant but solves the gRPCurl not found error)
-export GOROOT=/usr/local/go
-export GOPATH=$HOME/go
-export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
 
 
 # List of bootstrap peers
