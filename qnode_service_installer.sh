@@ -2,40 +2,45 @@
 
 # Step 0: Welcome
 
-cat << "EOF"             
-     QQQQQQQQQ       1111111   
-   QQ:::::::::QQ    1::::::1   
- QQ:::::::::::::QQ 1:::::::1   
-Q:::::::QQQ:::::::Q111:::::1   
-Q::::::O   Q::::::Q   1::::1   
-Q:::::O     Q:::::Q   1::::1   
-Q:::::O     Q:::::Q   1::::1   
-Q:::::O     Q:::::Q   1::::l   
-Q:::::O     Q:::::Q   1::::l   
-Q:::::O     Q:::::Q   1::::l   
-Q:::::O  QQQQ:::::Q   1::::l   
-Q::::::O Q::::::::Q   1::::l   
-Q:::::::QQ::::::::Q111::::::111
- QQ::::::::::::::Q 1::::::::::1
-   QQ:::::::::::Q  1::::::::::1
-     QQQQQQQQ::::QQ111111111111
-             Q:::::Q           
-              QQQQQQ                                                                                                                                  
+cat << "EOF"
+
+                    QQQQQQQQQ       1111111   
+                  QQ:::::::::QQ    1::::::1   
+                QQ:::::::::::::QQ 1:::::::1   
+               Q:::::::QQQ:::::::Q111:::::1   
+               Q::::::O   Q::::::Q   1::::1   
+               Q:::::O     Q:::::Q   1::::1   
+               Q:::::O     Q:::::Q   1::::1   
+               Q:::::O     Q:::::Q   1::::l   
+               Q:::::O     Q:::::Q   1::::l   
+               Q:::::O     Q:::::Q   1::::l   
+               Q:::::O  QQQQ:::::Q   1::::l   
+               Q::::::O Q::::::::Q   1::::l   
+               Q:::::::QQ::::::::Q111::::::111
+                QQ::::::::::::::Q 1::::::::::1
+                  QQ:::::::::::Q  1::::::::::1
+                    QQQQQQQQ::::QQ111111111111
+                            Q:::::Q           
+                             QQQQQQ                                                                                                                                  
+
+===================================================================
+                 ✨ QNODE SERVICE INSTALLER ✨
+===================================================================
+This script will install your Quilibrum node as a service.
+It will run your node from the release_autostart.sh file.
+
+Be sure to run the 'Server Setup' script first.
+Follow the guide at https://docs.quilibrium.one
+
+Made with 🔥 by LaMat - https://quilibrium.one
+====================================================================
+
+Processing... ⏳
+
 EOF
-echo ""
-echo ""
-echo "==================================================================="
-echo "                ✨ QNODE SERVICE INSTALLER ✨"
-echo "==================================================================="
-echo "This script will install your Quilibrum node as a service."
-echo "Be sure to run the 'Server Setup' script first."
-echo "Follow the guide at https://docs.quilibrium.one"
-echo ""
-echo "Made with 🔥 by LaMat - https://quilibrium.one"
-echo "===================================================================="
-echo ""
-echo "Processing... ⏳"
+
 sleep 7  # Add a 7-second delay
+
 
 # Exit on any error
 set -e
