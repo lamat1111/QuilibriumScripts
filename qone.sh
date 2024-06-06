@@ -20,7 +20,7 @@ check_for_updates() {
     fi
 }
 
-# Set service file path
+# Service file path
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
 # User working folder
 HOME=$(eval echo ~$USER)
