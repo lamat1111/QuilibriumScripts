@@ -47,11 +47,13 @@ else
     # Try installing gRPCurl using go install
     if go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest; then
         echo "✅ gRPCurl installed successfully via go install."
+        echo ""
     else
         echo "⚠️ Failed to install gRPCurl via go install. Trying apt-get..."
         # Try installing gRPCurl using apt-get
         if sudo apt-get install grpcurl -y; then
             echo "✅ gRPCurl installed successfully via apt-get."
+            echo ""
         else
             echo "❌ Failed to install gRPCurl via apt-get! Please install it manually."
             exit 1
@@ -95,6 +97,7 @@ if $visible ; then
     echo ""
     echo ""
     echo "✅ Your node is visible to bootstrap peers!"
+    echo ""
 else
     echo ""
     echo ""
@@ -105,4 +108,5 @@ else
     echo "https://docs.quilibrium.one/quilibrium-node-setup-guide/troubleshooting#node-not-visible-to-bootstrap-peers"
     echo ""
     echo "If all your settings are correct, restart your node, wait 15 minutes and try again."
+    echo ""
 fi
