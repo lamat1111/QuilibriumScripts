@@ -1,17 +1,25 @@
 #!/bin/bash
 
-# Step 0: Welcome
-echo "✨ Welcome! This script will prepare your server for the Quilibrium node installation. ✨"
-echo ""
-echo "Made with 🔥 by LaMat - https://quilibrium.one"
-echo "Helped by 0xOzgur.eth - https://quilibrium.space"
-echo "====================================================================================="
-echo ""
-echo "Processing... ⏳"
-sleep 7  # Add a 7-second delay
-
 # Set CPU limit percent
-CPU_LIMIT_PERCENT=70
+CPU_LIMIT_PERCENT=80
+
+cat <<- EOF
+
+=====================================================================================================
+                                  ✨ QUILIBRIUM NODE INSTALLER ✨
+                                         CPU LIMIT $CPU_LIMIT_PERCENT %
+=====================================================================================================
+This script will install your node as a service. It will run your node form the binary file.
+It will also set a CPUQuota limit of $CPU_LIMIT_PERCENT %
+
+Made with 🔥 by LaMat - https://quilibrium.one
+=====================================================================================================
+
+Processing... ⏳
+
+EOF
+
+sleep 5
 
 # Exit on any error
 set -e
@@ -87,15 +95,15 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Step 7: Set the version number
-VERSION=$(cat config/version.go | grep -A 1 "func GetVersion() \[\]byte {" | grep -Eo '0x[0-9a-fA-F]+' | xargs printf "%d.%d.%d")
-
-# Step 8: Get the system architecture
-ARCH=$(uname -m)
-
 # Step 9: Determine the ExecStart line based on the architecture
 HOME=$(eval echo ~$USER)
 NODE_PATH="$HOME/ceremonyclient/node"
+
+# Step 7: Set the version number
+VERSION=$(cat $NODE_PATH/config/version.go | grep -A 1 "func GetVersion() \[\]byte {" | grep -Eo '0x[0-9a-fA-F]+' | xargs printf "%d.%d.%d")
+
+# Step 8: Get the system architecture
+ARCH=$(uname -m)
 
 if [ "$ARCH" = "x86_64" ]; then
     EXEC_START="$NODE_PATH/node-$VERSION-linux-amd64"
