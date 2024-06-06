@@ -80,7 +80,7 @@ sleep 1
 echo "🔍 Checking listenMultiaddr..."
 if line_exists "listenMultiaddr: /ip4/0.0.0.0/udp/8336/quic" .config/config.yml || line_exists "listenMultiaddr:/ip4/0.0.0.0/udp/8336/quic" .config/config.yml; then
     echo "🛠️ Modifying listenMultiaddr..."
-    sudo sed -i -E 's|^ *listenMultiaddr: */ip4/0.0.0.0/udp/quic *$|  listenMultiaddr:/ip4/0.0.0.0/tcp/8336|' .config/config.yml || { echo "❌ Failed to modify listenMultiaddr! Exiting..."; exit 1; }
+    sudo sed -i -E 's|^ *listenMultiaddr: /ip4/0.0.0.0/udp/quic *$|  listenMultiaddr: /ip4/0.0.0.0/tcp/8336|' .config/config.yml || { echo "❌ Failed to modify listenMultiaddr! Exiting..."; exit 1; }
     echo "✅ listenMultiaddr modified."
 
     # Double check if the new line exists after the change
