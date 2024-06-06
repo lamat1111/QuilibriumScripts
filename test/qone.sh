@@ -115,15 +115,15 @@ while true; do
 
 EOF
 
-    echo "Please choose an option:"
+    echo "Choose an option:"
     echo ""
     echo "If you want install a new node choose option 1, and then 2"
     echo ""
     echo "1) Prepare your server"
     echo "2) Install Node"
     echo ""
-    echo "3) Configure gRPCurl"
-    echo "4) Update Node"
+    echo "3) Update Node"
+    echo "4) Set up gRPCurl"
     echo "5) Check Visibility"
     echo "6) Node Info"
     echo "7) Node Logs"
@@ -138,8 +138,8 @@ EOF
     case $choice in
         1) install_prerequisites ;;
         2) install_node ;;
-        3) configure_grpcurl ;;
-        4) update_node ;;
+        3) update_node ;;
+        4) configure_grpcurl ;;
         5) check_visibility ;;
         6) node_info ;;
         7) node_logs ;;
