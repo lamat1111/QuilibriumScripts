@@ -38,12 +38,12 @@ EOF
 sleep 5  # Add a 7-second delay
 
 # Install gRPCurl if not installed
-echo "📦 Installing gRPCurl..."
-sleep 1  # Add a 1-second delay
-
-if command_exists grpcurl; then
-    echo "✅ gRPCurl is already installed."
+if which grpcurl >/dev/null; then
+    echo "✅ gRPCurl is installed."
 else
+    echo "❌ gRPCurl is not installed."
+    echo "📦 Installing gRPCurl..."
+    sleep 1  # Add a 1-second delay
     # Try installing gRPCurl using go install
     if go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest; then
         echo "✅ gRPCurl installed successfully via go install."
