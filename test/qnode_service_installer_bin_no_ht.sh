@@ -9,7 +9,7 @@ echo "==========================================================================
 echo "                                  ✨ QUILIBRIUM NODE INSTALLER ✨"
 echo "====================================================================================================="
 echo "This script will install your node as a service. It will run your node form the binary file."
-echo "It will also disable HT (Hyper Threading), and it will set a CPUQuota limit of $CPU_LIMIT_PERCEN %"
+echo "It will also disable HT (Hyper Threading), and it will set a CPUQuota limit of $CPU_LIMIT_PERCENT %"
 echo ""
 echo "Made with 🔥 by LaMat - https://quilibrium.one"
 echo "====================================================================================================="
@@ -199,7 +199,7 @@ else
 fi
 
 # Final messages
-echo "✅ You are now using $vCores cores"
+echo "✅ You are now using $vCORES cores"
 echo "✅ A CPU limit of $CPU_LIMIT_PERCENT % has been automatically applied"
 echo "✅ You can change this manually later in your service file if you need"
 echo ""
