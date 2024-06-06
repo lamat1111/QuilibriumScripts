@@ -3,20 +3,24 @@
 # Set CPU limit percent
 CPU_LIMIT_PERCENT=80
 
-echo ""
-echo ""
-echo "====================================================================================================="
-echo "                                  ✨ QUILIBRIUM NODE INSTALLER ✨"
-echo "====================================================================================================="
-echo "This script will install your node as a service. It will run your node form the binary file."
-echo "It will also disable HT (Hyper Threading), and it will set a CPUQuota limit of $CPU_LIMIT_PERCENT %"
-echo ""
-echo "Made with 🔥 by LaMat - https://quilibrium.one"
-echo "====================================================================================================="
-echo ""
-echo "Processing... ⏳"
+
+cat <<- EOF
+
+=====================================================================================================
+                                 ✨ QUILIBRIUM NODE INSTALLER ✨
+                                 NO HT - CPU LIMIT $CPU_LIMIT_PERCENT %
+=====================================================================================================
+This script will install your node as a service. It will run your node from the binary file.
+It will also disable HT (Hyper Threading), and it will set a CPUQuota limit of $CPU_LIMIT_PERCENT %
+
+Made with 🔥 by LaMat - https://quilibrium.one
+=====================================================================================================
+
+Processing... ⏳
+
+EOF
+
 sleep 5
-echo ""
 
 # Exit on any error
 set -e
