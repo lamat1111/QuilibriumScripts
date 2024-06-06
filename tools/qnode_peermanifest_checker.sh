@@ -11,21 +11,28 @@ echo ""
 echo "Processing... ⏳"
 sleep 7  # Add a 7-second delay
 
-# Install gRPCurl if not installed
-echo "📦 Installing gRPCurl..."
-sleep 1  # Add a 1-second delay
+# Export some variables ot solve the gRPCurl not found error
+export GOROOT=/usr/local/go
+export GOPATH=$HOME/go
+export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
 
-if command_exists grpcurl; then
-    echo "✅ gRPCurl is already installed."
+# Install gRPCurl if not installed
+if which grpcurl >/dev/null; then
+    echo "✅ gRPCurl is installed."
 else
+    echo "❌ gRPCurl is not installed."
+    echo "📦 Installing gRPCurl..."
+    sleep 1  # Add a 1-second delay
     # Try installing gRPCurl using go install
     if go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest; then
         echo "✅ gRPCurl installed successfully via go install."
+        echo ""
     else
         echo "⚠️ Failed to install gRPCurl via go install. Trying apt-get..."
         # Try installing gRPCurl using apt-get
         if sudo apt-get install grpcurl -y; then
             echo "✅ gRPCurl installed successfully via apt-get."
+            echo ""
         else
             echo "❌ Failed to install gRPCurl via apt-get! Please install it manually."
             exit 1
@@ -44,11 +51,6 @@ if ! command_exists base58; then
     echo "📦 Installing base58..."
     sudo apt-get install -y base58
 fi
-
-# Set up environment variables (redundant but solves the gRPCurl not found error)
-export GOROOT=/usr/local/go
-export GOPATH=$HOME/go
-export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
 
 # Command to retrieve peer information
 get_peer_info_command="peer_id_base64=\$(grpcurl -plaintext localhost:8337 quilibrium.node.node.pb.NodeService.GetNodeInfo | jq -r .peerId | base58 -d | base64) && grpcurl -plaintext localhost:8337 quilibrium.node.node.pb.NodeService.GetPeerManifests | grep -A 15 -B 1 \"\$peer_id_base64\""
