@@ -80,7 +80,7 @@ install_prerequisites() {
 
 install_node() {
     echo "⚙️ Running installation script for Quilibrium Node..."
-    wget --no-cache -O - "$NODE_INSTALL_UR" | bash
+    wget --no-cache -O - "$NODE_INSTALL_URL" | bash
 }
 
 configure_grpcurl() {
@@ -203,57 +203,58 @@ EOF
     echo "e) Exit"
 }
 
-while true; do
-    clear
-    display_menu
-
-    read -p "Enter your choice: " choice
-    action_performed=0
-
-    case $choice in
-        1) confirm_action "This action will install the necessary prerequisites for your server.
+    while true; do
+        clear
+        display_menu
+    
+        read -p "Enter your choice: " choice
+        action_performed=0
+    
+        case $choice in
+            1) confirm_action "This action will install the necessary prerequisites for your server.
 If this is the first time you install a Quilibrium node I suggest you 
 to follow the online guide instead at: https://docs.quilibrium.one/" "Prepare your server" install_prerequisites ;;
-        2) confirm_action "This action will install the node on your server.
+            2) confirm_action "This action will install the node on your server.
 If this is the first time you install a Quilibrium node I suggest you 
 to follow the online guide instead at: https://docs.quilibrium.one/
 Ensure that your server meets all the requirements and that you have already prepared you server via Step 1." "Install node" install_node ;;
-        3) confirm_action "This action will update your node.
+            3) confirm_action "This action will update your node.
 Only use this if you have installed the node via the guide at https://docs.quilibrium.one/" "Update node" update_node ;;
-        4) confirm_action "This action will make some edit to your config.yml to enable communication with the newtwork.
+            4) confirm_action "This action will make some edit to your config.yml to enable communication with the newtwork.
 If this a fresh node installation, let the node run for 30 minutes before doing this." "Set up gRPCurl" configure_grpcurl ;;
-        5) check_visibility ;;
-        6) node_info ;;
-        7) node_logs ;;
-        8) restart_node ;;
-        9) stop_node ;;
-        10) confirm_action "This action will check the peer manifest to provide informatio about the difficulty metric score of your node.
+            5) check_visibility ;;
+            6) node_info ;;
+            7) node_logs ;;
+            8) restart_node ;;
+            9) stop_node ;;
+            10) confirm_action "This action will check the peer manifest to provide informatio about the difficulty metric score of your node.
 It only works after 15-30 minutes that the node has been running." "Peer manifest" peer_manifest ;;
-        11) node_version ;;
-        e) break ;;
-        *) echo "Invalid option, please try again." ;;
-    esac
+            11) node_version ;;
+            e) break ;;
+            *) echo "Invalid option, please try again." ;;
+        esac
+    
+       if [ $action_performed -eq 1 ]; then
+            read -n 1 -s -r -p "\nPress any key to continue"
+        fi
+    done
 
-   if [ $action_performed -eq 1 ]; then
-        read -n 1 -s -r -p "\nPress any key to continue"
-    fi
-done
-
-while true; do
-    clear
-    display_menu
-
-    read -p "Enter your choice: " choice
-    action_performed=0
-
-    case $choice in
-        e) break ;;
-        *) echo "Invalid option, please try again." ;;
-    esac
-
-    if [ $action_performed -eq 1 ]; then
-        read -n 1 -s -r -p "\nPress any key to continue"
-    fi
+    while true; do
+        clear
+        display_menu
+    
+        read -p "Enter your choice: " choice
+        action_performed=0
+    
+        case $choice in
+            e) break ;;
+            *) echo "Invalid option, please try again." ;;
+        esac
+    
+        if [ $action_performed -eq 1 ]; then
+            read -n 1 -s -r -p "\nPress any key to continue"
+        fi
+    done
 done
 
 # Check for updates before displaying the menu
