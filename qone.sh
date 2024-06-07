@@ -196,7 +196,21 @@ It only works after 15-30 minutes that the node has been running." "Peer manifes
         *) echo "Invalid option, please try again." ;;
     esac
 
-    read -n 1 -s -r -p "Press any key to continue"
+while true; do
+    clear
+    
+    # Display the menu options here
+    
+    read -p "Enter your choice: " choice
+    action_performed=0
+
+    case $choice in
+        # Cases for different options
+    esac
+
+    if [ $action_performed -eq 1 ]; then
+        read -n 1 -s -r -p "Press any key to continue"
+    fi
 done
 
 # Check for updates before displaying the menu
