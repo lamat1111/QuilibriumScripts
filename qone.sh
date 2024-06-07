@@ -327,13 +327,15 @@ If you want to install a new node, choose option 1, and then 2
 3) Set up gRPCurl           9) Stop Node
 4) Update Node             10) Peer manifest (Difficulty metric)
 5) Check Visibility        11) Node Version
-6) Node Info              #12) Test Script
+6) Node Info              
 
 ------------------------------------------------------------------
 e) Exit
 
 EOF
 }
+
+#12) Test Script
 
 #=====================
 # Main Menu Loop
