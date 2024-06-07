@@ -110,7 +110,8 @@ node_info() {
 	echo ""
     	sleep 1
         cd ~/ceremonyclient/node && ./$NODE_BINARY -node-info
-	sleep 5
+	echo ""
+	read -n 1 -s -r -p "Press any key to continue..."  # Pause and wait for user input
     fi
 }
 
@@ -137,7 +138,9 @@ restart_node() {
     sleep 1
     service ceremonyclient restart
     sleep 5
-    echo "Node restarted"
+    echo "✅   Node restarted"
+    echo ""
+    read -n 1 -s -r -p "Press any key to continue..."  # Pause and wait for user input
 }
 
 stop_node() {
@@ -151,11 +154,13 @@ stop_node() {
     sleep 1
     service ceremonyclient stop
     sleep 3
-    echo "Node stopped"
+    echo "✅   Node stopped"
+    echo ""
+    read -n 1 -s -r -p "Press any key to continue..."  # Pause and wait for user input
 }
 
 peer_manifest() {
-    echo "⚙️ Checking peer manifest (Difficulty metric)..."
+    echo "⚙️   Checking peer manifest (Difficulty metric)..."
     wget --no-cache -O - "$PEER_MANIFEST_URL" | bash
 }
 
@@ -169,7 +174,8 @@ node_version() {
     echo ""
     sleep 1
     journalctl -u ceremonyclient -r --no-hostname  -n 1 -g "Quilibrium Node" -o cat
-    sleep 3
+    echo ""
+    read -n 1 -s -r -p "Press any key to continue..."  # Pause and wait for user input
 }
 
 test_script() {
