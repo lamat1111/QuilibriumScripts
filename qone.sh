@@ -99,6 +99,8 @@ node_info() {
         echo ""  # Add an empty line for better readability
     else
         echo "⚙️ Displaying information about Quilibrium Node..."
+	echo ""
+    	sleep 1
         cd "$NODE_PATH" && "$EXEC_START" -node-info
     fi
 }
@@ -110,6 +112,8 @@ node_logs() {
         echo ""  # Add an empty line for better readability
     fi
     echo "⚙️ Displaying logs of Quilibrium Node..."
+    echo ""
+    sleep 1
     sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
 }
 
@@ -120,16 +124,20 @@ restart_node() {
         echo ""  # Add an empty line for better readability
     fi
     echo "⚙️ Restarting Quilibrium Node service..."
+    echo ""
+    sleep 1
     service ceremonyclient restart
 }
 
 stop_node() {
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
-		read -n 1 -s -r -p "Press any key to continue..."
+	read -n 1 -s -r -p "Press any key to continue..."
         echo ""  # Add an empty line for better readability
     fi
     echo "⚙️ Stopping Quilibrium Node service..."
+    echo ""
+    sleep 1
     service ceremonyclient stop
 }
 
@@ -145,6 +153,8 @@ node_version() {
         echo ""  # Add an empty line for better readability
     fi
     echo "⚙️ Displaying Quilibrium Node version..."
+    echo ""
+    sleep 1
     journalctl -u ceremonyclient -r --no-hostname  -n 1 -g "Quilibrium Node" -o cat
 }
 
