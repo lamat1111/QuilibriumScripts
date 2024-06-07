@@ -63,6 +63,10 @@ MISSING_SERVICE_MSG="⚠️ Your service file does not exist. Looks like you do 
 
 # Function definitions
 
+best_providers() {
+ "$(wrap_text "$best_providers" "")"
+}
+
 install_prerequisites() {
     echo "⚙️ Running installation script for server prerequisites..."
     wget --no-cache -O - "$PREREQUISITES_URL" | bash
@@ -313,7 +317,7 @@ while true; do
     action_performed=0
 
     case $choice in
-    	0) best_providers "$(wrap_text "$best_providers" "")" "Best server providers";;
+    	0) best_providers action_performed=1 ;;
         1) confirm_action "$(wrap_text "$prepare_server_message" "")" "Prepare your server" install_prerequisites prompt_return_to_menu;;
         2) confirm_action "$(wrap_text "$install_node_message" "")" "Install node" install_node prompt_return_to_menu;;
         3) confirm_action "$(wrap_text "$update_node_message" "")" "Update node" update_node prompt_return_to_menu;;
