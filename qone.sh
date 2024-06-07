@@ -285,7 +285,7 @@ This will run the test script
 
 display_menu() {
     clear
-    cat << EOF
+    cat << "EOF"
 
                   QQQQQQQQQ       1111111   
                 QQ:::::::::QQ    1::::::1   
@@ -317,27 +317,21 @@ display_menu() {
 
 EOF
 
-    echo -e "Choose an option:\n"
-    echo "If you want to install a new node, choose option 1, and then 2"
-    echo ""
-    echo "0) Best server providers"
-    echo "------------------------"
-    echo "1) Prepare your server"
-    echo "2) Install Node"
-    echo "------------------------"
-    echo "3) Update Node"
-    echo "4) Set up gRPCurl"
-    echo "5) Check Visibility"
-    echo "6) Node Info"
-    echo "7) Node Logs (CTRL+C to detach)"
-    echo "8) Restart Node"
-    echo "9) Stop Node"
-    echo "10) Peer manifest (Difficulty metric)"
-    echo "11) Node Version"
-    #echo "12) Test Script"
-    echo "------------------------"
-    echo "e) Exit"
-    echo ""
+    cat << "EOF"
+If you want to install a new node, choose option 1, and then 2
+
+0) Best server providers
+------------------------------------------------------------------
+1) Prepare your server      7) Node Logs (CTRL+C to detach)
+2) Install Node             8) Restart Node
+3) Set up gRPCurl           9) Stop Node
+4) Update Node             10) Peer manifest (Difficulty metric)
+5) Check Visibility        11) Node Version
+6) Node Info              #12) Test Script
+------------------------------------------------------------------
+e) Exit
+
+EOF
 }
 
 #=====================
@@ -354,8 +348,8 @@ while true; do
     	0) best_providers;;
         1) confirm_action "$(wrap_text "$prepare_server_message" "")" "Prepare your server" install_prerequisites prompt_return_to_menu;;
         2) confirm_action "$(wrap_text "$install_node_message" "")" "Install node" install_node prompt_return_to_menu;;
-        3) confirm_action "$(wrap_text "$update_node_message" "")" "Update node" update_node prompt_return_to_menu;;
-        4) confirm_action "$(wrap_text "$setup_grpcurl_message" "")" "Set up gRPCurl" configure_grpcurl prompt_return_to_menu;;
+	3) confirm_action "$(wrap_text "$setup_grpcurl_message" "")" "Set up gRPCurl" configure_grpcurl prompt_return_to_menu;;
+        4) confirm_action "$(wrap_text "$update_node_message" "")" "Update node" update_node prompt_return_to_menu;;
         5) check_visibility prompt_return_to_menu;;
         6) node_info action_performed=1;;
         7) node_logs action_performed=1;;
