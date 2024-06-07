@@ -70,9 +70,11 @@ TEST_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tes
 MISSING_SERVICE_MSG="⚠️ Your service file does not exist. Looks like you do not have a node running as a service yet!"
 
 # Function definitions
-
 best_providers() {
- "$(wrap_text "$best_providers_message" "")"
+    wrap_text "$best_providers_message" ""
+    echo ""
+    echo "-------------------------------"
+    read -n 1 -s -r -p "Press any key to continue..."  # Pause and wait for user input
 }
 
 install_prerequisites() {
@@ -111,6 +113,7 @@ node_info() {
     	sleep 1
         cd ~/ceremonyclient/node && ./$NODE_BINARY -node-info
 	echo ""
+        echo "-------------------------------"
 	read -n 1 -s -r -p "Press any key to continue..."  # Pause and wait for user input
     fi
 }
@@ -139,7 +142,7 @@ restart_node() {
     service ceremonyclient restart
     sleep 5
     echo "✅   Node restarted"
-    echo ""
+    echo "-------------------------------"
     read -n 1 -s -r -p "Press any key to continue..."  # Pause and wait for user input
 }
 
@@ -155,7 +158,7 @@ stop_node() {
     service ceremonyclient stop
     sleep 3
     echo "✅   Node stopped"
-    echo ""
+    echo "-------------------------------"
     read -n 1 -s -r -p "Press any key to continue..."  # Pause and wait for user input
 }
 
@@ -174,7 +177,7 @@ node_version() {
     echo ""
     sleep 1
     journalctl -u ceremonyclient -r --no-hostname  -n 1 -g "Quilibrium Node" -o cat
-    echo ""
+    echo "-------------------------------"
     read -n 1 -s -r -p "Press any key to continue..."  # Pause and wait for user input
 }
 
@@ -348,7 +351,7 @@ while true; do
     action_performed=0
 
     case $choice in
-    	0) best_providers action_performed=1 ;;
+    	0) best_providers;;
         1) confirm_action "$(wrap_text "$prepare_server_message" "")" "Prepare your server" install_prerequisites prompt_return_to_menu;;
         2) confirm_action "$(wrap_text "$install_node_message" "")" "Install node" install_node prompt_return_to_menu;;
         3) confirm_action "$(wrap_text "$update_node_message" "")" "Update node" update_node prompt_return_to_menu;;
