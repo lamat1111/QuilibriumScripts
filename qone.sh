@@ -201,6 +201,13 @@ wrap_text() {
 #=====================
 
 # Define messages
+best_providers='
+Check out the best server providers for your node
+at https://docs.quilibrium.one/quilibrium-node-setup-guide/best-server-providers
+
+Avoid using providers that specifically ban crypto and mining.
+'
+
 prepare_server_message='
 This action will install the necessary prerequisites for your server. 
 If this is the first time you install a Quilibrium node I suggest you 
@@ -276,6 +283,8 @@ EOF
     echo -e "Choose an option:\n"
     echo "If you want to install a new node, choose option 1, and then 2"
     echo ""
+    echo "0) Best server providers"
+    echo "------------------------"
     echo "1) Prepare your server"
     echo "2) Install Node"
     echo "------------------------"
@@ -288,7 +297,7 @@ EOF
     echo "9) Stop Node"
     echo "10) Peer manifest (Difficulty metric)"
     echo "11) Node Version"
-	echo "12) Test Script"
+    #echo "12) Test Script"
     echo "e) Exit"
 }
 
@@ -303,6 +312,7 @@ while true; do
     action_performed=0
 
     case $choice in
+    	0) confirm_action "$(wrap_text "$best_providers" "")" "Best server providers" best_providers;;
         1) confirm_action "$(wrap_text "$prepare_server_message" "")" "Prepare your server" install_prerequisites prompt_return_to_menu;;
         2) confirm_action "$(wrap_text "$install_node_message" "")" "Install node" install_node prompt_return_to_menu;;
         3) confirm_action "$(wrap_text "$update_node_message" "")" "Update node" update_node prompt_return_to_menu;;
@@ -314,7 +324,7 @@ while true; do
         9) stop_node action_performed=1 ;;
         10) confirm_action "$(wrap_text "$peer_manifest_message" "")" "Peer manifest" peer_manifest prompt_return_to_menu;;
         11) node_version action_performed=1 ;;
-		12) confirm_action "$(wrap_text "$test_script_message" "")" "Test Script" test_script prompt_return_to_menu;;
+	12) confirm_action "$(wrap_text "$test_script_message" "")" "Test Script" test_script prompt_return_to_menu;;
         e) exit ;;
         *) echo "Invalid option, please try again." ;;
     esac
