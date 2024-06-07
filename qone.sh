@@ -222,15 +222,15 @@ Ensure that your server meets all the requirements and that you have already pre
 Only use this if you have installed the node via the guide at https://docs.quilibrium.one/" "Update node" update_node ;;
             4) confirm_action "This action will make some edit to your config.yml to enable communication with the newtwork.
 If this a fresh node installation, let the node run for 30 minutes before doing this." "Set up gRPCurl" configure_grpcurl ;;
-            5) check_visibility ;;
-            6) node_info ;;
-            7) node_logs ;;
-            8) restart_node ;;
-            9) stop_node ;;
+            5) check_visibility action_performed=1;;
+            6) node_info action_performed=1;;
+            7) node_logs action_performed=1;;
+            8) restart_node action_performed=1;;
+            9) stop_node action_performed=1;;
             10) confirm_action "This action will check the peer manifest to provide informatio about the difficulty metric score of your node.
 It only works after 15-30 minutes that the node has been running." "Peer manifest" peer_manifest ;;
-            11) node_version ;;
-            e) break ;;
+            11) node_version action_performed=1;;
+            e) action_performed=1 && break ;;
             *) echo "Invalid option, please try again." ;;
         esac
     
@@ -243,7 +243,7 @@ It only works after 15-30 minutes that the node has been running." "Peer manifes
         clear
         display_menu
     
-        read -p "Enter your choice: " choice
+        read -rp "Enter your choice: " choice
         action_performed=0
     
         case $choice in
