@@ -105,6 +105,62 @@ This action will check the peer manifest to provide information about the diffic
 It only works after 15-30 minutes that the node has been running.
 '
 
+# Function definitions
+install_prerequisites() {
+    echo "Running installation script for server prerequisites..."
+    wget --no-cache -O - https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/server_setup.sh | bash
+}
+
+install_node() {
+    echo "Running installation script for Quilibrium Node..."
+    wget --no-cache -O - https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/master/qnode_service_installer.sh | bash
+}
+
+configure_grpcurl() {
+    echo "Running configuration script for gRPCurl..."
+    wget --no-cache -O - https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/tools/qnode_gRPC_calls_setup.sh | bash
+}
+
+update_node() {
+    echo "Running update script for Quilibrium Node..."
+    wget --no-cache -O - https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/master/qnode_service_update.sh | bash
+}
+
+check_visibility() {
+    echo "Checking visibility of Quilibrium Node..."
+    wget -O - https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_visibility_check.sh | bash
+}
+
+node_info() {
+    echo "Displaying information about Quilibrium Node..."
+    cd "$NODE_PATH" && "$EXEC_START" -node-info
+}
+
+node_logs() {
+    echo "Displaying logs of Quilibrium Node..."
+    sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
+}
+
+restart_node() {
+    echo "Restarting Quilibrium Node service..."
+    service ceremonyclient restart
+}
+
+stop_node() {
+    echo "Stopping Quilibrium Node service..."
+    service ceremonyclient stop
+}
+
+peer_manifest() {
+    echo "Checking peer manifest (Difficulty metric)..."
+    wget --no-cache -O - https://raw.githubusercontent.com/lamat1111/quilibriumscripts/main_new/tools/qnode_peermanifest_checker.sh | bash
+}
+
+node_version() {
+    echo "Displaying Quilibrium Node version..."
+    journalctl -u ceremonyclient -r --no-hostname  -n 1 -g "Quilibrium Node" -o cat
+}
+
 #=====================
 # Main Menu Function
 #=====================
