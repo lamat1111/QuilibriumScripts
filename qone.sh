@@ -2,19 +2,19 @@
 
 # Function to check for updates on GitHub and download the new version if available
 check_for_updates() {
-    echo "Checking for updates..."
+    echo "⚙️ Checking for updates..."
     latest_version=$(curl -s https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/qone.sh | md5sum | awk '{print $1}')
     current_version=$(md5sum $0 | awk '{print $1}')
 
     if [ "$latest_version" != "$current_version" ]; then
-        echo "A new version is available. Updating..."
+        echo "⚙️ A new version is available. Updating..."
         wget -O "$0.tmp" https://github.com/lamat1111/QuilibriumScripts/raw/main/qone.sh
         chmod +x "$0.tmp"
         mv -f "$0.tmp" "$0"
-        echo "Update complete. Restarting..."
+        echo "✅ Update complete. Restarting..."
         exec "$0"
     else
-        echo "You already have the latest version."
+        echo "✅ You already have the latest version."
     fi
 }
 
@@ -54,64 +54,64 @@ EOF
         $3
         return 0
     else
-        echo "Action \"$2\" canceled."
+        echo "❌ Action \"$2\" canceled."
         return 1
     fi
 }
 
 # Function definitions
 install_prerequisites() {
-    echo "Running installation script for server prerequisites..."
+    echo "⚙️ Running installation script for server prerequisites..."
     wget --no-cache -O - https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/server_setup.sh | bash
 }
 
 install_node() {
-    echo "Running installation script for Quilibrium Node..."
+    echo "⚙️ Running installation script for Quilibrium Node..."
     wget --no-cache -O - https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/master/qnode_service_installer.sh | bash
 }
 
 configure_grpcurl() {
-    echo "Running configuration script for gRPCurl..."
+    echo "⚙️ Running configuration script for gRPCurl..."
     wget --no-cache -O - https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/tools/qnode_gRPC_calls_setup.sh | bash
 }
 
 update_node() {
-    echo "Running update script for Quilibrium Node..."
+    echo "⚙️ Running update script for Quilibrium Node..."
     wget --no-cache -O - https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/master/qnode_service_update.sh | bash
 }
 
 check_visibility() {
-    echo "Checking visibility of Quilibrium Node..."
+    echo "⚙️ Checking visibility of Quilibrium Node..."
     wget -O - https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_visibility_check.sh | bash
 }
 
 node_info() {
-    echo "Displaying information about Quilibrium Node..."
+    echo "⚙️ Displaying information about Quilibrium Node..."
     cd "$NODE_PATH" && "$EXEC_START" -node-info
 }
 
 node_logs() {
-    echo "Displaying logs of Quilibrium Node..."
+    echo "⚙️ Displaying logs of Quilibrium Node..."
     sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
 }
 
 restart_node() {
-    echo "Restarting Quilibrium Node service..."
+    echo "⚙️ Restarting Quilibrium Node service..."
     service ceremonyclient restart
 }
 
 stop_node() {
-    echo "Stopping Quilibrium Node service..."
+    echo "⚙️ Stopping Quilibrium Node service..."
     service ceremonyclient stop
 }
 
 peer_manifest() {
-    echo "Checking peer manifest (Difficulty metric)..."
+    echo "⚙️ Checking peer manifest (Difficulty metric)..."
     wget --no-cache -O - https://raw.githubusercontent.com/lamat1111/quilibriumscripts/main_new/tools/qnode_peermanifest_checker.sh | bash
 }
 
 node_version() {
-    echo "Displaying Quilibrium Node version..."
+    echo "⚙️ Displaying Quilibrium Node version..."
     journalctl -u ceremonyclient -r --no-hostname  -n 1 -g "Quilibrium Node" -o cat
 }
 
@@ -179,9 +179,9 @@ to follow the online guide instead at: https://docs.quilibrium.one/" "Prepare yo
         2) confirm_action "This action will install the node on your server.
 If this is the first time you install a Quilibrium node I suggest you 
 to follow the online guide instead at: https://docs.quilibrium.one/
-Ensure that your server meets all the requirements and that you have already prepared you server via Step 1." "Install Node" install_node ;;
+Ensure that your server meets all the requirements and that you have already prepared you server via Step 1." "Install node" install_node ;;
         3) confirm action "This action will update your node.
-Only use this if you have installed the node via the guide at https://docs.quilibrium.one/" update_node ;;
+Only use this if you have installed the node via the guide at https://docs.quilibrium.one/" "Update node" update_node ;;
         4) confirm action "This action will make some edit to your config.yml to enable communication with the newtwork.
 If this a fresh node installation, let the node run for 30 minutes before doing this." "Set up gRPCurl" configure_grpcurl ;;
         5) check_visibility ;;
@@ -209,7 +209,7 @@ while true; do
     esac
 
     if [ $action_performed -eq 1 ]; then
-        read -n 1 -s -r -p "Press any key to continue"
+        read -n 1 -s -r -p "\nPress any key to continue"
     fi
 done
 
