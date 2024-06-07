@@ -334,7 +334,7 @@ while true; do
         3) confirm_action "$(wrap_text "$update_node_message" "")" "Update node" update_node prompt_return_to_menu;;
         4) confirm_action "$(wrap_text "$setup_grpcurl_message" "")" "Set up gRPCurl" configure_grpcurl prompt_return_to_menu;;
         5) check_visibility action_performed=1 ;;
-        6) node_info action_performed=1 ;;
+        6) node_info action_performed=1 prompt_return_to_menu;;
         7) node_logs action_performed=1 ;;
         8) restart_node action_performed=1 ;;
         9) stop_node action_performed=1 ;;
