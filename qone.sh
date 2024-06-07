@@ -206,8 +206,8 @@ EOF
     while true; do
         clear
         display_menu
-    
-        read -p "Enter your choice: " choice
+        
+        read -r -p "Enter your choice: " choice
         action_performed=0
     
         case $choice in
