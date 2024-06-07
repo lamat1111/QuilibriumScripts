@@ -1,24 +1,24 @@
 #!/bin/bash -i
 
 cat << "EOF"             
-     QQQQQQQQQ       1111111   
-   QQ:::::::::QQ    1::::::1   
- QQ:::::::::::::QQ 1:::::::1   
-Q:::::::QQQ:::::::Q111:::::1   
-Q::::::O   Q::::::Q   1::::1   
-Q:::::O     Q:::::Q   1::::1   
-Q:::::O     Q:::::Q   1::::1   
-Q:::::O     Q:::::Q   1::::l   
-Q:::::O     Q:::::Q   1::::l   
-Q:::::O     Q:::::Q   1::::l   
-Q:::::O  QQQQ:::::Q   1::::l   
-Q::::::O Q::::::::Q   1::::l   
-Q:::::::QQ::::::::Q111::::::111
- QQ::::::::::::::Q 1::::::::::1
-   QQ:::::::::::Q  1::::::::::1
-     QQQQQQQQ::::QQ111111111111
-             Q:::::Q           
-              QQQQQQ                                                                                                                                  
+                              QQQQQQQQQ       1111111   
+                            QQ:::::::::QQ    1::::::1   
+                          QQ:::::::::::::QQ 1:::::::1   
+                         Q:::::::QQQ:::::::Q111:::::1   
+                         Q::::::O   Q::::::Q   1::::1   
+                         Q:::::O     Q:::::Q   1::::1   
+                         Q:::::O     Q:::::Q   1::::1   
+                         Q:::::O     Q:::::Q   1::::l   
+                         Q:::::O     Q:::::Q   1::::l   
+                         Q:::::O     Q:::::Q   1::::l   
+                         Q:::::O  QQQQ:::::Q   1::::l   
+                         Q::::::O Q::::::::Q   1::::l   
+                         Q:::::::QQ::::::::Q111::::::111
+                          QQ::::::::::::::Q 1::::::::::1
+                            QQ:::::::::::Q  1::::::::::1
+                              QQQQQQQQ::::QQ111111111111
+                                      Q:::::Q           
+                                       QQQQQQ                                                                                                                                  
 EOF
 echo ""
 echo "==========================================================================="
@@ -220,3 +220,4 @@ echo "Type 'sudo reboot' and press ENTER to reboot your server."
 echo ""
 echo "Then follow the online guide for the next steps"
 echo "to install your Quilibrium node as a service: https://docs.quilibrium.one" 
+sleep 7
