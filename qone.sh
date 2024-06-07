@@ -1,8 +1,4 @@
 #!/bin/bash
-# Function to check for updates on GitHub and download the new version if available
-# Function to check for updates on GitHub and download the new version if available
-# Function to check for updates on GitHub and download the new version if available
-# Function to check for updates on GitHub and download the new version if available
 
 # Function to check for updates on GitHub and download the new version if available
 check_for_updates() {
