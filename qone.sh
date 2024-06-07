@@ -68,27 +68,27 @@ best_providers() {
 }
 
 install_prerequisites() {
-    echo "⚙️ Running installation script for server prerequisites..."
+    echo "⚙️  Running installation script for server prerequisites..."
     wget --no-cache -O - "$PREREQUISITES_URL" | bash
 }
 
 install_node() {
-    echo "⚙️ Running installation script for Quilibrium Node..."
+    echo "⚙️  Running installation script for Quilibrium Node..."
     wget --no-cache -O - "$NODE_INSTALL_URL" | bash
 }
 
 configure_grpcurl() {
-    echo "⚙️ Running configuration script for gRPCurl..."
+    echo "⚙️  Running configuration script for gRPCurl..."
     wget --no-cache -O - "$GRPCURL_CONFIG_URL" | bash
 }
 
 update_node() {
-    echo "⚙️ Running update script for Quilibrium Node..."
+    echo "⚙️  Running update script for Quilibrium Node..."
     wget --no-cache -O - "$UPDATE_URL" | bash
 }
 
 check_visibility() {
-    echo "⚙️ Checking visibility of Quilibrium Node..."
+    echo "⚙️  Checking visibility of Quilibrium Node..."
     wget -O - "$CHECK_VISIBILITY_URL" | bash
 }
 
@@ -98,7 +98,7 @@ node_info() {
         read -n 1 -s -r -p "Press any key to continue..."
         echo ""  # Add an empty line for better readability
     else
-        echo "⚙️ Displaying information about Quilibrium Node..."
+        echo "⚙️  Displaying information about Quilibrium Node..."
 	echo ""
     	sleep 1
         cd "$NODE_PATH" && "$EXEC_START" -node-info
@@ -111,7 +111,7 @@ node_logs() {
 		read -n 1 -s -r -p "Press any key to continue..."
         echo ""  # Add an empty line for better readability
     fi
-    echo "⚙️ Displaying logs of Quilibrium Node..."
+    echo "⚙️  Displaying logs of Quilibrium Node..."
     echo ""
     sleep 1
     sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
@@ -123,7 +123,7 @@ restart_node() {
 		read -n 1 -s -r -p "Press any key to continue..."
         echo ""  # Add an empty line for better readability
     fi
-    echo "⚙️ Restarting Quilibrium Node service..."
+    echo "⚙️  Restarting Quilibrium Node service..."
     echo ""
     sleep 1
     service ceremonyclient restart
