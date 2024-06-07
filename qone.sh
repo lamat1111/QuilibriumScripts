@@ -213,30 +213,24 @@ while true; do
 
     case $choice in
         1) confirm_action "This action will install the necessary prerequisites for your server.
-            If this is the first time you install a Quilibrium node I suggest you 
-            to follow the online guide instead at: https://docs.quilibrium.one/" "Prepare your server" install_prerequisites ;;
+If this is the first time you install a Quilibrium node I suggest you 
+to follow the online guide instead at: https://docs.quilibrium.one/" "Prepare your server" install_prerequisites ;;
         2) confirm_action "This action will install the node on your server.
-            If this is the first time you install a Quilibrium node I suggest you 
-            to follow the online guide instead at: https://docs.quilibrium.one/
-            Ensure that your server meets all the requirements and that you have already prepared you server via Step 1." "Install node" install_node ;;
+If this is the first time you install a Quilibrium node I suggest you 
+to follow the online guide instead at: https://docs.quilibrium.one/
+Ensure that your server meets all the requirements and that you have already prepared you server via Step 1." "Install node" install_node ;;
         3) confirm_action "This action will update your node.
-            Only use this if you have installed the node via the guide at https://docs.quilibrium.one/" "Update node" update_node ;;
+Only use this if you have installed the node via the guide at https://docs.quilibrium.one/" "Update node" update_node ;;
         4) confirm_action "This action will make some edit to your config.yml to enable communication with the newtwork.
-            If this a fresh node installation, let the node run for 30 minutes before doing this." "Set up gRPCurl" configure_grpcurl ;;
-        5) check_visibility
-            action_performed=1 ;;
-        6) node_info
-            action_performed=1 ;;
-        7) node_logs
-            action_performed=1 ;;
-        8) restart_node
-            action_performed=1 ;;
-        9) stop_node
-            action_performed=1 ;;
+If this a fresh node installation, let the node run for 30 minutes before doing this." "Set up gRPCurl" configure_grpcurl ;;
+        5) check_visibility action_performed=1 ;;
+        6) node_info action_performed=1 ;;
+        7) node_logs action_performed=1 ;;
+        8) restart_node action_performed=1 ;;
+        9) stop_node action_performed=1 ;;
         10) confirm_action "This action will check the peer manifest to provide informatio about the difficulty metric score of your node.
-            It only works after 15-30 minutes that the node has been running." "Peer manifest" peer_manifest ;;
-        11) node_version
-            action_performed=1 ;;
+It only works after 15-30 minutes that the node has been running." "Peer manifest" peer_manifest ;;
+        11) node_version action_performed=1 ;;
         e) exit ;;
         *) echo "Invalid option, please try again." ;;
     esac
