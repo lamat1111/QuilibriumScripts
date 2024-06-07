@@ -266,13 +266,19 @@ while true; do
         2) confirm_action "$(wrap_text "$install_node_message" "")" "Install node" install_node ;;
         3) confirm_action "$(wrap_text "$update_node_message" "")" "Update node" update_node ;;
         4) confirm_action "$(wrap_text "$setup_grpcurl_message" "")" "Set up gRPCurl" configure_grpcurl ;;
-        5) check_visibility action_performed=1 ;;
-        6) node_info action_performed=1 ;;
-        7) node_logs action_performed=1 ;;
-        8) restart_node action_performed=1 ;;
-        9) stop_node action_performed=1 ;;
+        5) check_visibility 
+        action_performed=1 ;;
+        6) node_info 
+        action_performed=1 ;;
+        7) node_logs 
+        action_performed=1 ;;
+        8) restart_node 
+        action_performed=1 ;;
+        9) stop_node 
+        action_performed=1 ;;
         10) confirm_action "$(wrap_text "$peer_manifest_message" "")" "Peer manifest" peer_manifest ;;
-        11) node_version action_performed=1 ;;
+        11) node_version 
+        action_performed=1 ;;
         e) exit ;;
         *) echo "Invalid option, please try again." ;;
     esac
