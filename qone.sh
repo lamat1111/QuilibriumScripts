@@ -312,7 +312,7 @@ while true; do
     action_performed=0
 
     case $choice in
-    	0) confirm_action "$(wrap_text "$best_providers" "")" "Best server providers" best_providers;;
+    	0) best_providers "$(wrap_text "$best_providers" "")" "Best server providers";;
         1) confirm_action "$(wrap_text "$prepare_server_message" "")" "Prepare your server" install_prerequisites prompt_return_to_menu;;
         2) confirm_action "$(wrap_text "$install_node_message" "")" "Install node" install_node prompt_return_to_menu;;
         3) confirm_action "$(wrap_text "$update_node_message" "")" "Update node" update_node prompt_return_to_menu;;
