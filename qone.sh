@@ -64,7 +64,7 @@ MISSING_SERVICE_MSG="⚠️ Your service file does not exist. Looks like you do 
 # Function definitions
 
 best_providers() {
- "$(wrap_text "$best_providers" "")"
+ "$(wrap_text "$best_providers_message" "")"
 }
 
 install_prerequisites() {
@@ -205,7 +205,7 @@ wrap_text() {
 #=====================
 
 # Define messages
-best_providers='
+best_providers_message='
 Check out the best server providers for your node
 at https://docs.quilibrium.one/quilibrium-node-setup-guide/best-server-providers
 
@@ -304,6 +304,7 @@ EOF
     #echo "12) Test Script"
     echo "------------------------"
     echo "e) Exit"
+    echo ""
 }
 
 #=====================
