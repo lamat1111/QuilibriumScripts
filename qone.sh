@@ -25,23 +25,30 @@ check_for_updates
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
 # User working folder
 USER_HOME=$(eval echo ~$USER)
-# Node path
-NODE_PATH="$USER_HOME/ceremonyclient/node" 
 
+# Set the version number
 VERSION=$(cat $NODE_PATH/config/version.go | grep -A 1 "func GetVersion() \[\]byte {" | grep -Eo '0x[0-9a-fA-F]+' | xargs printf "%d.%d.%d")
 
 # Get the system architecture
 ARCH=$(uname -m)
+OS=$(uname -s)
 
 if [ "$ARCH" = "x86_64" ]; then
-    EXEC_START="$NODE_PATH/node-$VERSION-linux-amd64"
+    if [ "$OS" = "Linux" ]; then
+        NODE_BINARY="node-$VERSION-linux-amd64"
+        GO_BINARY="go1.20.14.linux-amd64.tar.gz"
+    elif [ "$OS" = "Darwin" ]; then
+        NODE_BINARY="node-$VERSION-darwin-amd64"
+        GO_BINARY="go1.20.14.linux-amd64.tar.gz"
+    fi
 elif [ "$ARCH" = "aarch64" ]; then
-    EXEC_START="$NODE_PATH/node-$VERSION-linux-arm64"
-elif [ "$ARCH" = "arm64" ]; then
-    EXEC_START="$NODE_PATH/node-$VERSION-darwin-arm64"
-else
-    echo "❌ Unsupported architecture: $ARCH"
-    exit 1
+    if [ "$OS" = "Linux" ]; then
+        NODE_BINARY="node-$VERSION-linux-arm64"
+        GO_BINARY="go1.20.14.linux-arm64.tar.gz"
+    elif [ "$OS" = "Darwin" ]; then
+        NODE_BINARY="node-$VERSION-darwin-arm64"
+        GO_BINARY="go1.20.14.linux-arm64.tar.gz"
+    fi
 fi
 
 #=====================
@@ -101,7 +108,7 @@ node_info() {
         echo "⚙️  Displaying information about Quilibrium Node..."
 	echo ""
     	sleep 1
-        cd "$NODE_PATH" && "$EXEC_START" -node-info
+        cd ~/ceremonyclient/node && ./$NODE_BINARY -node-info
     fi
 }
 
@@ -139,6 +146,7 @@ stop_node() {
     echo ""
     sleep 1
     service ceremonyclient stop
+    echo "Node stopped"
 }
 
 peer_manifest() {
