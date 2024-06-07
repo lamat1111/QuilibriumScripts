@@ -221,6 +221,7 @@ echo "✅ Done."
 # Step 10: Prompt for reboot
 echo "🎉 Server setup is finished!"
 echo ""
+echo "🟡 YOU NEED TO REBOOT YOUR SERVER NOW 🟡"
 echo "Type 'sudo reboot' and press ENTER to reboot your server."
 echo ""
 echo "Then follow the online guide for the next steps"
