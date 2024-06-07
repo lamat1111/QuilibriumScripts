@@ -195,6 +195,7 @@ It only works after 15-30 minutes that the node has been running." "Peer manifes
         e) break ;;
         *) echo "Invalid option, please try again." ;;
     esac
+done
 
 while true; do
     clear
