@@ -180,9 +180,9 @@ to follow the online guide instead at: https://docs.quilibrium.one/" "Prepare yo
 If this is the first time you install a Quilibrium node I suggest you 
 to follow the online guide instead at: https://docs.quilibrium.one/
 Ensure that your server meets all the requirements and that you have already prepared you server via Step 1." "Install node" install_node ;;
-        3) confirm action "This action will update your node.
+        3) confirm_action "This action will update your node.
 Only use this if you have installed the node via the guide at https://docs.quilibrium.one/" "Update node" update_node ;;
-        4) confirm action "This action will make some edit to your config.yml to enable communication with the newtwork.
+        4) confirm_action "This action will make some edit to your config.yml to enable communication with the newtwork.
 If this a fresh node installation, let the node run for 30 minutes before doing this." "Set up gRPCurl" configure_grpcurl ;;
         5) check_visibility ;;
         6) node_info ;;
