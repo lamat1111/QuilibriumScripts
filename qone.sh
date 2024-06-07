@@ -298,6 +298,7 @@ EOF
     echo "10) Peer manifest (Difficulty metric)"
     echo "11) Node Version"
     #echo "12) Test Script"
+    echo "------------------------"
     echo "e) Exit"
 }
 
