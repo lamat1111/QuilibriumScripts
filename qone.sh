@@ -27,7 +27,8 @@ SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
 USER_HOME=$(eval echo ~$USER)
 
 # Set the version number
-VERSION=$(cat $NODE_PATH/config/version.go | grep -A 1 "func GetVersion() \[\]byte {" | grep -Eo '0x[0-9a-fA-F]+' | xargs printf "%d.%d.%d")
+#VERSION=$(cat $NODE_PATH/config/version.go | grep -A 1 "func GetVersion() \[\]byte {" | grep -Eo '0x[0-9a-fA-F]+' | xargs printf "%d.%d.%d")
+VERSION="1.4.18"
 
 # Get the system architecture
 ARCH=$(uname -m)
@@ -134,6 +135,8 @@ restart_node() {
     echo ""
     sleep 1
     service ceremonyclient restart
+    sleep 5
+    echo "Node restarted"
 }
 
 stop_node() {
@@ -146,6 +149,7 @@ stop_node() {
     echo ""
     sleep 1
     service ceremonyclient stop
+    sleep 3
     echo "Node stopped"
 }
 
