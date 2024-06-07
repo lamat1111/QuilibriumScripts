@@ -357,20 +357,3 @@ while true; do
         read -n 1 -s -r -p "Press any key to continue..."
     fi
 done
-    while true; do
-        clear
-        display_menu
-    
-        read -rp "Enter your choice: " choice
-        action_performed=0
-    
-        case $choice in
-            e) exit ;;
-            *) echo "Invalid option, please try again." ;;
-        esac
-    
-        if [ $action_performed -eq 1 ]; then
-            read -n 1 -s -r -p "Press any key to continue..."
-        fi
-    done
-done
