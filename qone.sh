@@ -21,9 +21,9 @@ check_for_updates() {
 # Service file path
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
 # User working folder
-HOME=$(eval echo ~$USER)
+USER_HOME=$(eval echo ~$USER)
 # Node path
-NODE_PATH="$HOME/ceremonyclient/node" 
+NODE_PATH="$USER_HOME/ceremonyclient/node" 
 
 VERSION=$(cat $NODE_PATH/config/version.go | grep -A 1 "func GetVersion() \[\]byte {" | grep -Eo '0x[0-9a-fA-F]+' | xargs printf "%d.%d.%d")
 
@@ -40,6 +40,10 @@ else
     echo "❌ Unsupported architecture: $ARCH"
     exit 1
 fi
+
+#=====================
+# Function Definitions
+#=====================
 
 # Function to ask for confirmation with an EOF message
 confirm_action() {
@@ -59,100 +63,54 @@ EOF
     fi
 }
 
-# URLs for scripts
-UPDATE_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/testing/qone.sh"
-PREREQUISITES_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/server_setup.sh"
-NODE_INSTALL_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/master/qnode_service_installer.sh"
-GRPCURL_CONFIG_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/tools/qnode_gRPC_calls_setup.sh"
-NODE_UPDATE_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/master/qnode_service_update.sh"
-PEER_MANIFEST_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/main_new/tools/qnode_peermanifest_checker.sh"
-CHECK_VISIBILITY_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_visibility_check.sh"
-
-# Common message for missing service file
-MISSING_SERVICE_MSG="⚠️ Your service file does not exist. Looks like you do not have a node running as a service yet!"
-
-# Function definitions
-
-install_prerequisites() {
-    echo "⚙️ Running installation script for server prerequisites..."
-    wget --no-cache -O - "$PREREQUISITES_URL" | bash
+# Function to wrap and indent text
+wrap_text() {
+    local text="$1"
+    local indent="$2"
+    echo "$text" | fold -s -w 80 | awk -v indent="$indent" '{printf "%s%s\n", indent, $0}'
 }
 
-install_node() {
-    echo "⚙️ Running installation script for Quilibrium Node..."
-    wget --no-cache -O - "$NODE_INSTALL_URL" | bash
-}
+#=====================
+# Message Definitions
+#=====================
 
-configure_grpcurl() {
-    echo "⚙️ Running configuration script for gRPCurl..."
-    wget --no-cache -O - "$GRPCURL_CONFIG_URL" | bash
-}
+# Define messages
+prepare_server_message='
+This action will install the necessary prerequisites for your server. 
+If this is the first time you install a Quilibrium node I suggest you 
+to follow the online guide instead at: https://docs.quilibrium.one/
+'
 
-update_node() {
-    echo "⚙️ Running update script for Quilibrium Node..."
-    wget --no-cache -O - "$UPDATE_URL" | bash
-}
+install_node_message='
+This action will install the node on your server. 
+If this is the first time you install a Quilibrium node I suggest you 
+to follow the online guide instead at: https://docs.quilibrium.one/ 
+Ensure that your server meets all the requirements and that you have 
+already prepared you server via Step 1.
+'
 
-check_visibility() {
-    echo "⚙️ Checking visibility of Quilibrium Node..."
-    wget -O - "$CHECK_VISIBILITY_URL" | bash
-}
+update_node_message='
+This action will update your node. 
+Only use this if you have installed the node via the guide at 
+https://docs.quilibrium.one/
+'
 
-node_info() {
-    if [ ! -f "$SERVICE_FILE" ]; then
-        echo "$MISSING_SERVICE_MSG"
-        return
-    fi
-    echo "⚙️ Displaying information about Quilibrium Node..."
-    cd "$NODE_PATH" && "$EXEC_START" -node-info
-}
+setup_grpcurl_message='
+This action will make some edit to your config.yml to enable communication with the network. 
+If this a fresh node installation, let the node run for 30 minutes before doing this.
+'
 
-node_logs() {
-    if [ ! -f "$SERVICE_FILE" ]; then
-        echo "$MISSING_SERVICE_MSG"
-        return
-    fi
-    echo "⚙️ Displaying logs of Quilibrium Node..."
-    sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
-}
+peer_manifest_message='
+This action will check the peer manifest to provide information about the difficulty metric score of your node. 
+It only works after 15-30 minutes that the node has been running.
+'
 
-restart_node() {
-    if [ ! -f "$SERVICE_FILE" ]; then
-        echo "$MISSING_SERVICE_MSG"
-        return
-    fi
-    echo "⚙️ Restarting Quilibrium Node service..."
-    service ceremonyclient restart
-}
+#=====================
+# Main Menu
+#=====================
 
-stop_node() {
-    if [ ! -f "$SERVICE_FILE" ]; then
-        echo "$MISSING_SERVICE_MSG"
-        return
-    fi
-    echo "⚙️ Stopping Quilibrium Node service..."
-    service ceremonyclient stop
-}
-
-peer_manifest() {
-    echo "⚙️ Checking peer manifest (Difficulty metric)..."
-    wget --no-cache -O - "$PEER_MANIFEST_URL" | bash
-}
-
-node_version() {
-    if [ ! -f "$SERVICE_FILE" ]; then
-        echo "$MISSING_SERVICE_MSG"
-        return
-    fi
-    echo "⚙️ Displaying Quilibrium Node version..."
-    journalctl -u ceremonyclient -r --no-hostname  -n 1 -g "Quilibrium Node" -o cat
-}
-
-# Main menu
 while true; do
     clear
-    
-display_menu() {
     cat << EOF
 
                   QQQQQQQQQ       1111111   
@@ -199,11 +157,12 @@ EOF
     echo "8) Restart Node"
     echo "9) Stop Node"
     echo "10) Peer manifest (Difficulty metric)"
+    echo "11
+
     echo "11) Node Version"
     echo "e) Exit"
 }
 
-    # Main menu
 while true; do
     clear
     display_menu
@@ -212,24 +171,44 @@ while true; do
     action_performed=0
 
     case $choice in
-        1) confirm_action "This action will install the necessary prerequisites for your server.
-If this is the first time you install a Quilibrium node I suggest you 
-to follow the online guide instead at: https://docs.quilibrium.one/" "Prepare your server" install_prerequisites ;;
-        2) confirm_action "This action will install the node on your server.
-If this is the first time you install a Quilibrium node I suggest you 
-to follow the online guide instead at: https://docs.quilibrium.one/
-Ensure that your server meets all the requirements and that you have already prepared you server via Step 1." "Install node" install_node ;;
-        3) confirm_action "This action will update your node.
-Only use this if you have installed the node via the guide at https://docs.quilibrium.one/" "Update node" update_node ;;
-        4) confirm_action "This action will make some edit to your config.yml to enable communication with the newtwork.
-If this a fresh node installation, let the node run for 30 minutes before doing this." "Set up gRPCurl" configure_grpcurl ;;
+        1) confirm_action "$(wrap_text "$prepare_server_message" "")" "Prepare your server" install_prerequisites ;;
+        2) confirm_action "$(wrap_text "$install_node_message" "")" "Install node" install_node ;;
+        3) confirm_action "$(wrap_text "$update_node_message" "")" "Update node" update_node ;;
+        4) confirm_action "$(wrap_text "$setup_grpcurl_message" "")" "Set up gRPCurl" configure_grpcurl ;;
         5) check_visibility action_performed=1 ;;
         6) node_info action_performed=1 ;;
         7) node_logs action_performed=1 ;;
         8) restart_node action_performed=1 ;;
         9) stop_node action_performed=1 ;;
-        10) confirm_action "This action will check the peer manifest to provide informatio about the difficulty metric score of your node.
-It only works after 15-30 minutes that the node has been running." "Peer manifest" peer_manifest ;;
+        10) confirm_action "$(wrap_text "$peer_manifest_message" "")" "Peer manifest" peer_manifest ;;
+        11) node_version action_performed=1 ;;
+        e) exit ;;
+        *) echo "Invalid option, please try again." ;;
+    esac
+    
+    if [ $action_performed -eq 1 ]; then
+        read -n 1 -s -r -p "Press any key to continue..."
+    fi
+done
+
+    while true; do
+    clear
+    display_menu
+    
+    read -rp "Enter your choice: " choice
+    action_performed=0
+
+    case $choice in
+        1) confirm_action "$(wrap_text "$prepare_server_message" "")" "Prepare your server" install_prerequisites ;;
+        2) confirm_action "$(wrap_text "$install_node_message" "")" "Install node" install_node ;;
+        3) confirm_action "$(wrap_text "$update_node_message" "")" "Update node" update_node ;;
+        4) confirm_action "$(wrap_text "$setup_grpcurl_message" "")" "Set up gRPCurl" configure_grpcurl ;;
+        5) check_visibility action_performed=1 ;;
+        6) node_info action_performed=1 ;;
+        7) node_logs action_performed=1 ;;
+        8) restart_node action_performed=1 ;;
+        9) stop_node action_performed=1 ;;
+        10) confirm_action "$(wrap_text "$peer_manifest_message" "")" "Peer manifest" peer_manifest ;;
         11) node_version action_performed=1 ;;
         e) exit ;;
         *) echo "Invalid option, please try again." ;;
