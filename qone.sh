@@ -152,7 +152,8 @@ node_version() {
 while true; do
     clear
     
-    cat << "EOF"
+display_menu() {
+    cat << EOF
 
                   QQQQQQQQQ       1111111   
                 QQ:::::::::QQ    1::::::1   
@@ -184,8 +185,7 @@ while true; do
 
 EOF
 
-    echo "Choose an option:"
-    echo ""
+    echo -e "Choose an option:\n"
     echo "If you want install a new node choose option 1, and then 2"
     echo ""
     echo "1) Prepare your server"
@@ -201,6 +201,11 @@ EOF
     echo "10) Peer manifest (Difficulty metric)"
     echo "11) Node Version"
     echo "e) Exit"
+}
+
+while true; do
+    clear
+    display_menu
 
     read -p "Enter your choice: " choice
     action_performed=0
@@ -228,18 +233,22 @@ It only works after 15-30 minutes that the node has been running." "Peer manifes
         e) break ;;
         *) echo "Invalid option, please try again." ;;
     esac
+
+   if [ $action_performed -eq 1 ]; then
+        read -n 1 -s -r -p "\nPress any key to continue"
+    fi
 done
 
 while true; do
     clear
-    
-    # Display the menu options here
-    
+    display_menu
+
     read -p "Enter your choice: " choice
     action_performed=0
 
     case $choice in
-        # Cases for different options
+        e) break ;;
+        *) echo "Invalid option, please try again." ;;
     esac
 
     if [ $action_performed -eq 1 ]; then
