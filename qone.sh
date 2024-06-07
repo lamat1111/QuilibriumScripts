@@ -3,18 +3,22 @@
 # Function to check for updates on GitHub and download the new version if available
 check_for_updates() {
     echo "⚙️ Checking for updates..."
+    sleep 1
     latest_version=$(curl -s https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/qone.sh | md5sum | awk '{print $1}')
     current_version=$(md5sum $0 | awk '{print $1}')
 
     if [ "$latest_version" != "$current_version" ]; then
         echo "⚙️ A new version is available. Updating..."
+	sleep 1
         wget -O "$0.tmp" https://github.com/lamat1111/QuilibriumScripts/raw/main/qone.sh
         chmod +x "$0.tmp"
         mv -f "$0.tmp" "$0"
         echo "✅ Update complete. Restarting..."
+	sleep 1
         exec "$0"
     else
         echo "✅ You already have the latest version."
+	sleep 1
     fi
 }
 
