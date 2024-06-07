@@ -56,6 +56,7 @@ GRPCURL_CONFIG_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscript
 NODE_UPDATE_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/master/qnode_service_update.sh"
 PEER_MANIFEST_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/main_new/tools/qnode_peermanifest_checker.sh"
 CHECK_VISIBILITY_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_visibility_check.sh"
+TEST_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/test/test_script.sh"
 
 # Common message for missing service file
 MISSING_SERVICE_MSG="⚠️ Your service file does not exist. Looks like you do not have a node running as a service yet!"
@@ -90,16 +91,19 @@ check_visibility() {
 node_info() {
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
-        return
+        read -n 1 -s -r -p "Press any key to continue..."
+        echo ""  # Add an empty line for better readability
+    else
+        echo "⚙️ Displaying information about Quilibrium Node..."
+        cd "$NODE_PATH" && "$EXEC_START" -node-info
     fi
-    echo "⚙️ Displaying information about Quilibrium Node..."
-    cd "$NODE_PATH" && "$EXEC_START" -node-info
 }
 
 node_logs() {
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
-        return
+		read -n 1 -s -r -p "Press any key to continue..."
+        echo ""  # Add an empty line for better readability
     fi
     echo "⚙️ Displaying logs of Quilibrium Node..."
     sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
@@ -108,7 +112,8 @@ node_logs() {
 restart_node() {
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
-        return
+		read -n 1 -s -r -p "Press any key to continue..."
+        echo ""  # Add an empty line for better readability
     fi
     echo "⚙️ Restarting Quilibrium Node service..."
     service ceremonyclient restart
@@ -117,7 +122,8 @@ restart_node() {
 stop_node() {
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
-        return
+		read -n 1 -s -r -p "Press any key to continue..."
+        echo ""  # Add an empty line for better readability
     fi
     echo "⚙️ Stopping Quilibrium Node service..."
     service ceremonyclient stop
@@ -131,14 +137,34 @@ peer_manifest() {
 node_version() {
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
-        return
+		read -n 1 -s -r -p "Press any key to continue..."
+        echo ""  # Add an empty line for better readability
     fi
     echo "⚙️ Displaying Quilibrium Node version..."
     journalctl -u ceremonyclient -r --no-hostname  -n 1 -g "Quilibrium Node" -o cat
 }
 
+test_script() {
+echo "⚙️ Running test script..."
+    wget --no-cache -O - "$TEST_URL" | bash
+}
 
-# Function to ask for confirmation with an EOF message
+
+
+# Function to prompt for returning to the main menu
+prompt_return_to_menu() {
+    echo -e "\n\n"  # Add two empty lines for readability
+    echo "---------------------------------------------------"
+    read -rp "⬅️   Go back to the main menu? Type Y or N: " return_to_menu
+    case $return_to_menu in
+        [Yy]) return 0 ;;  # Return to the main menu
+        *) 
+            echo "Exiting the script..."
+            exit 0
+            ;;
+    esac
+}
+
 confirm_action() {
     cat << EOF
 
@@ -148,13 +174,20 @@ Do you want to proceed with "$2"? Type Y or N:
 EOF
     read -p "> " confirm
     if [[ "$confirm" =~ ^[Yy]$ ]]; then
-        $3
+        if $3; then
+            if [ $? -eq 0 ]; then  # Check if action returns success
+                prompt_return_to_menu
+            fi
+        else
+            echo "❌ Action \"$2\" failed."
+        fi
         return 0
     else
         echo "❌ Action \"$2\" canceled."
         return 1
     fi
 }
+
 
 # Function to wrap and indent text
 wrap_text() {
@@ -196,6 +229,10 @@ If this a fresh node installation, let the node run for 30 minutes before doing 
 peer_manifest_message='
 This action will check the peer manifest to provide information about the difficulty metric score of your node. 
 It only works after 15-30 minutes that the node has been running.
+'
+
+test_script_message='
+This will run the test script
 '
 
 #=====================
@@ -251,6 +288,7 @@ EOF
     echo "9) Stop Node"
     echo "10) Peer manifest (Difficulty metric)"
     echo "11) Node Version"
+	echo "12) Test Script"
     echo "e) Exit"
 }
 
@@ -265,23 +303,18 @@ while true; do
     action_performed=0
 
     case $choice in
-        1) confirm_action "$(wrap_text "$prepare_server_message" "")" "Prepare your server" install_prerequisites ;;
-        2) confirm_action "$(wrap_text "$install_node_message" "")" "Install node" install_node ;;
-        3) confirm_action "$(wrap_text "$update_node_message" "")" "Update node" update_node ;;
-        4) confirm_action "$(wrap_text "$setup_grpcurl_message" "")" "Set up gRPCurl" configure_grpcurl ;;
-        5) check_visibility 
-        action_performed=1 ;;
-        6) node_info 
-        action_performed=1 ;;
-        7) node_logs 
-        action_performed=1 ;;
-        8) restart_node 
-        action_performed=1 ;;
-        9) stop_node 
-        action_performed=1 ;;
-        10) confirm_action "$(wrap_text "$peer_manifest_message" "")" "Peer manifest" peer_manifest ;;
-        11) node_version 
-        action_performed=1 ;;
+        1) confirm_action "$(wrap_text "$prepare_server_message" "")" "Prepare your server" install_prerequisites prompt_return_to_menu;;
+        2) confirm_action "$(wrap_text "$install_node_message" "")" "Install node" install_node prompt_return_to_menu;;
+        3) confirm_action "$(wrap_text "$update_node_message" "")" "Update node" update_node prompt_return_to_menu;;
+        4) confirm_action "$(wrap_text "$setup_grpcurl_message" "")" "Set up gRPCurl" configure_grpcurl prompt_return_to_menu;;
+        5) check_visibility action_performed=1 ;;
+        6) node_info action_performed=1 ;;
+        7) node_logs action_performed=1 ;;
+        8) restart_node action_performed=1 ;;
+        9) stop_node action_performed=1 ;;
+        10) confirm_action "$(wrap_text "$peer_manifest_message" "")" "Peer manifest" peer_manifest prompt_return_to_menu;;
+        11) node_version action_performed=1 ;;
+		12) confirm_action "$(wrap_text "$test_script_message" "")" "Test Script" test_script prompt_return_to_menu;;
         e) exit ;;
         *) echo "Invalid option, please try again." ;;
     esac
@@ -307,4 +340,3 @@ done
         fi
     done
 done
-
