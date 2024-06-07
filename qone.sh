@@ -110,6 +110,7 @@ node_info() {
 	echo ""
     	sleep 1
         cd ~/ceremonyclient/node && ./$NODE_BINARY -node-info
+	sleep 5
     fi
 }
 
@@ -347,12 +348,12 @@ while true; do
         3) confirm_action "$(wrap_text "$update_node_message" "")" "Update node" update_node prompt_return_to_menu;;
         4) confirm_action "$(wrap_text "$setup_grpcurl_message" "")" "Set up gRPCurl" configure_grpcurl prompt_return_to_menu;;
         5) check_visibility prompt_return_to_menu;;
-        6) node_info prompt_return_to_menu;;
-        7) node_logs action_performed=1 ;;
-        8) restart_node action_performed=1 ;;
-        9) stop_node action_performed=1 ;;
+        6) node_info action_performed=1;;
+        7) node_logs action_performed=1;;
+        8) restart_node action_performed=1;;
+        9) stop_node action_performed=1;;
         10) confirm_action "$(wrap_text "$peer_manifest_message" "")" "Peer manifest" peer_manifest prompt_return_to_menu;;
-        11) node_version prompt_return_to_menu;;
+        11) node_version action_performed=1;;
 	12) confirm_action "$(wrap_text "$test_script_message" "")" "Test Script" test_script prompt_return_to_menu;;
         e) exit ;;
         *) echo "Invalid option, please try again." ;;
