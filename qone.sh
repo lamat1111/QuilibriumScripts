@@ -346,7 +346,7 @@ while true; do
         2) confirm_action "$(wrap_text "$install_node_message" "")" "Install node" install_node prompt_return_to_menu;;
         3) confirm_action "$(wrap_text "$update_node_message" "")" "Update node" update_node prompt_return_to_menu;;
         4) confirm_action "$(wrap_text "$setup_grpcurl_message" "")" "Set up gRPCurl" configure_grpcurl prompt_return_to_menu;;
-        5) check_visibility prompt_return_to_menu;;;
+        5) check_visibility prompt_return_to_menu;;
         6) node_info prompt_return_to_menu;;
         7) node_logs action_performed=1 ;;
         8) restart_node action_performed=1 ;;
