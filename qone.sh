@@ -18,6 +18,9 @@ check_for_updates() {
     fi
 }
 
+# Check for updates
+check_for_updates
+
 # Service file path
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
 # User working folder
@@ -106,10 +109,10 @@ It only works after 15-30 minutes that the node has been running.
 '
 
 #=====================
-# Main Menu
+# Main Menu Function
 #=====================
 
-while true; do
+display_menu() {
     clear
     cat << EOF
 
@@ -144,7 +147,7 @@ while true; do
 EOF
 
     echo -e "Choose an option:\n"
-    echo "If you want install a new node choose option 1, and then 2"
+    echo "If you want to install a new node, choose option 1, and then 2"
     echo ""
     echo "1) Prepare your server"
     echo "2) Install Node"
@@ -153,18 +156,19 @@ EOF
     echo "4) Set up gRPCurl"
     echo "5) Check Visibility"
     echo "6) Node Info"
-    echo "7) Node Logs (CTRL+C to detatch)"
+    echo "7) Node Logs (CTRL+C to detach)"
     echo "8) Restart Node"
     echo "9) Stop Node"
     echo "10) Peer manifest (Difficulty metric)"
-    echo "11
-
     echo "11) Node Version"
     echo "e) Exit"
 }
 
+#=====================
+# Main Menu Loop
+#=====================
+
 while true; do
-    clear
     display_menu
     
     read -rp "Enter your choice: " choice
@@ -190,35 +194,6 @@ while true; do
         read -n 1 -s -r -p "Press any key to continue..."
     fi
 done
-
-    while true; do
-    clear
-    display_menu
-    
-    read -rp "Enter your choice: " choice
-    action_performed=0
-
-    case $choice in
-        1) confirm_action "$(wrap_text "$prepare_server_message" "")" "Prepare your server" install_prerequisites ;;
-        2) confirm_action "$(wrap_text "$install_node_message" "")" "Install node" install_node ;;
-        3) confirm_action "$(wrap_text "$update_node_message" "")" "Update node" update_node ;;
-        4) confirm_action "$(wrap_text "$setup_grpcurl_message" "")" "Set up gRPCurl" configure_grpcurl ;;
-        5) check_visibility action_performed=1 ;;
-        6) node_info action_performed=1 ;;
-        7) node_logs action_performed=1 ;;
-        8) restart_node action_performed=1 ;;
-        9) stop_node action_performed=1 ;;
-        10) confirm_action "$(wrap_text "$peer_manifest_message" "")" "Peer manifest" peer_manifest ;;
-        11) node_version action_performed=1 ;;
-        e) exit ;;
-        *) echo "Invalid option, please try again." ;;
-    esac
-    
-    if [ $action_performed -eq 1 ]; then
-        read -n 1 -s -r -p "Press any key to continue..."
-    fi
-done
-
     while true; do
         clear
         display_menu
@@ -237,5 +212,4 @@ done
     done
 done
 
-# Check for updates before displaying the menu
-check_for_updates
+
