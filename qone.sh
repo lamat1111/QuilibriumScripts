@@ -45,6 +45,96 @@ fi
 # Function Definitions
 #=====================
 
+# URLs for scripts
+UPDATE_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/testing/qone.sh"
+PREREQUISITES_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/server_setup.sh"
+NODE_INSTALL_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/master/qnode_service_installer.sh"
+GRPCURL_CONFIG_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/tools/qnode_gRPC_calls_setup.sh"
+NODE_UPDATE_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/master/qnode_service_update.sh"
+PEER_MANIFEST_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/main_new/tools/qnode_peermanifest_checker.sh"
+CHECK_VISIBILITY_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_visibility_check.sh"
+
+# Common message for missing service file
+MISSING_SERVICE_MSG="⚠️ Your service file does not exist. Looks like you do not have a node running as a service yet!"
+
+# Function definitions
+
+install_prerequisites() {
+    echo "⚙️ Running installation script for server prerequisites..."
+    wget --no-cache -O - "$PREREQUISITES_URL" | bash
+}
+
+install_node() {
+    echo "⚙️ Running installation script for Quilibrium Node..."
+    wget --no-cache -O - "$NODE_INSTALL_URL" | bash
+}
+
+configure_grpcurl() {
+    echo "⚙️ Running configuration script for gRPCurl..."
+    wget --no-cache -O - "$GRPCURL_CONFIG_URL" | bash
+}
+
+update_node() {
+    echo "⚙️ Running update script for Quilibrium Node..."
+    wget --no-cache -O - "$UPDATE_URL" | bash
+}
+
+check_visibility() {
+    echo "⚙️ Checking visibility of Quilibrium Node..."
+    wget -O - "$CHECK_VISIBILITY_URL" | bash
+}
+
+node_info() {
+    if [ ! -f "$SERVICE_FILE" ]; then
+        echo "$MISSING_SERVICE_MSG"
+        return
+    fi
+    echo "⚙️ Displaying information about Quilibrium Node..."
+    cd "$NODE_PATH" && "$EXEC_START" -node-info
+}
+
+node_logs() {
+    if [ ! -f "$SERVICE_FILE" ]; then
+        echo "$MISSING_SERVICE_MSG"
+        return
+    fi
+    echo "⚙️ Displaying logs of Quilibrium Node..."
+    sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
+}
+
+restart_node() {
+    if [ ! -f "$SERVICE_FILE" ]; then
+        echo "$MISSING_SERVICE_MSG"
+        return
+    fi
+    echo "⚙️ Restarting Quilibrium Node service..."
+    service ceremonyclient restart
+}
+
+stop_node() {
+    if [ ! -f "$SERVICE_FILE" ]; then
+        echo "$MISSING_SERVICE_MSG"
+        return
+    fi
+    echo "⚙️ Stopping Quilibrium Node service..."
+    service ceremonyclient stop
+}
+
+peer_manifest() {
+    echo "⚙️ Checking peer manifest (Difficulty metric)..."
+    wget --no-cache -O - "$PEER_MANIFEST_URL" | bash
+}
+
+node_version() {
+    if [ ! -f "$SERVICE_FILE" ]; then
+        echo "$MISSING_SERVICE_MSG"
+        return
+    fi
+    echo "⚙️ Displaying Quilibrium Node version..."
+    journalctl -u ceremonyclient -r --no-hostname  -n 1 -g "Quilibrium Node" -o cat
+}
+
+
 # Function to ask for confirmation with an EOF message
 confirm_action() {
     cat << EOF
@@ -104,62 +194,6 @@ peer_manifest_message='
 This action will check the peer manifest to provide information about the difficulty metric score of your node. 
 It only works after 15-30 minutes that the node has been running.
 '
-
-# Function definitions
-install_prerequisites() {
-    echo "Running installation script for server prerequisites..."
-    wget --no-cache -O - https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/server_setup.sh | bash
-}
-
-install_node() {
-    echo "Running installation script for Quilibrium Node..."
-    wget --no-cache -O - https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/master/qnode_service_installer.sh | bash
-}
-
-configure_grpcurl() {
-    echo "Running configuration script for gRPCurl..."
-    wget --no-cache -O - https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/tools/qnode_gRPC_calls_setup.sh | bash
-}
-
-update_node() {
-    echo "Running update script for Quilibrium Node..."
-    wget --no-cache -O - https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/master/qnode_service_update.sh | bash
-}
-
-check_visibility() {
-    echo "Checking visibility of Quilibrium Node..."
-    wget -O - https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_visibility_check.sh | bash
-}
-
-node_info() {
-    echo "Displaying information about Quilibrium Node..."
-    cd "$NODE_PATH" && "$EXEC_START" -node-info
-}
-
-node_logs() {
-    echo "Displaying logs of Quilibrium Node..."
-    sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
-}
-
-restart_node() {
-    echo "Restarting Quilibrium Node service..."
-    service ceremonyclient restart
-}
-
-stop_node() {
-    echo "Stopping Quilibrium Node service..."
-    service ceremonyclient stop
-}
-
-peer_manifest() {
-    echo "Checking peer manifest (Difficulty metric)..."
-    wget --no-cache -O - https://raw.githubusercontent.com/lamat1111/quilibriumscripts/main_new/tools/qnode_peermanifest_checker.sh | bash
-}
-
-node_version() {
-    echo "Displaying Quilibrium Node version..."
-    journalctl -u ceremonyclient -r --no-hostname  -n 1 -g "Quilibrium Node" -o cat
-}
 
 #=====================
 # Main Menu Function
