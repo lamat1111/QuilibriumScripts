@@ -168,6 +168,7 @@ node_version() {
     echo ""
     sleep 1
     journalctl -u ceremonyclient -r --no-hostname  -n 1 -g "Quilibrium Node" -o cat
+    sleep 3
 }
 
 test_script() {
