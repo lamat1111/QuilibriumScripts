@@ -113,7 +113,6 @@ node_info() {
     	sleep 1
         cd ~/ceremonyclient/node && ./$NODE_BINARY -node-info
 	echo ""
-        echo "-------------------------------"
 	read -n 1 -s -r -p "Press any key to continue..."  # Pause and wait for user input
     fi
 }
@@ -142,7 +141,7 @@ restart_node() {
     service ceremonyclient restart
     sleep 5
     echo "✅   Node restarted"
-    echo "-------------------------------"
+    echo ""
     read -n 1 -s -r -p "Press any key to continue..."  # Pause and wait for user input
 }
 
@@ -158,7 +157,7 @@ stop_node() {
     service ceremonyclient stop
     sleep 3
     echo "✅   Node stopped"
-    echo "-------------------------------"
+    echo ""
     read -n 1 -s -r -p "Press any key to continue..."  # Pause and wait for user input
 }
 
@@ -177,7 +176,7 @@ node_version() {
     echo ""
     sleep 1
     journalctl -u ceremonyclient -r --no-hostname  -n 1 -g "Quilibrium Node" -o cat
-    echo "-------------------------------"
+    echo ""
     read -n 1 -s -r -p "Press any key to continue..."  # Pause and wait for user input
 }
 
@@ -320,14 +319,16 @@ EOF
     cat << "EOF"
 If you want to install a new node, choose option 1, and then 2
 
-0) Best server providers
 ------------------------------------------------------------------
+
+0) Best server providers
 1) Prepare your server      7) Node Logs (CTRL+C to detach)
 2) Install Node             8) Restart Node
 3) Set up gRPCurl           9) Stop Node
 4) Update Node             10) Peer manifest (Difficulty metric)
 5) Check Visibility        11) Node Version
 6) Node Info              #12) Test Script
+
 ------------------------------------------------------------------
 e) Exit
 
