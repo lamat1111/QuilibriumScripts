@@ -59,33 +59,43 @@ EOF
     fi
 }
 
+# URLs for scripts
+UPDATE_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/testing/qone.sh"
+PREREQUISITES_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/server_setup.sh"
+NODE_INSTALL_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/master/qnode_service_installer.sh"
+GRPCURL_CONFIG_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/tools/qnode_gRPC_calls_setup.sh"
+NODE_UPDATE_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/master/qnode_service_update.sh"
+PEER_MANIFEST_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/main_new/tools/qnode_peermanifest_checker.sh"
+CHECK_VISIBILITY_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_visibility_check.sh"
+
 # Common message for missing service file
 MISSING_SERVICE_MSG="⚠️ Your service file does not exist. Looks like you do not have a node running as a service yet!"
 
 # Function definitions
+
 install_prerequisites() {
     echo "⚙️ Running installation script for server prerequisites..."
-    wget --no-cache -O - https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/server_setup.sh | bash
+    wget --no-cache -O - "$PREREQUISITES_URL" | bash
 }
 
 install_node() {
     echo "⚙️ Running installation script for Quilibrium Node..."
-    wget --no-cache -O - https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/master/qnode_service_installer.sh | bash
+    wget --no-cache -O - "$NODE_INSTALL_UR" | bash
 }
 
 configure_grpcurl() {
     echo "⚙️ Running configuration script for gRPCurl..."
-    wget --no-cache -O - https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/tools/qnode_gRPC_calls_setup.sh | bash
+    wget --no-cache -O - "$GRPCURL_CONFIG_URL" | bash
 }
 
 update_node() {
     echo "⚙️ Running update script for Quilibrium Node..."
-    wget --no-cache -O - https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/master/qnode_service_update.sh | bash
+    wget --no-cache -O - "$UPDATE_URL" | bash
 }
 
 check_visibility() {
     echo "⚙️ Checking visibility of Quilibrium Node..."
-    wget -O - https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_visibility_check.sh | bash
+    wget -O - "$CHECK_VISIBILITY_URL" | bash
 }
 
 node_info() {
@@ -126,7 +136,7 @@ stop_node() {
 
 peer_manifest() {
     echo "⚙️ Checking peer manifest (Difficulty metric)..."
-    wget --no-cache -O - https://raw.githubusercontent.com/lamat1111/quilibriumscripts/main_new/tools/qnode_peermanifest_checker.sh | bash
+    wget --no-cache -O - "$PEER_MANIFEST_URL" | bash
 }
 
 node_version() {
