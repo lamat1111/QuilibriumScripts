@@ -164,8 +164,10 @@ systemctl daemon-reload
 systemctl enable ceremonyclient
 service ceremonyclient start
 
-# Showing the node logs
+# Showing the node version and logs
 echo "🌟Your Qnode is now updated!"
+journalctl -u ceremonyclient -r --no-hostname  -n 1 -g "Quilibrium Node" -o cat
+echo ""
 echo "⏳ Showing the node log... (CTRL+C to exit)"
 echo ""
 echo ""
