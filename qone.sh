@@ -59,6 +59,9 @@ EOF
     fi
 }
 
+# Common message for missing service file
+MISSING_SERVICE_MSG="⚠️ Your service file does not exist. Looks like you do not have a node running as a service yet!"
+
 # Function definitions
 install_prerequisites() {
     echo "⚙️ Running installation script for server prerequisites..."
@@ -86,21 +89,37 @@ check_visibility() {
 }
 
 node_info() {
+    if [ ! -f "$SERVICE_FILE" ]; then
+        echo "$MISSING_SERVICE_MSG"
+        return
+    fi
     echo "⚙️ Displaying information about Quilibrium Node..."
     cd "$NODE_PATH" && "$EXEC_START" -node-info
 }
 
 node_logs() {
+    if [ ! -f "$SERVICE_FILE" ]; then
+        echo "$MISSING_SERVICE_MSG"
+        return
+    fi
     echo "⚙️ Displaying logs of Quilibrium Node..."
     sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
 }
 
 restart_node() {
+    if [ ! -f "$SERVICE_FILE" ]; then
+        echo "$MISSING_SERVICE_MSG"
+        return
+    fi
     echo "⚙️ Restarting Quilibrium Node service..."
     service ceremonyclient restart
 }
 
 stop_node() {
+    if [ ! -f "$SERVICE_FILE" ]; then
+        echo "$MISSING_SERVICE_MSG"
+        return
+    fi
     echo "⚙️ Stopping Quilibrium Node service..."
     service ceremonyclient stop
 }
@@ -111,6 +130,10 @@ peer_manifest() {
 }
 
 node_version() {
+    if [ ! -f "$SERVICE_FILE" ]; then
+        echo "$MISSING_SERVICE_MSG"
+        return
+    fi
     echo "⚙️ Displaying Quilibrium Node version..."
     journalctl -u ceremonyclient -r --no-hostname  -n 1 -g "Quilibrium Node" -o cat
 }
