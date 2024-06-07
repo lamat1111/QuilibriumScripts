@@ -1,7 +1,5 @@
 #!/bin/bash
 
-#!/bin/bash
-
 # Function to check for updates on GitHub and download the new version if available
 check_for_updates() {
     echo "Checking for updates..."
@@ -42,6 +40,22 @@ else
     echo "❌ Unsupported architecture: $ARCH"
     exit 1
 fi
+
+# Function to ask for confirmation with an EOF message
+confirm_action() {
+    cat << EOF
+
+$1
+
+Do you want to proceed with "$2"? Type Y or N:
+EOF
+    read -p "> " confirm
+    if [[ "$confirm" =~ ^[Yy]$ ]]; then
+        $3
+    else
+        echo "Action \"$2\" canceled."
+    fi
+}
 
 # Function definitions
 install_prerequisites() {
@@ -141,12 +155,12 @@ EOF
     echo ""
     echo "1) Prepare your server"
     echo "2) Install Node"
-    echo ""
+    echo "------------------------"
     echo "3) Update Node"
     echo "4) Set up gRPCurl"
     echo "5) Check Visibility"
     echo "6) Node Info"
-    echo "7) Node Logs"
+    echo "7) Node Logs (CTRL+C to detatch)"
     echo "8) Restart Node"
     echo "9) Stop Node"
     echo "10) Peer manifest (Difficulty metric)"
@@ -156,16 +170,24 @@ EOF
     read -p "Enter your choice: " choice
 
     case $choice in
-        1) install_prerequisites ;;
-        2) install_node ;;
-        3) update_node ;;
-        4) configure_grpcurl ;;
+        1) confirm_action "This action will install the necessary prerequisites for your server.
+If this is the first time you install a Quilibrium node I suggest you 
+to follow the online guide instead at: https://docs.quilibrium.one/" "Prepare your server" install_prerequisites ;;
+        2) confirm_action "This action will install the node on your server.
+If this is the first time you install a Quilibrium node I suggest you 
+to follow the online guide instead at: https://docs.quilibrium.one/
+Ensure that your server meets all the requirements and that you have already prepared you server via Step 1." "Install Node" install_node ;;
+        3) confirm action "This action will update your node.
+Only use this if you have installed the node via the guide at https://docs.quilibrium.one/" update_node ;;
+        4) confirm action "This action will make some edit to your config.yml to enable communication with the newtwork.
+If this a fresh node installation, let the node run for 30 minutes before doing this." "Set up gRPC url" configure_grpcurl ;;
         5) check_visibility ;;
         6) node_info ;;
         7) node_logs ;;
         8) restart_node ;;
         9) stop_node ;;
-        10) peer_manifest ;;
+        10) confirm_action "This action will check the peer manifest to provide informatio about the difficulty metric score of your node.
+It only works after 15-30 minutes that the node has been running." "Peer manifest" peer_manifest ;;
         11) node_version ;;
         e) break ;;
         *) echo "Invalid option, please try again." ;;
