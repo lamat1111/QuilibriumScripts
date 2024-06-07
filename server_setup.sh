@@ -1,24 +1,24 @@
 #!/bin/bash -i
 
 cat << "EOF"             
-                              QQQQQQQQQ       1111111   
-                            QQ:::::::::QQ    1::::::1   
-                          QQ:::::::::::::QQ 1:::::::1   
-                         Q:::::::QQQ:::::::Q111:::::1   
-                         Q::::::O   Q::::::Q   1::::1   
-                         Q:::::O     Q:::::Q   1::::1   
-                         Q:::::O     Q:::::Q   1::::1   
-                         Q:::::O     Q:::::Q   1::::l   
-                         Q:::::O     Q:::::Q   1::::l   
-                         Q:::::O     Q:::::Q   1::::l   
-                         Q:::::O  QQQQ:::::Q   1::::l   
-                         Q::::::O Q::::::::Q   1::::l   
-                         Q:::::::QQ::::::::Q111::::::111
-                          QQ::::::::::::::Q 1::::::::::1
-                            QQ:::::::::::Q  1::::::::::1
-                              QQQQQQQQ::::QQ111111111111
-                                      Q:::::Q           
-                                       QQQQQQ                                                                                                                                  
+                            QQQQQQQQQ       1111111   
+                          QQ:::::::::QQ    1::::::1   
+                        QQ:::::::::::::QQ 1:::::::1   
+                       Q:::::::QQQ:::::::Q111:::::1   
+                       Q::::::O   Q::::::Q   1::::1   
+                       Q:::::O     Q:::::Q   1::::1   
+                       Q:::::O     Q:::::Q   1::::1   
+                       Q:::::O     Q:::::Q   1::::l   
+                       Q:::::O     Q:::::Q   1::::l   
+                       Q:::::O     Q:::::Q   1::::l   
+                       Q:::::O  QQQQ:::::Q   1::::l   
+                       Q::::::O Q::::::::Q   1::::l   
+                       Q:::::::QQ::::::::Q111::::::111
+                        QQ::::::::::::::Q 1::::::::::1
+                          QQ:::::::::::Q  1::::::::::1
+                            QQQQQQQQ::::QQ111111111111
+                                    Q:::::Q           
+                                     QQQQQQ                                                                                                                                  
 EOF
 echo ""
 echo "==========================================================================="
@@ -153,6 +153,10 @@ else
 fi
 sudo sysctl -p
 
+export GOROOT=/usr/local/go
+export GOPATH=$HOME/go
+export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
+
 # Step 7: Install gRPCurl
 echo "📦 Installing gRPCurl..."
 sleep 1  # Add a 1-second delay
@@ -216,6 +220,7 @@ echo "✅ Done."
 
 # Step 10: Prompt for reboot
 echo "🎉 Server setup is finished!"
+echo ""
 echo "Type 'sudo reboot' and press ENTER to reboot your server."
 echo ""
 echo "Then follow the online guide for the next steps"
