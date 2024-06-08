@@ -41,6 +41,25 @@ exit_message() {
     echo "🛠️ If you still receive an error, you may want to proceed manually, step by step instead of using the auto-installer."
 }
 
+# Determine the ExecStart line based on the architecture
+ARCH=$(uname -m)
+OS=$(uname -s)
+
+# Determine the node binary name based on the architecture and OS
+if [ "$ARCH" = "x86_64" ]; then
+    if [ "$OS" = "Linux" ]; then
+        GO_BINARY="go1.22.4.linux-amd64.tar.gz"
+    elif [ "$OS" = "Darwin" ]; then
+        GO_BINARY="go1.22.4.linux-amd64.tar.gz"
+    fi
+elif [ "$ARCH" = "aarch64" ]; then
+    if [ "$OS" = "Linux" ]; then
+        GO_BINARY="go1.22.4.linux-arm64.tar.gz"
+    elif [ "$OS" = "Darwin" ]; then
+        GO_BINARY="go1.22.4.linux-arm64.tar.gz"
+    fi
+fi
+
 # Step 1: Check sudo availability
 if ! [ -x "$(command -v sudo)" ]; then
   echo "⚠️ Sudo is not installed! This script requires sudo to run. Exiting..."
@@ -81,10 +100,11 @@ echo "✅ cpulimit and gawk are installed and up to date."
 # Step 4: Download and extract Go
 
 # Installing Go
-wget https://go.dev/dl/go1.22.4.linux-amd64.tar.gz
-sudo tar -xvf go1.22.4.linux-amd64.tar.gz || { echo "Failed to extract Go! Exiting..."; exit_message; exit 1; }
+wget https://go.dev/dl/$GO_BINARY || { echo "Failed to download Node! Exiting..."; exit_message; exit 1; }    
+sudo tar -xvf $GO_BINARY || { echo "Failed to extract Go! Exiting..."; exit_message; exit 1; }
+sudo rm -rf /usr/local/go || { echo "Failed to remove existing Go! Exiting..."; exit_message; exit 1; }
 sudo mv go /usr/local || { echo "Failed to move go! Exiting..."; exit_message; exit 1; }
-sudo rm go1.22.4.linux-amd64.tar.gz || { echo "Failed to remove downloaded archive! Exiting..."; exit_message; exit 1; }
+sudo rm $GO_BINARY || { echo "Failed to remove downloaded archive! Exiting..."; exit_message; exit 1; }
 
 # Step 5: Set Go environment variables
 echo "🌍 Setting Go environment variables..."
