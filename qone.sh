@@ -131,7 +131,7 @@ quil_balance() {
         read -n 1 -s -r -p "Press any key to continue..."
         echo ""  # Add an empty line for better readability
     else
-        echo "⚙️  Displaying node info..."
+        echo "⚙️  Displaying your QUIL balance..."
 	echo ""
     	sleep 1
         cd ~/ceremonyclient/node && ./$NODE_BINARY -balance
