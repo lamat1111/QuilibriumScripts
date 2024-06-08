@@ -147,10 +147,15 @@ node_logs() {
         read -n 1 -s -r -p "Press any key to continue..."
         echo ""  # Add an empty line for better readability
     fi
-    echo "⚙️  Displaying your node log...  (Press any key to return to the main menu)"
+    echo "⚙️  Displaying your node log...  (Press CTRL+C to return to the main menu)"
     echo ""
-    sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat &
-    read -n 1 -s -r  # Wait for any key press to return to the main menu
+    trap 'echo "Returning to main menu..."; return_to_menu' INT  # Trap CTRL+C to return to main menu
+    sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
+}
+
+return_to_menu() {
+    clear
+    display_menu
 }
 
 restart_node() {
