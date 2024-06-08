@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Set CPU limit
-CPU_LIMIT_PERCENT=70
 
 # Step 0: Welcome
 echo "✨ Welcome! This script will update your Quilibrium node when running it as a service. ✨"
-echo " It will set your CPU limit automatically to $CPU_LIMIT_PERCENT %"
+echo "It will run the node directly frm the binary"
+echo "It will update your service file without changing your customizations"
+echo ""
 echo "Made with 🔥 by LaMat - https://quilibrium.one"
 echo "====================================================================================="
 echo ""
@@ -34,30 +34,6 @@ if [ ! -d "$CEREMONYCLIENT_DIR" ]; then
     exit 1
 fi
 
-#===========================
-# CPU limit cheks
-#===========================
-# Calculate the number of vCores
-vCORES=$(nproc)
-# Calculate the CPUQuota value
-CPU_QUOTA=$(($CPU_LIMIT_PERCENT * $vCORES))
-
-# Remove existing CPUQuota line from the service file
-if sudo sed -i "/CPUQuota=/d" "$SERVICE_FILE"; then
-    echo "➖ Removed existing CPUQuota from service file."
-else
-    echo "ℹ️ No existing CPUQuota found in service file."
-fi
-
-# Add the new CPUQuota line
-if ! sudo sed -i "/\[Service\]/a CPUQuota=${CPU_QUOTA}%" "$SERVICE_FILE"; then
-    echo "❌ Error: Failed to add CPUQuota to ceremonyclient service file." >&2
-    exit 1
-else
-    echo "➕ Added CPUQuota=${CPU_QUOTA}% to service file."
-    echo " This will limit your CPU by $CPU_LIMIT_PERCENT %"
-fi
-sleep 1
 #===========================
 # Stop the ceremonyclient service if it exists
 #===========================
@@ -142,13 +118,15 @@ else
 fi
 
 sleep 1
+
 #===========================
 # Re-Create or Update Ceremonyclient Service
 #===========================
-echo "🔧 Rebuilding Ceremonyclient Service..."
+echo "🔧 Checking Ceremonyclient Service..."
 sleep 2  # Add a 2-second delay
+
 if [ ! -f "$SERVICE_FILE" ]; then
-    echo "📝 Creating new ceremonyclient service file..."
+    echo "📝 Service file does not exist. Creating new ceremonyclient service file..."
     if ! sudo tee "$SERVICE_FILE" > /dev/null <<EOF
 [Unit]
 Description=Ceremony Client Go App Service
@@ -157,8 +135,8 @@ Description=Ceremony Client Go App Service
 Type=simple
 Restart=always
 RestartSec=5s
-WorkingDirectory="$NODE_PATH"
-ExecStart="$EXEC_START"
+WorkingDirectory=$NODE_PATH
+ExecStart=$EXEC_START
 
 [Install]
 WantedBy=multi-user.target
@@ -170,22 +148,24 @@ EOF
 else
     echo "🔍 Checking existing ceremonyclient service file..."
 
-    # Check if the required lines exist or are different
-    if ! grep -q "WorkingDirectory=$NODE_PATH" "$SERVICE_FILE" || ! grep -q "ExecStart=$EXEC_START" "$SERVICE_FILE"; then
-        echo "🔄 Updating existing ceremonyclient service file..."
-        # Replace the existing lines with new values
-        if ! sudo sed -i "s|WorkingDirectory=.*|WorkingDirectory=$NODE_PATH|" "$SERVICE_FILE"; then
-            echo "❌ Error: Failed to update WorkingDirectory in ceremonyclient service file." >&2
-            exit 1
-        fi
-        if ! sudo sed -i "s|ExecStart=.*|ExecStart=$EXEC_START|" "$SERVICE_FILE"; then
-            echo "❌ Error: Failed to update ExecStart in ceremonyclient service file." >&2
-            exit 1
-        fi
+    # Replace the existing lines with new values
+    if sudo grep -q "WorkingDirectory=" "$SERVICE_FILE"; then
+        sudo sed -i "s|^WorkingDirectory=.*|WorkingDirectory=$NODE_PATH|" "$SERVICE_FILE"
     else
-        echo "✅ No changes needed."
+        echo "WorkingDirectory not found in the service file. Adding it."
+        sudo sed -i "/\[Service\]/a WorkingDirectory=$NODE_PATH" "$SERVICE_FILE"
     fi
+
+    if sudo grep -q "ExecStart=" "$SERVICE_FILE"; then
+        sudo sed -i "s|^ExecStart=.*|ExecStart=$EXEC_START|" "$SERVICE_FILE"
+    else
+        echo "ExecStart not found in the service file. Adding it."
+        sudo sed -i "/\[Service\]/a ExecStart=$EXEC_START" "$SERVICE_FILE"
+    fi
+
+    echo "✅ Ceremonyclient service file updated."
 fi  
+
 sleep 1  # Add a 1-second delay
 
 #===========================
