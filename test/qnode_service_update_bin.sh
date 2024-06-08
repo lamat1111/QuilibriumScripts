@@ -1,8 +1,11 @@
 #!/bin/bash
 
+# Set sCPU limit
+CPU_LIMIT_PERCENT=70
+
 # Step 0: Welcome
 echo "✨ Welcome! This script will update your Quilibrium node when running it as a service. ✨"
-echo ""
+echo " It will set your CPU limit automatically to CPU_LIMIT_PERCENT %"
 echo "Made with 🔥 by LaMat - https://quilibrium.one"
 echo "====================================================================================="
 echo ""
@@ -12,8 +15,7 @@ sleep 7  # Add a 7-second delay
 #===========================
 # Set variables
 #===========================
-# Set sCPU limit
-CPU_LIMIT_PERCENT=70
+
 # Set service file path
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
 # User working folder
@@ -108,29 +110,13 @@ git checkout -- node/release_autorun.sh
 #===========================
 echo "⏳ Downloading New Release..."
 
-# Change to the ceremonyclient directory
-cd ~/ceremonyclient || { echo "❌ Error: Directory ~/ceremonyclient does not exist."; exit 1; }
 
-# Set the remote URL and verify access
-for url in \
-    "https://source.quilibrium.com/quilibrium/ceremonyclient.git" \
-    "https://git.quilibrium-mirror.ch/agostbiro/ceremonyclient.git" \
-    "https://github.com/QuilibriumNetwork/ceremonyclient.git"; do
-    if git remote set-url origin "$url" && git fetch origin; then
-        echo "✅ Remote URL set to $url"
-        break
-    fi
-done
-
-# Check if the URL was set and accessible
-if ! git remote -v | grep -q origin; then
-    echo "❌ Error: Failed to set and access remote URL." >&2
-    exit 1
-fi
-
-# Pull the latest changes
-git pull || { echo "❌ Error: Failed to download the latest changes." >&2; exit 1; }
-git checkout release || { echo "❌ Error: Failed to checkout release." >&2; exit 1; }
+# Download new release
+echo "⏳ Downloading New Release v1.4.19"
+cd  ~/ceremonyclient
+git remote set-url origin https://source.quilibrium.com/quilibrium/ceremonyclient.git || git remote set-url origin https://git.quilibrium-mirror.ch/agostbiro/ceremonyclient.git
+git pull
+git checkout release-cdn
 
 echo "✅ Downloaded the latest changes successfully."
 
