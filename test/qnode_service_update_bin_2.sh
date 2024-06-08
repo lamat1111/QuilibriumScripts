@@ -85,23 +85,21 @@ git checkout -- node/release_autorun.sh
 # Download Binary
 #===========================
 echo "⏳ Downloading New Release..."
-
-
-# Download new release
-echo "⏳ Downloading New Release v1.4.19"
 cd  ~/ceremonyclient
 git remote set-url origin https://source.quilibrium.com/quilibrium/ceremonyclient.git || git remote set-url origin https://git.quilibrium-mirror.ch/agostbiro/ceremonyclient.git
 git pull
 git checkout release-cdn
 
-echo "✅ Downloaded the latest changes successfully."
-
 sleep 1
+
+# Set the version number
+VERSION=$(cat $NODE_PATH/config/version.go | grep -A 1 "func GetVersion() \[\]byte {" | grep -Eo '0x[0-9a-fA-F]+' | xargs printf "%d.%d.%d")
+
+echo "✅ Downloaded the latest changes successfully - V $VERSION "
+
 #===========================
 # Determine the ExecStart line based on the architecture
 #===========================
-# Set the version number
-VERSION=$(cat $NODE_PATH/config/version.go | grep -A 1 "func GetVersion() \[\]byte {" | grep -Eo '0x[0-9a-fA-F]+' | xargs printf "%d.%d.%d")
 
 # Get the system architecture
 ARCH=$(uname -m)
@@ -197,7 +195,7 @@ service ceremonyclient start
 # Showing the node logs
 #===========================
 echo ""
-echo "🌟Your Qnode is now updated to $VERSION!"
+echo "🌟Your Qnode is now updated to V $VERSION!"
 echo ""
 echo "⏳ Showing the node log... (Hit Ctrl+C to exit log)"
 sleep 1
