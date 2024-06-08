@@ -81,7 +81,7 @@ echo "✅ cpulimit and gawk are installed and up to date."
 echo "⏳ Downloading New Release..."
 
 # Change to the ceremonyclient directory
-cd ~/ceremonyclient || { echo "❌ Error: Directory ~/ceremonyclient does not exist."; exit 1; }
+cd ~/ceremonyclient
 
 # Set the remote URL and verify access
 for url in \
