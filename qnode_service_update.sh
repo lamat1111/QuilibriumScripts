@@ -80,29 +80,11 @@ echo "✅ cpulimit and gawk are installed and up to date."
 # Step 4: Download Binary
 echo "⏳ Downloading New Release..."
 
-# Change to the ceremonyclient directory
-cd ~/ceremonyclient
-
-# Set the remote URL and verify access
-for url in \
-    "https://source.quilibrium.com/quilibrium/ceremonyclient.git" \
-    "https://git.quilibrium-mirror.ch/agostbiro/ceremonyclient.git" \
-    "https://github.com/QuilibriumNetwork/ceremonyclient.git"; do
-    if git remote set-url origin "$url" && git fetch origin; then
-        echo "✅ Remote URL set to $url"
-        break
-    fi
-done
-
-# Check if the URL was set and accessible
-if ! git remote -v | grep -q origin; then
-    echo "❌ Error: Failed to set and access remote URL." >&2
-    exit 1
-fi
-
-# Pull the latest changes
-git pull || { echo "❌ Error: Failed to download the latest changes." >&2; exit 1; }
-git checkout release-cdn || { echo "❌ Error: Failed to checkout release." >&2; exit 1; }
+# Set the remote URL and download
+cd  ~/ceremonyclient
+git remote set-url origin https://source.quilibrium.com/quilibrium/ceremonyclient.git || git remote set-url origin https://git.quilibrium-mirror.ch/agostbiro/ceremonyclient.git
+git pull
+git checkout release-cdn
 
 echo "✅ Downloaded the latest changes successfully."
 
