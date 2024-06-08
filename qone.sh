@@ -23,7 +23,7 @@ check_for_updates() {
 }
 
 # Check for updates
-check_for_updates
+#check_for_updates
 
 # Service file path
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
@@ -108,6 +108,7 @@ update_node() {
 check_visibility() {
     echo "⚙️  Checking node visibility..."
     wget -O - "$CHECK_VISIBILITY_URL" | bash
+    prompt_return_to_menu
 }
 
 node_info() {
@@ -125,16 +126,36 @@ node_info() {
     fi
 }
 
+quil_balance() {
+    if [ ! -f "$SERVICE_FILE" ]; then
+        echo "$MISSING_SERVICE_MSG"
+        read -n 1 -s -r -p "Press any key to continue..."
+        echo ""  # Add an empty line for better readability
+    else
+        echo "⚙️  Displaying your QUIL balance..."
+	echo ""
+    	sleep 1
+        cd ~/ceremonyclient/node && ./$NODE_BINARY -balance
+	echo ""
+	read -n 1 -s -r -p "Press any key to continue..."  # Pause and wait for user input
+    fi
+}
+
 node_logs() {
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
-		read -n 1 -s -r -p "Press any key to continue..."
+        read -n 1 -s -r -p "Press any key to continue..."
         echo ""  # Add an empty line for better readability
     fi
-    echo "⚙️  Displaying your node log...  (CTRL+C to detach)"
+    echo "⚙️  Displaying your node log...  (Press CTRL+C to return to the main menu)"
     echo ""
-    sleep 1
+    trap 'echo "Returning to main menu..."; return_to_menu' INT  # Trap CTRL+C to return to main menu
     sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
+}
+
+return_to_menu() {
+    clear
+    display_menu
 }
 
 restart_node() {
@@ -328,22 +349,21 @@ EOF
 If you want to install a new node, choose option 1, and then 2
 
 ------------------------------------------------------------------
-
-0) Best server providers    7) Node Log
-1) Prepare your server      8) Restart node
-2) Install node             9) Stop node
-3) Set up gRPCurl          10) Peer manifest (Difficulty metric)
-4) Update node             11) Node version
-5) Check visibility
-6) Node info              
-
+0) Best server providers      8) Node version
+1) Prepare your server        9) Node info (peerID & balance)    
+2) Install node              10) QUIL balance
+3) Set up gRPCurl            11) Peer manifest (Difficulty metric)
+4) Node Log                  12) Check visibility
+5) Update node
+6) Stop node
+7) Restart node
 ------------------------------------------------------------------
 e) Exit
 
 EOF
 }
 
-#12) Test Script
+#20) Test Script
 
 #=====================
 # Main Menu Loop
@@ -354,21 +374,22 @@ while true; do
     
     read -rp "Enter your choice: " choice
     action_performed=0
-
+    
     case $choice in
     	0) best_providers;;
         1) confirm_action "$(wrap_text "$prepare_server_message" "")" "Prepare your server" install_prerequisites prompt_return_to_menu;;
         2) confirm_action "$(wrap_text "$install_node_message" "")" "Install node" install_node prompt_return_to_menu;;
 	3) confirm_action "$(wrap_text "$setup_grpcurl_message" "")" "Set up gRPCurl" configure_grpcurl prompt_return_to_menu;;
-        4) confirm_action "$(wrap_text "$update_node_message" "")" "Update node" update_node prompt_return_to_menu;;
-        5) check_visibility prompt_return_to_menu;;
-        6) node_info action_performed=1;;
-        7) node_logs action_performed=1;;
-        8) restart_node action_performed=1;;
-        9) stop_node action_performed=1;;
-        10) confirm_action "$(wrap_text "$peer_manifest_message" "")" "Peer manifest" peer_manifest prompt_return_to_menu;;
-        11) node_version action_performed=1;;
-	12) confirm_action "$(wrap_text "$test_script_message" "")" "Test Script" test_script prompt_return_to_menu;;
+        4) node_logs action_performed=1;;
+        5) confirm_action "$(wrap_text "$update_node_message" "")" "Update node" update_node prompt_return_to_menu;;
+	6) stop_node action_performed=1;;
+        7) restart_node action_performed=1;;
+	8) node_version action_performed=1;;
+        9) node_info action_performed=1;;
+ 	10) quil_balance action_performed=1;;
+        11) confirm_action "$(wrap_text "$peer_manifest_message" "")" "Peer manifest" peer_manifest prompt_return_to_menu;;
+        12) check_visibility prompt_return_to_menu;;
+	20) confirm_action "$(wrap_text "$test_script_message" "")" "Test Script" test_script prompt_return_to_menu;;
         e) exit ;;
         *) echo "Invalid option, please try again." ;;
     esac
