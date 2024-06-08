@@ -3,7 +3,7 @@
 
 # Step 0: Welcome
 echo "✨ Welcome! This script will update your Quilibrium node when running it as a service. ✨"
-echo "It will run the node directly frm the binary"
+echo "It will run the node directly form the binary"
 echo "It will update your service file without changing your customizations"
 echo ""
 echo "Made with 🔥 by LaMat - https://quilibrium.one"
