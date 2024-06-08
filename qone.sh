@@ -144,13 +144,13 @@ quil_balance() {
 node_logs() {
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
-		read -n 1 -s -r -p "Press any key to continue..."
+        read -n 1 -s -r -p "Press any key to continue..."
         echo ""  # Add an empty line for better readability
     fi
-    echo "⚙️  Displaying your node log...  (CTRL+C to detach)"
+    echo "⚙️  Displaying your node log...  (Press any key to return to the main menu)"
     echo ""
-    sleep 1
-    sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
+    sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat &
+    read -n 1 -s -r  # Wait for any key press to return to the main menu
 }
 
 restart_node() {
