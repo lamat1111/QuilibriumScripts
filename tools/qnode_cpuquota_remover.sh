@@ -55,9 +55,8 @@ else
     echo "ℹ️ No CPUQuota line found in $SERVICE_FILE"
 fi
 
-#===========================
+
 # Remove the SELF_TEST file
-#===========================
 if [ -f "$NODE_PATH/.config/SELF_TEST" ]; then
     echo "🗑️ Removing SELF_TEST file..."
     if rm "$NODE_PATH/.config/SELF_TEST"; then
@@ -71,12 +70,15 @@ else
 fi
 sleep 1  # Add a 1-second delay
 
-#===========================
+
 # Start the ceremonyclient service
-#===========================
 echo "✅ Starting Ceremonyclient Service"
 sleep 2  # Add a 2-second delay
 systemctl daemon-reload
 systemctl enable ceremonyclient
 service ceremonyclient start
 echo "✅ All done!"
+echo "Here is your service file"
+echo =""
+# Display the service file
+cat "$SERVICE_FILE"
