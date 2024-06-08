@@ -102,7 +102,7 @@ fi
 
 # Pull the latest changes
 git pull || { echo "❌ Error: Failed to download the latest changes." >&2; exit 1; }
-git checkout release || { echo "❌ Error: Failed to checkout release." >&2; exit 1; }
+git checkout release-cdn || { echo "❌ Error: Failed to checkout release." >&2; exit 1; }
 
 echo "✅ Downloaded the latest changes successfully."
 
