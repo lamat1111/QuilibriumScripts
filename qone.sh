@@ -235,7 +235,7 @@ confirm_action() {
 
 $1
 
-Do you want to proceed with "$2"? Type Y or N:
+✅ Do you want to proceed with "$2"? Type Y or N:
 EOF
     read -p "> " confirm
     if [[ "$confirm" =~ ^[Yy]$ ]]; then
@@ -268,7 +268,7 @@ wrap_text() {
 # Define messages
 best_providers_message='
 Check out the best server providers for your node
-at https://docs.quilibrium.one/quilibrium-node-setup-guide/best-server-providers
+at ⭐️ https://iri.quest/q-best-providers ⭐️
 
 Avoid using providers that specifically ban crypto and mining.
 '
