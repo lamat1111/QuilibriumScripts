@@ -115,7 +115,7 @@ else
 fi
 
 cd ~/ceremonyclient/
-git checkout release
+git checkout release-cdn
 
 # Set up environment variables (redundant but solves the command go not found error)
 export GOROOT=/usr/local/go
