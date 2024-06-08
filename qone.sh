@@ -108,6 +108,7 @@ update_node() {
 check_visibility() {
     echo "⚙️  Checking node visibility..."
     wget -O - "$CHECK_VISIBILITY_URL" | bash
+    prompt_return_to_menu
 }
 
 node_info() {
