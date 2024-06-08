@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Set sCPU limit
+# Set CPU limit
 CPU_LIMIT_PERCENT=70
 
 # Step 0: Welcome
 echo "✨ Welcome! This script will update your Quilibrium node when running it as a service. ✨"
-echo " It will set your CPU limit automatically to CPU_LIMIT_PERCENT %"
+echo " It will set your CPU limit automatically to $CPU_LIMIT_PERCENT %"
 echo "Made with 🔥 by LaMat - https://quilibrium.one"
 echo "====================================================================================="
 echo ""
