@@ -27,12 +27,16 @@ check_for_updates
 
 # Service file path
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
+
 # User working folder
 USER_HOME=$(eval echo ~$USER)
 
-# Set the version number
-#VERSION=$(cat $NODE_PATH/config/version.go | grep -A 1 "func GetVersion() \[\]byte {" | grep -Eo '0x[0-9a-fA-F]+' | xargs printf "%d.%d.%d")
-VERSION="1.4.18"
+#Node path
+NODE_PATH="$HOME/ceremonyclient/node"
+
+# Version number
+VERSION=$(cat $NODE_PATH/config/version.go | grep -A 1 "func GetVersion() \[\]byte {" | grep -Eo '0x[0-9a-fA-F]+' | xargs printf "%d.%d.%d")
+#VERSION="1.4.19"
 
 # Get the system architecture
 ARCH=$(uname -m)
