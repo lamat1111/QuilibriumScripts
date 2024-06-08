@@ -53,7 +53,7 @@ echo "🔄 Updating the machine..."
 echo "Processing... ⏳"
 sleep 2  # Add a 2-second delay
 sudo apt-get update
-# sudo apt-get upgrade -y
+sudo apt-get upgrade -y
 
 # Step 3: Install required packages
 echo "🔧 Installing useful packages..."
@@ -79,26 +79,12 @@ echo "✅ cpulimit and gawk are installed and up to date."
 
 
 # Step 4: Download and extract Go
-if [[ $(go version) == *"go1.20.1"* || $(go version) == *"go1.20.2"* || $(go version) == *"go1.20.3"* || $(go version) == *"go1.20.4"* ]]; then
-  echo "✅ Correct version of Go is already installed, moving on..."
-else
-  echo "⬇️ Installing the necessary version of Go..."
 
-  # Download the Go tarball
-  wget -4 https://go.dev/dl/go1.20.14.linux-amd64.tar.gz || { echo "❌ Failed to download Go! Exiting..."; exit_message; exit 1; }
-
-  # Remove the existing Go installation if it exists
-  if [ -d "/usr/local/go" ]; then
-    echo "🧹 Removing existing Go installation..."
-    sudo rm -rf /usr/local/go || { echo "❌ Failed to remove existing Go installation! Exiting..."; exit_message; exit 1; }
-  fi
-
-  # Extract the new Go tarball
-  sudo tar -C /usr/local -xzf go1.20.14.linux-amd64.tar.gz || { echo "❌ Failed to extract Go! Exiting..."; exit_message; exit 1; }
-
-  # Clean up the downloaded tarball
-  sudo rm go1.20.14.linux-amd64.tar.gz || { echo "❌ Failed to remove downloaded archive! Exiting..."; exit_message; exit 1; }
-fi
+# Installing Go
+wget https://go.dev/dl/go1.22.4.linux-amd64.tar.gz
+sudo tar -xvf go1.22.4.linux-amd64.tar.gz || { echo "Failed to extract Go! Exiting..."; exit_message; exit 1; }
+sudo mv go /usr/local || { echo "Failed to move go! Exiting..."; exit_message; exit 1; }
+sudo rm go1.22.4.linux-amd64.tar.gz || { echo "Failed to remove downloaded archive! Exiting..."; exit_message; exit 1; }
 
 # Step 5: Set Go environment variables
 echo "🌍 Setting Go environment variables..."
