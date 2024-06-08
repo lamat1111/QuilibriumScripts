@@ -86,27 +86,32 @@ best_providers() {
 }
 
 install_prerequisites() {
-    echo "⚙️  Preparing server with necessary apps and settings..."
+    echo ""
+    echo "⌛️  Preparing server with necessary apps and settings..."
     wget --no-cache -O - "$PREREQUISITES_URL" | bash
 }
 
 install_node() {
-    echo "⚙️  Installing node..."
+    echo ""
+    echo "⌛️  Installing node..."
     wget --no-cache -O - "$NODE_INSTALL_URL" | bash
 }
 
 configure_grpcurl() {
-    echo "⚙️  Setting up gRPCurl..."
+    echo ""
+    echo "⌛️  Setting up gRPCurl..."
     wget --no-cache -O - "$GRPCURL_CONFIG_URL" | bash
 }
 
 update_node() {
-    echo "⚙️  Updating node..."
+    echo ""
+    echo "⌛️  Updating node..."
     wget --no-cache -O - "$UPDATE_URL" | bash
 }
 
 check_visibility() {
-    echo "⚙️  Checking node visibility..."
+    echo ""
+    echo "⌛️  Checking node visibility..."
     wget -O - "$CHECK_VISIBILITY_URL" | bash
     prompt_return_to_menu
 }
@@ -117,7 +122,8 @@ node_info() {
         read -n 1 -s -r -p "Press any key to continue..."
         echo ""  # Add an empty line for better readability
     else
-        echo "⚙️  Displaying node info..."
+        echo ""
+	echo "⌛️  Displaying node info..."
 	echo ""
     	sleep 1
         cd ~/ceremonyclient/node && ./$NODE_BINARY -node-info
@@ -132,7 +138,8 @@ quil_balance() {
         read -n 1 -s -r -p "Press any key to continue..."
         echo ""  # Add an empty line for better readability
     else
-        echo "⚙️  Displaying your QUIL balance..."
+        echo ""
+        echo "⌛️  Displaying your QUIL balance..."
 	echo ""
     	sleep 1
         cd ~/ceremonyclient/node && ./$NODE_BINARY -balance
@@ -147,7 +154,8 @@ node_logs() {
         read -n 1 -s -r -p "Press any key to continue..."
         echo ""  # Add an empty line for better readability
     fi
-    echo "⚙️  Displaying your node log...  (Press CTRL+C to return to the main menu)"
+    echo ""
+    echo "⌛️  Displaying your node log...  (Press CTRL+C to return to the main menu)"
     echo ""
     trap 'echo "Returning to main menu..."; return_to_menu' INT  # Trap CTRL+C to return to main menu
     sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
@@ -164,7 +172,8 @@ restart_node() {
 		read -n 1 -s -r -p "Press any key to continue..."
         echo ""  # Add an empty line for better readability
     fi
-    echo "⚙️  Restarting node service..."
+    echo ""
+    echo "⌛️   Restarting node service..."
     echo ""
     sleep 1
     service ceremonyclient restart
@@ -180,7 +189,8 @@ stop_node() {
 	read -n 1 -s -r -p "Press any key to continue..."
         echo ""  # Add an empty line for better readability
     fi
-    echo "⚙️ Stopping node service..."
+    echo ""
+    echo "⌛️  Stopping node service..."
     echo ""
     sleep 1
     service ceremonyclient stop
@@ -191,7 +201,7 @@ stop_node() {
 }
 
 peer_manifest() {
-    echo "⚙️   Checking peer manifest (Difficulty metric)..."
+    echo "⌛️  Checking peer manifest (Difficulty metric)..."
     wget --no-cache -O - "$PEER_MANIFEST_URL" | bash
 }
 
@@ -201,7 +211,8 @@ node_version() {
 		read -n 1 -s -r -p "Press any key to continue..."
         echo ""  # Add an empty line for better readability
     fi
-    echo "⚙️ Displaying node version..."
+    echo ""
+    echo "⌛️   Displaying node version..."
     echo ""
     sleep 1
     journalctl -u ceremonyclient -r --no-hostname  -n 1 -g "Quilibrium Node" -o cat
@@ -210,7 +221,7 @@ node_version() {
 }
 
 test_script() {
-echo "⚙️ Running test script..."
+echo "⌛️   Running test script..."
     wget --no-cache -O - "$TEST_URL" | bash
 }
 
