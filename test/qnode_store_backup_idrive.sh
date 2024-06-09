@@ -43,31 +43,56 @@ sleep 7  # Add a 7-second delay
 # Checking if iDrive is Downloaded and Installed
 # ==================
 
-# Check if iDrive for Linux is downloaded and installed
-if [ ! -f idriveforlinux.bin ] || ! command -v idriveforlinux.bin >/dev/null 2>&1; then
-    echo "⚠️ iDrive for Linux is not downloaded or installed."
-    echo "Do you want to download and install iDrive for Linux now? (y/n)"
-    read -r CHOICE
-    if [ "$CHOICE" = "y" ]; then
-        # Download iDrive for Linux
-        echo "Downloading iDrive for Linux..."
-        wget https://www.idrivedownloads.com/downloads/linux/download-for-linux/linux-bin/idriveforlinux.bin
-        chmod +x idriveforlinux.bin
-        echo "✅ iDrive for Linux downloaded successfully."
-        sleep 1
-        echo ""
-        
-        # Install iDrive for Linux
+# Function to display error messages and exit
+display_error_idrive() {
+    echo "❌ Error: $1"
+    echo "Try again from the beginning by running:"
+    echo "~/scripts/qnode_store_backup_idrive.sh"
+    exit 1
+}
+
+# Check if iDrive is installed
+if ! command -v idrive >/dev/null 2>&1; then
+    # Check if idriveforlinux.bin is downloaded
+    if [ ! -f idriveforlinux.bin ]; then
+        # Prompt user to download and install iDrive
+        echo "⚠️ iDrive is not installed."
+        echo "Do you want to download and install iDrive for Linux now? (y/n)"
+        read -r CHOICE
+        if [ "$CHOICE" = "y" ]; then
+            # Download iDrive for Linux
+            echo "Downloading iDrive for Linux..."
+            wget https://www.idrivedownloads.com/downloads/linux/download-for-linux/linux-bin/idriveforlinux.bin || display_error_idrive "Failed to download iDrive for Linux."
+            chmod +x idriveforlinux.bin || display_error "Failed to set execute permission for iDrive for Linux."
+            echo "✅ iDrive for Linux downloaded successfully."
+            sleep 1
+            echo ""
+            
+            # Install iDrive for Linux
+            echo "Installing iDrive for Linux..."
+            ./idriveforlinux.bin --install || display_error_idrive "Failed to install iDrive for Linux."
+            echo "✅ iDrive for Linux installed successfully."
+            sleep 1
+            echo ""
+        else
+            echo "Installation of iDrive for Linux cancelled."
+            exit 1
+        fi
+    else
+        # Install iDrive for Linux directly
+        echo "⚠️ iDrive for Linux is downloaded but not installed."
         echo "Installing iDrive for Linux..."
-        chmod a+x idriveforlinux.bin && ./idriveforlinux.bin --install
+        chmod a+x idriveforlinux.bin && ./idriveforlinux.bin --install || display_error_idrive "Failed to install iDrive for Linux."
         echo "✅ iDrive for Linux installed successfully."
         sleep 1
         echo ""
-    else
-        echo "Installation of iDrive for Linux cancelled."
-        exit 1
     fi
+else
+    # iDrive is installed
+    echo "✅ iDrive for Linux is installed."
+    echo ""
 fi
+
 
 # Variables
 IDRIVE_BIN_PATH="/opt/IDriveForLinux/bin/idrive"
