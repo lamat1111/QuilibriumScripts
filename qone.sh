@@ -29,13 +29,13 @@ if ! grep -Fxq "# === qone.sh setup ===" ~/.bashrc; then
         exit 1
     else
         echo "✅ qone-setup.sh executed successfully."
-	sleep 1
+        sleep 1
         # Continue executing the rest of the script here if needed
     fi
-    # Exit after running the setup script
-    exit 0
+else
+    echo "ℹ️ qone.sh setup already present in .bashrc."
+    sleep 1
 fi
-
 
 
 # Function to check for updates on GitHub and download the new version if available
