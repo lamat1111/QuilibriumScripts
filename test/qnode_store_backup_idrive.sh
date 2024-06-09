@@ -71,6 +71,14 @@ display_error_idrive() {
     exit 1
 }
 
+# Function to display error messages and exit
+display_error_idrive() {
+    echo "❌ Error: $1"
+    echo "Try again from the beginning by running:"
+    echo "~/scripts/qnode_store_backup_idrive.sh"
+    exit 1
+}
+
 # Check if iDrive is installed
 if ! command -v idrive >/dev/null 2>&1; then
     # Check if idriveforlinux.bin is downloaded
@@ -90,8 +98,11 @@ if ! command -v idrive >/dev/null 2>&1; then
             
             # Install iDrive for Linux
             echo "Installing iDrive for Linux..."
-            ./idriveforlinux.bin --install || display_error_idrive "❌ Failed to install iDrive for Linux."
-            # echo "✅ iDrive for Linux installed successfully."
+            INSTALL_OUTPUT=$(./idriveforlinux.bin --install 2>&1)
+            if echo "$INSTALL_OUTPUT" | grep -q "Failed to complete installation. Please reinstall IDrive package."; then
+                display_error_idrive "Failed to install iDrive for Linux. Please reinstall IDrive package."
+            fi
+            echo "✅ iDrive for Linux installed successfully."
             sleep 1
             echo ""
         else
@@ -102,7 +113,10 @@ if ! command -v idrive >/dev/null 2>&1; then
         # Install iDrive for Linux directly
         echo "⚠️ iDrive for Linux is downloaded but not installed."
         echo "Installing iDrive for Linux..."
-        chmod a+x idriveforlinux.bin && ./idriveforlinux.bin --install || display_error_idrive "Failed to install iDrive for Linux."
+        INSTALL_OUTPUT=$(./idriveforlinux.bin --install 2>&1)
+        if echo "$INSTALL_OUTPUT" | grep -q "Failed to complete installation. Please reinstall IDrive package."; then
+            display_error_idrive "Failed to install iDrive for Linux. Please reinstall IDrive package."
+        fi
         echo "✅ iDrive for Linux installed successfully."
         sleep 1
         echo ""
@@ -112,6 +126,7 @@ else
     echo "✅ iDrive for Linux is installed."
     echo ""
 fi
+
 
 
 # Variables
