@@ -4,21 +4,43 @@
 check_for_updates() {
     echo "⌛️   Checking for updates..."
     sleep 1
-    latest_version=$(curl -s https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/qone.sh | md5sum | awk '{print $1}')
-    current_version=$(md5sum $0 | awk '{print $1}')
+
+    # URLs for checking updates
+    LATEST_SCRIPT_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/qone.sh"
+    TEMP_FILE="$0.tmp"
+
+    # Fetch the latest and current script versions
+    latest_version=$(curl -s "$LATEST_SCRIPT_URL" | md5sum | awk '{print $1}')
+    current_version=$(md5sum "$0" | awk '{print $1}')
+
+    echo "Latest version: $latest_version"
+    echo "Current version: $current_version"
 
     if [ "$latest_version" != "$current_version" ]; then
         echo "⌛️   A new version is available. Updating..."
-	sleep 1
-        wget -O "$0.tmp" https://github.com/lamat1111/QuilibriumScripts/raw/main/qone.sh
-        chmod +x "$0.tmp"
-        mv -f "$0.tmp" "$0"
-        echo "✅ Update complete. Restarting..."
-	sleep 1
-        exec "$0"
+        sleep 1
+        wget -O "$TEMP_FILE" "$LATEST_SCRIPT_URL"
+
+        # Verify the download succeeded
+        if [ $? -eq 0 ]; then
+            chmod +x "$TEMP_FILE"
+            mv -f "$TEMP_FILE" "$0"
+            if [ $? -eq 0 ]; then
+                echo "✅ Update complete. Restarting..."
+                sleep 1
+                exec "$0"
+            else
+                echo "❌ Failed to replace the script. Check permissions."
+                exit 1
+            fi
+        else
+            echo "❌ Failed to download the latest version. Check your connection."
+            rm -f "$TEMP_FILE"
+            exit 1
+        fi
     else
         echo "✅ You already have the latest version."
-	sleep 1
+        sleep 1
     fi
 }
 
