@@ -45,7 +45,7 @@ check_for_updates() {
 }
 
 # Check for updates
-check_for_updates
+#check_for_updates
 
 # Service file path
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
