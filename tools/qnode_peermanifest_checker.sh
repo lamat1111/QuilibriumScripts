@@ -62,6 +62,7 @@ eval $get_peer_info_command
 # Check for errors
 if [ $? -ne 0 ]; then
     echo "❌ Error: Failed to retrieve peer information. Please make sure your Quilibrium node is running and accessible."
+    echo "You can only retrieve the peer manifest on fresh nodes after 15-30 minutes that the node has been running."
     exit 1
 fi
 
