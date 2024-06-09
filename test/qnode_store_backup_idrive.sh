@@ -23,7 +23,7 @@ cat << "EOF"
     
 
 =============================================================================
-                   ✨ QNODE STORE BACKUP on IDRIVE ✨"
+                   ✨ QNODE STORE BACKUP on IDRIVE ✨
 =============================================================================
 This script will setup an automatic backup of your store folder to IDrive.
 You need an 'IDrive Business' account for this to work.
