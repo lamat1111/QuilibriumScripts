@@ -28,13 +28,13 @@ if ! grep -Fxq "# === qone.sh setup ===" ~/.bashrc; then
         echo "❌ Error: Failed to download and execute qone-setup.sh"
         exit 1
     else
-        echo "✅ qone-setup.sh executed successfully."
+        echo "✅ qone.sh upgraded."
         sleep 1
         # Check if wget is installed
         check_wget
     fi
 else
-    echo "ℹ️ qone.sh setup already present in .bashrc."
+    echo "ℹ️ qone.sh is already upgraded."
     sleep 1
     # Check if wget is installed
     check_wget
