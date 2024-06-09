@@ -16,6 +16,11 @@ check_wget() {
 
 # Function to check for updates on GitHub and download the new version if available
 check_for_updates() {
+    # Check if the script has just restarted after an update
+    if [ "$UPDATED" == "true" ]; then
+        return
+    fi
+
     echo "⌛️   Checking for updates..."
     sleep 1
 
@@ -43,7 +48,7 @@ check_for_updates() {
             mv -f "$0.tmp" "$0"
             echo "✅ Update complete. Restarting..."
             sleep 1
-            exec "$0"  # Restart the script with the updated version
+            UPDATED=true exec "$0"  # Restart the script with the updated version and set UPDATED flag
         else
             echo "❌ Failed to download the latest version. Check your connection."
             rm -f "$0.tmp"
@@ -54,6 +59,10 @@ check_for_updates() {
         sleep 1
     fi
 }
+
+# Run the update check function
+check_for_updates
+
 
 # Check if wget is installed
 check_wget
