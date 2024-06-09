@@ -13,7 +13,7 @@ if ! command -v wget &> /dev/null; then
 fi
 
 # Download the qone.sh script
-wget -O ~/qone.sh https://github.com/lamat1111/QuilibriumScripts/raw/testing/qone.sh
+wget -O ~/qone.sh https://github.com/lamat1111/QuilibriumScripts/raw/main/qone.sh
 if [ $? -ne 0 ]; then
     echo "❌ Error: Failed to download qone.sh script."
     exit 1
@@ -47,7 +47,7 @@ else
     fi
 
     # Download the qone.sh script
-    wget -O ~/qone.sh https://github.com/lamat1111/QuilibriumScripts/raw/testing/qone.sh
+    wget -O ~/qone.sh https://github.com/lamat1111/QuilibriumScripts/raw/main/qone.sh
     if [ $? -ne 0 ]; then
         echo "❌ Error: Failed to download qone.sh script."
         exit 1
