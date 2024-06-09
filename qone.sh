@@ -44,9 +44,6 @@ else
     check_wget
 fi
 
-# Reload .bashrc to apply changes
-source ~/.bashrc
-
 # Function to check for updates on GitHub and download the new version if available
 check_for_updates() {
     # Check if the script has just restarted after an update using a temporary file marker
@@ -479,3 +476,6 @@ while true; do
         read -n 1 -s -r -p "Press any key to continue..."
     fi
 done
+
+# Reload .bashrc to apply changes
+source ~/.bashrc
