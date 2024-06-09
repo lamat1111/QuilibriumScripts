@@ -5,10 +5,9 @@
 cat <<- EOF
 
 =====================================================================================================
-                                  ✨ QUILIBRIUM NODE INSTALLER ✨
-                                         CPU LIMIT $CPU_LIMIT_PERCENT %
+                                ✨ QUILIBRIUM NODE INSTALLER ✨
 =====================================================================================================
-This script will install your node as a service. It will run your node form the binary file.
+This script will install your node as a service. It will run your node from the binary file.
 
 Made with 🔥 by LaMat - https://quilibrium.one
 =====================================================================================================
