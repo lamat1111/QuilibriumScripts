@@ -3,18 +3,47 @@
 # Function to check if wget is installed, and install it if it is not
 check_wget() {
     if ! command -v wget &> /dev/null; then
-        echo "❌ wget is not installed. Installing wget..."
+        echo "❌ wget is not installed."
+	sleep 1
+        echo "⌛️ Installing wget... "
+	sleep 1
         sudo apt-get update && sudo apt-get install -y wget
 
         # Verify that wget was successfully installed
         if ! command -v wget &> /dev/null; then
             echo "❌ Failed to install wget. Please install wget manually and try again."
+	    sleep 1
             exit 1
         fi
     fi
 }
 
-#!/bin/bash
+# Function to check if the qone.sh setup section is present in .bashrc
+if ! grep -Fxq "# === qone.sh setup ===" ~/.bashrc; then
+    # Run the setup script
+    echo "⌛️ Upgrading the qone.sh script... just one minute!"
+    sleep 3
+    echo "ℹ️ Downloading qone_setup.sh..."
+    if ! wget -qO- https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/qone_setup.sh | bash; then
+        echo "❌ Error: Failed to download and execute qone-setup.sh"
+        exit 1
+    else
+        echo "✅ qone.sh upgraded!"
+	echo ""
+	echo "🟢 You can now use 'Q1', 'q1', or 'qone' to launch the Node Quickstart Menu."
+ 	sleep 1
+	echo "🟢 The menu will also load automatically every time you log in."
+	echo ""
+	sleep 5
+        # Check if wget is installed
+        check_wget
+    fi
+else
+    echo "ℹ️ qone.sh is already upgraded."
+    # Check if wget is installed
+    check_wget
+fi
+
 
 # Function to check for updates on GitHub and download the new version if available
 check_for_updates() {
@@ -24,7 +53,6 @@ check_for_updates() {
         return
     fi
     echo "⌛️   Checking for updates..."
-    sleep 1
     # URL for checking updates
     LATEST_SCRIPT_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/qone.sh"
     # Fetch the latest and current script versions
@@ -46,7 +74,6 @@ check_for_updates() {
             mv -f "$0.tmp" "$0"
             touch /tmp/qone_script_updated
             echo "✅ Update complete. Restarting..."
-            sleep 1
             exec "$0"  # Restart the script with the updated version
         else
             echo "❌ Failed to download the latest version. Check your connection."
@@ -55,15 +82,11 @@ check_for_updates() {
         fi
     else
         echo "✅ You already have the latest version."
-        sleep 1
     fi
 }
 
 # Run the update check function
 check_for_updates
-
-# Check if wget is installed
-check_wget
 
 # Service file path
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
@@ -433,19 +456,19 @@ while true; do
     
     case $choice in
     	0) best_providers;;
-        1) confirm_action "$(wrap_text "$prepare_server_message" "")" "Prepare your server" install_prerequisites prompt_return_to_menu;;
-        2) confirm_action "$(wrap_text "$install_node_message" "")" "Install node" install_node prompt_return_to_menu;;
-	3) confirm_action "$(wrap_text "$setup_grpcurl_message" "")" "Set up gRPCurl" configure_grpcurl prompt_return_to_menu;;
+        1) confirm_action "$(wrap_text "$prepare_server_message" "")" "Prepare your server" install_prerequisites;;
+        2) confirm_action "$(wrap_text "$install_node_message" "")" "Install node" install_node;;
+	3) confirm_action "$(wrap_text "$setup_grpcurl_message" "")" "Set up gRPCurl" configure_grpcurl;;
         4) node_logs action_performed=1;;
-        5) confirm_action "$(wrap_text "$update_node_message" "")" "Update node" update_node prompt_return_to_menu;;
+        5) confirm_action "$(wrap_text "$update_node_message" "")" "Update node" update_node;;
 	6) stop_node action_performed=1;;
         7) restart_node action_performed=1;;
 	8) node_version action_performed=1;;
         9) node_info action_performed=1;;
  	10) quil_balance action_performed=1;;
-        11) confirm_action "$(wrap_text "$peer_manifest_message" "")" "Peer manifest" peer_manifest prompt_return_to_menu;;
+        11) confirm_action "$(wrap_text "$peer_manifest_message" "")" "Peer manifest" peer_manifest;;
         12) check_visibility prompt_return_to_menu;;
-	20) confirm_action "$(wrap_text "$test_script_message" "")" "Test Script" test_script prompt_return_to_menu;;
+	20) confirm_action "$(wrap_text "$test_script_message" "")" "Test Script" test_script;;
         e) exit ;;
         *) echo "Invalid option, please try again." ;;
     esac

@@ -106,15 +106,4 @@ if [ $? -ne 0 ]; then
     # Continue execution even if reloading .bashrc fails
 fi
 
-echo "✅ Setup complete!"
-echo "You can now use 'qone', 'q1', or 'Q1' to launch the Node Quickstart Menu."
-echo "The menu will also load automatically every time you log in."
-echo ""
-echo "⌛️ Opening the menu..."
-sleep 3
 
-# Execute qone.sh
-~/qone.sh
-if [ $? -ne 0 ]; then
-    echo "❌ Error: Failed to execute qone.sh. Try to run './qone.sh' manually"
-fi
