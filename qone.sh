@@ -18,9 +18,8 @@ check_wget() {
 
 # Function to check for updates on GitHub and download the new version if available
 check_for_updates() {
-    if [ -f "/tmp/qone_updated" ]; then
-        #echo "✅ Update check skipped to avoid redundancy."
-        rm -f "/tmp/qone_updated"  # Clean up the flag file
+    # Check if the script has just restarted after an update
+    if [ "$UPDATED" == "true" ]; then
         return
     fi
 
@@ -51,8 +50,7 @@ check_for_updates() {
             mv -f "$0.tmp" "$0"
             echo "✅ Update complete. Restarting..."
             sleep 1
-            touch /tmp/qone_updated  # Create the flag file
-            exec "$0"  # Restart the script with the updated version
+            UPDATED=true exec "$0"  # Restart the script with the updated version and set UPDATED flag
         else
             echo "❌ Failed to download the latest version. Check your connection."
             rm -f "$0.tmp"
@@ -66,6 +64,7 @@ check_for_updates() {
 
 # Run the update check function
 check_for_updates
+
 
 # Check if wget is installed
 check_wget
