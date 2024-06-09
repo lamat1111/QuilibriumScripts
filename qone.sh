@@ -1,23 +1,5 @@
 #!/bin/bash
 
-# Function to check if wget is installed, and install it if it is not
-check_wget() {
-    if ! command -v wget &> /dev/null; then
-        echo "❌ wget is not installed."
-	sleep 1
-        echo "⌛️ Installing wget... "
-	sleep 1
-        sudo apt-get update && sudo apt-get install -y wget
-
-        # Verify that wget was successfully installed
-        if ! command -v wget &> /dev/null; then
-            echo "❌ Failed to install wget. Please install wget manually and try again."
-	    sleep 1
-            exit 1
-        fi
-    fi
-}
-
 # Check if the qone.sh setup section is present in .bashrc
 if ! grep -Fxq "# === qone.sh setup ===" ~/.bashrc; then
     # Run the setup script
@@ -36,6 +18,24 @@ else
     echo "ℹ️ qone.sh setup already present in .bashrc."
     sleep 1
 fi
+
+# Function to check if wget is installed, and install it if it is not
+check_wget() {
+    if ! command -v wget &> /dev/null; then
+        echo "❌ wget is not installed."
+	sleep 1
+        echo "⌛️ Installing wget... "
+	sleep 1
+        sudo apt-get update && sudo apt-get install -y wget
+
+        # Verify that wget was successfully installed
+        if ! command -v wget &> /dev/null; then
+            echo "❌ Failed to install wget. Please install wget manually and try again."
+	    sleep 1
+            exit 1
+        fi
+    fi
+}
 
 
 # Function to check for updates on GitHub and download the new version if available
