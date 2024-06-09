@@ -34,8 +34,6 @@ if ! grep -Fxq "# === qone.sh setup ===" ~/.bashrc; then
  	sleep 1
 	echo "🟢 The menu will also load automatically every time you log in."
 	echo ""
-        # Reload .bashrc to apply changes
-	source ~/.bashrc
 	sleep 5
         # Check if wget is installed
         check_wget
@@ -477,6 +475,7 @@ while true; do
     if [ $action_performed -eq 1 ]; then
         read -n 1 -s -r -p "Press any key to continue..."
     fi
-
+        # Reload .bashrc to apply changes
+	source ~/.bashrc
 done
 
