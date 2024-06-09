@@ -1,39 +1,74 @@
 #!/bin/bash
 
-cat << "EOF"             
-                            QQQQQQQQQ       1111111   
-                          QQ:::::::::QQ    1::::::1   
-                        QQ:::::::::::::QQ 1:::::::1   
-                       Q:::::::QQQ:::::::Q111:::::1   
-                       Q::::::O   Q::::::Q   1::::1   
-                       Q:::::O     Q:::::Q   1::::1   
-                       Q:::::O     Q:::::Q   1::::1   
-                       Q:::::O     Q:::::Q   1::::l   
-                       Q:::::O     Q:::::Q   1::::l   
-                       Q:::::O     Q:::::Q   1::::l   
-                       Q:::::O  QQQQ:::::Q   1::::l   
-                       Q::::::O Q::::::::Q   1::::l   
-                       Q:::::::QQ::::::::Q111::::::111
-                        QQ::::::::::::::Q 1::::::::::1
-                          QQ:::::::::::Q  1::::::::::1
-                            QQQQQQQQ::::QQ111111111111
-                                    Q:::::Q           
-                                     QQQQQQ                                                                                                                                  
+cat << "EOF"
+
+                      QQQQQQQQQ       1111111   
+                    QQ:::::::::QQ    1::::::1   
+                  QQ:::::::::::::QQ 1:::::::1   
+                 Q:::::::QQQ:::::::Q111:::::1   
+                 Q::::::O   Q::::::Q   1::::1   
+                 Q:::::O     Q:::::Q   1::::1   
+                 Q:::::O     Q:::::Q   1::::1   
+                 Q:::::O     Q:::::Q   1::::l   
+                 Q:::::O     Q:::::Q   1::::l   
+                 Q:::::O     Q:::::Q   1::::l   
+                 Q:::::O  QQQQ:::::Q   1::::l   
+                 Q::::::O Q::::::::Q   1::::l   
+                 Q:::::::QQ::::::::Q111::::::111
+                  QQ::::::::::::::Q 1::::::::::1
+                    QQ:::::::::::Q  1::::::::::1
+                      QQQQQQQQ::::QQ111111111111
+                              Q:::::Q           
+                               QQQQQQ  QUILIBRIUM.ONE                                                                                                                                  
+    
+
+=============================================================================
+                   ✨ QNODE STORE BACKUP on IDRIVE ✨"
+=============================================================================
+This script will setup an automatic backup of your store folder to IDrive.
+You need an 'IDrive Business' account for this to work.
+Cost: $69 per year for 250 GB of space and unlimited servers.
+
+⭐️ Signup for IDrive here: https://quilibrium.one/idrive
+
+Made with 🔥 by LaMat - https://quilibrium.one
+=============================================================================
+Processing... ⏳
+
 EOF
-echo ""
-echo "==========================================================================="
-echo "                   ✨ QNODE STORE BACKUP on IDRIVE ✨"
-echo "==========================================================================="
-echo "This script will setup an atuomatic backup of your store folder to IDrive"
-echo "You need an 'IDrive Business' account for this to work - $65 per year"
-eco "
-echo "Follow the guide at https://docs.quilibrium.one"
-echo ""
-echo "Made with 🔥 by LaMat - https://quilibrium.one"
-echo "==========================================================================="
-echo ""
-echo "Processing... ⏳"
+
 sleep 7  # Add a 7-second delay
+
+# ==================
+# Checking if iDrive is Installed
+# ==================
+
+# ℹ️ Check if iDrive for Linux is installed
+echo "Checking if iDrive for Linux is installed..."
+sleep 1
+
+if ! command -v idrive >/dev/null 2>&1; then
+    cat <<EOF
+⚠️ iDrive for Linux is not installed.
+You need the iDrive package before beng able to run this script.
+
+To install iDrive for Linux, follow these instructions:
+
+1. Download the latest IDrive for Linux package to your Linux machine: 
+   https://quilibrium.one/idrive_download
+
+2. Copy the downloaded IDrive for Linux package to your root folder
+
+3. Install iDrive for Linux:
+   chmod a+x idriveforlinux.bin && ./idriveforlinux.bin --install
+
+EOF
+    exit 1
+else
+    echo "✅ iDrive for Linux is installed."
+    echo ""
+fi
+
 
 # Variables
 IDRIVE_BIN_PATH="/opt/IDriveForLinux/bin/idrive"
