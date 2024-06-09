@@ -447,19 +447,19 @@ while true; do
     
     case $choice in
     	0) best_providers;;
-        1) confirm_action "$(wrap_text "$prepare_server_message" "")" "Prepare your server" install_prerequisites prompt_return_to_menu;;
-        2) confirm_action "$(wrap_text "$install_node_message" "")" "Install node" install_node prompt_return_to_menu;;
-	3) confirm_action "$(wrap_text "$setup_grpcurl_message" "")" "Set up gRPCurl" configure_grpcurl prompt_return_to_menu;;
+        1) confirm_action "$(wrap_text "$prepare_server_message" "")" "Prepare your server" install_prerequisites;;
+        2) confirm_action "$(wrap_text "$install_node_message" "")" "Install node" install_node;;
+	3) confirm_action "$(wrap_text "$setup_grpcurl_message" "")" "Set up gRPCurl" configure_grpcurl;;
         4) node_logs action_performed=1;;
-        5) confirm_action "$(wrap_text "$update_node_message" "")" "Update node" update_node prompt_return_to_menu;;
+        5) confirm_action "$(wrap_text "$update_node_message" "")" "Update node" update_node;;
 	6) stop_node action_performed=1;;
         7) restart_node action_performed=1;;
 	8) node_version action_performed=1;;
         9) node_info action_performed=1;;
  	10) quil_balance action_performed=1;;
-        11) confirm_action "$(wrap_text "$peer_manifest_message" "")" "Peer manifest" peer_manifest prompt_return_to_menu;;
+        11) confirm_action "$(wrap_text "$peer_manifest_message" "")" "Peer manifest" peer_manifest;;
         12) check_visibility prompt_return_to_menu;;
-	20) confirm_action "$(wrap_text "$test_script_message" "")" "Test Script" test_script prompt_return_to_menu;;
+	20) confirm_action "$(wrap_text "$test_script_message" "")" "Test Script" test_script;;
         e) exit ;;
         *) echo "Invalid option, please try again." ;;
     esac
