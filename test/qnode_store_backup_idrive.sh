@@ -1,5 +1,40 @@
 #!/bin/bash
 
+cat << "EOF"             
+                            QQQQQQQQQ       1111111   
+                          QQ:::::::::QQ    1::::::1   
+                        QQ:::::::::::::QQ 1:::::::1   
+                       Q:::::::QQQ:::::::Q111:::::1   
+                       Q::::::O   Q::::::Q   1::::1   
+                       Q:::::O     Q:::::Q   1::::1   
+                       Q:::::O     Q:::::Q   1::::1   
+                       Q:::::O     Q:::::Q   1::::l   
+                       Q:::::O     Q:::::Q   1::::l   
+                       Q:::::O     Q:::::Q   1::::l   
+                       Q:::::O  QQQQ:::::Q   1::::l   
+                       Q::::::O Q::::::::Q   1::::l   
+                       Q:::::::QQ::::::::Q111::::::111
+                        QQ::::::::::::::Q 1::::::::::1
+                          QQ:::::::::::Q  1::::::::::1
+                            QQQQQQQQ::::QQ111111111111
+                                    Q:::::Q           
+                                     QQQQQQ                                                                                                                                  
+EOF
+echo ""
+echo "==========================================================================="
+echo "                   ✨ QNODE STORE BACKUP on IDRIVE ✨"
+echo "==========================================================================="
+echo "This script will setup an atuomatic backup of your store folder to IDrive"
+echo "You need an 'IDrive Business' account for this to work - $65 per year"
+eco "
+echo "Follow the guide at https://docs.quilibrium.one"
+echo ""
+echo "Made with 🔥 by LaMat - https://quilibrium.one"
+echo "==========================================================================="
+echo ""
+echo "Processing... ⏳"
+sleep 7  # Add a 7-second delay
+
 # Variables
 IDRIVE_BIN_PATH="/opt/IDriveForLinux/bin/idrive"
 SOURCE_PATH="$HOME/ceremonyclient/node/.config/store"
