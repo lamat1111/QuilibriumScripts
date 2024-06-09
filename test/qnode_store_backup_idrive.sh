@@ -40,35 +40,34 @@ EOF
 sleep 7  # Add a 7-second delay
 
 # ==================
-# Checking if iDrive is Installed
+# Checking if iDrive is Downloaded and Installed
 # ==================
 
-# ℹ️ Check if iDrive for Linux is installed
-echo "Checking if iDrive for Linux is installed..."
-sleep 1
-
-if ! command -v idrive >/dev/null 2>&1; then
-    cat <<EOF
-⚠️ iDrive for Linux is not installed.
-You need the iDrive package before beng able to run this script.
-
-To install iDrive for Linux, follow these instructions:
-
-1. Download the latest IDrive for Linux package to your Linux machine: 
-   https://quilibrium.one/idrive_download
-
-2. Copy the downloaded IDrive for Linux package to your root folder
-
-3. Install iDrive for Linux:
-   chmod a+x idriveforlinux.bin && ./idriveforlinux.bin --install
-
-EOF
-    exit 1
-else
-    echo "✅ iDrive for Linux is installed."
-    echo ""
+# Check if iDrive for Linux is downloaded and installed
+if [ ! -f idriveforlinux.bin ] || ! command -v idriveforlinux.bin >/dev/null 2>&1; then
+    echo "⚠️ iDrive for Linux is not downloaded or installed."
+    echo "Do you want to download and install iDrive for Linux now? (y/n)"
+    read -r CHOICE
+    if [ "$CHOICE" = "y" ]; then
+        # Download iDrive for Linux
+        echo "Downloading iDrive for Linux..."
+        wget https://www.idrivedownloads.com/downloads/linux/download-for-linux/linux-bin/idriveforlinux.bin
+        chmod +x idriveforlinux.bin
+        echo "✅ iDrive for Linux downloaded successfully."
+        sleep 1
+        echo ""
+        
+        # Install iDrive for Linux
+        echo "Installing iDrive for Linux..."
+        chmod a+x idriveforlinux.bin && ./idriveforlinux.bin --install
+        echo "✅ iDrive for Linux installed successfully."
+        sleep 1
+        echo ""
+    else
+        echo "Installation of iDrive for Linux cancelled."
+        exit 1
+    fi
 fi
-
 
 # Variables
 IDRIVE_BIN_PATH="/opt/IDriveForLinux/bin/idrive"
@@ -151,6 +150,15 @@ if [ $? -eq 0 ]; then
 
   schedule_backup
   echo "✅ Setup complete to back up $SOURCE_PATH"
+  echo ""
+  echo "Your store folder will be backed up every $BACKUP_INTERVAL hours automatically."
+  echo "Each backup is incremental, so only the new files will be backed up."
+  echo "If you delete the store folder fomr your server, the backup on iDrive will remaion intact."
 else
   echo "❌ Failed to log in to IDrive."
 fi
+echo ""
+echo "If you want to test the backup right now, you can run the below command:"
+echo "If you do, you will have to be patient because the first backup may take time."
+echo "Test command:"
+echo "$IDRIVE_BIN_PATH/idrive -b --src $SOURCE_PATH --dst $TARGET_BASE_PATH"
