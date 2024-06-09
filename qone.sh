@@ -1,24 +1,5 @@
 #!/bin/bash
 
-# Check if the qone.sh setup section is present in .bashrc
-if ! grep -Fxq "# === qone.sh setup ===" ~/.bashrc; then
-    # Run the setup script
-    echo "⌛️ Upgrading the qone.sh script... just one minute!"
-    sleep 3
-    echo "ℹ️ Downloading qone_setup.sh..."
-    if ! wget -qO- https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/testing/qone_setup.sh | bash; then
-        echo "❌ Error: Failed to download and execute qone-setup.sh"
-        exit 1
-    else
-        echo "✅ qone-setup.sh executed successfully."
-        sleep 1
-        # Continue executing the rest of the script here if needed
-    fi
-else
-    echo "ℹ️ qone.sh setup already present in .bashrc."
-    sleep 1
-fi
-
 # Function to check if wget is installed, and install it if it is not
 check_wget() {
     if ! command -v wget &> /dev/null; then
@@ -36,6 +17,28 @@ check_wget() {
         fi
     fi
 }
+
+# Function to check if the qone.sh setup section is present in .bashrc
+if ! grep -Fxq "# === qone.sh setup ===" ~/.bashrc; then
+    # Run the setup script
+    echo "⌛️ Upgrading the qone.sh script... just one minute!"
+    sleep 3
+    echo "ℹ️ Downloading qone_setup.sh..."
+    if ! wget -qO- https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/testing/qone_setup.sh | bash; then
+        echo "❌ Error: Failed to download and execute qone-setup.sh"
+        exit 1
+    else
+        echo "✅ qone-setup.sh executed successfully."
+        sleep 1
+        # Check if wget is installed
+        check_wget
+    fi
+else
+    echo "ℹ️ qone.sh setup already present in .bashrc."
+    sleep 1
+    # Check if wget is installed
+    check_wget
+fi
 
 
 # Function to check for updates on GitHub and download the new version if available
@@ -83,9 +86,6 @@ check_for_updates() {
 
 # Run the update check function
 check_for_updates
-
-# Check if wget is installed
-check_wget
 
 # Service file path
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
