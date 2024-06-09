@@ -103,7 +103,7 @@ schedule_backup() {
   fi
 
   # Prompt user for backup interval in hours
-  echo "ℹ️ Enter the desired backup interval in hours (e.g., 1, 3, 24):"
+  echo "ℹ️ Enter the desired backup interval in hours (e.g., 1, 2, 3... 24):"
   read -r BACKUP_INTERVAL
 
   # Validate input and set the cron expression
