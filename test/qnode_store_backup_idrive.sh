@@ -39,6 +39,26 @@ EOF
 
 sleep 7  # Add a 7-second delay
 
+# Function to check for newer script version and update
+check_for_updates() {
+    SCRIPT_CHECKSUM=$(md5sum ~/scripts/qnode_store_backup_idrive.sh | awk '{ print $1 }')
+    LATEST_CHECKSUM=$(curl -s https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_store_backup_idrive.sh | md5sum | awk '{ print $1 }')
+
+    if [ "$SCRIPT_CHECKSUM" != "$LATEST_CHECKSUM" ]; then
+        echo "Updating the script to the latest version..."
+        sleep 1
+        curl -o ~/scripts/qnode_store_backup_idrive.sh https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_store_backup_idrive.sh || display_error "❌ Failed to download the newer version of the script."
+        chmod +x ~/scripts/qnode_store_backup_idrive.sh || display_error "❌ Failed to set execute permission for the updated script."
+        echo "✅ Script updated successfully."
+        sleep 1
+        echo "Please run the script again."
+        exit 0
+    fi
+}
+
+# Check for updates and update if available
+#check_for_updates
+
 # ==================
 # Checking if iDrive is Downloaded and Installed
 # ==================
