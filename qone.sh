@@ -28,14 +28,17 @@ if ! grep -Fxq "# === qone.sh setup ===" ~/.bashrc; then
         echo "❌ Error: Failed to download and execute qone-setup.sh"
         exit 1
     else
-        echo "✅ qone.sh upgraded."
-        sleep 1
+        echo "✅ qone.sh upgraded!"
+	echo ""
+	echo "You can now use 'Q1', 'q1', or 'qone' to launch the Node Quickstart Menu."
+	echo "The menu will also load automatically every time you log in."
+	echo ""
+	sleep 5
         # Check if wget is installed
         check_wget
     fi
 else
     echo "ℹ️ qone.sh is already upgraded."
-    sleep 1
     # Check if wget is installed
     check_wget
 fi
@@ -49,7 +52,6 @@ check_for_updates() {
         return
     fi
     echo "⌛️   Checking for updates..."
-    sleep 1
     # URL for checking updates
     LATEST_SCRIPT_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/testing/qone.sh"
     # Fetch the latest and current script versions
@@ -71,7 +73,6 @@ check_for_updates() {
             mv -f "$0.tmp" "$0"
             touch /tmp/qone_script_updated
             echo "✅ Update complete. Restarting..."
-            sleep 1
             exec "$0"  # Restart the script with the updated version
         else
             echo "❌ Failed to download the latest version. Check your connection."
@@ -80,7 +81,6 @@ check_for_updates() {
         fi
     else
         echo "✅ You already have the latest version."
-        sleep 1
     fi
 }
 
