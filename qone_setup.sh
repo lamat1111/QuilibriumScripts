@@ -36,7 +36,7 @@ if grep -q "# === [^=]*setup ===" ~/.bashrc; then
     bashrc_section=$(cat << 'EOF'
 # === qone.sh setup ===
 # The following lines are added to create aliases for qone.sh
-alias qone='~/qone.sh'
+# alias qone='~/qone.sh' #this runs .qone on login
 alias q1='~/qone.sh'
 alias Q1='~/qone.sh'
 # === end qone.sh setup ===
