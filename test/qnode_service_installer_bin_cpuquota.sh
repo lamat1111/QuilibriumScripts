@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set CPU limit percent
-CPU_LIMIT_PERCENT=80
+#CPU_LIMIT_PERCENT=80
 
 cat <<- EOF
 
