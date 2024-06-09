@@ -23,7 +23,7 @@ if ! grep -Fxq "# === qone.sh setup ===" ~/.bashrc; then
     # Run the setup script
     echo "⌛️ Upgrading the qone.sh script... just one minute!"
     sleep 3
-    bash <(wget -qO- https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/qone-setup.sh)
+    bash <(wget -qO- https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/testing/qone-setup.sh)
     # Exit after running the setup script
     exit 0
 fi
@@ -40,7 +40,7 @@ check_for_updates() {
     echo "⌛️   Checking for updates..."
     sleep 1
     # URL for checking updates
-    LATEST_SCRIPT_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/qone.sh"
+    LATEST_SCRIPT_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/testing/qone.sh"
     # Fetch the latest and current script versions
     latest_version=$(wget -qO- "$LATEST_SCRIPT_URL" | md5sum | awk '{print $1}')
     current_version=$(md5sum "$0" | awk '{print $1}')
