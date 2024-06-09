@@ -30,8 +30,9 @@ if ! grep -Fxq "# === qone.sh setup ===" ~/.bashrc; then
     else
         echo "✅ qone.sh upgraded!"
 	echo ""
-	echo "You can now use 'Q1', 'q1', or 'qone' to launch the Node Quickstart Menu."
-	echo "The menu will also load automatically every time you log in."
+	echo "🟢 You can now use 'Q1', 'q1', or 'qone' to launch the Node Quickstart Menu."
+ 	sleep 1
+	echo "🟢 The menu will also load automatically every time you log in."
 	echo ""
 	sleep 5
         # Check if wget is installed
