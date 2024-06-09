@@ -90,8 +90,8 @@ if ! command -v idrive >/dev/null 2>&1; then
             
             # Install iDrive for Linux
             echo "Installing iDrive for Linux..."
-            ./idriveforlinux.bin --install || display_error_idrive "Failed to install iDrive for Linux."
-            echo "✅ iDrive for Linux installed successfully."
+            ./idriveforlinux.bin --install || display_error_idrive "❌ Failed to install iDrive for Linux."
+            # echo "✅ iDrive for Linux installed successfully."
             sleep 1
             echo ""
         else
@@ -173,9 +173,9 @@ schedule_backup() {
 # ==================
 # Main script execution
 # ==================
-echo "⚙️ Log in to your IDrive account..."
-sleep 1
-$IDRIVE_BIN_PATH/idrive -i
+#echo "⚙️ Log in to your IDrive account..."
+#sleep 1
+#$IDRIVE_BIN_PATH/idrive -i
 
 if [ $? -eq 0 ]; then
   # Prompt user for target folder name and validate
@@ -195,15 +195,18 @@ if [ $? -eq 0 ]; then
 
   schedule_backup
   echo "✅ Setup complete to back up $SOURCE_PATH"
+  sleep 1
   echo ""
   echo "Your store folder will be backed up every $BACKUP_INTERVAL hours automatically."
+  sleep 1
   echo "Each backup is incremental, so only the new files will be backed up."
-  echo "If you delete the store folder fomr your server, the backup on iDrive will remaion intact."
+  echo "If you delete the store folder from your server, the backup on iDrive will remaion intact."
+  sleep 1
+  echo ""
+  echo "If you want to test the backup right now, you can run the below command."
+  echo "If you do, you will have to be patient because the first backup may take time."
+  echo "Test command:"
+  echo "$IDRIVE_BIN_PATH/idrive -b --src $SOURCE_PATH --dst $TARGET_BASE_PATH"
 else
-  echo "❌ Failed to log in to IDrive."
+  display_error_idrive "❌ Failed to complete back up process."
 fi
-echo ""
-echo "If you want to test the backup right now, you can run the below command:"
-echo "If you do, you will have to be patient because the first backup may take time."
-echo "Test command:"
-echo "$IDRIVE_BIN_PATH/idrive -b --src $SOURCE_PATH --dst $TARGET_BASE_PATH"
