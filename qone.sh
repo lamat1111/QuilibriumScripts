@@ -23,12 +23,17 @@ if ! grep -Fxq "# === qone.sh setup ===" ~/.bashrc; then
     # Run the setup script
     echo "⌛️ Upgrading the qone.sh script... just one minute!"
     sleep 3
-    bash <(wget -qO- https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/testing/qone-setup.sh)
+    echo "ℹ️ Downloading qone-setup.sh..."
+    if ! wget -qO- https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/qone-setup.sh | bash; then
+        echo "❌ Error: Failed to download and execute qone-setup.sh"
+        exit 1
+    else
+        echo "✅ qone-setup.sh executed successfully."
+    fi
     # Exit after running the setup script
     exit 0
 fi
 
-#!/bin/bash
 
 # Function to check for updates on GitHub and download the new version if available
 check_for_updates() {
