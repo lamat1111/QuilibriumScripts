@@ -92,17 +92,14 @@ if ! command -v idrive >/dev/null 2>&1; then
             echo "Downloading iDrive for Linux..."
             wget https://www.idrivedownloads.com/downloads/linux/download-for-linux/linux-bin/idriveforlinux.bin || display_error_idrive "Failed to download iDrive for Linux."
             chmod +x idriveforlinux.bin || display_error "Failed to set execute permission for iDrive for Linux."
-            echo "✅ iDrive for Linux downloaded successfully."
+            #echo "✅ iDrive for Linux downloaded successfully."
             sleep 1
             echo ""
             
             # Install iDrive for Linux
             echo "Installing iDrive for Linux..."
-            INSTALL_OUTPUT=$(./idriveforlinux.bin --install 2>&1)
-            if echo "$INSTALL_OUTPUT" | grep -q "Failed to complete installation. Please reinstall IDrive package."; then
-                display_error_idrive "Failed to install iDrive for Linux. Please reinstall IDrive package."
-            fi
-            echo "✅ iDrive for Linux installed successfully."
+            ./idriveforlinux.bin --install || display_error_idrive "❌ Failed to install iDrive for Linux."
+            # echo "✅ iDrive for Linux installed successfully."
             sleep 1
             echo ""
         else
@@ -113,11 +110,8 @@ if ! command -v idrive >/dev/null 2>&1; then
         # Install iDrive for Linux directly
         echo "⚠️ iDrive for Linux is downloaded but not installed."
         echo "Installing iDrive for Linux..."
-        INSTALL_OUTPUT=$(./idriveforlinux.bin --install 2>&1)
-        if echo "$INSTALL_OUTPUT" | grep -q "Failed to complete installation. Please reinstall IDrive package."; then
-            display_error_idrive "Failed to install iDrive for Linux. Please reinstall IDrive package."
-        fi
-        echo "✅ iDrive for Linux installed successfully."
+        chmod a+x idriveforlinux.bin && ./idriveforlinux.bin --install || display_error_idrive "Failed to install iDrive for Linux."
+        #echo "✅ iDrive for Linux installed successfully."
         sleep 1
         echo ""
     fi
