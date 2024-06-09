@@ -111,7 +111,7 @@ echo "You can now use 'qone', 'q1', or 'Q1' to launch the Node Quickstart Menu."
 echo "The menu will also load automatically every time you log in."
 echo ""
 echo "⌛️ Opening the menu..."
-sleep 3
+sleep 5
 
 # Execute qone.sh
 ~/qone.sh
