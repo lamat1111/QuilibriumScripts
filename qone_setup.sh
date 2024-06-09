@@ -27,21 +27,38 @@ if [ $? -ne 0 ]; then
     # Continue execution even if chmod fails
 fi
 
-# Define the section to add in .bashrc
-bashrc_section=$(cat << 'EOF'
+# Check if there's already a section for another script in .bashrc
+if grep -q "# === [^=]*setup ===" ~/.bashrc; then
+    echo "⚠️ Warning: Another script seems to be already set up to run on login."
+    echo "To avoid conflicts, qone.sh will not be executed on login, but aliases will be set up."
 
+    # Define the section to add in .bashrc without the execution line
+    bashrc_section=$(cat << 'EOF'
 # === qone.sh setup ===
-# The following lines are added to run qone.sh on login and create aliases for qone.sh
-~/qone.sh
+# The following lines are added to create aliases for qone.sh
 alias qone='~/qone.sh'
 alias q1='~/qone.sh'
 alias Q1='~/qone.sh'
 # === end qone.sh setup ===
 EOF
 )
+else
+    # Define the section to add in .bashrc with the execution line
+    bashrc_section=$(cat << 'EOF'
+# === qone.sh setup ===
+# The following lines are added to run qone.sh on login and create aliases for qone.sh
+~/qone.sh #this runs .qone on login
+alias qone='~/qone.sh'
+alias q1='~/qone.sh'
+alias Q1='~/qone.sh'
+# === end qone.sh setup ===
+EOF
+)
+fi
 
-# Add the section to the end of .bashrc if not already present
+# Check if the section is already present in .bashrc
 if ! grep -Fxq "# === qone.sh setup ===" ~/.bashrc; then
+    # Add the section to the end of .bashrc if not already present
     echo "$bashrc_section" >> ~/.bashrc
     if [ $? -ne 0 ]; then
         echo "❌ Error: Failed to add section to .bashrc. No worries, this is optional."
@@ -59,7 +76,7 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "✅ Setup complete!"
-echo "You can now use 'qone', 'q1', or 'Q1' to launch the Node Quickstart Menu"
+echo "You can now use 'qone', 'q1', or 'Q1' to launch the Node Quickstart Menu."
 echo "The menu will also load automatically every time you log in."
 echo ""
 echo "⌛️ Opening the menu..."
