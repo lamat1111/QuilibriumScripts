@@ -110,20 +110,8 @@ echo "✅ Setup complete!"
 echo "You can now use 'Q1', 'q1', or 'qone' to launch the Node Quickstart Menu."
 echo "The menu will also load automatically every time you log in."
 echo ""
-echo "🟢 To open the menu, type 'qone' and ENTER 🟢"
-
-# Check if qone.sh is already running
-if pgrep -f "qone.sh" >/dev/null; then
-    echo "⚠️ qone.sh is already running."
-else
-    echo "⌛️ Opening the menu..."
-    sleep 5
-    # Execute qone.sh
-    ~/qone.sh
-    if [ $? -ne 0 ]; then
-        echo "❌ Error: Failed to execute qone.sh. Try to run './qone.sh' manually"
-    fi
-fi
+#echo "🟢 To open the menu, type 'qone' and ENTER 🟢"
+sleep 2
 
 #echo "⌛️ Opening the menu..."
 #sleep 5
