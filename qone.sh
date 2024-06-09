@@ -44,6 +44,8 @@ else
     check_wget
 fi
 
+# Reload .bashrc to apply changes
+source ~/.bashrc
 
 # Function to check for updates on GitHub and download the new version if available
 check_for_updates() {
