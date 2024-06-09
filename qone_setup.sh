@@ -106,10 +106,4 @@ if [ $? -ne 0 ]; then
     # Continue execution even if reloading .bashrc fails
 fi
 
-echo "✅ Setup complete!"
-echo "You can now use 'Q1', 'q1', or 'qone' to launch the Node Quickstart Menu."
-echo "The menu will also load automatically every time you log in."
-echo ""
-sleep 2
-
 
