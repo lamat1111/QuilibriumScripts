@@ -18,39 +18,36 @@ check_wget() {
 
 # Function to check for updates on GitHub and download the new version if available
 check_for_updates() {
-    # Check if the script has just restarted after an update
-    if [ "$UPDATED" == "true" ]; then
+    # Check if the script has just restarted after an update using a temporary file marker
+    if [ -f /tmp/qone_script_updated ]; then
+        rm /tmp/qone_script_updated
         return
     fi
-
     echo "⌛️   Checking for updates..."
     sleep 1
-
     # URL for checking updates
     LATEST_SCRIPT_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/qone.sh"
-
     # Fetch the latest and current script versions
     latest_version=$(wget -qO- "$LATEST_SCRIPT_URL" | md5sum | awk '{print $1}')
     current_version=$(md5sum "$0" | awk '{print $1}')
-
     echo "Latest version: $latest_version"
     echo "Current version: $current_version"
-
     # Check if the latest version differs from the current one
     if [ "$latest_version" != "$current_version" ]; then
         echo "⌛️   A new version is available. Updating..."
         sleep 1
-        
+
         # Download the latest version
         wget -q -O "$0.tmp" "$LATEST_SCRIPT_URL"
-        
+
         # Verify the download succeeded
         if [ $? -eq 0 ]; then
             chmod +x "$0.tmp"
             mv -f "$0.tmp" "$0"
+            touch /tmp/qone_script_updated
             echo "✅ Update complete. Restarting..."
             sleep 1
-            UPDATED=true exec "$0"  # Restart the script with the updated version and set UPDATED flag
+            exec "$0"  # Restart the script with the updated version
         else
             echo "❌ Failed to download the latest version. Check your connection."
             rm -f "$0.tmp"
@@ -65,10 +62,8 @@ check_for_updates() {
 # Run the update check function
 check_for_updates
 
-
 # Check if wget is installed
 check_wget
-
 
 # Service file path
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
