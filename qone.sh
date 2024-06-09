@@ -125,24 +125,28 @@ install_prerequisites() {
     echo ""
     echo "⌛️  Preparing server with necessary apps and settings..."
     wget --no-cache -O - "$PREREQUISITES_URL" | bash
+    prompt_return_to_menu
 }
 
 install_node() {
     echo ""
     echo "⌛️  Installing node..."
     wget --no-cache -O - "$NODE_INSTALL_URL" | bash
+    prompt_return_to_menu
 }
 
 configure_grpcurl() {
     echo ""
     echo "⌛️  Setting up gRPCurl..."
     wget --no-cache -O - "$GRPCURL_CONFIG_URL" | bash
+    prompt_return_to_menu
 }
 
 update_node() {
     echo ""
     echo "⌛️  Updating node..."
     wget --no-cache -O - "$UPDATE_URL" | bash
+    prompt_return_to_menu
 }
 
 check_visibility() {
@@ -239,6 +243,7 @@ stop_node() {
 peer_manifest() {
     echo "⌛️  Checking peer manifest (Difficulty metric)..."
     wget --no-cache -O - "$PEER_MANIFEST_URL" | bash
+    prompt_return_to_menu
 }
 
 node_version() {
