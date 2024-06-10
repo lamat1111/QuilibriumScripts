@@ -59,7 +59,7 @@ check_for_updates() {
 }
 
 # Check for updates and update if available
-#check_for_updates
+check_for_updates
 
 
 # [USER INPUT]
