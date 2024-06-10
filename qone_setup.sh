@@ -67,6 +67,7 @@ else
         echo "To avoid conflicts, qone.sh will not be executed on login, but aliases will be set up."
         # Define the section to add in .bashrc without the execution line
         bashrc_section=$(cat << 'EOF'
+
 # === qone.sh setup ===
 # The following lines are added to create aliases for qone.sh
 alias qone='~/qone.sh'
@@ -78,6 +79,7 @@ EOF
     else
         # Define the section to add in .bashrc with the execution line
         bashrc_section=$(cat << 'EOF'
+
 # === qone.sh setup ===
 # The following lines are added to run qone.sh on login and create aliases for qone.sh
 ~/qone.sh #this runs .qone on login
