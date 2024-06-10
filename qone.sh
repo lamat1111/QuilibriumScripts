@@ -35,11 +35,6 @@ if ! grep -Fxq "# === qone.sh setup ===" ~/.bashrc; then
 	echo "🟢 The menu will also load automatically every time you log in."
 	echo ""
 	sleep 5
-	 # Source the qone.sh setup section from .bashrc
-	if ! eval "$(awk '/# === qone.sh setup ===/,/# === end qone.sh setup ===/' ~/.bashrc)"; then
-	    echo "❌ Error: qone.sh setup section not found in ~/.bashrc - Not so important"
-     	sleep 1
-	fi
         # Check if wget is installed
         check_wget
     fi
@@ -396,6 +391,7 @@ This will run the test script
 
 display_menu() {
     clear
+    source ~/.bashrc
     cat << "EOF"
 
                   QQQQQQQQQ       1111111   
