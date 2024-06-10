@@ -84,13 +84,16 @@ sleep 1
 
 # [USER CONFIGURATION]
 
+echo ""
 echo "ℹ️ Please specify how frequently you want to run the backup (in hours):"
 read -p "Enter the backup frequency: " BACKUP_FREQUENCY
-
+echo ""
 echo "ℹ️ Please provide the name of your AWS S3 bucket:"
+echo "This is the general container on AWS. You need to create one via the AWS dashboard if you haven't already."
+echo "Tip create a bucket specific for Quilibrium files."
 read -p "Enter bucket name: " BUCKET_NAME
-
-echo "ℹ️ Please provide a unique name for the remote folder (no spaces or special characters, max 20 characters):"
+echo ""
+echo "ℹ️ Please provide a unique name for the remote folder, eg. 'Q1' (no spaces or special characters, max 20 characters):"
 while true; do
     read -p "Enter the folder name: " TARGET_FOLDER
     if [[ ! "$TARGET_FOLDER" =~ ^[a-zA-Z0-9_-]{1,20}$ ]]; then
@@ -99,6 +102,10 @@ while true; do
         break
     fi
 done
+
+echo "Your remote backup location on AWS will be '$BUCKET_NAME/stores_backup/$TARGET_FOLDER/'"
+echo ""
+sleep 1
 
 # [CRON JOB]
 
@@ -112,7 +119,7 @@ sleep 1
 
 echo "✅ Backup setup complete!"
 echo ""
-echo "You have configured the backup to run every $BACKUP_FREQUENCY hours at minute (1 + $RANDOM % 59) to the bucket '$BUCKET_NAME'."
+echo "You have configured the backup to run every $BACKUP_FREQUENCY hours at minute $((1 + RANDOM % 59)) to the bucket '$BUCKET_NAME'."
 sleep 1
 echo ""
 echo "You can test this backup with a dry run using the following command:"
