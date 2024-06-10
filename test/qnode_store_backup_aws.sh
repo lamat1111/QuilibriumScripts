@@ -105,7 +105,7 @@ done
 echo "⚙️ Creating cronjob to run backup every $BACKUP_FREQUENCY hours..."
 RANDOM_MINUTE=$((1 + $RANDOM % 59)) # Generate a random minute between 1 and 59
 CRON_EXPRESSION="$RANDOM_MINUTE */$BACKUP_FREQUENCY * * *"
-(crontab -l ; echo "$CRON_EXPRESSION aws s3 sync ~/ceremonyclient/node/.config/store s3://$BUCKET_NAME/$TARGET_FOLDER") | crontab -
+(crontab -l ; echo "$CRON_EXPRESSION aws s3 sync ~/ceremonyclient/node/.config/store s3://$BUCKET_NAME/stores_backup/$TARGET_FOLDER") | crontab -
 sleep 1
 
 # [COMPLETION]
@@ -116,4 +116,4 @@ echo "You have configured the backup to run every $BACKUP_FREQUENCY hours at min
 sleep 1
 echo ""
 echo "You can test this backup with a dry run using the following command:"
-echo "aws s3 sync ~/ceremonyclient/node/.config/store s3://$BUCKET_NAME/$TARGET_FOLDER --dryrun"
+echo "aws s3 sync ~/ceremonyclient/node/.config/store s3://$BUCKET_NAME//stores_backup/$TARGET_FOLDER --dryrun"
