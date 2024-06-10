@@ -67,9 +67,15 @@ echo "⚙️ Updating package repositories..."
 sudo apt update
 sleep 1
 
-echo "⚙️ Installing AWS CLI..."
-sudo apt install awscli
-sleep 1
+# [CHECK FOR AWS CLI]
+if ! command -v aws &> /dev/null; then
+    echo "⚙️ Installing AWS CLI..."
+    sudo apt update
+    sudo apt install awscli -y
+    echo "✅ AWS CLI installed."
+else
+    echo "ℹ️ AWS CLI is already installed."
+fi
 
 echo "⚙️ Configuring AWS CLI..."
 aws configure
