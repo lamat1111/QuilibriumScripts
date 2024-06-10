@@ -112,7 +112,7 @@ sleep 1
 
 echo "✅ Backup setup complete!"
 echo ""
-echo "You have configured the backup to run every $BACKUP_FREQUENCY hours at minute $RANDOM to the bucket '$BUCKET_NAME'."
+echo "You have configured the backup to run every $BACKUP_FREQUENCY hours at minute (1 + $RANDOM % 59) to the bucket '$BUCKET_NAME'."
 sleep 1
 echo ""
 echo "You can test this backup with a dry run using the following command:"
