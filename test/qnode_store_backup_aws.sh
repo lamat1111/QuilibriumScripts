@@ -90,10 +90,11 @@ read -p "Enter the backup frequency: " BACKUP_FREQUENCY
 echo ""
 echo "ℹ️ Please provide the name of your AWS S3 bucket:"
 echo "This is the general container on AWS. You need to create one via the AWS dashboard if you haven't already."
-echo "Tip create a bucket specific for Quilibrium files."
+echo "Tip: create a bucket specific for Quilibrium files."
 read -p "Enter bucket name: " BUCKET_NAME
 echo ""
-echo "ℹ️ Please provide a unique name for the remote folder, eg. 'Q1' (no spaces or special characters, max 20 characters):"
+echo "ℹ️ Please provide a unique name for the remote folder, eg. 'Q1' (no spaces or special characters, max 20 characters)."
+echo "This must be unique for each node. Your store files will be backed up inside this folder on AWS."
 while true; do
     read -p "Enter the folder name: " TARGET_FOLDER
     if [[ ! "$TARGET_FOLDER" =~ ^[a-zA-Z0-9_-]{1,20}$ ]]; then
@@ -103,6 +104,7 @@ while true; do
     fi
 done
 
+echo ""
 echo "Your remote backup location on AWS will be '$BUCKET_NAME/stores_backup/$TARGET_FOLDER/'"
 echo ""
 sleep 1
