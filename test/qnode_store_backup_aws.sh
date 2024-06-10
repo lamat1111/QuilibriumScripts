@@ -4,35 +4,36 @@
 
 cat << "EOF"
 
-                  QQQQQQQQQ       1111111   
-                QQ:::::::::QQ    1::::::1   
-              QQ:::::::::::::QQ 1:::::::1   
-             Q:::::::QQQ:::::::Q111:::::1   
-             Q::::::O   Q::::::Q   1::::1   
-             Q:::::O     Q:::::Q   1::::1   
-             Q:::::O     Q:::::Q   1::::1   
-             Q:::::O     Q:::::Q   1::::l   
-             Q:::::O     Q:::::Q   1::::l   
-             Q:::::O     Q:::::Q   1::::l   
-             Q:::::O  QQQQ:::::Q   1::::l   
-             Q::::::O Q::::::::Q   1::::l   
-             Q:::::::QQ::::::::Q111::::::111
-              QQ::::::::::::::Q 1::::::::::1
-                QQ:::::::::::Q  1::::::::::1
-                  QQQQQQQQ::::QQ111111111111
-                          Q:::::Q           
-                           QQQQQQ  QUILIBRIUM.ONE                                                                                                                                  
+                      QQQQQQQQQ       1111111   
+                    QQ:::::::::QQ    1::::::1   
+                  QQ:::::::::::::QQ 1:::::::1   
+                 Q:::::::QQQ:::::::Q111:::::1   
+                 Q::::::O   Q::::::Q   1::::1   
+                 Q:::::O     Q:::::Q   1::::1   
+                 Q:::::O     Q:::::Q   1::::1   
+                 Q:::::O     Q:::::Q   1::::l   
+                 Q:::::O     Q:::::Q   1::::l   
+                 Q:::::O     Q:::::Q   1::::l   
+                 Q:::::O  QQQQ:::::Q   1::::l   
+                 Q::::::O Q::::::::Q   1::::l   
+                 Q:::::::QQ::::::::Q111::::::111
+                  QQ::::::::::::::Q 1::::::::::1
+                    QQ:::::::::::Q  1::::::::::1
+                      QQQQQQQQ::::QQ111111111111
+                              Q:::::Q           
+                               QQQQQQ  QUILIBRIUM.ONE                                                                                                                                  
 
 
-===================================================================
-                  ✨ STORE BACKUP VIA AWS ✨
-===================================================================
-This script automates the backup of your data to AWS S3.
+==========================================================================
+                    ✨ NODE "STORE" BACKUP VIA AWS ✨
+==========================================================================
+This script automates the backup of your node "store" data to AWS S3.
 You need an AWS account and a Public/Secret access key.
-For security creates a user + keys specific to the bucket you want to use.
+
+For security create a user + keys specific to the bucket you want to use.
 
 Made with 🔥 by LaMat - https://quilibrium.one
-====================================================================
+===========================================================================
 
 Processing... ⏳
 
