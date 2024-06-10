@@ -1,19 +1,42 @@
 #!/bin/bash
 
-# Step 0: Welcome
-echo "✨ Welcome! This script will clean up your system from temporary files and old log entries ✨"
-echo "Made with 🔥 by LaMat - https://quilibrium.one"
-echo "====================================================================================="
-echo ""
-echo "Processing... ⏳"
-sleep 7  # Add a 7-second delay
+cat << "EOF"
 
-#!/bin/bash
+                      QQQQQQQQQ       1111111   
+                    QQ:::::::::QQ    1::::::1   
+                  QQ:::::::::::::QQ 1:::::::1   
+                 Q:::::::QQQ:::::::Q111:::::1   
+                 Q::::::O   Q::::::Q   1::::1   
+                 Q:::::O     Q:::::Q   1::::1   
+                 Q:::::O     Q:::::Q   1::::1   
+                 Q:::::O     Q:::::Q   1::::l   
+                 Q:::::O     Q:::::Q   1::::l   
+                 Q:::::O     Q:::::Q   1::::l   
+                 Q:::::O  QQQQ:::::Q   1::::l   
+                 Q::::::O Q::::::::Q   1::::l   
+                 Q:::::::QQ::::::::Q111::::::111
+                  QQ::::::::::::::Q 1::::::::::1
+                    QQ:::::::::::Q  1::::::::::1
+                      QQQQQQQQ::::QQ111111111111
+                              Q:::::Q           
+                               QQQQQQ  QUILIBRIUM.ONE                                                                                                                                  
 
-# Function to print a separator line
-print_separator() {
-    echo "======================================================================"
-}
+
+==========================================================================
+                         ✨ SYSTEM CLEANER ✨
+==========================================================================
+This script will clean up your system 
+from temporary files and old log entries
+
+
+Made with 🔥 by LaMat - https://quilibrium.one
+===========================================================================
+
+Processing... ⏳
+
+EOF
+
+sleep 7
 
 # Function to capture disk space
 capture_disk_space() {
@@ -46,6 +69,7 @@ main() {
 
     # Capture initial disk space
     echo "Initial free disk space: $(capture_disk_space)"
+    echo ""
 
     # Vacuum journal logs
     vacuum_journal_logs
@@ -54,7 +78,9 @@ main() {
     clean_system
 
     # Capture final disk space
+    echo ""
     echo "Final free disk space: $(capture_disk_space)"
+    echo ""
 
     echo "🌟 Cleanup process completed successfully."
 }
