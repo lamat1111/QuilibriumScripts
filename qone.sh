@@ -134,6 +134,7 @@ GRPCURL_CONFIG_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscript
 NODE_UPDATE_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/master/qnode_service_update.sh"
 PEER_MANIFEST_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/tools/qnode_peermanifest_checker.sh"
 CHECK_VISIBILITY_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/master/tools/qnode_visibility_check.sh"
+SYSTEM_CLEANER_URL="https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/tools/qnode_system_cleanup.sh"
 TEST_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/test/test_script.sh"
 
 # Common message for missing service file
@@ -179,6 +180,13 @@ check_visibility() {
     echo ""
     echo "⌛️  Checking node visibility..."
     wget -O - "$CHECK_VISIBILITY_URL" | bash
+    prompt_return_to_menu
+}
+
+system_cleaner() {
+    echo ""
+    echo "⌛️  Cleaning your system..."
+    wget -O - "$SYSTEM_CLEANER_URL" | bash
     prompt_return_to_menu
 }
 
@@ -382,7 +390,53 @@ It only works after 15-30 minutes that the node has been running.
 '
 
 test_script_message='
-This will run the test script
+This will run the test script.
+'
+
+Help_message='
+Here are all the options of the Quickstart Node Menu
+
+0) Best server providers:
+   $best_providers_message
+
+1) Prepare your server:
+   $prepare_server_message
+
+2) Install node:
+   $install_node_message
+
+3) Set up gRPCurl:
+   $setup_grpcurl_message
+
+4) Node Log:
+   Display the log of the node.
+
+5) Update node:
+   $update_node_message
+
+6) Stop node:
+   Stop the node via the service command.
+
+7) Restart node:
+   Restart the node via the service command.
+
+8) Node version:
+   Display the version of the node.
+
+9) Node info (peerID & balance):
+   Display information about your node peerID and balance.
+
+10) QUIL balance:
+    Display the balance of QUIL tokens.
+
+11) Peer manifest (Difficulty metric):
+    $peer_manifest_message
+
+12) Check visibility:
+    Check the visibility status of the node.
+
+13) System cleaner:
+    Perform basic system cleanup tasks to free server space. It will not affect your node in anyway.
 '
 
 #=====================
@@ -433,11 +487,11 @@ If you want to install a new node, choose option 1, and then 2
 2) Install node              10) QUIL balance
 3) Set up gRPCurl            11) Peer manifest (Difficulty metric)
 4) Node Log                  12) Check visibility
-5) Update node
+5) Update node               13) System cleaner
 6) Stop node
 7) Restart node
 ------------------------------------------------------------------
-e) Exit
+E) Exit                       H) Help
 
 EOF
 }
@@ -467,9 +521,11 @@ while true; do
         9) node_info action_performed=1;;
  	10) quil_balance action_performed=1;;
         11) confirm_action "$(wrap_text "$peer_manifest_message" "")" "Peer manifest" peer_manifest;;
-        12) check_visibility prompt_return_to_menu;;
+        12) check_visibility;;
+	12) system_cleaner;;
 	20) confirm_action "$(wrap_text "$test_script_message" "")" "Test Script" test_script;;
-        e) exit ;;
+        [eE]) exit ;;
+	[hH]) help_message;;
         *) echo "Invalid option, please try again." ;;
     esac
     
