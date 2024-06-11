@@ -547,7 +547,7 @@ while true; do
  	10) quil_balance action_performed=1;;
         11) confirm_action "$(wrap_text "$peer_manifest_message" "")" "Peer manifest" peer_manifest;;
         12) check_visibility;;
-	12) system_cleaner;;
+	13) system_cleaner;;
 	20) confirm_action "$(wrap_text "$test_script_message" "")" "Test Script" test_script;;
         [eE]) exit ;;
 	[hH]) help_message;;
