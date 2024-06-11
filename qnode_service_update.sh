@@ -26,7 +26,7 @@ cat << "EOF"
                        ✨ QNODE SERVICE UPDATER ✨
 ===========================================================================
 This script will update your Quilibrium node when running it as a service.
-It will run your ndoe form the release_autostart.sh file.
+It will run your node from the release_autostart.sh file.
 
 Follow the guide at https://docs.quilibrium.one
 
