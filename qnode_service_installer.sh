@@ -140,6 +140,22 @@ EXEC_START="$NODE_PATH/release_autorun.sh"
 echo "⏳ Creating Ceremonyclient Service"
 sleep 2  # Add a 2-second delay
 
+# Calculate GOMAXPROCS based on the system's RAM
+calculate_gomaxprocs() {
+    local ram_gb=$(free -g | awk '/^Mem:/{print $2}')
+    local cpu_cores=$(nproc)
+    local gomaxprocs=$((ram_gb / 2))
+    if [ $gomaxprocs -gt $cpu_cores ]; then
+        gomaxprocs=$cpu_cores
+    fi
+    gomaxprocs=$((gomaxprocs + 1))
+    echo $gomaxprocs
+}
+
+GOMAXPROCS=$(calculate_gomaxprocs)
+
+echo "✅ GOMAXPROCS has been set to $GOMAXPROCS based on your server's resources."
+
 # Check if the file exists before attempting to remove it
 if [ -f "/lib/systemd/system/ceremonyclient.service" ]; then
     rm /lib/systemd/system/ceremonyclient.service
@@ -158,6 +174,7 @@ Restart=always
 RestartSec=5s
 WorkingDirectory=$NODE_PATH
 ExecStart=$EXEC_START
+Environment="GOMAXPROCS=$GOMAXPROCS"
 
 [Install]
 WantedBy=multi-user.target
