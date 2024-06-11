@@ -88,10 +88,23 @@ echo ""
 echo "ℹ️ Please specify how frequently you want to run the backup (in hours):"
 read -p "Enter the backup frequency: " BACKUP_FREQUENCY
 echo ""
-echo "ℹ️ Please provide the name of your AWS S3 bucket:"
-echo "This is the general container on AWS. You need to create one via the AWS dashboard if you haven't already."
-echo "Tip: create a bucket specific for Quilibrium files."
-read -p "Enter bucket name: " BUCKET_NAME
+
+# Prompt the user if they already have a bucket
+read -p "Do you already have an AWS S3 bucket for backups? (y/n): " HAS_BUCKET
+echo ""
+if [[ $HAS_BUCKET == "y" ]]; then
+    echo "Tip: Use a bucket specific to Quilibrium."
+    read -p "Enter the name of your existing AWS S3 bucket: " BUCKET_NAME
+    echo ""
+else
+    echo "Tip: Create a bucket specific to Quilibrium."
+    read -p "Enter a name for your new AWS S3 bucket: " BUCKET_NAME
+    echo ""
+    # Create the bucket
+    aws s3 mb s3://$BUCKET_NAME
+    echo "✅ Bucket '$BUCKET_NAME' created successfully."
+fi
+
 echo ""
 echo "ℹ️ Please provide a unique name for the remote folder, eg. 'Q1' (no spaces or special characters, max 20 characters)."
 echo "This must be unique for each node. Your store files will be backed up inside this folder on AWS."
