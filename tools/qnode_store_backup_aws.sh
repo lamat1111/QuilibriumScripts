@@ -127,7 +127,7 @@ sleep 1
 echo "⚙️ Creating cronjob to run backup every $BACKUP_FREQUENCY hours..."
 RANDOM_MINUTE=$((1 + $RANDOM % 59)) # Generate a random minute between 1 and 59
 CRON_EXPRESSION="$RANDOM_MINUTE */$BACKUP_FREQUENCY * * *"
-(crontab -l ; echo "$CRON_EXPRESSION aws s3 sync ~/ceremonyclient/node/.config/store s3://$BUCKET_NAME/stores_backup/$TARGET_FOLDER") | crontab -
+(crontab -l ; echo "$CRON_EXPRESSION aws s3 sync ~/ceremonyclient/node/.config/store s3://$BUCKET_NAME/stores_backup/$TARGET_FOLDER --delete") | crontab -
 sleep 1
 
 # [COMPLETION]
@@ -136,6 +136,13 @@ echo "✅ Backup setup complete!"
 echo ""
 echo "You have configured the backup to run every $BACKUP_FREQUENCY hours at minute $((1 + RANDOM % 59)) to the bucket '$BUCKET_NAME'."
 sleep 1
+echo "✅ IMPORTANT NOTE"
+echo "Please note that is a 2 way backup. The store folder on AWS will always mirror the one in your server."
+echo "So... if you delete the store folder in your server, it will deleted the one on AWS too."
+echo "If you want to avoid this, just edit your cronjob (run crontab -e) and remove the --delete flag from the command."
+echo "If you do this, your AWS store folder will grow bigger then your actual one, and won't mirror it anymore."
 echo ""
-echo "You can test this backup with a dry run using the following command:"
+echo "✅ TEST YOUR BACKUP"
+echo "You can test this backup with a 'dry run' using the command below."
+echo "The 'dry run' doesn't back up anything, it just shows you what it would back up."
 echo "aws s3 sync ~/ceremonyclient/node/.config/store s3://$BUCKET_NAME//stores_backup/$TARGET_FOLDER --dryrun"
