@@ -85,7 +85,7 @@ check_for_updates() {
 }
 
 # Run the update check function
-check_for_updates
+#check_for_updates
 
 # Service file path
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
@@ -142,10 +142,10 @@ MISSING_SERVICE_MSG="⚠️ Your service file does not exist. Looks like you do 
 
 # Function definitions
 best_providers() {
-    wrap_text "$best_providers_message" ""
+    wrap_text "$best_providers_message"
     echo ""
     echo "-------------------------------"
-    read -n 1 -s -r -p "Press any key to continue..."  # Pause and wait for user input
+    read -n 1 -s -r -p "✅  Press any key to continue..."  # Pause and wait for user input
 }
 
 install_prerequisites() {
@@ -193,7 +193,7 @@ system_cleaner() {
 node_info() {
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
-        read -n 1 -s -r -p "Press any key to continue..."
+        read -n 1 -s -r -p "✅  Press any key to continue..."
         echo ""  # Add an empty line for better readability
     else
         echo ""
@@ -202,7 +202,7 @@ node_info() {
     	sleep 1
         cd ~/ceremonyclient/node && ./$NODE_BINARY -node-info
 	echo ""
-	read -n 1 -s -r -p "Press any key to continue..."  # Pause and wait for user input
+	read -n 1 -s -r -p "✅  Press any key to continue..."  # Pause and wait for user input
     fi
 }
 
@@ -218,14 +218,14 @@ quil_balance() {
     	sleep 1
         cd ~/ceremonyclient/node && ./$NODE_BINARY -balance
 	echo ""
-	read -n 1 -s -r -p "Press any key to continue..."  # Pause and wait for user input
+	read -n 1 -s -r -p "✅  Press any key to continue..."  # Pause and wait for user input
     fi
 }
 
 node_logs() {
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
-        read -n 1 -s -r -p "Press any key to continue..."
+        read -n 1 -s -r -p "✅  Press any key to continue..."
         echo ""  # Add an empty line for better readability
     fi
     echo ""
@@ -243,7 +243,7 @@ return_to_menu() {
 restart_node() {
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
-		read -n 1 -s -r -p "Press any key to continue..."
+		read -n 1 -s -r -p "✅  Press any key to continue..."
         echo ""  # Add an empty line for better readability
     fi
     echo ""
@@ -292,8 +292,15 @@ node_version() {
     sleep 1
     journalctl -u ceremonyclient -r --no-hostname  -n 1 -g "Quilibrium Node" -o cat
     echo ""
-    read -n 1 -s -r -p "Press any key to continue..."  # Pause and wait for user input
+    read -n 1 -s -r -p "✅ Press any key to continue..."  # Pause and wait for user input
 }
+
+help_message() {
+    echo "$help_message"
+    echo ""
+    prompt_return_to_menu
+}
+
 
 test_script() {
 echo "⌛️   Running test script..."
@@ -305,8 +312,8 @@ echo "⌛️   Running test script..."
 # Function to prompt for returning to the main menu
 prompt_return_to_menu() {
     echo -e "\n\n"  # Add two empty lines for readability
-    echo "---------------------------------------------------"
-    read -rp "⬅️   Go back to the main menu? Type Y or N: " return_to_menu
+    echo "---------------------------------------------"
+    read -rp "⬅️   Go back to the main menu? (y/n): " return_to_menu
     case $return_to_menu in
         [Yy]) return 0 ;;  # Return to the main menu
         *) 
@@ -321,7 +328,7 @@ confirm_action() {
 
 $1
 
-✅ Do you want to proceed with "$2"? Type Y or N:
+✅ Do you want to proceed with "$2"? (y/n):
 EOF
     read -p "> " confirm
     if [[ "$confirm" =~ ^[Yy]$ ]]; then
@@ -345,6 +352,11 @@ wrap_text() {
     local text="$1"
     local indent="$2"
     echo "$text" | fold -s -w 80 | awk -v indent="$indent" '{printf "%s%s\n", indent, $0}'
+}
+
+wrap_text_2() {
+    local text="$1"
+    echo "$text" | fold -s -w 100
 }
 
 #=====================
@@ -393,50 +405,63 @@ test_script_message='
 This will run the test script.
 '
 
-Help_message='
+help_message='
 Here are all the options of the Quickstart Node Menu
+====================================================
 
-0) Best server providers:
-   $best_providers_message
+ 0) Best server providers:
+    Check out the best server providers for your node
+    at ⭐️ https://iri.quest/q-best-providers ⭐️
+    Avoid using providers that specifically ban crypto and mining.
 
-1) Prepare your server:
-   $prepare_server_message
+ 1) Prepare your server:
+    This action will install the necessary prerequisites for your server. 
+    If this is the first time you install a Quilibrium node, it is recommended
+    to follow the online guide at: https://docs.quilibrium.one/
 
-2) Install node:
-   $install_node_message
+ 2) Install node:
+    This action will install the node on your server. 
+    If this is the first time you install a Quilibrium node, it is recommended
+    to follow the online guide at: https://docs.quilibrium.one/ 
+    Ensure that your server meets all the requirements and that you have 
+    already prepared your server via Step 1.
 
-3) Set up gRPCurl:
-   $setup_grpcurl_message
+ 3) Set up gRPCurl:
+    This action will make some edits to your config.yml to enable communication with the network. 
+    If this is a fresh node installation, let the node run for 30 minutes before doing this.
 
-4) Node Log:
-   Display the log of the node.
+ 4) Node Log:
+    Display the log of the node.
 
-5) Update node:
-   $update_node_message
+ 5) Update node:
+    This action will update your node. 
+    Only use this if you have installed the node via the guide at 
+    https://docs.quilibrium.one/
 
-6) Stop node:
-   Stop the node via the service command.
+ 6) Stop node:
+    Stop the node.
 
-7) Restart node:
-   Restart the node via the service command.
+ 7) Restart node:
+    Restart the node.
 
-8) Node version:
-   Display the version of the node.
+ 8) Node version:
+    Display the version of the node.
 
-9) Node info (peerID & balance):
-   Display information about your node peerID and balance.
+ 9) Node info (peerID & balance):
+    Display information about your node peerID and balance.
 
 10) QUIL balance:
     Display the balance of QUIL tokens.
 
 11) Peer manifest (Difficulty metric):
-    $peer_manifest_message
+    Check the peer manifest to provide information about the difficulty metric score of your node. 
+    It only works after the node has been running for 15-30 minutes.
 
 12) Check visibility:
     Check the visibility status of the node.
 
 13) System cleaner:
-    Perform basic system cleanup tasks to free server space. It will not affect your node in anyway.
+    Perform system cleanup tasks. It will not affect your node.
 '
 
 #=====================
