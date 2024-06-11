@@ -122,15 +122,17 @@ EOF
 else
     echo "🔍 Checking existing ceremonyclient service file..."
     
-# Check if the required lines exist or if CPUQuota exists
-if ! grep -q "WorkingDirectory=$NODE_PATH" "$SERVICE_FILE" || ! grep -q "ExecStart=$EXEC_START" "$SERVICE_FILE"; then
-    echo "🔄 Updating existing ceremonyclient service file..."
-    # Replace the existing lines with new values
-    sudo sed -i "s|WorkingDirectory=.*|WorkingDirectory=$NODE_PATH|" "$SERVICE_FILE"
-    sudo sed -i "s|ExecStart=.*|ExecStart=$EXEC_START|" "$SERVICE_FILE"
-else
-    echo "✅ No changes needed."
+    # Check if the required lines exist or if CPUQuota exists
+    if ! grep -q "WorkingDirectory=$NODE_PATH" "$SERVICE_FILE" || ! grep -q "ExecStart=$EXEC_START" "$SERVICE_FILE"; then
+        echo "🔄 Updating existing ceremonyclient service file..."
+        # Replace the existing lines with new values
+        sudo sed -i "s|WorkingDirectory=.*|WorkingDirectory=$NODE_PATH|" "$SERVICE_FILE"
+        sudo sed -i "s|ExecStart=.*|ExecStart=$EXEC_START|" "$SERVICE_FILE"
+    else
+        echo "✅ No changes needed."
+    fi
 fi
+
 
 # Step 6: Start the ceremonyclient service
 echo "✅ Starting Ceremonyclient Service"
