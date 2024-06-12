@@ -1,25 +1,28 @@
 #!/bin/bash
 
 # Define the version number here
-VERSION="1.5"
+SCRIPT_VERSION="1.5"
 
 # Function to check if wget is installed, and install it if it is not
 check_wget() {
     if ! command -v wget &> /dev/null; then
         echo "❌ wget is not installed."
-	sleep 1
+        sleep 1
         echo "⌛️ Installing wget... "
-	sleep 1
+        sleep 1
         sudo apt-get update && sudo apt-get install -y wget
 
         # Verify that wget was successfully installed
         if ! command -v wget &> /dev/null; then
             echo "❌ Failed to install wget. Please install wget manually and try again."
-	    sleep 1
+            sleep 1
             exit 1
         fi
     fi
 }
+
+# Check if wget is installed
+check_wget
 
 # Function to check if the qone.sh setup section is present in .bashrc
 if ! grep -Fxq "# === qone.sh setup ===" ~/.bashrc; then
@@ -32,82 +35,29 @@ if ! grep -Fxq "# === qone.sh setup ===" ~/.bashrc; then
         exit 1
     else
         echo "✅ qone.sh upgraded!"
-	echo ""
-	echo "🟢 You can now use 'Q1', 'q1', or 'qone' to launch the Node Quickstart Menu."
- 	sleep 1
-	echo "🟢 The menu will also load automatically every time you log in."
-	echo ""
-	sleep 5
-        # Check if wget is installed
-        check_wget
+        echo ""
+        echo "🟢 You can now use 'Q1', 'q1', or 'qone' to launch the Node Quickstart Menu."
+        sleep 1
+        echo "🟢 The menu will also load automatically every time you log in."
+        echo ""
+        sleep 5
     fi
 else
     echo "ℹ️ qone.sh is already upgraded."
-    # Check if wget is installed
-    check_wget
 fi
 
-# Function to check for updates on GitHub and download the new version if available
+# Function to check for newer script version
 check_for_updates() {
-    # Check if the script has just restarted after an update using a temporary file marker
-    if [ -f /tmp/qone_script_updated ]; then
-        rm /tmp/qone_script_updated
-        return
-    fi
-    echo "⌛️   Checking for updates..."
-    # URL for checking updates
-    LATEST_SCRIPT_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/qone.sh"
-    # Fetch the latest and current script versions
-    latest_version=$(wget -qO- "$LATEST_SCRIPT_URL" | md5sum | awk '{print $1}')
-    current_version=$(md5sum "$0" | awk '{print $1}')
-    echo "Latest version: $latest_version"
-    echo "Current version: $current_version"
-    # Check if the latest version differs from the current one
-    if [ "$latest_version" != "$current_version" ]; then
-        echo "⌛️   A new version is available. Updating..."
-        sleep 1
-
-        # Download the latest version
-        wget -q -O "$0.tmp" "$LATEST_SCRIPT_URL"
-
-        # Verify the download succeeded
-        if [ $? -eq 0 ]; then
-            chmod +x "$0.tmp"
-            mv -f "$0.tmp" "$0"
-            touch /tmp/qone_script_updated
-            echo "✅ Update complete. Restarting..."
-            exec "$0"  # Restart the script with the updated version
-        else
-            echo "❌ Failed to download the latest version. Check your connection."
-            rm -f "$0.tmp"
-            exit 1
-        fi
-    else
-        echo "✅ You already have the latest version."
+    LATEST_VERSION=$(wget -qO- "https://github.com/lamat1111/QuilibriumScripts/raw/MAIN/qone.sh" | grep 'SCRIPT_VERSION="' | head -1 | cut -d'"' -f2)
+    if [ "$SCRIPT_VERSION" != "$LATEST_VERSION" ]; then
+        wget -O ~/qone.sh "https://github.com/lamat1111/QuilibriumScripts/raw/main/qone.sh"
+        echo "✅ New version downloaded: V $SCRIPT_VERSION."
+	sleep 1
     fi
 }
 
-
-# Function to update the script
-update_script() {
-    # Download the latest version
-    wget -q -O "$0.tmp" "$LATEST_SCRIPT_URL"
-
-    # Verify the download succeeded
-    if [ $? -eq 0 ]; then
-        chmod +x "$0.tmp"
-        mv -f "$0.tmp" "$0"
-        echo "✅ Update complete. Restarting..."
-        exec "$0"  # Restart the script with the updated version
-    else
-        echo "❌ Failed to download the latest version. Check your connection."
-        rm -f "$0.tmp"
-        exit 1
-    fi
-}
-
-# Run the update check function
-#check_for_updates
+# Check for updates
+check_for_updates
 
 # Service file path
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
@@ -606,4 +556,3 @@ while true; do
         read -n 1 -s -r -p "Press any key to continue..."
     fi
 done
-
