@@ -1,25 +1,28 @@
 #!/bin/bash
 
 # Define the version number here
-VERSION="1.5"
+SCRIPT_VERSION="1.5"
 
 # Function to check if wget is installed, and install it if it is not
 check_wget() {
     if ! command -v wget &> /dev/null; then
         echo "❌ wget is not installed."
-	sleep 1
+        sleep 1
         echo "⌛️ Installing wget... "
-	sleep 1
+        sleep 1
         sudo apt-get update && sudo apt-get install -y wget
 
         # Verify that wget was successfully installed
         if ! command -v wget &> /dev/null; then
             echo "❌ Failed to install wget. Please install wget manually and try again."
-	    sleep 1
+            sleep 1
             exit 1
         fi
     fi
 }
+
+# Check if wget is installed
+check_wget
 
 # Function to check if the qone.sh setup section is present in .bashrc
 if ! grep -Fxq "# === qone.sh setup ===" ~/.bashrc; then
@@ -32,27 +35,24 @@ if ! grep -Fxq "# === qone.sh setup ===" ~/.bashrc; then
         exit 1
     else
         echo "✅ qone.sh upgraded!"
-	echo ""
-	echo "🟢 You can now use 'Q1', 'q1', or 'qone' to launch the Node Quickstart Menu."
- 	sleep 1
-	echo "🟢 The menu will also load automatically every time you log in."
-	echo ""
-	sleep 5
-        # Check if wget is installed
-        check_wget
+        echo ""
+        echo "🟢 You can now use 'Q1', 'q1', or 'qone' to launch the Node Quickstart Menu."
+        sleep 1
+        echo "🟢 The menu will also load automatically every time you log in."
+        echo ""
+        sleep 5
     fi
 else
     echo "ℹ️ qone.sh is already upgraded."
-    # Check if wget is installed
-    check_wget
 fi
 
 # Function to check for newer script version
 check_for_updates() {
-    LATEST_VERSION=$(wget -qO- "https://github.com/lamat1111/QuilibriumScripts/raw/testing/qone.sh" | grep 'SCRIPT_VERSION="' | head -1 | cut -d'"' -f2)
+    LATEST_VERSION=$(wget -qO- "https://github.com/lamat1111/QuilibriumScripts/raw/MAIN/qone.sh" | grep 'SCRIPT_VERSION="' | head -1 | cut -d'"' -f2)
     if [ "$SCRIPT_VERSION" != "$LATEST_VERSION" ]; then
-        wget -O qone.sh "https://github.com/lamat1111/QuilibriumScripts/raw/testing/qone.sh"
-        echo "New version downloaded."
+        wget -O ~/qone.sh "https://github.com/lamat1111/QuilibriumScripts/raw/main/qone.sh"
+        echo "✅ New version downloaded: V $SCRIPT_VERSION."
+	sleep 1
     fi
 }
 
