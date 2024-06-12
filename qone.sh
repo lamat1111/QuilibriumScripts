@@ -218,7 +218,7 @@ node_logs() {
     echo ""
     echo "⌛️  Displaying your node log...  (Press CTRL+C to return to the main menu)"
     echo ""
-    trap 'echo "Returning to main menu..."; return_to_menu' INT  # Trap CTRL+C to return to main menu
+    trap "echo 'Returning to main menu...'; return_to_menu" INT  # Trap CTRL+C to return to main menu
     sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
 }
 
