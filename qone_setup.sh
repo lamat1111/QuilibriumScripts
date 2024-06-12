@@ -80,4 +80,4 @@ EOF
     fi
 fi
 
-~/qone.sh
+echo "To launch the Quickstart Node Menu run './qone.sh'"
