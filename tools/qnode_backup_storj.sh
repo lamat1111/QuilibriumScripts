@@ -139,7 +139,7 @@ fi
 
 # Prompt for the target folder name
 echo "Enter the target folder name where you want to store this backup, must be unique for each node!"
-read -p "▶️ Enter the target folder name, e.g., 'quil-1': " target_folder
+read -p "▶️ Enter the target folder name, e.g., 'quil-01': " target_folder
 echo
 
 # Prompt for the backup choice
