@@ -242,40 +242,71 @@ if [[ $backup_node_folder =~ ^[Yy]$ ]]; then
     fi
 fi
 
-# Backup existing cronjobs if selected
+# Function to check if a cron job with a specific pattern exists
+cron_job_exists() {
+    local pattern="$1"
+    crontab -l | grep -q "$pattern"
+}
+
+# Function to add new cron jobs
+add_new_cronjob() {
+    local cron_command="$1"
+    local cron_schedule="$2"
+    (crontab -l; echo "$cron_schedule $cron_command") | crontab -
+}
+
+# Function to perform immediate backup
+perform_backup() {
+    local command="$1"
+    eval "$command"
+}
+
+# Backup existing cron jobs if selected
 read -p "❔ Do you want to backup your existing cronjobs? (y/n): " backup_cronjobs
 if [[ $backup_cronjobs =~ ^[Yy]$ ]]; then
-    random_minute=$(shuf -i 0-59 -n 1)
-    cron_schedule="$random_minute */12 * * *"
     cron_command="crontab -l > $HOME/cron_jobs.txt && rclone $backup_type $HOME/cron_jobs.txt storj:/$bucket/$target_folder/cron_jobs.txt"
     existing_cronjobs_pattern="/cron_jobs.txt storj:"
-    if ! crontab -l | grep -q "$existing_cronjobs_pattern"; then
-        (crontab -l ; echo "$cron_schedule $cron_command") | crontab -
+
+    # Perform immediate backup
+    perform_backup "$cron_command"
+    echo "⌛️ Backing up your 'cronjobs' immediately..."
+
+    # Schedule cron job
+    random_minute=$(shuf -i 0-59 -n 1)
+    cron_schedule="$random_minute */12 * * *"
+    if ! cron_job_exists "$existing_cronjobs_pattern"; then
+        add_new_cronjob "$cron_command" "$cron_schedule"
         echo "⌛️ Setting cron job to backup existing cronjobs every 12 hours at a random minute..."
-        echo
     else
         echo "⚠️ Cron job to backup existing cron jobs already exists. Skipping..."
-        echo
     fi
+    echo
 fi
 
 # Backup third-party scripts folder if selected
 if [ -d "$HOME/scripts/" ]; then
     read -p "❔ Do you want to backup your third-party scripts folder? (y/n): " backup_scripts
     if [[ $backup_scripts =~ ^[Yy]$ ]]; then
-        random_minute=$(shuf -i 0-59 -n 1)
-        cron_schedule="$random_minute */12 * * *"
         cron_command="rclone $backup_type $HOME/scripts storj:/$bucket/$target_folder/scripts"
         existing_scripts_pattern="/scripts storj:"
-        if ! crontab -l | grep -q "$existing_scripts_pattern"; then
-            (crontab -l ; echo "$cron_schedule $cron_command") | crontab -
+
+        # Perform immediate backup
+        perform_backup "$cron_command"
+        echo "⌛️ Backing up your 'scripts' folder immediately..."
+
+        # Schedule cron job
+        random_minute=$(shuf -i 0-59 -n 1)
+        cron_schedule="$random_minute */12 * * *"
+        if ! cron_job_exists "$existing_scripts_pattern"; then
+            add_new_cronjob "$cron_command" "$cron_schedule"
             echo "⌛️ Setting cron job to backup third-party scripts folder every 12 hours at a random minute..."
         else
             echo "⚠️ Cron job to backup third-party scripts folder already exists. Skipping..."
-            echo
         fi
+        echo
     fi
 fi
+
 
 # Done
 echo
