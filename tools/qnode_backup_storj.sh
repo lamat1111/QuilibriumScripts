@@ -144,7 +144,7 @@ echo
 
 # Prompt for the backup choice
 echo "❔ What kind of backup do you want to create?"
-echo "If you chose to backup your keys, these will be always be copied and not synced for security."
+#echo "If you chose to backup your keys, these will be always be copied and not synced for security."
 echo
 echo "1. Sync: files on StorJ will be deleted if they are deleted on the source."
 echo "2. Copy: files on StorJ will never be deleted."
@@ -198,15 +198,15 @@ if [[ $create_bucket_flag == true ]]; then
     fi
 fi
 
-# Backup node keys.yml and config.yml if selected
-read -p "❔ Do you want to backup your node 'keys.yml' and 'config.yml' files? (y/n): " backup_keys
-if [[ $backup_keys =~ ^[Yy]$ ]]; then
-    echo "⌛️ Copying node 'keys.yml' and 'config.yml' files... (I will back up these only once)."
-    rclone copy $HOME/ceremonyclient/node/.config/keys.yml storj:/$bucket/$target_folder/keys/
-    rclone copy $HOME/ceremonyclient/node/.config/config.yml storj:/$bucket/$target_folder/keys/
-    echo "✅ Your keys are now backed up in 'storj:/$bucket/$target_folder/keys'"
-    echo
-fi
+# # Backup node keys.yml and config.yml if selected
+# read -p "❔ Do you want to backup your node 'keys.yml' and 'config.yml' files? (y/n): " backup_keys
+# if [[ $backup_keys =~ ^[Yy]$ ]]; then
+#     echo "⌛️ Copying node 'keys.yml' and 'config.yml' files... (I will back up these only once)."
+#     rclone copy $HOME/ceremonyclient/node/.config/keys.yml storj:/$bucket/$target_folder/keys/
+#     rclone copy $HOME/ceremonyclient/node/.config/config.yml storj:/$bucket/$target_folder/keys/
+#     echo "✅ Your keys are now backed up in 'storj:/$bucket/$target_folder/keys'"
+#     echo
+# fi
 
 
 # Function to check if a cron job with a specific pattern exists
