@@ -60,7 +60,7 @@ check_for_updates() {
 }
 
 # Check for updates and update if available
-#check_for_updates
+check_for_updates
 
 # ensure the script is run as root
 if [ "$EUID" -ne 0 ]; then
