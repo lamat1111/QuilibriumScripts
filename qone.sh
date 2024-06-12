@@ -85,7 +85,7 @@ check_for_updates() {
 }
 
 # Run the update check function
-#check_for_updates
+check_for_updates
 
 # Service file path
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
@@ -135,6 +135,7 @@ NODE_UPDATE_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/m
 PEER_MANIFEST_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/tools/qnode_peermanifest_checker.sh"
 CHECK_VISIBILITY_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/master/tools/qnode_visibility_check.sh"
 SYSTEM_CLEANER_URL="https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/tools/qnode_system_cleanup.sh"
+BACKUP_STORJ_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_backup_storj.sh"
 TEST_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/test/test_script.sh"
 
 # Common message for missing service file
@@ -189,6 +190,20 @@ system_cleaner() {
     wget -O - "$SYSTEM_CLEANER_URL" | bash
     prompt_return_to_menu
 }
+
+backup_storj() {
+    echo ""
+    echo "⌛️  Downloading Storj backup script..."
+    mkdir -p ~/scripts && wget -P ~/scripts -O ~/scripts/qnode_backup_storj.sh "$BACKUP_STORJ_URL"
+    if [ -f ~/scripts/qnode_backup_storj.sh ]; then
+        chmod +x ~/scripts/qnode_backup_storj.sh
+        ~/scripts/qnode_backup_storj.sh
+    else
+        echo "❌ Failed to download Storj backup script."
+    fi
+    prompt_return_to_menu
+}
+
 
 node_info() {
     if [ ! -f "$SERVICE_FILE" ]; then
@@ -401,6 +416,12 @@ This action will check the peer manifest to provide information about the diffic
 It only works after 15-30 minutes that the node has been running.
 '
 
+backup_storj_message='
+This action automates the backup of your node data to StorJ.
+You need a StorJ account https://www.storj.io/ and a Public/Secret access key.
+For security we suggest you to create a bucket specific to Quilibrium, and specific keys for accessing only that bucket.
+'
+
 test_script_message='
 This will run the test script.
 '
@@ -462,6 +483,10 @@ Here are all the options of the Quickstart Node Menu
 
 13) System cleaner:
     Perform system cleanup tasks. It will not affect your node.
+
+14) Backup your node:
+    Backup of your node stoe folder and other data on StorJ.
+    You need a Storj account https://www.storj.io/ and a Public/Secret access key.
 '
 
 #=====================
@@ -513,7 +538,7 @@ If you want to install a new node, choose option 1, and then 2
 3) Set up gRPCurl            11) Peer manifest (Difficulty metric)
 4) Node Log                  12) Check visibility
 5) Update node               13) System cleaner
-6) Stop node
+6) Stop node                 14) Backup your node
 7) Restart node
 ------------------------------------------------------------------
 E) Exit                       H) Help
@@ -537,20 +562,21 @@ while true; do
     	0) best_providers;;
         1) confirm_action "$(wrap_text "$prepare_server_message" "")" "Prepare your server" install_prerequisites;;
         2) confirm_action "$(wrap_text "$install_node_message" "")" "Install node" install_node;;
-	3) confirm_action "$(wrap_text "$setup_grpcurl_message" "")" "Set up gRPCurl" configure_grpcurl;;
+	    3) confirm_action "$(wrap_text "$setup_grpcurl_message" "")" "Set up gRPCurl" configure_grpcurl;;
         4) node_logs action_performed=1;;
         5) confirm_action "$(wrap_text "$update_node_message" "")" "Update node" update_node;;
-	6) stop_node action_performed=1;;
+	    6) stop_node action_performed=1;;
         7) restart_node action_performed=1;;
-	8) node_version action_performed=1;;
+	    8) node_version action_performed=1;;
         9) node_info action_performed=1;;
- 	10) quil_balance action_performed=1;;
+ 	    10) quil_balance action_performed=1;;
         11) confirm_action "$(wrap_text "$peer_manifest_message" "")" "Peer manifest" peer_manifest;;
         12) check_visibility;;
-	13) system_cleaner;;
-	20) confirm_action "$(wrap_text "$test_script_message" "")" "Test Script" test_script;;
+	    13) system_cleaner;;
+        14) confirm_action "$(wrap_text "$backup_storj_message" "")" "Backup your node on StorJ" backup_storj;;
+	    20) confirm_action "$(wrap_text "$test_script_message" "")" "Test Script" test_script;;
         [eE]) exit ;;
-	[hH]) help_message;;
+	    [hH]) help_message;;
         *) echo "Invalid option, please try again." ;;
     esac
     
