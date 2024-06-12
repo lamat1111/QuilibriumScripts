@@ -123,10 +123,10 @@ export GOPATH=$HOME/go
 export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
 
 # Step 4.1: Build Ceremonyclient qClient
-echo "⏳ Building qClient..."
-sleep 1  # Add a 1-second delay
-cd ~/ceremonyclient/client
-GOEXPERIMENT=arenas go build -o qclient main.go
+# echo "⏳ Building qClient..."
+# sleep 1  # Add a 1-second delay
+# cd ~/ceremonyclient/client
+# GOEXPERIMENT=arenas go build -o qclient main.go
 
 # Step 5: Determine the ExecStart line based on the architecture
 # Get the current user's home directory
