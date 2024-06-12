@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.5"
+VERSION="1.5"
 
 # Function to check if wget is installed, and install it if it is not
 check_wget() {
@@ -27,7 +27,7 @@ if ! grep -Fxq "# === qone.sh setup ===" ~/.bashrc; then
     echo "⌛️ Upgrading the qone.sh script... just one minute!"
     sleep 3
     echo "ℹ️ Downloading qone_setup.sh..."
-    if ! wget -qO- https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/testing/qone_setup.sh | bash; then
+    if ! wget -qO- https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/qone_setup.sh | bash; then
         echo "❌ Error: Failed to download and execute qone-setup.sh"
         exit 1
     else
@@ -49,9 +49,9 @@ fi
 
 # Function to check for newer script version
 check_for_updates() {
-    LATEST_VERSION=$(wget -qO- "https://github.com/lamat1111/QuilibriumScripts/raw/main/qone.sh" | grep 'SCRIPT_VERSION="' | head -1 | cut -d'"' -f2)
+    LATEST_VERSION=$(wget -qO- "https://github.com/lamat1111/QuilibriumScripts/raw/testing/qone.sh" | grep 'SCRIPT_VERSION="' | head -1 | cut -d'"' -f2)
     if [ "$SCRIPT_VERSION" != "$LATEST_VERSION" ]; then
-        wget -O qone.sh "https://github.com/lamat1111/QuilibriumScripts/raw/main/qone.sh"
+        wget -O qone.sh "https://github.com/lamat1111/QuilibriumScripts/raw/testing/qone.sh"
         echo "New version downloaded."
     fi
 }
@@ -216,7 +216,7 @@ node_logs() {
         echo ""  # Add an empty line for better readability
     fi
     echo ""
-    echo "⌛️  Displaying your node log...  Press CTRL+C to return to the main menu"
+    echo "⌛️  Displaying your node log...  (Press CTRL+C to return to the main menu)"
     echo ""
     trap 'echo "Returning to main menu..."; return_to_menu' INT  # Trap CTRL+C to return to main menu
     sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
@@ -556,4 +556,3 @@ while true; do
         read -n 1 -s -r -p "Press any key to continue..."
     fi
 done
-
