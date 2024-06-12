@@ -230,12 +230,12 @@ if [[ $backup_node_folder =~ ^[Yy]$ ]]; then
     read -p "▶️ How frequently do you want to backup your 'store' folder (in hours): " backup_interval
     random_minute=$(shuf -i 0-59 -n 1)
     cron_schedule="$random_minute */$backup_interval * * *"
-    echo
     cron_command="rclone $backup_type --transfers 10 --checkers 20 --disable-http2 --retries 1 $HOME/ceremonyclient/node/.config/store storj:/$bucket/$target_folder/store"
     existing_store_pattern="/ceremonyclient/node/.config/store storj:"
     if ! crontab -l | grep -q "$existing_store_pattern"; then
         (crontab -l ; echo "$cron_schedule $cron_command") | crontab -
         echo "⌛️ Setting cron job to backup node 'store' folder every $backup_interval hours at a random minute..."
+        echo
     else
         echo "⚠️ Cron job to backup node 'store' folder already exists. Skipping..."
         echo
@@ -245,7 +245,6 @@ fi
 # Backup existing cronjobs if selected
 read -p "❔ Do you want to backup your existing cronjobs? (y/n): " backup_cronjobs
 if [[ $backup_cronjobs =~ ^[Yy]$ ]]; then
-    echo
     random_minute=$(shuf -i 0-59 -n 1)
     cron_schedule="$random_minute */12 * * *"
     cron_command="crontab -l > $HOME/cron_jobs.txt && rclone $backup_type $HOME/cron_jobs.txt storj:/$bucket/$target_folder/cron_jobs.txt"
@@ -253,6 +252,7 @@ if [[ $backup_cronjobs =~ ^[Yy]$ ]]; then
     if ! crontab -l | grep -q "$existing_cronjobs_pattern"; then
         (crontab -l ; echo "$cron_schedule $cron_command") | crontab -
         echo "⌛️ Setting cron job to backup existing cronjobs every 12 hours at a random minute..."
+        echo
     else
         echo "⚠️ Cron job to backup existing cron jobs already exists. Skipping..."
         echo
@@ -263,7 +263,6 @@ fi
 if [ -d "$HOME/scripts/" ]; then
     read -p "❔ Do you want to backup your third-party scripts folder? (y/n): " backup_scripts
     if [[ $backup_scripts =~ ^[Yy]$ ]]; then
-        echo
         random_minute=$(shuf -i 0-59 -n 1)
         cron_schedule="$random_minute */12 * * *"
         cron_command="rclone $backup_type $HOME/scripts storj:/$bucket/$target_folder/scripts"
