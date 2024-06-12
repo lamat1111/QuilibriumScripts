@@ -53,7 +53,6 @@ check_for_updates() {
     if [ "$SCRIPT_VERSION" != "$LATEST_VERSION" ]; then
         wget -O qone.sh "https://github.com/lamat1111/QuilibriumScripts/raw/main/qone.sh"
         echo "New version downloaded."
-        exit 0
     fi
 }
 
