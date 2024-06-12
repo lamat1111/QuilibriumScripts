@@ -173,8 +173,11 @@ echo
 # Ensure rclone config directory exists
 mkdir -p $HOME/.config/rclone
 
-# Remove existing StorJ bucket configuration
-sed -i '/^\[storj\]/,/^$/d' "$HOME/.config/rclone/rclone.conf"
+# Check if the rclone configuration file exists
+if [ -f "$HOME/.config/rclone/rclone.conf" ]; then
+    # Remove existing StorJ bucket configuration
+    sed -i '/^\[storj\]/,/^$/d' "$HOME/.config/rclone/rclone.conf"
+fi
 
 # Configure StorJ bucket using S3
 {
