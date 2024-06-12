@@ -49,13 +49,10 @@ fi
 
 # Function to check for newer script version
 check_for_updates() {
-    LATEST_VERSION=$(curl -s https://raw.githubusercontent.com/Quilibrium-wiki/YAQAS/main/tools/backup.sh | grep 'SCRIPT_VERSION="' | head -1 | cut -d'"' -f2)
+    LATEST_VERSION=$(wget -qO- "https://github.com/lamat1111/QuilibriumScripts/raw/main/qone.sh" | grep 'SCRIPT_VERSION="' | head -1 | cut -d'"' -f2)
     if [ "$SCRIPT_VERSION" != "$LATEST_VERSION" ]; then
-        echo "A newer version of this script is available (v$LATEST_VERSION)."
-        read -p "Do you want to download the newer version? (y/n): " RESPONSE
-        if [ "$RESPONSE" == "y" ] || [ "$RESPONSE" == "Y" ]; then
-            curl -o backup.sh https://raw.githubusercontent.com/Quilibrium-wiki/YAQAS/main/tools/backup.sh
-            echo "New version downloaded. Please run the script again."
+            wget -O qone.sh "https://github.com/lamat1111/QuilibriumScripts/raw/main/qone.sh"
+            echo "New version downloaded."
             exit 0
         fi
     fi
