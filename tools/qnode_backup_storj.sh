@@ -279,8 +279,10 @@ if [ -d "$HOME/scripts/" ]; then
 fi
 
 # Done
-  echo "✅ Your automatic backups are all set!"
-  echo
-  echo "Here is a summary of your cronjobs:"
-  echo
-  crontab -l
+echo
+echo "✅ Your automatic backups are all set!"
+echo
+echo "Here is a summary of your cronjobs:"
+echo
+crontab -l
+echo
