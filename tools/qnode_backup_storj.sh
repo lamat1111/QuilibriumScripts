@@ -230,7 +230,7 @@ add_new_cronjob() {
 # Backup node store folder if selected
 read -p "❔ Do you want to backup your node 'store' folder? (y/n): " backup_node_folder
 if [[ $backup_node_folder =~ ^[Yy]$ ]]; then
-    read -p "▶️ How frequently do you want to backup your 'store' folder (in hours): " backup_interval
+    read -p "▶️ Backup 'store' folder every how many hours? (1-100): " backup_interval
     random_minute=$(shuf -i 0-59 -n 1)
     cron_schedule="$random_minute */$backup_interval * * *"
     cron_command="rclone $backup_type --transfers 10 --checkers 20 --disable-http2 --retries 1 $HOME/ceremonyclient/node/.config/store storj:/$bucket/$target_folder/store"
