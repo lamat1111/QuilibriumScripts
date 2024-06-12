@@ -27,7 +27,7 @@ if ! grep -Fxq "# === qone.sh setup ===" ~/.bashrc; then
     echo "⌛️ Upgrading the qone.sh script... just one minute!"
     sleep 3
     echo "ℹ️ Downloading qone_setup.sh..."
-    if ! wget -qO- https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/testing/qone_setup.sh | bash; then
+    if ! wget -qO- https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/qone_setup.sh | bash; then
         echo "❌ Error: Failed to download and execute qone-setup.sh"
         exit 1
     else
