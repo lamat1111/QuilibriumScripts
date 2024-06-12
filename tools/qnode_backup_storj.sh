@@ -245,6 +245,7 @@ fi
 # Backup existing cronjobs if selected
 read -p "❔ Do you want to backup your existing cronjobs? (y/n): " backup_cronjobs
 if [[ $backup_cronjobs =~ ^[Yy]$ ]]; then
+    echo
     random_minute=$(shuf -i 0-59 -n 1)
     cron_schedule="$random_minute */12 * * *"
     cron_command="crontab -l > $HOME/cron_jobs.txt && rclone $backup_type $HOME/cron_jobs.txt storj:/$bucket/$target_folder/cron_jobs.txt"
