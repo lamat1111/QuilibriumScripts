@@ -167,7 +167,7 @@ echo
 echo "⌛️ Installing rclone..."
 sudo -v
 curl -s https://rclone.org/install.sh | sudo bash > /dev/null
-echo "rclone installed successfully."
+echo "✅ rclone installed successfully."
 echo
 
 # Ensure rclone config directory exists
