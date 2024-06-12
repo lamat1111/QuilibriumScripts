@@ -44,6 +44,7 @@ else
     if grep -q "# === [^=]*setup ===" ~/.bashrc; then
         echo "⚠️ Warning: Another script seems to be already set up to run on login."
         echo "To avoid conflicts, qone.sh will not be executed on login, but aliases will be set up."
+        sleep 1
         # Define the section to add in .bashrc without the execution line
         bashrc_section=$(cat << 'EOF'
         
@@ -79,5 +80,4 @@ EOF
     fi
 fi
 
-
-
+~/qone.sh
