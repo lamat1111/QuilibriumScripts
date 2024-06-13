@@ -40,7 +40,6 @@ def main():
         balance = get_unclaimed_balance()
         if balance is not None:
             home_dir = os.getenv('HOME', '/root')
-            hostname = get_hostname()
             filename = f"{home_dir}/scripts/balance_log.csv"
             
             # Calculate previous hour time range
