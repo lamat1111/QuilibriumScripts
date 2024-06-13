@@ -24,18 +24,14 @@ cat << "EOF"
                            QQQQQQ  QUILIBRIUM.ONE                                                                                                                              
 
 
-=================================================================================
-                    ✨ NODE BALANCE CHECKER INSTALLER ✨
-=================================================================================
+===============================================================
+            ✨ NODE BALANCE CHECKER - INSTALLER ✨
+===============================================================
 This installer sets up a script to check your node balance
 and then sets up a cronjob to log your balance every hour.
 
-If your node version is not 1.4.19 and your system architecture is not 'amd64',
-you will need to manually change this variable at the beginning of the script:
-'~/scripts/balance_checker.sh'
-
 Made with 🔥 by LaMat - https://quilibrium.one
-=================================================================================
+===============================================================
 
 Processing... ⏳
 
@@ -43,6 +39,9 @@ EOF
 
 sleep 7
 
+# If your node version is not 1.4.19 and your system architecture is not 'amd64',
+# you will need to manually change this variable at the beginning of the script:
+# '~/scripts/balance_checker.sh'
 
 echo "⚙️ Installing Python 3 and pip3..."
 sudo apt install -y python3 python3-pip > /dev/null || { echo "❌ Failed to install Python 3 and pip3."; exit 1; } 
@@ -81,5 +80,7 @@ echo
 echo "ℹ️ The script will now log your node balance every hour in ~/scripts/balance_log.csv"
 echo "ℹ️ To see the log just run 'cat ~/scripts/balance_log.csv'"
 echo
-echo "ℹ️ If you need to change your node version or sys archiutecture run:"
-eho "nano ~/scripts/balance_checker.sh"
+#echo "ℹ️ If you need to change your node version or sys archiutecture run:"
+#cho "nano ~/scripts/balance_checker.sh"
+echo "Testing..."
+~/scripts/balance_checker.sh
