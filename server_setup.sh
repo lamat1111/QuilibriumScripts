@@ -72,7 +72,7 @@ echo "⏳ Updating the machine..."
 echo "⏳ Processing... "
 sleep 2  # Add a 2-second delay
 sudo apt-get update
-sudo apt-get upgrade -y
+#sudo apt-get upgrade -y
 
 # Step 3: Install required packages
 echo "🔧 Installing useful packages..."
