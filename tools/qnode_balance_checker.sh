@@ -110,7 +110,7 @@ main() {
         
         # Format balance and increase to required precision
         local formatted_balance=$(printf "%.2f" "$balance")
-        local formatted_increase=$(printf "%.5f" "$increase")
+        local formatted_increase=$(printf "%.2f" "$increase")
         
         # Print data
         local data_to_write="$current_time,$formatted_balance,$formatted_increase"
