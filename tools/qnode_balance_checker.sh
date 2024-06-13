@@ -4,7 +4,7 @@
 SCRIPT_VERSION="1.0"
 
 # Define the node binary filename
-NODE_BINARY="node-1.4.19-linux-amd64"
+#NODE_BINARY="node-1.4.19-linux-amd64"
 
 # Function to check for newer script version
 check_for_updates() {
@@ -20,6 +20,23 @@ check_for_updates() {
 
 # Check for updates and update if available
 check_for_updates
+
+# Set the version number
+VERSION=$(cat $HOME/ceremonyclient/node/config/version.go | grep -A 1 "func GetVersion() \[\]byte {" | grep -Eo '0x[0-9a-fA-F]+' | xargs printf "%d.%d.%d")
+
+# Get the system architecture
+ARCH=$(uname -m)
+
+if [ "$ARCH" = "x86_64" ]; then
+    NODE_BINARY="node-$VERSION-linux-amd64"
+elif [ "$ARCH" = "aarch64" ]; then
+    NODE_BINARY="node-$VERSION-linux-arm64"
+elif [ "$ARCH" = "arm64" ]; then
+    NODE_BINARY="node-$VERSION-darwin-arm64"
+else
+    echo "Unsupported architecture: $ARCH"
+    exit 1
+fi
 
 cat << "EOF"
 
