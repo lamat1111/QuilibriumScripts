@@ -126,9 +126,9 @@ if [[ $has_bucket =~ ^[Yy]$ ]]; then
         fi
     done
 else
-    echo "▶️ Create a new StorJ bucket using lowercase characters [a-z][0-9][-.]"
+    echo "Create a new StorJ bucket using lowercase characters [a-z][0-9][-.]"
     while true; do
-        read -p "Enter your StorJ bucket name: " bucket
+        read -p "▶️ Enter your StorJ bucket name: " bucket
         echo
         if validate_bucket_name "$bucket"; then
             create_bucket_flag=true
@@ -141,6 +141,7 @@ fi
 
 # Prompt for the target folder name
 echo "Enter the target folder name where you want to store this backup, must be unique for each node!"
+echo "No spaces or special characters, only [a-z][0-9][-.]"
 read -p "▶️ Enter the target folder name, e.g., 'quil-01': " target_folder
 echo
 
