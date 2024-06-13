@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script version
-SCRIPT_VERSION="1.1"
+SCRIPT_VERSION="1.2"
 
 # Define the node binary filename
 #NODE_BINARY="node-1.4.19-linux-amd64"
@@ -61,17 +61,18 @@ cat << "EOF"
 
 
 ===================================================================
-         ✨ NODE BALANCE LOGGER SCRIPT - V $SCRIPT_VERSION ✨
+               ✨ NODE BALANCE LOGGER SCRIPT ✨
 ===================================================================
 This script check your node balance and logs it to a CSV file.
 It also calculate the increase of your balance for every hour.
 
 Made with 🔥 by LaMat - https://quilibrium.one
-====================================================================
-
-Processing... ⏳
+===================================================================
 
 EOF
+echo "Version: $SCRIPT_VERSION"
+echo
+echo "Processing... ⏳"
 
 sleep 3
 
