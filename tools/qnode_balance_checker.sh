@@ -92,22 +92,34 @@ main() {
     balance=$(get_unclaimed_balance)
     
     if [ -n "$balance" ]; then
-        local previous_balance="$balance"  # For now, assume it's the same balance
-
-        # Calculate increase in balance over one hour
-        local increase=0  # Assuming no previous balance tracking for now
+        local filename="$HOME/scripts/balance_log.csv"
         
-        # Format balance to required precision
-        local formatted_balance="$balance"
+        # Read the last recorded balance and increase from CSV
+        local last_record
+        last_record=$(tail -n 1 "$filename" 2>/dev/null)
+        local previous_balance=0
+        local previous_increase=0
         
-        # Format increase to required precision
+        if [ -n "$last_record" ]; then
+            previous_balance=$(echo "$last_record" | awk -F ',' '{print $2}')
+            previous_increase=$(echo "$last_record" | awk -F ',' '{print $3}')
+        fi
+        
+        # Calculate increase in balance since last recorded balance
+        local increase=$(echo "$balance - $previous_increase" | bc)
+        
+        # Format balance and increase to required precision
+        local formatted_balance=$(printf "%.2f" "$balance")
         local formatted_increase=$(printf "%.5f" "$increase")
         
         # Print data
         local data_to_write="$current_time,$formatted_balance,$formatted_increase"
         
         # Write to CSV file
-        write_to_csv "$data_to_write"
+        if [ ! -f "$filename" ] || [ ! -s "$filename" ]; then
+            echo "time,balance,increase" > "$filename"
+        fi
+        echo "$data_to_write" >> "$filename"
     fi
 }
 
