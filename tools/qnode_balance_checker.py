@@ -59,11 +59,17 @@ def main():
             # Calculate increase in balance over one hour
             increase = balance - balance_one_hour_ago
             
+            # Format increase to 4 decimal places
+            formatted_increase = f"{increase:.4f}"
+            
+            # Format balance to 2 decimal places
+            formatted_balance = f"{balance:.2f}"
+            
             # Print data
             data_to_write = [
                 current_time.strftime('%d/%m/%Y %H:%M'),
-                str(balance),
-                str(increase)
+                formatted_balance,
+                formatted_increase
             ]
             print(','.join(data_to_write))
             
