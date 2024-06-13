@@ -76,11 +76,13 @@ sleep 1
 echo
 echo "✅ Installer script completed!"
 echo "✅ Cronjob set!"
-echo
 echo "ℹ️ The script will now log your node balance every hour in ~/scripts/balance_log.csv"
+echo
+echo "Testing..."
+~/scripts/qnode_balance_checker.sh
+echo
 echo "ℹ️ To see the log just run 'cat ~/scripts/balance_log.csv'"
 echo
 #echo "ℹ️ If you need to change your node version or sys archiutecture run:"
 #cho "nano ~/scripts/balance_checker.sh"
-echo "Testing..."
-~/scripts/qnode_balance_checker.sh
+

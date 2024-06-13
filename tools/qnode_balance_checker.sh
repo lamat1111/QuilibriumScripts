@@ -1,16 +1,16 @@
 #!/bin/bash
 
 # Script version
-SCRIPT_VERSION="1.5.2"
+SCRIPT_VERSION="1.5.3"
 
 # Function to check for newer script version
 check_for_updates() {
-    echo "⚙️ Checking for script updates..."
+    #echo "⚙️ Checking for script updates..."
     LATEST_VERSION=$(wget -qO- "https://github.com/lamat1111/QuilibriumScripts/raw/main/tools/qnode_balance_checker.sh" | grep 'SCRIPT_VERSION="' | head -1 | cut -d'"' -f2)
     if [ "$SCRIPT_VERSION" != "$LATEST_VERSION" ]; then
         wget -O ~/scripts/qnode_balance_checker.sh "https://github.com/lamat1111/QuilibriumScripts/raw/main/tools/qnode_balance_checker.sh"
         chmod +x ~/scripts/qnode_balance_checker.sh
-        echo "✅ New version downloaded: V $SCRIPT_VERSION."
+        #echo "✅ New version downloaded: V $SCRIPT_VERSION."
         sleep 1
     fi
 }
