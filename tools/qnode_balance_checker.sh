@@ -6,6 +6,20 @@ SCRIPT_VERSION="1.0"
 # Define the node binary filename
 NODE_BINARY="node-1.4.19-linux-amd64"
 
+# Function to check for newer script version
+check_for_updates() {
+    LATEST_VERSION=$(wget -qO- "https://github.com/lamat1111/QuilibriumScripts/raw/main/tools/qnode_balance_checker.sh" | grep 'SCRIPT_VERSION="' | head -1 | cut -d'"' -f2)
+    if [ "$SCRIPT_VERSION" != "$LATEST_VERSION" ]; then
+        wget -O ~/scripts/qnode_balance_checker.sh "https://github.com/lamat1111/QuilibriumScripts/raw/main/tools/qnode_balance_checker.sh"
+        chmod +x ~/scripts/qnode_balance_checker.sh
+        echo "✅ New version downloaded: V $SCRIPT_VERSION."
+	sleep 1
+    fi
+}
+
+# Check for updates and update if available
+check_for_updates
+
 # Function to get the unclaimed balance
 get_unclaimed_balance() {
     local node_directory="$HOME/ceremonyclient/node"
