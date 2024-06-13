@@ -39,7 +39,58 @@ EOF
 
 sleep 7  # Add a 7-second delay
 
+#==========================
+# GO UPGRADE
+#==========================
 
+# Check the currently installed Go version
+if go version &>/dev/null; then
+    INSTALLED_VERSION=$(go version | awk '{print $3}' | sed 's/go//')
+else
+    INSTALLED_VERSION="none"
+fi
+
+# If the installed version is not 1.22.4, proceed with the installation
+if [ "$INSTALLED_VERSION" != "1.22.4" ]; then
+    echo "Current Go version is $INSTALLED_VERSION. Proceeding with installation of Go 1.22.4..."
+
+    # Determine the architecture and OS only if installing a new version
+    ARCH=$(uname -m)
+    OS=$(uname -s)
+
+    # Determine the Go binary name based on the architecture and OS
+    if [ "$ARCH" = "x86_64" ]; then
+        if [ "$OS" = "Linux" ]; then
+            GO_BINARY="go1.22.4.linux-amd64.tar.gz"
+        elif [ "$OS" = "Darwin" ]; then
+            GO_BINARY="go1.22.4.darwin-amd64.tar.gz"
+        fi
+    elif [ "$ARCH" = "aarch64" ]; then
+        if [ "$OS" = "Linux" ]; then
+            GO_BINARY="go1.22.4.linux-arm64.tar.gz"
+        elif [ "$OS" = "Darwin" ]; then
+            GO_BINARY="go1.22.4.darwin-arm64.tar.gz"
+        fi
+    else
+        echo "Unsupported architecture: $ARCH"
+        exit 1
+    fi
+
+    # Download and install Go
+    wget https://go.dev/dl/$GO_BINARY || echo "Failed to download Go!"
+    sudo tar -xvf $GO_BINARY || echo "Failed to extract Go!"
+    sudo rm -rf /usr/local/go || echo "Failed to remove existing Go!"
+    sudo mv go /usr/local || echo "Failed to move Go!"
+    sudo rm $GO_BINARY || echo "Failed to remove downloaded archive!"
+    
+    echo "Go 1.22.4 has been installed successfully."
+else
+    echo "Go version 1.22.4 is already installed. No action needed."
+fi
+
+#==========================
+# NODE UPDATE
+#==========================
 
 # Step 1: Stop the ceremonyclient service if it exists
 echo "⏳ Stopping the ceremonyclient service if it exists..."
@@ -58,23 +109,23 @@ cd ~/ceremonyclient || { echo "❌ Error: Directory ~/ceremonyclient does not ex
 echo "✅ Discarding local changes in release_autorun.sh..."
 git checkout -- node/release_autorun.sh
 
-# Function to install a package if it is not already installed
-install_package() {
-    echo "⏳ Installing $1..."
-    if apt-get install -y $1; then
-        echo "✅ $1 installed successfully."
-    else
-        echo "❌ Failed to install $1. You will have to do this manually."
-    fi
-}
+# # Function to install a package if it is not already installed
+# install_package() {
+#     echo "⏳ Installing $1..."
+#     if apt-get install -y $1; then
+#         echo "✅ $1 installed successfully."
+#     else
+#         echo "❌ Failed to install $1. You will have to do this manually."
+#     fi
+# }
 
-# Install cpulimit
-install_package cpulimit
+# # Install cpulimit
+# install_package cpulimit
 
-# Install gawk
-install_package gawk
+# # Install gawk
+# install_package gawk
 
-echo "✅ cpulimit and gawk are installed and up to date."
+# echo "✅ cpulimit and gawk are installed and up to date."
 
 
 # Step 4: Download Binary
@@ -94,6 +145,10 @@ HOME=$(eval echo ~$HOME_DIR)
 # Use the home directory in the path
 NODE_PATH="$HOME/ceremonyclient/node"
 EXEC_START="$NODE_PATH/release_autorun.sh"
+
+#==========================
+# SERVICE UPDATE
+#==========================
 
 # Step 5: Re-Create or Update Ceremonyclient Service
 echo "🔧 Rebuilding Ceremonyclient Service..."
