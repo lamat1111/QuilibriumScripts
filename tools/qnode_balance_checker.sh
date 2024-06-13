@@ -71,7 +71,12 @@ write_to_csv() {
     local filename="$HOME/scripts/balance_log.csv"
     local data="$1"
 
-    # Write data to CSV file, skipping the first line if it's not a valid data line
+    # Check if file exists to determine if headers need to be written
+    if [ ! -f "$filename" ] || [ ! -s "$filename" ]; then
+        echo "time,balance,increase" > "$filename"
+    fi
+
+    # Append data to CSV
     echo "$data" >> "$filename"
 }
 
