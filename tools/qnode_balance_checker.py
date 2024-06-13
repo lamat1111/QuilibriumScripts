@@ -33,13 +33,6 @@ def write_to_csv(filename, data):
     except Exception as e:
         print(f"Error writing to CSV file: {e}")
 
-# Function to get hostname or default to random 2-digit number
-def get_hostname():
-    hostname = os.getenv('HOSTNAME')
-    if not hostname:
-        hostname = f"rand{random.randint(10, 99)}"
-    return hostname
-
 # Main function to run once per execution
 def main():
     try:
@@ -48,7 +41,7 @@ def main():
         if balance is not None:
             home_dir = os.getenv('HOME', '/root')
             hostname = get_hostname()
-            filename = f"{home_dir}/scripts/rewards_log_{hostname}.csv"
+            filename = f"{home_dir}/scripts/balance_log.csv"
             
             # Calculate previous hour time range
             start_time = current_time - timedelta(hours=1)
@@ -64,7 +57,7 @@ def main():
             
             # Format balance to 2 decimal places
             formatted_balance = f"{balance:.2f}"
-            
+
             # Print data
             data_to_write = [
                 current_time.strftime('%d/%m/%Y %H:%M'),
