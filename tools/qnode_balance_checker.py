@@ -27,8 +27,12 @@ def get_unclaimed_balance():
 # Function to write data to CSV file
 def write_to_csv(filename, data):
     try:
+        # Check if file exists to determine if headers need to be written
+        file_exists = os.path.isfile(filename)
         with open(filename, 'a', newline='') as file:
             writer = csv.writer(file)
+            if not file_exists:
+                writer.writerow(["time", "balance", "increase"])  # Write headers if file is empty
             writer.writerow(data)
     except Exception as e:
         print(f"Error writing to CSV file: {e}")
