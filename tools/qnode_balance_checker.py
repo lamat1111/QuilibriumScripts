@@ -6,10 +6,13 @@ import csv
 import random
 from datetime import datetime, timedelta
 
+# Define the node binary filename
+NODE_BINARY = 'node-1.4.19-linux-amd64'
+
 # Function to get the unclaimed balance
 def get_unclaimed_balance():
     try:
-        node_command = ['./node-1.4.19-linux-amd64', '-node-info']
+        node_command = [os.path.join('./', NODE_BINARY), '-node-info']
         node_directory = os.path.expanduser('~/ceremonyclient/node')
         result = subprocess.run(node_command, cwd=node_directory, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
         output = result.stdout.decode('utf-8')
@@ -55,8 +58,8 @@ def main():
             # Calculate increase in balance over one hour
             increase = balance - balance_one_hour_ago
             
-            # Format increase to 4 decimal places
-            formatted_increase = f"{increase:.4f}"
+            # Format increase to 5 decimal places
+            formatted_increase = f"{increase:.5f}"
             
             # Format balance to 2 decimal places
             formatted_balance = f"{balance:.2f}"
