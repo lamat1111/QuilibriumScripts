@@ -33,6 +33,8 @@ and a Public/Secret access key.
 For security we suggest you to create a bucket specific to Quilibrium, 
 and specific keys for accessing only that bucket.
 
+To create your Keys on STorJ: "Access Keys > S3 Credentials"
+
 Made with 🔥 by LaMat - https://quilibrium.one
 ===========================================================================
 
