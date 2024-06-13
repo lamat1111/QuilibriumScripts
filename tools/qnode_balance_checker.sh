@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script version
-SCRIPT_VERSION="1.5"
+SCRIPT_VERSION="1.5.1"
 
 # Function to check for newer script version
 check_for_updates() {
@@ -55,7 +55,7 @@ get_unclaimed_balance() {
     
     # Parse output to find unclaimed balance
     local balance
-    balance=$(echo "$output" | grep "Unclaimed balance" | awk '{print $3}')
+    balance=$(echo "$output" | grep "Unclaimed balance" | awk '{print $3}' | sed 's/[^0-9.]//g')
     
     # Check if balance is a valid number
     if [[ "$balance" =~ ^[0-9.]+$ ]]; then
@@ -99,6 +99,7 @@ main() {
 
         # Calculate increase in balance over one hour
         local increase=0  # Assuming no previous balance tracking for now
+        
         # Format balance to required precision
         local formatted_balance="$balance"
         
