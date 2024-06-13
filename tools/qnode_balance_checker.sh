@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script version
-SCRIPT_VERSION="1.5.1"
+SCRIPT_VERSION="1.5.2"
 
 # Function to check for newer script version
 check_for_updates() {
@@ -42,8 +42,6 @@ get_node_binary_filename() {
 
 # Function to get the unclaimed balance
 get_unclaimed_balance() {
-    echo
-    echo "⚙️ Retrieving unclaimed balance..."
     local node_directory="$HOME/ceremonyclient/node"
     local NODE_BINARY
     NODE_BINARY=$(get_node_binary_filename)
@@ -73,17 +71,8 @@ write_to_csv() {
     local filename="$HOME/scripts/balance_log.csv"
     local data="$1"
 
-    echo
-    echo "⚙️ Writing data to CSV file..."
-
-    # Check if file exists to determine if headers need to be written
-    if [ ! -f "$filename" ]; then
-        echo "time,balance,increase" > "$filename"
-    fi
-
-    # Append data to CSV
+    # Write data to CSV file, skipping the first line if it's not a valid data line
     echo "$data" >> "$filename"
-    sleep 1
 }
 
 # Main function
@@ -108,7 +97,6 @@ main() {
         
         # Print data
         local data_to_write="$current_time,$formatted_balance,$formatted_increase"
-        echo "$data_to_write"
         
         # Write to CSV file
         write_to_csv "$data_to_write"
