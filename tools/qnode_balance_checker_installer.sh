@@ -50,7 +50,7 @@ sleep 1
 
 echo "⚙️ Removing existing script if it exists..."
 echo
-rm -f ~/scripts/qnode_balance_checker.py
+rm -f ~/scripts/qnode_balance_checker.sh
 sleep 1
 
 echo "⚙️ Creating directory for scripts..."
