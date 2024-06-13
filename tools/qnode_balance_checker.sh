@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script version
-SCRIPT_VERSION="1.2"
+SCRIPT_VERSION="1.3"
 
 # Define the node binary filename
 #NODE_BINARY="node-1.4.19-linux-amd64"
@@ -76,12 +76,14 @@ echo "Processing... ⏳"
 
 sleep 3
 
-# Function to get the unclaimed balance
+## Function to get the unclaimed balance
 get_unclaimed_balance() {
     echo
     echo "⚙️ Retrieving unclaimed balance..."
     local node_directory="$HOME/ceremonyclient/node"
-    local node_command="./$NODE_BINARY -node-info"
+    local NODE_BINARY
+    NODE_BINARY=$(get_node_binary_filename)
+    local node_command="./$NODE_BINARY -balance"
     
     # Run node command and capture output
     local output
