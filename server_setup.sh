@@ -30,15 +30,15 @@ echo ""
 echo "Made with 🔥 by LaMat - https://quilibrium.one"
 echo "==========================================================================="
 echo ""
-echo "Processing... ⏳"
+echo "⏳ Processing... "
 sleep 7  # Add a 7-second delay
 
 
 # Define a function for displaying exit messages
 exit_message() {
     echo "❌ Oops! There was an error during the script execution and the process stopped. No worries!"
-    echo "🔄 You can try to run the script from scratch again."
-    echo "🛠️ If you still receive an error, you may want to proceed manually, step by step instead of using the auto-installer."
+    echo "You can try to run the script from scratch again."
+    echo "🛠If you still receive an error, you may want to proceed manually, step by step instead of using the auto-installer."
 }
 
 # Determine the ExecStart line based on the architecture
@@ -68,11 +68,11 @@ if ! [ -x "$(command -v sudo)" ]; then
 fi
 
 # Step 2: Update and Upgrade the Machine
-echo "🔄 Updating the machine..."
-echo "Processing... ⏳"
+echo "⏳ Updating the machine..."
+echo "⏳ Processing... "
 sleep 2  # Add a 2-second delay
 sudo apt-get update
-sudo apt-get upgrade -y
+#sudo apt-get upgrade -y
 
 # Step 3: Install required packages
 echo "🔧 Installing useful packages..."
@@ -100,11 +100,12 @@ echo "✅ cpulimit and gawk are installed and up to date."
 # Step 4: Download and extract Go
 
 # Installing Go
-wget https://go.dev/dl/$GO_BINARY || { echo "Failed to download Node! Exiting..."; exit_message; exit 1; }    
-sudo tar -xvf $GO_BINARY || { echo "Failed to extract Go! Exiting..."; exit_message; exit 1; }
-sudo rm -rf /usr/local/go || { echo "Failed to remove existing Go! Exiting..."; exit_message; exit 1; }
-sudo mv go /usr/local || { echo "Failed to move go! Exiting..."; exit_message; exit 1; }
-sudo rm $GO_BINARY || { echo "Failed to remove downloaded archive! Exiting..."; exit_message; exit 1; }
+echo "⏳ Downloading and installing GO..."
+wget https://go.dev/dl/$GO_BINARY > /dev/null 2>&1 || echo "❌ Failed to download GO!"    
+sudo tar -xvf $GO_BINARY > /dev/null 2>&1 || echo "❌ Failed to extract GO!"
+sudo rm -rf /usr/local/go || echo "❌ Failed to remove existing GO!"
+sudo mv go /usr/local || echo "❌ Failed to move GO!"
+sudo rm $GO_BINARY || echo "❌ Failed to remove downloaded archive!"
 
 # Step 5: Set Go environment variables
 echo "🌍 Setting Go environment variables..."
@@ -164,14 +165,14 @@ export GOPATH=$HOME/go
 export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
 
 # Step 7: Install gRPCurl
-echo "📦 Installing gRPCurl..."
+echo "⏳ Installing gRPCurl..."
 sleep 1  # Add a 1-second delay
 
 # Try installing gRPCurl using go install
 if go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest; then
     echo "✅ gRPCurl installed successfully via go install."
 else
-    echo "⚠️ Failed to install gRPCurl via go install. Trying apt-get..."
+    echo "❌ Failed to install gRPCurl via go install. Trying apt-get..."
     # Try installing gRPCurl using apt-get
     if sudo apt-get install grpcurl -y; then
         echo "✅ gRPCurl installed successfully via apt-get."
@@ -212,15 +213,15 @@ else
 fi
 
 # Step 9: Creating some useful folders
-echo "📂 Creating /root/backup/ folder..."
+echo "⏳ Creating /root/backup/ folder..."
 sudo mkdir -p /root/backup/
 echo "✅ Done."
 
-echo "📂 Creating /root/scripts/ folder..."
+echo "⏳ Creating /root/scripts/ folder..."
 sudo mkdir -p /root/scripts/
 echo "✅ Done."
 
-echo "📂 Creating /root/scripts/log/ folder..."
+echo "⏳ Creating /root/scripts/log/ folder..."
 sudo mkdir -p /root/scripts/log/
 echo "✅ Done."
 
