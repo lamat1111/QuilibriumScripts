@@ -53,8 +53,8 @@ def main():
             # Calculate previous hour time range
             start_time = current_time - timedelta(hours=1)
             
-            # Get balance from one hour ago
-            balance_one_hour_ago = get_unclaimed_balance_at_time(start_time)
+            # For now, we're using the current balance instead of get_unclaimed_balance_at_time
+            balance_one_hour_ago = balance
             
             # Calculate increase in balance over one hour
             increase = balance - balance_one_hour_ago
