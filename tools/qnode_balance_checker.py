@@ -2,6 +2,7 @@
 
 import subprocess
 import os
+import csv
 from datetime import datetime, timedelta
 
 # Function to get the unclaimed balance
@@ -22,47 +23,64 @@ def get_unclaimed_balance():
         print(f"Unexpected error: {e}")
     return None
 
+# Function to read the last entry from CSV file
+def read_last_entry_from_csv(filename):
+    try:
+        with open(filename, 'r') as file:
+            reader = csv.reader(file)
+            last_row = None
+            for row in reader:
+                last_row = row
+            return last_row
+    except FileNotFoundError:
+        return None
+    except Exception as e:
+        print(f"Error reading CSV file: {e}")
+        return None
+
 # Function to write data to CSV file
 def write_to_csv(filename, data):
     try:
-        with open(filename, 'w') as file:
-            file.write("date and time,balance,increase\n")
-            for row in data:
-                file.write(','.join(map(str, row)) + '\n')
+        with open(filename, 'a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(data)
     except Exception as e:
         print(f"Error writing to CSV file: {e}")
 
-# Main function to run once per hour
+# Main function to run once per execution
 def main():
     try:
-        balance = get_unclaimed_balance()
         current_time = datetime.now()
-        
+        balance = get_unclaimed_balance()
         if balance is not None:
             home_dir = os.getenv('HOME', '/root')
-            filename = f"{home_dir}/scripts/rewards_log_{os.getenv('HOSTNAME', 'unknown')}.csv"
+            hostname = os.getenv('HOSTNAME', 'unknown')
+            filename = f"{home_dir}/scripts/rewards_log_{hostname}.csv"
             
-            # Calculate previous hour time range
-            start_time = current_time.replace(minute=0, second=0, microsecond=0) - timedelta(hours=1)
-            end_time = start_time + timedelta(hours=1)
+            # Read last entry from CSV file
+            last_entry = read_last_entry_from_csv(filename)
+            if last_entry:
+                last_timestamp = datetime.strptime(last_entry[0], '%d/%m/%Y %H:%M')
+                last_balance = float(last_entry[1])
+                last_increase = float(last_entry[2])
+            else:
+                last_timestamp = current_time - timedelta(hours=1)
+                last_balance = balance
+                last_increase = 0.0
             
-            # Calculate increase in balance
-            previous_hour_data = []
-            while current_time > start_time:
-                previous_hour_data.append([
-                    current_time.strftime('%d/%m/%Y %H:%M'),
-                    balance,
-                    0  # Placeholder for increase, filled below
-                ])
-                current_time -= timedelta(minutes=1)
+            # Calculate increase in balance since last recorded entry
+            increase = balance - last_balance
             
-            for i in range(len(previous_hour_data)-1, 0, -1):
-                previous_hour_data[i][2] = previous_hour_data[i][1] - previous_hour_data[i-1][1]
-
+            # Print data
+            data_to_write = [
+                current_time.strftime('%d/%m/%Y %H:%M'),
+                str(balance),
+                str(increase)
+            ]
+            print(','.join(data_to_write))
+            
             # Write to CSV file
-            write_to_csv(filename, previous_hour_data)
-            
-            print(f"Data written to {filename} for {start_time.strftime('%d/%m/%Y %H:%M')} - {end_time.strftime('%d/%m/%Y %H:%M')}")
+            write_to_csv(filename, data_to_write)
     
     except Exception as e:
         print(f"Error: {e}")
