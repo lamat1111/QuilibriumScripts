@@ -83,4 +83,4 @@ echo
 #echo "ℹ️ If you need to change your node version or sys archiutecture run:"
 #cho "nano ~/scripts/balance_checker.sh"
 echo "Testing..."
-~/scripts/balance_checker.sh
+~/scripts/qnode_balance_checker.sh
