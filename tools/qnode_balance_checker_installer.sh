@@ -50,19 +50,19 @@ sleep 1
 
 echo "⚙️ Removing existing script if it exists..."
 echo
-rm -f ~/scripts/qnode_balance_checker.sh
+rm -f $HOME/scripts/qnode_balance_checker.sh
 sleep 1
 
 echo "⚙️ Creating directory for scripts..."
-mkdir -p ~/scripts
+mkdir -p $HOME/scripts
 sleep 1
 
 echo "⚙️ Downloading new script..."
-wget -q -P ~/scripts -O ~/scripts/qnode_balance_checker.sh https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_balance_checker.sh
+wget -q -P $HOME/scripts -O $HOME/scripts/qnode_balance_checker.sh https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_balance_checker.sh
 sleep 1
 
 echo "⚙️ Setting executable permissions for the script..."
-chmod +x ~/scripts/qnode_balance_checker.sh
+chmod +x $HOME/scripts/qnode_balance_checker.sh
 sleep 1
 
 echo "⚙️ Checking if a cronjob exists for qnode_balance_checker.py and deleting it if found..."
@@ -70,19 +70,19 @@ crontab -l | grep -v "qnode_balance_checker.sh" | crontab -
 sleep 1
 
 echo "⚙️ Setting up cronjob to run the script once every hour..."
-(crontab -l ; echo "0 * * * * ~/scripts/qnode_balance_checker.sh") | crontab -
+(crontab -l ; echo "0 * * * * $HOME/scripts/qnode_balance_checker.sh") | crontab -
 sleep 1
 
 echo
 echo "✅ Installer script completed!"
 echo "✅ Cronjob set!"
-echo "ℹ️ The script will now log your node balance every hour in ~/scripts/balance_log.csv"
+echo "ℹ️ The script will now log your node balance every hour in $HOME/scripts/balance_log.csv"
 echo
 echo "Testing..."
-~/scripts/qnode_balance_checker.sh
+$HOME/scripts/qnode_balance_checker.sh
 echo
-echo "ℹ️ To see the log just run 'cat ~/scripts/balance_log.csv'"
+echo "ℹ️ To see the log just run 'cat $HOME/scripts/balance_log.csv'"
 echo
 #echo "ℹ️ If you need to change your node version or sys archiutecture run:"
-#cho "nano ~/scripts/balance_checker.sh"
+#echo "nano ~/scripts/balance_checker.sh"
 
