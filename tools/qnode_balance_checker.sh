@@ -8,6 +8,7 @@ NODE_BINARY="node-1.4.19-linux-amd64"
 
 # Function to check for newer script version
 check_for_updates() {
+    echo "⚙️ Checking for script updates..."
     LATEST_VERSION=$(wget -qO- "https://github.com/lamat1111/QuilibriumScripts/raw/main/tools/qnode_balance_checker.sh" | grep 'SCRIPT_VERSION="' | head -1 | cut -d'"' -f2)
     if [ "$SCRIPT_VERSION" != "$LATEST_VERSION" ]; then
         wget -O ~/scripts/qnode_balance_checker.sh "https://github.com/lamat1111/QuilibriumScripts/raw/main/tools/qnode_balance_checker.sh"
@@ -20,8 +21,47 @@ check_for_updates() {
 # Check for updates and update if available
 check_for_updates
 
+cat << "EOF"
+
+                  QQQQQQQQQ       1111111   
+                QQ:::::::::QQ    1::::::1   
+              QQ:::::::::::::QQ 1:::::::1   
+             Q:::::::QQQ:::::::Q111:::::1   
+             Q::::::O   Q::::::Q   1::::1   
+             Q:::::O     Q:::::Q   1::::1   
+             Q:::::O     Q:::::Q   1::::1   
+             Q:::::O     Q:::::Q   1::::l   
+             Q:::::O     Q:::::Q   1::::l   
+             Q:::::O     Q:::::Q   1::::l   
+             Q:::::O  QQQQ:::::Q   1::::l   
+             Q::::::O Q::::::::Q   1::::l   
+             Q:::::::QQ::::::::Q111::::::111
+              QQ::::::::::::::Q 1::::::::::1
+                QQ:::::::::::Q  1::::::::::1
+                  QQQQQQQQ::::QQ111111111111
+                          Q:::::Q           
+                           QQQQQQ  QUILIBRIUM.ONE                                                                                                                                  
+
+
+===================================================================
+         ✨ NODE BALANCE LOGGER SCRIPT - V $SCRIPT_VERSION ✨
+===================================================================
+This script check your node balance and logs it to a CSV file.
+It also calculate the increase of your balance for every hour.
+
+Made with 🔥 by LaMat - https://quilibrium.one
+====================================================================
+
+Processing... ⏳
+
+EOF
+
+sleep 3
+
 # Function to get the unclaimed balance
 get_unclaimed_balance() {
+    echo
+    echo "⚙️ Retrieving unclaimed balance..."
     local node_directory="$HOME/ceremonyclient/node"
     local node_command="./$NODE_BINARY -node-info"
     
@@ -37,7 +77,7 @@ get_unclaimed_balance() {
     if [[ "$balance" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
         echo "$balance"
     else
-        echo "Error: Failed to retrieve balance"
+        echo "❌ Error: Failed to retrieve balance."
         exit 1
     fi
 }
@@ -47,6 +87,9 @@ write_to_csv() {
     local filename="$HOME/scripts/balance_log.csv"
     local data="$1"
 
+    echo
+    echo "⚙️ Writing data to CSV file..."
+
     # Check if file exists to determine if headers need to be written
     if [ ! -f "$filename" ]; then
         echo "time,balance,increase" > "$filename"
@@ -54,6 +97,7 @@ write_to_csv() {
 
     # Append data to CSV
     echo "$data" >> "$filename"
+    sleep 1
 }
 
 # Main function
