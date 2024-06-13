@@ -1,7 +1,10 @@
 #!/bin/bash
 
+# Set timezone to Europe/Rome
+export TZ="Europe/Rome"
+
 # Script version
-SCRIPT_VERSION="1.5.3"
+SCRIPT_VERSION="1.5.4"
 
 # Function to check for newer script version
 check_for_updates() {
