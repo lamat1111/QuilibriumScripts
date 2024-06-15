@@ -109,33 +109,18 @@ cd ~/ceremonyclient || { echo "❌ Error: Directory ~/ceremonyclient does not ex
 echo "✅ Discarding local changes in release_autorun.sh..."
 git checkout -- node/release_autorun.sh
 
-# # Function to install a package if it is not already installed
-# install_package() {
-#     echo "⏳ Installing $1..."
-#     if apt-get install -y $1; then
-#         echo "✅ $1 installed successfully."
-#     else
-#         echo "❌ Failed to install $1. You will have to do this manually."
-#     fi
-# }
-
-# # Install cpulimit
-# install_package cpulimit
-
-# # Install gawk
-# install_package gawk
-
-# echo "✅ cpulimit and gawk are installed and up to date."
-
-
 # Step 4: Download Binary
 echo "⏳ Downloading New Release..."
 
 # Set the remote URL and download
 cd  ~/ceremonyclient
-git remote set-url origin https://source.quilibrium.com/quilibrium/ceremonyclient.git || git remote set-url origin https://git.quilibrium-mirror.ch/agostbiro/ceremonyclient.git
+git remote set-url origin https://github.com/QuilibriumNetwork/ceremonyclient.git
+#git remote set-url origin https://source.quilibrium.com/quilibrium/ceremonyclient.git || git remote set-url origin https://git.quilibrium-mirror.ch/agostbiro/ceremonyclient.git
+git checkout main
+git branch -D release
 git pull
-git checkout release-cdn
+git checkout release
+
 
 echo "✅ Downloaded the latest changes successfully."
 
