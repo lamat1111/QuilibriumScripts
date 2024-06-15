@@ -39,6 +39,8 @@ EOF
 
 sleep 7  # Add a 7-second delay
 
+VERSION="1.4.19.1"
+
 #==========================
 # GO UPGRADE
 #==========================
@@ -182,7 +184,7 @@ systemctl enable ceremonyclient
 service ceremonyclient start
 
 # Showing the node version and logs
-echo "🌟Your Qnode is now updated!"
+echo "🌟Your Qnode is now updated to V$VERSION !"
 echo ""
 echo "⏳ Showing the node log... (CTRL+C to exit)"
 echo ""
