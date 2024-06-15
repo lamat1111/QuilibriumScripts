@@ -1,4 +1,4 @@
-# [SCRIPT HEADER]
+#!/bin/bash
 
 cat << "EOF"
 
@@ -231,7 +231,6 @@ add_new_cronjob() {
     echo "$cron_schedule $cron_command" | crontab -
 }
 
-#!/bin/bash
 
 # Backup node store folder if selected
 read -p "❔ Do you want to backup your node 'store' folder? (y/n): " backup_node_folder
