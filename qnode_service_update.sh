@@ -112,7 +112,7 @@ echo "✅ Discarding local changes in release_autorun.sh..."
 git checkout -- node/release_autorun.sh
 
 # Step 4: Download Binary
-echo "⏳ Downloading New Release..."
+echo "⏳ Downloading new release v$VERSION"
 
 # Set the remote URL and download
 cd  ~/ceremonyclient
