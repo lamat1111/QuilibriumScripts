@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.5.1"
+SCRIPT_VERSION="1.5.2"
 
 # Function to check if wget is installed, and install it if it is not
 check_wget() {
@@ -188,7 +188,8 @@ node_info() {
     echo "If this doesn't work you can try the direct commands: https://iri.quest/q-node-info"
 	echo ""
     	sleep 1
-        cd ~/ceremonyclient/node && ./$NODE_BINARY -node-info
+        cd ~/ceremonyclient/node && ./node-1.4.19.1-linux-amd64 -node-info
+        #cd ~/ceremonyclient/node && ./$NODE_BINARY -node-info
 	echo ""
 	read -n 1 -s -r -p "✅  Press any key to continue..."  # Pause and wait for user input
     fi
@@ -205,7 +206,8 @@ quil_balance() {
         echo "If this doesn't work you can try the direct commands: https://iri.quest/q-node-info"
 	    echo ""
     	sleep 1
-        cd ~/ceremonyclient/node && ./$NODE_BINARY -balance
+        cd ~/ceremonyclient/node && ./node-1.4.19.1-linux-amd64 -balance
+        #cd ~/ceremonyclient/node && ./$NODE_BINARY -balance
 	echo ""
 	read -n 1 -s -r -p "✅  Press any key to continue..."  # Pause and wait for user input
     fi
