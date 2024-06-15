@@ -141,7 +141,7 @@ fi
 
 # Prompt for the target folder name
 echo "Enter the target folder name where you want to store this backup, must be unique for each node!"
-echo "No spaces or special characters, only [a-z][0-9][-.]"
+echo "Only lowercase characters [a-z][0-9][-.]"
 read -p "▶️ Enter the target folder name, e.g., 'quil-01': " target_folder
 echo
 
@@ -204,15 +204,18 @@ if [[ $create_bucket_flag == true ]]; then
     fi
 fi
 
-# # Backup node keys.yml and config.yml if selected
-# read -p "❔ Do you want to backup your node 'keys.yml' and 'config.yml' files? (y/n): " backup_keys
-# if [[ $backup_keys =~ ^[Yy]$ ]]; then
-#     echo "⌛️ Copying node 'keys.yml' and 'config.yml' files... (I will back up these only once)."
-#     rclone copy $HOME/ceremonyclient/node/.config/keys.yml storj:/$bucket/$target_folder/keys/
-#     rclone copy $HOME/ceremonyclient/node/.config/config.yml storj:/$bucket/$target_folder/keys/
-#     echo "✅ Your keys are now backed up in 'storj:/$bucket/$target_folder/keys'"
-#     echo
-# fi
+# Backup node keys.yml and config.yml if selected
+echo "It's not very secure to backup your keys as an object on StorJ, but if you want to do it, here you are..."
+echo
+read -p "❔ Do you want to backup your node 'keys.yml' and 'config.yml' files? (y/n): " backup_keys
+if [[ $backup_keys =~ ^[Yy]$ ]]; then
+    echo "⌛️ Copying node 'keys.yml' and 'config.yml' files... (I will back up these only once)."
+    rclone copy $HOME/ceremonyclient/node/.config/keys.yml storj:/$bucket/$target_folder/.config/
+    rclone copy $HOME/ceremonyclient/node/.config/config.yml storj:/$bucket/$target_folder/.config/
+    echo "✅ Your keys are now backed up in 'storj:/$bucket/$target_folder/.config"
+    echo "Your keys are backed up only once."
+    echo
+fi
 
 
 # Function to check if a cron job with a specific pattern exists
@@ -233,16 +236,29 @@ add_new_cronjob() {
 # Backup node store folder if selected
 read -p "❔ Do you want to backup your node 'store' folder? (y/n): " backup_node_folder
 if [[ $backup_node_folder =~ ^[Yy]$ ]]; then
+    # Prompt user for backup interval
     read -p "▶️ Backup 'store' folder every how many hours? (1-100): " backup_interval
+
+    # Generate a random minute for the cron job
     random_minute=$(shuf -i 0-59 -n 1)
+
+    # Define the cron schedule
     cron_schedule="$random_minute */$backup_interval * * *"
-    cron_command="rclone $backup_type --transfers 10 --checkers 20 --disable-http2 --retries 1 $HOME/ceremonyclient/node/.config/store storj:/$bucket/$target_folder/store"
-    existing_store_pattern="/ceremonyclient/node/.config/store storj:"
+
+    # Define the cron command
+    cron_command="rclone sync --transfers 10 --checkers 20 --disable-http2 --retries 1 --filter '+ store/**' --filter '+ store' --filter '- SELF_TEST' --filter '- keys.yml' --filter '- config.yml' /root/ceremonyclient/node/.config/ storj:/$bucket/$target_folder/.config/"
+
+    # Pattern to check if the cron job already exists
+    existing_store_pattern="/ceremonyclient/node/.config/ storj:"
+
+    # Check if the cron job already exists
     if ! crontab -l | grep -q "$existing_store_pattern"; then
+        # Add the new cron job
         (crontab -l ; echo "$cron_schedule $cron_command") | crontab -
         echo "⌛️ Setting cron job to backup node 'store' folder every $backup_interval hours at a random minute..."
         echo
     else
+        # Inform user that the cron job already exists
         echo "⚠️ Cron job to backup node 'store' folder already exists. Skipping..."
         echo
     fi
