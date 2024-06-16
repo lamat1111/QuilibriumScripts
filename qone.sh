@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.5.3"
+SCRIPT_VERSION="1.5.4"
 
 # Function to check if wget is installed, and install it if it is not
 check_wget() {
@@ -52,7 +52,7 @@ check_for_updates() {
 upgrade_qone
 
 # Check for updates
-#check_for_updates
+check_for_updates
 
 #=============================
 # VARIABLES
@@ -68,8 +68,7 @@ USER_HOME=$(eval echo ~$USER)
 NODE_PATH="$HOME/ceremonyclient/node"
 
 # Version number
-
-#VERSION="1.4.19.1"
+#NODE_VERSION="1.4.19.1"
 
 #=============================
 # DETERMINE NODE BINARY PATH
