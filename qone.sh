@@ -1,7 +1,9 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.5.2"
+SCRIPT_VERSION="1.5.3"
+
+NODE_VERSION="1.4.19.1"
 
 # Function to check if wget is installed, and install it if it is not
 check_wget() {
@@ -188,7 +190,7 @@ node_info() {
     echo "If this doesn't work you can try the direct commands: https://iri.quest/q-node-info"
 	echo ""
     	sleep 1
-        cd ~/ceremonyclient/node && ./node-1.4.19.1-linux-amd64 -node-info
+        cd ~/ceremonyclient/node && ./node-"$NODE_VERSION"-linux-amd64 -node-info
         #cd ~/ceremonyclient/node && ./$NODE_BINARY -node-info
 	echo ""
 	read -n 1 -s -r -p "✅  Press any key to continue..."  # Pause and wait for user input
@@ -206,7 +208,7 @@ quil_balance() {
         echo "If this doesn't work you can try the direct commands: https://iri.quest/q-node-info"
 	    echo ""
     	sleep 1
-        cd ~/ceremonyclient/node && ./node-1.4.19.1-linux-amd64 -balance
+        cd ~/ceremonyclient/node && ./node-"$NODE_VERSION"-linux-amd64 -balance
         #cd ~/ceremonyclient/node && ./$NODE_BINARY -balance
 	echo ""
 	read -n 1 -s -r -p "✅  Press any key to continue..."  # Pause and wait for user input
@@ -505,7 +507,9 @@ display_menu() {
 EOF
 
     cat << "EOF"
-If you want to install a new node, choose option 1, and then 2
+HOW TO INSTALL A NEW NODE?
+Choose option 1, reboot and and then choose 2.
+Let your node run for 30 minutes, then choose option 3. Done!
 
 ------------------------------------------------------------------
 0) Best server providers      8) Node version
