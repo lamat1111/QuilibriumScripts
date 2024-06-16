@@ -36,9 +36,10 @@ sleep 7  # Add a 7-second delay
 
 # Define a function for displaying exit messages
 exit_message() {
+    echo
     echo "❌ Oops! There was an error during the script execution and the process stopped. No worries!"
     echo "You can try to run the script from scratch again."
-    echo "🛠If you still receive an error, you may want to proceed manually, step by step instead of using the auto-installer."
+    echo "If you still receive an error, you may want to proceed manually, step by step instead of using the auto-installer."
 }
 
 # Determine the ExecStart line based on the architecture
@@ -75,29 +76,35 @@ sudo apt-get update
 #sudo apt-get upgrade -y
 
 # Step 3: Install required packages
-echo "🔧 Installing useful packages..."
-sudo apt-get install git wget tmux tar -y || { echo "❌ Failed to install useful packages! Exiting..."; exit_message; exit 1; }
+echo "⏳ Installing useful packages..."
 
-# Function to install a package if it is not already installed
-install_package() {
-    echo "⏳ Installing $1..."
-    if apt-get install -y $1; then
-        echo "✅ $1 installed successfully."
-    else
-        echo "❌ Failed to install $1. You will have to do this manually."
-    fi
+# Function to check if a package is installed
+is_installed() {
+    dpkg -l "$1" &> /dev/null
 }
 
-# Install cpulimit
-install_package cpulimit
+# Install git, wget, tar and exit if it fails
+for pkg in git wget tar; do
+    if ! is_installed "$pkg"; then
+        echo "Installing $pkg..."
+        sudo apt-get install -y "$pkg" > /dev/null 2>&1 || { echo "❌ Failed to install $pkg! These are necessary apps, so I will exiting..."; exit_message; exit 1; }
+    else
+        echo "$pkg is already installed."
+    fi
+done
 
-# Install gawk
-install_package gawk
+# Install tmux and cron and move on if it fails
+for pkg in tmux cron; do
+    if ! is_installed "$pkg"; then
+        echo "Installing $pkg..."
+        sudo apt-get install -y "$pkg" > /dev/null 2>&1 || { echo "❌ Failed to install $pkg! These are optional apps, so I will continue..."; }
+    else
+        echo "$pkg is already installed."
+    fi
+done
 
-echo "✅ cpulimit and gawk are installed and up to date."
+echo "✅ All packages installed successfully or already present."
 
-
-# Step 4: Download and extract Go
 
 # Installing Go
 echo "⏳ Downloading and installing GO..."
@@ -107,8 +114,8 @@ sudo rm -rf /usr/local/go || echo "❌ Failed to remove existing GO!"
 sudo mv go /usr/local || echo "❌ Failed to move GO!"
 sudo rm $GO_BINARY || echo "❌ Failed to remove downloaded archive!"
 
-# Step 5: Set Go environment variables
-echo "🌍 Setting Go environment variables..."
+# Set Go environment variables
+echo "⏳ Setting Go environment variables..."
 
 # Check if PATH is already set
 if grep -q 'export PATH=$PATH:/usr/local/go/bin' ~/.bashrc; then
@@ -147,7 +154,7 @@ source ~/.bashrc
 sleep 1  # Add a 1-second delay
 
 # Step 6: Adjust network buffer sizes
-echo "🌐 Adjusting network buffer sizes..."
+echo "⏳ Adjusting network buffer sizes..."
 if grep -q "^net.core.rmem_max=600000000$" /etc/sysctl.conf; then
   echo "✅ net.core.rmem_max=600000000 found inside /etc/sysctl.conf, skipping..."
 else
@@ -183,13 +190,13 @@ else
 fi
 
 
-# Step 8: Install ufw and configure firewall
-echo "🛡️ Installing ufw (Uncomplicated Firewall)..."
+# Install ufw and configure firewall
+echo "⏳ Installing ufw (Uncomplicated Firewall)..."
 sudo apt-get update
 sudo apt-get install ufw -y || { echo "❌ Failed to install ufw! Moving on to the next step..."; }
 
 # Attempt to enable ufw
-echo "🛡️ Configuring firewall..."
+echo "⏳ Configuring firewall..."
 if command -v ufw >/dev/null 2>&1; then
     echo "y" | sudo ufw enable || { echo "❌ Failed to enable firewall! No worries, you can do it later manually."; }
 else
@@ -212,7 +219,7 @@ else
     echo "⚠️ Failed to configure firewall or ufw is not installed. No worries, you can do it later manually. Moving on to the next step..."
 fi
 
-# Step 9: Creating some useful folders
+# Creating some useful folders
 echo "⏳ Creating /root/backup/ folder..."
 sudo mkdir -p /root/backup/
 echo "✅ Done."
@@ -225,7 +232,7 @@ echo "⏳ Creating /root/scripts/log/ folder..."
 sudo mkdir -p /root/scripts/log/
 echo "✅ Done."
 
-# Step 10: Prompt for reboot
+# Prompt for reboot
 echo "🎉 Server setup is finished!"
 echo ""
 echo "🟡 YOU NEED TO REBOOT YOUR SERVER NOW 🟡"
