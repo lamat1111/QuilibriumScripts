@@ -508,7 +508,8 @@ display_menu() {
 
 
 =======================================================================
-                      ✨ Q.ONE QUICKSTART ✨
+                ✨✨✨ Q.ONE QUICKSTART ✨✨✨
+                           v"$SCRIPT_VERSION" 
 =======================================================================
          Follow the guide at https://docs.quilibrium.one
 
