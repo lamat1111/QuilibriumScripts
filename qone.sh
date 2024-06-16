@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.5.3"
+SCRIPT_VERSION="1.5.4"
 
 NODE_VERSION="1.4.19.1"
 
@@ -67,34 +67,6 @@ SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
 # User working folder
 USER_HOME=$(eval echo ~$USER)
 
-#Node path
-NODE_PATH="$HOME/ceremonyclient/node"
-
-# Version number
-VERSION=$(cat $NODE_PATH/config/version.go | grep -A 1 "func GetVersion() \[\]byte {" | grep -Eo '0x[0-9a-fA-F]+' | xargs printf "%d.%d.%d")
-#VERSION="1.4.19"
-
-# Get the system architecture
-ARCH=$(uname -m)
-OS=$(uname -s)
-
-if [ "$ARCH" = "x86_64" ]; then
-    if [ "$OS" = "Linux" ]; then
-        NODE_BINARY="node-$VERSION-linux-amd64"
-        GO_BINARY="go1.20.14.linux-amd64.tar.gz"
-    elif [ "$OS" = "Darwin" ]; then
-        NODE_BINARY="node-$VERSION-darwin-amd64"
-        GO_BINARY="go1.20.14.linux-amd64.tar.gz"
-    fi
-elif [ "$ARCH" = "aarch64" ]; then
-    if [ "$OS" = "Linux" ]; then
-        NODE_BINARY="node-$VERSION-linux-arm64"
-        GO_BINARY="go1.20.14.linux-arm64.tar.gz"
-    elif [ "$OS" = "Darwin" ]; then
-        NODE_BINARY="node-$VERSION-darwin-arm64"
-        GO_BINARY="go1.20.14.linux-arm64.tar.gz"
-    fi
-fi
 
 #=====================
 # Function Definitions
