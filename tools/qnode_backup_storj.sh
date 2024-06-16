@@ -95,12 +95,15 @@ get_backup_type() {
     fi
 }
 
+#====================
+# USER PROMPTS
+#====================
+
 # Prompt the user for StorJ S3 credentials
 echo
-echo "Your SECRET key won't be showed. Just right click to paste and press ENTER"
 echo
 read -p "🔒 Enter your StorJ access key: " access_key
-read -sp "🔒 Enter your StorJ SECRET key: " secret_key
+read -p "🔒 Enter your StorJ SECRET key: " secret_key
 echo
 
 # Initialize a flag to check if a new bucket needs to be created
@@ -166,12 +169,55 @@ echo "Your backups for this node will be stored in '$bucket/$target_folder/'"
 echo "Backup type selected: $backup_type"
 echo
 
-# Install rclone silently
-echo "⌛️ Installing rclone..."
-sudo -v
-curl -s https://rclone.org/install.sh | sudo bash > /dev/null
-echo "✅ rclone installed successfully."
-echo
+
+#====================
+# APPS INSTALLATION 
+#====================
+
+# Function to check if a package is installed
+is_installed() {
+    command -v "$1" &> /dev/null
+}
+
+# Function to install a package
+install_package() {
+    pkg=$1
+    if ! is_installed "$pkg"; then
+        echo "⌛️ Installing $pkg..."
+        sudo apt-get install -y "$pkg" > /dev/null 2>&1 || { echo "❌ Failed to install $pkg! This is a necessary app, so I will exit..."; exit_message; exit 1; }
+        echo "✅ $pkg installed successfully."
+    else
+        echo "$pkg is already installed."
+    fi
+}
+
+# Install curl if not installed
+install_package "curl"
+
+# Install cron if not installed
+install_package "cron"
+
+# Function to install rclone
+install_rclone() {
+    if ! is_installed "rclone"; then
+        echo "⌛️ Installing rclone..."
+        sudo -v
+        curl -s https://rclone.org/install.sh | sudo bash > /dev/null
+        echo "✅ rclone installed successfully."
+    else
+        echo "rclone is already installed."
+    fi
+}
+
+# Install rclone if not installed
+install_rclone
+
+echo "✅ All packages installed successfully or already present."
+
+#====================
+# RCLONE + STORJ CONFIGS
+#====================
+
 
 # Ensure rclone config directory exists
 mkdir -p $HOME/.config/rclone
@@ -217,6 +263,9 @@ if [[ $backup_keys =~ ^[Yy]$ ]]; then
     echo
 fi
 
+#====================
+# CRONJOBS SETUP
+#====================
 
 # Function to check if a cron job with a specific pattern exists
 cron_job_exists() {
