@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.5.7"
+SCRIPT_VERSION="1.5.8"
 
 # Function to check if wget is installed, and install it if it is not
 check_wget() {
@@ -416,13 +416,17 @@ This will run the test script.
 '
 
 help_message='
+=================================
+            Q.ONE HELP
+=================================
+
 If something does not work in Q.ONE please try to update to the
 latest version manually by running the code that you find here:
 https://docs.quilibrium.one/quilibrium-node-setup-guide/node-quickstart
 
 
 Here are all the options of the Quickstart Node Menu
-====================================================
+------------------------------------------------------
 
  0) Best server providers:
     Check out the best server providers for your node
