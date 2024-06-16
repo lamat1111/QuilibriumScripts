@@ -4,7 +4,7 @@
 export TZ="Europe/Rome"
 
 # Script version
-SCRIPT_VERSION="1.5.4"
+SCRIPT_VERSION="1.5.5"
 
 # Function to check for newer script version
 check_for_updates() {
