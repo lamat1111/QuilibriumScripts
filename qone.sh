@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.5.4"
+SCRIPT_VERSION="1.5.5"
 
 # Function to check if wget is installed, and install it if it is not
 check_wget() {
@@ -507,29 +507,31 @@ display_menu() {
                            QQQQQQ  QUILIBRIUM.ONE                                                                                                                                  
 
 
-===================================================================
-                      ✨ QNODE QUICKSTART ✨
-===================================================================
+=======================================================================
+                      ✨ Q.ONE QUICKSTART ✨
+=======================================================================
          Follow the guide at https://docs.quilibrium.one
 
                       Made with 🔥 by LaMat
-====================================================================
+=======================================================================
 
 EOF
-
     cat << "EOF"
-If you want to install a new node, choose option 1, and then 2
+HOW TO INSTALL A NEW NODE?
+Choose option 1, reboot and and then choose 2.
+Let your node run for 30 minutes, then choose option 3. Done!
 
-------------------------------------------------------------------
-0) Best server providers      8) Node version
-1) Prepare your server        9) Node info (peerID & balance)    
-2) Install node              10) QUIL balance
-3) Set up gRPCurl            11) Peer manifest (Difficulty metric)
-4) Node Log                  12) Check visibility
-5) Update node               13) System cleaner
-6) Stop node                 14) Backup your node
-7) Restart node
-------------------------------------------------------------------
+----------------------------------------------------------------------
+0) ⭐️ Best server providers 
+1) Prepare your server           8) Node version
+2) Install node                  9) Node info (peerID & balance)    
+3) Set up gRPCurl               10) QUIL balance
+
+4) Node Log                     11) Peer manifest (Difficulty metric)
+5) Update node                  12) Check visibility
+6) Stop node                    13) System cleaner
+7) Restart node                 14) Backup your node
+----------------------------------------------------------------------
 E) Exit                       H) Help
 
 EOF
