@@ -1,52 +1,42 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.5.4"
-
-NODE_VERSION="1.4.19.1"
+SCRIPT_VERSION="1.5.3"
 
 # Function to check if wget is installed, and install it if it is not
 check_wget() {
     if ! command -v wget &> /dev/null; then
-        echo "❌ wget is not installed."
-        sleep 1
-        echo "⌛️ Installing wget... "
-        sleep 1
-        sudo apt-get update && sudo apt-get install -y wget
-
-        # Verify that wget was successfully installed
-        if ! command -v wget &> /dev/null; then
-            echo "❌ Failed to install wget. Please install wget manually and try again."
-            sleep 1
-            exit 1
-        fi
+        echo "❌ wget not found. Installing..."
+        sudo apt-get update && sudo apt-get install -y wget || { echo "❌ wget installation failed."; exit 1; }
     fi
 }
 
 # Check if wget is installed
 check_wget
 
-# Function to check if the qone.sh setup section is present in .bashrc
-if ! grep -Fxq "# === qone.sh setup ===" ~/.bashrc; then
-    # Run the setup script
-    echo "⌛️ Upgrading the qone.sh script... just one minute!"
-    sleep 3
-    echo "ℹ️ Downloading qone_setup.sh..."
-    if ! wget -qO- https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/qone_setup.sh | bash; then
-        echo "❌ Error: Failed to download and execute qone-setup.sh"
-        exit 1
+upgrade_qone() {
+    # Function to check if the qone.sh setup section is present in .bashrc
+    if ! grep -Fxq "# === qone.sh setup ===" ~/.bashrc; then
+        # Run the setup script
+        echo "⌛️ Upgrading the qone.sh script... just one minute!"
+        sleep 3
+        echo "ℹ️ Downloading qone_setup.sh..."
+        if ! wget -qO- https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/qone_setup.sh | bash; then
+            echo "❌ Error: Failed to download and execute qone-setup.sh"
+            return 1
+        else
+            echo "✅ qone.sh upgraded!"
+            echo ""
+            echo "🟢 You can now use 'Q1', 'q1', or 'qone' to launch the Node Quickstart Menu."
+            sleep 1
+            echo "🟢 The menu will also load automatically every time you log in."
+            echo ""
+            sleep 5
+        fi
     else
-        echo "✅ qone.sh upgraded!"
-        echo ""
-        echo "🟢 You can now use 'Q1', 'q1', or 'qone' to launch the Node Quickstart Menu."
-        sleep 1
-        echo "🟢 The menu will also load automatically every time you log in."
-        echo ""
-        sleep 5
+        echo "ℹ️ qone.sh is already upgraded."
     fi
-else
-    echo "ℹ️ qone.sh is already upgraded."
-fi
+}
 
 # Function to check for newer script version
 check_for_updates() {
@@ -58,14 +48,66 @@ check_for_updates() {
     fi
 }
 
+# Upgrade QONE
+upgrade_qone
+
 # Check for updates
-check_for_updates
+#check_for_updates
+
+#=============================
+# VARIABLES
+#=============================
 
 # Service file path
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
 
 # User working folder
 USER_HOME=$(eval echo ~$USER)
+
+#Node path
+NODE_PATH="$HOME/ceremonyclient/node"
+
+# Version number
+
+#VERSION="1.4.19.1"
+
+#=============================
+# DETERMINE NODE BINARY PATH
+#=============================
+
+# Determine OS and architecture
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    release_os="linux"
+    release_arch=$(uname -m)
+    if [[ "$release_arch" == "aarch64" ]]; then
+        release_arch="arm64"
+    else
+        release_arch="amd64"
+    fi
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    release_os="darwin"
+    release_arch="arm64"
+else
+    echo "unsupported OS for releases, please build from source"
+    exit 1
+fi
+
+fetch() {
+    # Fetch available files for the determined OS and architecture
+    files=$(curl -s https://releases.quilibrium.com/release | grep $release_os-$release_arch)
+
+    # Extract the version from the first matching file
+    for file in $files; do
+        version=$(echo "$file" | cut -d '-' -f 2)
+        break
+    done
+}
+
+fetch
+
+# Set the node binary name based on the determined OS, architecture, and version
+NODE_BINARY=node-$version-$release_os-$release_arch
+
 
 
 #=====================
@@ -162,8 +204,7 @@ node_info() {
     echo "If this doesn't work you can try the direct commands: https://iri.quest/q-node-info"
 	echo ""
     	sleep 1
-        cd ~/ceremonyclient/node && ./node-"$NODE_VERSION"-linux-amd64 -node-info
-        #cd ~/ceremonyclient/node && ./$NODE_BINARY -node-info
+        cd ~/ceremonyclient/node && ./"$NODE_BINARY" -node-info
 	echo ""
 	read -n 1 -s -r -p "✅  Press any key to continue..."  # Pause and wait for user input
     fi
@@ -180,8 +221,7 @@ quil_balance() {
         echo "If this doesn't work you can try the direct commands: https://iri.quest/q-node-info"
 	    echo ""
     	sleep 1
-        cd ~/ceremonyclient/node && ./node-"$NODE_VERSION"-linux-amd64 -balance
-        #cd ~/ceremonyclient/node && ./$NODE_BINARY -balance
+        cd ~/ceremonyclient/node && ./"$NODE_BINARY" -balance
 	echo ""
 	read -n 1 -s -r -p "✅  Press any key to continue..."  # Pause and wait for user input
     fi
@@ -479,9 +519,7 @@ display_menu() {
 EOF
 
     cat << "EOF"
-HOW TO INSTALL A NEW NODE?
-Choose option 1, reboot and and then choose 2.
-Let your node run for 30 minutes, then choose option 3. Done!
+If you want to install a new node, choose option 1, and then 2
 
 ------------------------------------------------------------------
 0) Best server providers      8) Node version
