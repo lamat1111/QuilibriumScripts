@@ -43,9 +43,9 @@ sleep 7
 # you will need to manually change this variable at the beginning of the script:
 # '~/scripts/qnode_balance_checker.sh'
 
-echo "⚙️ Installing Python 3 and pip3..."
-sudo apt install -y python3 python3-pip > /dev/null || { echo "❌ Failed to install Python 3 and pip3."; exit 1; } 
-sleep 1
+#echo "⚙️ Installing Python 3 and pip3..."
+#sudo apt install -y python3 python3-pip > /dev/null || { echo "❌ Failed to install Python 3 and pip3."; exit 1; } 
+#sleep 1
 
 
 echo "⚙️ Removing existing script if it exists..."
