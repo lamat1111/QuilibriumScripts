@@ -4,7 +4,7 @@
 export TZ="Europe/Rome"
 
 # Script version
-SCRIPT_VERSION="1.5.5"
+SCRIPT_VERSION="1.5.6"
 
 # Function to check for newer script version
 check_for_updates() {
@@ -62,7 +62,8 @@ get_unclaimed_balance() {
     balance=$(echo "$output" | grep "Unclaimed balance" | awk '{print $3}' | sed 's/[^0-9.]//g')
     
     if [[ "$balance" =~ ^[0-9.]+$ ]]; then
-        balance=$(printf "%.2f" "$balance")
+        # Ensure the balance has two decimal places
+        balance=$(printf "%.5f" "$balance")
         echo "$balance"
     else
         echo "❌ Error: Failed to retrieve balance."
@@ -76,11 +77,22 @@ write_to_csv() {
     local data="$1"
 
     if [ ! -f "$filename" ] || [ ! -s "$filename" ]; then
-        echo "time,balance" > "$filename"
+        echo "\"time\",\"balance\"" > "$filename"
     fi
 
-    echo "$data" >> "$filename"
+    # Split the data into time and balance
+    local time=$(echo "$data" | cut -d',' -f1)
+    local balance=$(echo "$data" | cut -d',' -f2)
+
+    # Replace dot with comma in balance for correct CSV formatting
+    balance=$(echo "$balance" | sed 's/\./,/')
+
+    # Format the data with quotes
+    local formatted_data="\"$time\",\"$balance\""
+
+    echo "$formatted_data" >> "$filename"
 }
+
 
 # Main function
 main() {
