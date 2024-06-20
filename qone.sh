@@ -129,13 +129,6 @@ TEST_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tes
 MISSING_SERVICE_MSG="⚠️ Your service file does not exist. Looks like you do not have a node running as a service yet!"
 
 # Function definitions
-best_providers() {
-    wrap_text "$best_providers_message"
-    echo ""
-    echo "-------------------------------"
-    read -n 1 -s -r -p "✅  Press any key to continue..."  # Pause and wait for user input
-}
-
 install_prerequisites() {
     echo ""
     echo "⌛️  Preparing server with necessary apps and settings..."
@@ -299,6 +292,22 @@ node_version() {
     read -n 1 -s -r -p "✅ Press any key to continue..."  # Pause and wait for user input
 }
 
+best_providers() {
+    wrap_text "$best_providers_message"
+    echo ""
+    echo "-------------------------------"
+    read -n 1 -s -r -p "✅  Press any key to continue..."  # Pause and wait for user input
+}
+
+
+donations() {
+    wrap_text "$donations_message"
+    echo ""
+    echo "-------------------------------"
+    read -n 1 -s -r -p "✅  Press any key to continue..."  # Pause and wait for user input
+}
+
+
 help_message() {
     echo "$help_message"
     echo ""
@@ -368,12 +377,6 @@ wrap_text_2() {
 #=====================
 
 # Define messages
-best_providers_message='
-Check out the best server providers for your node
-at ⭐️ https://iri.quest/q-best-providers ⭐️
-
-Avoid using providers that specifically ban crypto and mining.
-'
 
 prepare_server_message='
 This action will install the necessary prerequisites for your server. 
@@ -411,6 +414,23 @@ You need a StorJ account https://www.storj.io/ and a Public/Secret access key.
 For security we suggest you to create a bucket specific to Quilibrium, and specific keys for accessing only that bucket.
 '
 
+best_providers_message='
+Check out the best server providers for your node
+at ⭐️ https://iri.quest/q-best-providers ⭐️
+
+Avoid using providers that specifically ban crypto and mining.
+'
+
+donations_message='
+Quilbrium.one is a one-man volunteer effort.
+If you would like to chip in some financial help, thank you!
+
+You can send ERC-20 tokens at this address:
+0x0fd383A1cfbcf4d1F493Dd71b798ebca89e8a013
+
+Or visit this page: https://iri.quest/q-donations
+'
+
 test_script_message='
 This will run the test script.
 '
@@ -425,10 +445,18 @@ latest version manually by running the code that you find here:
 https://docs.quilibrium.one/quilibrium-node-setup-guide/node-quickstart
 
 
-Here are all the options of the Quickstart Node Menu
+>> STOP Q.ONE FROM LOADING ON LOGIN
+Please find here: https://docs.quilibrium.one/start/node-quickstart
+the command to do this
+
+>> UNINSTALL Q.ONE
+To remove the script fomr your system, run: rm ~/qone.sh
+
+
+>> Q:ONE MENU OPTIONS DETAILS
 ------------------------------------------------------
 
- 0) Best server providers:
+ B) Best server providers:
     Check out the best server providers for your node
     at ⭐️ https://iri.quest/q-best-providers ⭐️
     Avoid using providers that specifically ban crypto and mining.
@@ -531,7 +559,6 @@ Choose option 1, reboot and and then choose 2.
 Let your node run for 30 minutes, then choose option 3. Done!
 
 ----------------------------------------------------------------------
-0) ⭐️ Best server providers 
 1) Prepare your server           8) Node version
 2) Install node                  9) Node info (peerID & balance)    
 3) Set up gRPCurl               10) QUIL balance
@@ -541,7 +568,11 @@ Let your node run for 30 minutes, then choose option 3. Done!
 6) Stop node                    13) System cleaner
 7) Restart node                 14) Backup your node
 ----------------------------------------------------------------------
+B) ⭐️ Best server providers
+D) 💜 Donations
+----------------------------------------------------------------------     
 E) Exit                          H) Help
+                        
 
 EOF
 }
@@ -559,7 +590,6 @@ while true; do
     action_performed=0
     
     case $choice in
-    	0) best_providers;;
         1) confirm_action "$(wrap_text "$prepare_server_message" "")" "Prepare your server" install_prerequisites;;
         2) confirm_action "$(wrap_text "$install_node_message" "")" "Install node" install_node;;
 	    3) confirm_action "$(wrap_text "$setup_grpcurl_message" "")" "Set up gRPCurl" configure_grpcurl;;
@@ -575,6 +605,8 @@ while true; do
 	    13) system_cleaner;;
         14) confirm_action "$(wrap_text "$backup_storj_message" "")" "Backup your node on StorJ" backup_storj;;
 	    20) confirm_action "$(wrap_text "$test_script_message" "")" "Test Script" test_script;;
+        [bB]) best_providers;;
+        [dD]) donations;;
         [eE]) exit ;;
 	    [hH]) help_message;;
         *) echo "Invalid option, please try again." ;;
