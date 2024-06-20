@@ -129,7 +129,7 @@ calculate_gomaxprocs() {
     if [ $gomaxprocs -gt $cpu_cores ]; then
         gomaxprocs=$cpu_cores
     fi
-    gomaxprocs=$((gomaxprocs + 1))
+    gomaxprocs=$((gomaxprocs))
     echo $gomaxprocs
 }
 
