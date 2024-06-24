@@ -171,6 +171,24 @@ else
     fi
 fi
 
+
+# Stop the ceremonyclient service if it exists
+echo "⏳ Stopping the ceremonyclient service if it exists..."
+if systemctl list-units --full -all | grep -Fq 'ceremonyclient.service'; then
+    if systemctl is-active --quiet ceremonyclient; then
+        if service ceremonyclient stop; then
+            echo "🔴 Service stopped successfully."
+        else
+            echo "❌ Ceremonyclient service could not be stopped." >&2
+        fi
+    else
+        echo "🟡 Ceremonyclient service is already stopped."
+    fi
+else
+    echo "❌ Ceremonyclient service does not exist." >&2
+fi
+sleep 1
+
 #====================
 # RESTORE BACKUP
 #====================
@@ -238,3 +256,5 @@ echo "------------------------------------------------------"
 echo "⚠️ If you don't see your keys.yml and config.yml files,"
 echo "it means you did not back them up via StorJ." 
 echo "Please upload them manually before restarting your node."
+echo
+echo "Remember to restart your node service manually whe you are done".
