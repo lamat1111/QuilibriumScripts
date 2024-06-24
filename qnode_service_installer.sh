@@ -103,13 +103,44 @@ export GOROOT=/usr/local/go
 export GOPATH=$HOME/go
 export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
 
-# Step 4.1: Build Ceremonyclient qClient
-# echo "⏳ Building qClient..."
-# sleep 1  # Add a 1-second delay
-# cd ~/ceremonyclient/client
-# GOEXPERIMENT=arenas go build -o qclient main.go
 
-# Step 5: Determine the ExecStart line based on the architecture
+
+# Determine the ExecStart line based on the architecture
+ARCH=$(uname -m)
+OS=$(uname -s)
+
+# Determine the Node binary name based on the architecture and OS
+if [ "$ARCH" = "x86_64" ]; then
+    if [ "$OS" = "Linux" ]; then
+        NODE_BINARY="node-$VERSION-linux-amd64"
+        GO_BINARY="go1.22.4.linux-amd64.tar.gz"
+        QCLIENT_BINARY="qclient-$VERSION-linux-amd64"
+    elif [ "$OS" = "Darwin" ]; then
+        NODE_BINARY="node-$VERSION-darwin-amd64"
+        GO_BINARY="go1.22.44.linux-amd64.tar.gz"
+        QCLIENT_BINARY="qclient-$VERSION-darwin-arm64"
+    fi
+
+# Determine the qClient binary name based on the architecture and OS
+elif [ "$ARCH" = "aarch64" ]; then
+    if [ "$OS" = "Linux" ]; then
+        NODE_BINARY="node-$VERSION-linux-arm64"
+        GO_BINARY="go1.22.4.linux-arm64.tar.gz"
+    elif [ "$OS" = "Darwin" ]; then
+        NODE_BINARY="node-$VERSION-darwin-arm64"
+        GO_BINARY="go1.22.4.linux-arm64.tar.gz"
+        QCLIENT_BINARY="qclient-$VERSION-linux-arm64"
+    fi
+fi
+
+# Download qClient
+echo "⏳ Downloading qClient... "
+sleep 1
+cd ~/ceremonyclient/client
+wget https://releases.quilibrium.com/$QCLIENT_BINARY
+mv $QCLIENT_BINARY qclient
+chmod +x qclient
+
 # Get the current user's home directory
 HOME=$(eval echo ~$USER)
 
