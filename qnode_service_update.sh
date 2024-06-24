@@ -126,6 +126,60 @@ git checkout release
 
 echo "✅ Downloaded the latest changes successfully."
 
+#==========================
+# CREATE PATH VARIABLES
+#==========================
+
+# Determine the ExecStart line based on the architecture
+ARCH=$(uname -m)
+OS=$(uname -s)
+
+# Determine the Node binary name based on the architecture and OS
+if [ "$ARCH" = "x86_64" ]; then
+    if [ "$OS" = "Linux" ]; then
+        NODE_BINARY="node-$VERSION-linux-amd64"
+        GO_BINARY="go1.22.4.linux-amd64.tar.gz"
+        QCLIENT_BINARY="qclient-$VERSION-linux-amd64"
+    elif [ "$OS" = "Darwin" ]; then
+        NODE_BINARY="node-$VERSION-darwin-amd64"
+        GO_BINARY="go1.22.44.linux-amd64.tar.gz"
+        QCLIENT_BINARY="qclient-$VERSION-darwin-arm64"
+    fi
+
+# Determine the qClient binary name based on the architecture and OS
+elif [ "$ARCH" = "aarch64" ]; then
+    if [ "$OS" = "Linux" ]; then
+        NODE_BINARY="node-$VERSION-linux-arm64"
+        GO_BINARY="go1.22.4.linux-arm64.tar.gz"
+    elif [ "$OS" = "Darwin" ]; then
+        NODE_BINARY="node-$VERSION-darwin-arm64"
+        GO_BINARY="go1.22.4.linux-arm64.tar.gz"
+        QCLIENT_BINARY="qclient-$VERSION-linux-arm64"
+    fi
+fi
+
+#==========================
+# QCLIENT UPDATE
+#==========================
+
+# Update qClient
+echo "⏳ Updating qClient..."
+sleep 1
+cd ~/ceremonyclient/client
+
+# Check if qclient exists and remove it if it does
+if [ -f qclient ]; then
+    echo "Removing existing qClient..."
+    rm -f qclient
+else
+    echo "qClient does not exist. Proceeding with installation..."
+fi
+
+# Download and install the new qClient
+wget https://releases.quilibrium.com/$QCLIENT_BINARY
+mv $QCLIENT_BINARY qclient
+chmod +x qclient
+
 # Get the current user's home directory
 HOME=$(eval echo ~$HOME_DIR)
 
