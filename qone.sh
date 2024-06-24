@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.5.9"
+SCRIPT_VERSION="1.6"
 
 # Function to check if wget is installed, and install it if it is not
 check_wget() {
@@ -123,6 +123,7 @@ PEER_MANIFEST_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts
 CHECK_VISIBILITY_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/master/tools/qnode_visibility_check.sh"
 SYSTEM_CLEANER_URL="https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/tools/qnode_system_cleanup.sh"
 BACKUP_STORJ_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_backup_storj.sh"
+BACKUP_RESTORE_STORJ_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_backup_restore_storj.sh"
 TEST_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/test/test_script.sh"
 
 # Common message for missing service file
@@ -180,6 +181,19 @@ backup_storj() {
         ~/scripts/qnode_backup_storj.sh
     else
         echo "❌ Failed to download Storj backup script."
+    fi
+    prompt_return_to_menu
+}
+
+backup_restore_storj() {
+    echo ""
+    echo "⌛️  Downloading Storj backup restore script..."
+    mkdir -p ~/scripts && wget -P ~/scripts -O ~/scripts/qnode_backup_restore_storj.sh "$BACKUP_RESTORE_STORJ_URL"
+    if [ -f ~/scripts/qnode_backup_restore_storj.sh ]; then
+        chmod +x ~/scripts/qnode_backup_restore_storj.sh
+        ~/scripts/qnode_backup_restore_storj.sh
+    else
+        echo "❌ Failed to download Storj backup restore script."
     fi
     prompt_return_to_menu
 }
@@ -414,6 +428,12 @@ You need a StorJ account https://www.storj.io/ and a Public/Secret access key.
 For security we suggest you to create a bucket specific to Quilibrium, and specific keys for accessing only that bucket.
 '
 
+backup_restore_storj_message='
+This action restores a backup of the node '.config' folder from StorJ.
+It will only work if you performed the .config folder backup via the script
+in the Q.One Quickstart menu.
+'
+
 best_providers_message='
 Check out the best server providers for your node
 at ⭐️ https://iri.quest/q-best-providers ⭐️
@@ -567,6 +587,7 @@ Let your node run for 30 minutes, then choose option 3. Done!
 5) Update node                  12) Check visibility
 6) Stop node                    13) System cleaner
 7) Restart node                 14) Backup your node
+                                15) Restore backup
 ----------------------------------------------------------------------
 B) ⭐️ Best server providers
 D) 💜 Donations
@@ -604,6 +625,7 @@ while true; do
         12) check_visibility;;
 	    13) system_cleaner;;
         14) confirm_action "$(wrap_text "$backup_storj_message" "")" "Backup your node on StorJ" backup_storj;;
+        15) confirm_action "$(wrap_text "$backup_restore_storj_message" "")" "Restore a node backup frm STorJ" backup_restore_storj;;
 	    20) confirm_action "$(wrap_text "$test_script_message" "")" "Test Script" test_script;;
         [bB]) best_providers;;
         [dD]) donations;;
