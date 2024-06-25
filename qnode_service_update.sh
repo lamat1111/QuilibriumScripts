@@ -182,11 +182,10 @@ else
   echo "wget failed, trying alternative method"
 
   # Try the alternative method
-  if ! (cd ceremonyclient/client && GOEXPERIMENT=arenas go build -o qclient main.go); then
+  if ! GOEXPERIMENT=arenas go build -o qclient main.go; then
     echo "Alternative method also failed, moving on to the next step"
   fi
 fi
-
 
 # Get the current user's home directory
 HOME=$(eval echo ~$HOME_DIR)
