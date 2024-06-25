@@ -83,26 +83,24 @@ if [ -d ~/ceremonyclient ]; then
 fi
 
 # Download Ceremonyclient
-echo "⏳ Downloading Ceremonyclient"
+echo "⏳Downloading Ceremonyclient"
 sleep 1  # Add a 1-second delay
 cd ~
 if [ -d "ceremonyclient" ]; then
   echo "Directory ceremonyclient already exists, skipping git clone..."
 else
-  until git clone https://github.com/QuilibriumNetwork/ceremonyclient.git || git clone  git clone https://git.quilibrium-mirror.ch/agostbiro/ceremonyclient.git; do
+  until git clone https://source.quilibrium.com/quilibrium/ceremonyclient.git || git clone https://git.quilibrium-mirror.ch/agostbiro/ceremonyclient.git; do
     echo "Git clone failed, retrying..."
     sleep 2
   done
 fi
-
 cd ~/ceremonyclient/
-git checkout release
+git checkout release-cdn
 
 # Set up environment variables (redundant but solves the command go not found error)
 export GOROOT=/usr/local/go
 export GOPATH=$HOME/go
 export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
-
 
 
 # Determine the ExecStart line based on the architecture
@@ -134,21 +132,10 @@ elif [ "$ARCH" = "aarch64" ]; then
 fi
 
 # Download qClient
-echo "⏳ Downloading qClient... "
-sleep 1
+echo "⏳ Building qCiient..."
+sleep 1  # Add a 1-second delay
 cd ~/ceremonyclient/client
-
-# Try to download and install the new qClient
-if wget https://releases.quilibrium.com/$QCLIENT_BINARY -O qclient; then
-  chmod +x qclient
-else
-  echo "wget failed, trying alternative method"
-
-  # Try the alternative method
-  if ! GOEXPERIMENT=arenas go build -o qclient main.go; then
-    echo "Alternative method also failed, moving on to the next step"
-  fi
-fi
+GOEXPERIMENT=arenas go build -o qclient main.go
 
 # Get the current user's home directory
 HOME=$(eval echo ~$USER)
