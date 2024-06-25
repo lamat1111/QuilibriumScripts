@@ -137,9 +137,18 @@ fi
 echo "⏳ Downloading qClient... "
 sleep 1
 cd ~/ceremonyclient/client
-wget https://releases.quilibrium.com/$QCLIENT_BINARY
-mv $QCLIENT_BINARY qclient
-chmod +x qclient
+
+# Try to download and install the new qClient
+if wget https://releases.quilibrium.com/$QCLIENT_BINARY -O qclient; then
+  chmod +x qclient
+else
+  echo "wget failed, trying alternative method"
+
+  # Try the alternative method
+  if ! GOEXPERIMENT=arenas go build -o qclient main.go; then
+    echo "Alternative method also failed, moving on to the next step"
+  fi
+fi
 
 # Get the current user's home directory
 HOME=$(eval echo ~$USER)
