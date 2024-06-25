@@ -162,30 +162,10 @@ fi
 # QCLIENT UPDATE
 #==========================
 
-# Update qClient
-echo "⏳ Updating qClient..."
-sleep 1
-cd ~/ceremonyclient/client
-
-# Check if qclient exists and remove it if it does
-if [ -f qclient ]; then
-    echo "Removing existing qClient..."
-    rm -f qclient
-else
-    echo "qClient does not exist. Proceeding with installation..."
-fi
-
-# Try to download and install the new qClient
-if wget https://releases.quilibrium.com/$QCLIENT_BINARY -O qclient; then
-  chmod +x qclient
-else
-  echo "wget failed, trying alternative method"
-
-  # Try the alternative method
-  if ! GOEXPERIMENT=arenas go build -o qclient main.go; then
-    echo "Alternative method also failed, moving on to the next step"
-  fi
-fi
+# Build qClient
+echo "⏳ Building qCiient..."
+sleep 1  # Add a 1-second delay
+GOEXPERIMENT=arenas go build -o qclient main.go
 
 # Get the current user's home directory
 HOME=$(eval echo ~$HOME_DIR)
