@@ -116,12 +116,12 @@ echo "⏳ Downloading new release v$VERSION"
 
 # Set the remote URL and download
 cd  ~/ceremonyclient
-#git remote set-url origin https://github.com/QuilibriumNetwork/ceremonyclient.git
-git remote set-url origin https://source.quilibrium.com/quilibrium/ceremonyclient.git || git remote set-url origin https://git.quilibrium-mirror.ch/agostbiro/ceremonyclient.git
+git remote set-url origin https://github.com/QuilibriumNetwork/ceremonyclient.git
+#git remote set-url origin https://source.quilibrium.com/quilibrium/ceremonyclient.git || git remote set-url origin https://git.quilibrium-mirror.ch/agostbiro/ceremonyclient.git
 git checkout main
 git branch -D release
 git pull
-git checkout release-cdn
+git checkout release
 
 
 echo "✅ Downloaded the latest changes successfully."
