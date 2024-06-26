@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.7.2"
+SCRIPT_VERSION="1.7.3"
 
 # Function to check if wget is installed, and install it if it is not
 check_wget() {
@@ -41,9 +41,9 @@ upgrade_qone() {
 # Function to check for newer script version
 check_for_updates() {
     echo "Checking for updates..."
-    LATEST_VERSION=$(wget --no-cache -qO- "https://github.com/lamat1111/QuilibriumScripts/raw/main/qone.sh" | grep 'SCRIPT_VERSION="' | head -1 | cut -d'"' -f2)
-    if [ $? -ne 0 ]; then
-        echo "Failed to check for updates. Continuing with current version."
+    LATEST_VERSION=$(wget --no-cache -qO- "https://github.com/lamat1111/QuilibriumScripts/raw/main/qone.sh" | grep 'SCRIPT_VERSION=' | head -1 | cut -d'"' -f2)
+    if [ $? -ne 0 ] || [ -z "$LATEST_VERSION" ]; then
+        echo "Failed to check for updates or retrieve version. Continuing with current version."
         return 0
     fi
     
@@ -51,7 +51,7 @@ check_for_updates() {
         echo "New version available: $LATEST_VERSION (current: $SCRIPT_VERSION)"
         if wget --no-cache -O ~/qone_new.sh "https://github.com/lamat1111/QuilibriumScripts/raw/main/qone.sh"; then
             # Verify the downloaded file
-            if grep -q "SCRIPT_VERSION=\"$LATEST_VERSION\"" ~/qone_new.sh; then
+            if grep -q "SCRIPT_VERSION=$LATEST_VERSION" ~/qone_new.sh; then
                 mv ~/qone_new.sh ~/qone.sh
                 chmod +x ~/qone.sh
                 echo "✅ New version downloaded and installed. Restarting script..."
