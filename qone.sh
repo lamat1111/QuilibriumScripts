@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.7"
+SCRIPT_VERSION="1.7.1"
 
 # Function to check if wget is installed, and install it if it is not
 check_wget() {
@@ -530,22 +530,30 @@ To remove the script fomr your system, run: rm ~/qone.sh
  9) Node info (peerID & balance):
     Display information about your node peerID and balance.
 
-10) QUIL balance:
+10) Check balance:
     Display the balance of QUIL tokens.
 
-11) Peer manifest (Difficulty metric):
+11) Balance log:
+    Log your balance every 1 hour on a CSV file.
+
+12) Backup your node:
+    Backup of your node .config folder and other data on StorJ.
+    You need a Storj account https://www.storj.io/ and a Public/Secret access key.
+
+13) Restore backup:
+    This script will restore your node backup from StorJ.
+    You need a Storj account https://www.storj.io/ and a Public/Secret access key.
+
+14) Peer manifest (Difficulty metric):
     Check the peer manifest to provide information about the difficulty metric score of your node. 
     It only works after the node has been running for 15-30 minutes.
 
-12) Check visibility:
+15) Check visibility:
     Check the visibility status of the node.
 
-13) System cleaner:
+16) System cleaner:
     Perform system cleanup tasks. It will not affect your node.
 
-14) Backup your node:
-    Backup of your node stoe folder and other data on StorJ.
-    You need a Storj account https://www.storj.io/ and a Public/Secret access key.
 '
 
 #=====================
