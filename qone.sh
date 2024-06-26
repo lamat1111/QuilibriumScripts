@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.7.1"
+SCRIPT_VERSION="1.7.2"
 
 # Function to check if wget is installed, and install it if it is not
 check_wget() {
