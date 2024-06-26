@@ -453,6 +453,9 @@ It only works after 15-30 minutes that the node has been running.
 balance_log_message='
 This installer sets up a script to check your node balance
 and then sets up a cronjob to log your balance every hour in a CSV file.
+
+For more info on how to see/download your balance CSV log, please visit:
+https://docs.quilibrium.one/start/tutorials/log-your-node-balance-every-1-hour
 '
 
 backup_storj_message='
@@ -555,6 +558,8 @@ To remove the script fomr your system, run: rm ~/qone.sh
 
 11) Balance log:
     Log your balance every 1 hour on a CSV file.
+    For more info on how to see/download your balance CSV log, please visit:
+    https://docs.quilibrium.one/start/tutorials/log-your-node-balance-every-1-hour
 
 12) Backup your node:
     Backup of your node .config folder and other data on StorJ.
