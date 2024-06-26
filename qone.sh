@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.6"
+SCRIPT_VERSION="1.7"
 
 # Function to check if wget is installed, and install it if it is not
 check_wget() {
@@ -124,6 +124,7 @@ CHECK_VISIBILITY_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScri
 SYSTEM_CLEANER_URL="https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/tools/qnode_system_cleanup.sh"
 BACKUP_STORJ_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_backup_storj.sh"
 BACKUP_RESTORE_STORJ_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_backup_restore_storj.sh"
+BALANCE_LOG_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_balance_checker_installer.sh"
 TEST_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/test/test_script.sh"
 
 # Common message for missing service file
@@ -169,6 +170,13 @@ system_cleaner() {
     echo ""
     echo "⌛️  Cleaning your system..."
     wget -O - "$SYSTEM_CLEANER_URL" | bash
+    prompt_return_to_menu
+}
+
+balance_log() {
+    echo ""
+    echo "⌛️  Installing the balance log script..."
+    wget -O - "$BALANCE_LOG_URL" | bash
     prompt_return_to_menu
 }
 
@@ -422,6 +430,11 @@ This action will check the peer manifest to provide information about the diffic
 It only works after 15-30 minutes that the node has been running.
 '
 
+balance_log_message='
+This installer sets up a script to check your node balance
+and then sets up a cronjob to log your balance every hour in a CSV file.
+'
+
 backup_storj_message='
 This action automates the backup of your node data to StorJ.
 You need a StorJ account https://www.storj.io/ and a Public/Secret access key.
@@ -579,15 +592,16 @@ Choose option 1, reboot and and then choose 2.
 Let your node run for 30 minutes, then choose option 3. Done!
 
 ----------------------------------------------------------------------
-1) Prepare your server           8) Node version
-2) Install node                  9) Node info (peerID & balance)    
-3) Set up gRPCurl               10) QUIL balance
-
-4) Node Log                     11) Peer manifest (Difficulty metric)
-5) Update node                  12) Check visibility
-6) Stop node                    13) System cleaner
-7) Restart node                 14) Backup your node
-                                15) Restore backup
+1) Prepare your server        10) Check balance
+2) Install node               11) Balance log
+3) Set up gRPCurl             12) Backup your node
+                              13) Restore backup                
+4) Node Log                                    
+5) Update node                14) Peer manifest         
+6) Stop node                  15) Check visibility                              
+7) Restart node               16) System cleaner 
+8) Node version                 
+9) Node info                     
 ----------------------------------------------------------------------
 B) ⭐️ Best server providers
 D) 💜 Donations
@@ -621,11 +635,12 @@ while true; do
 	    8) node_version action_performed=1;;
         9) node_info action_performed=1;;
  	    10) quil_balance action_performed=1;;
-        11) confirm_action "$(wrap_text "$peer_manifest_message" "")" "Peer manifest" peer_manifest;;
-        12) check_visibility;;
-	    13) system_cleaner;;
-        14) confirm_action "$(wrap_text "$backup_storj_message" "")" "Backup your node on StorJ" backup_storj;;
-        15) confirm_action "$(wrap_text "$backup_restore_storj_message" "")" "Restore a node backup frm STorJ" backup_restore_storj;;
+        11) confirm_action "$(wrap_text "$balance_log_message" "")" "Balance log" balance_log;;
+        12) confirm_action "$(wrap_text "$backup_storj_message" "")" "Backup your node on StorJ" backup_storj;;
+        13) confirm_action "$(wrap_text "$backup_restore_storj_message" "")" "Restore a node backup frm STorJ" backup_restore_storj;;
+        14) confirm_action "$(wrap_text "$peer_manifest_message" "")" "Peer manifest" peer_manifest;;
+        15) check_visibility;;
+	    16) system_cleaner;;
 	    20) confirm_action "$(wrap_text "$test_script_message" "")" "Test Script" test_script;;
         [bB]) best_providers;;
         [dD]) donations;;
