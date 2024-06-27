@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.7.3"
+SCRIPT_VERSION="1.7.4"
 
 # Function to check if wget is installed, and install it if it is not
 check_wget() {
@@ -639,7 +639,7 @@ Let your node run for 30 minutes, then choose option 3. Done!
 B) ⭐️ Best server providers
 D) 💜 Donations
 ----------------------------------------------------------------------     
-E) Exit                          H) Help
+E) Exit                       H) Help
                         
 
 EOF
