@@ -43,7 +43,7 @@ sleep 5 # add sleep time
 # Check if ceremonyclient.service exists
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
 if [ ! -f "$SERVICE_FILE" ]; then
-    echo "❌ Error: you do not have a service file called 'ceremonyclient'. The script won't work without it. Exising..."
+    echo "❌ Error: The file $SERVICE_FILE does not exist. Ceremonyclient service setup failed."
     exit 1
 fi
 
@@ -51,7 +51,7 @@ fi
 SCRIPT_DIR=~/scripts
 SCRIPT_FILE=$SCRIPT_DIR/qnode_oom_sys_restart.sh
 
-# Function to check if a command succeeded 
+# Function to check if a command succeeded
 check_command() {
     if [ $? -ne 0 ]; then
         echo "❌ Error: $1"
@@ -66,10 +66,10 @@ sleep 1
 mkdir -p $SCRIPT_DIR
 check_command "Failed to create script directory"
 
-# Create the monitoring script
-echo "⌛️ Creating monitoring script..."
+# Overwrite the monitoring script if it already exists
+echo "⌛️ Creating or overwriting monitoring script..."
 sleep 1
-cat << 'EOF' > $SCRIPT_FILE
+cat << 'EOF' >| $SCRIPT_FILE
 #!/bin/bash
 
 LOG_DIR=~/scripts/log
@@ -83,7 +83,7 @@ get_ram_usage() {
 # Function to restart the ceremonyclient service
 restart_service() {
     local timestamp=$(date +"%Y-%m-%d %H:%M:%S")
-    echo "$timestamp: RAM usage is above 97%. Restarting ceremonyclient service..." | tee -a $LOG_DIR/monitor.log
+    echo "$timestamp: RAM usage is above 98%. Restarting ceremonyclient service..." | tee -a $LOG_DIR/monitor.log
     if sudo service ceremonyclient restart; then
         echo "$timestamp: ceremonyclient service restarted successfully." >> $LOG_DIR/qnode_oom_sys_restart.log
     else
@@ -93,11 +93,11 @@ restart_service() {
 
 # Check RAM usage and restart service if necessary
 RAM_USAGE=$(get_ram_usage)
-if (( $(echo "$RAM_USAGE > 97.00" | bc -l) )); then
+if (( $(echo "$RAM_USAGE > 98.00" | bc -l) )); then
     restart_service
 fi
 EOF
-check_command "Failed to create monitoring script"
+check_command "Failed to create or overwrite monitoring script"
 
 # Make the script executable
 echo "⌛️ Making the script executable..."
@@ -105,21 +105,28 @@ sleep 1
 chmod +x $SCRIPT_FILE
 check_command "Failed to make script executable"
 
-# Create a cron job to run the script every 10 minutes
-echo "⌛️ Setting up cron job..."
+# Check if cron job already exists
+echo "⌛️ Checking if cron job exists..."
 sleep 1
-if (crontab -l 2>/dev/null; echo "*/10 * * * * $SCRIPT_FILE") | crontab -; then
-    echo "✅ Cron job created successfully."
-    sleep 1
+if crontab -l | grep -q "$SCRIPT_FILE"; then
+    echo "✅ Cron job already exists. Skipping..."
 else
-    echo "❌ Failed to create cron job. Please check your permissions."
+    # Create a cron job to run the script every 10 minutes
+    echo "⌛️ Setting up cron job..."
     sleep 1
-    exit 1
+    if (crontab -l 2>/dev/null; echo "*/10 * * * * $SCRIPT_FILE") | crontab -; then
+        echo "✅ Cron job created successfully."
+        sleep 1
+    else
+        echo "❌ Failed to create cron job. Please check your permissions."
+        sleep 1
+        exit 1
+    fi
 fi
 
-echo "✅ Installation complete. The monitoring script has been set up and the cron job has been created."
+echo "✅ Installation complete. The monitoring script has been set up and the cron job has been created or skipped."
 sleep 1
 echo "You can find the monitoring script at: $SCRIPT_FILE"
 sleep 1
-echo "Logs will be written to: ~/scripts/log/qnode_oom_sys_restart.log"
+echo "Logs will be written to: ~/scripts/log/"
 sleep 1
