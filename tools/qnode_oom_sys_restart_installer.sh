@@ -51,7 +51,7 @@ fi
 SCRIPT_DIR=~/scripts
 SCRIPT_FILE=$SCRIPT_DIR/qnode_oom_sys_restart.sh
 
-# Function to check if a command succeeded
+# Function to check if a command succeeded 
 check_command() {
     if [ $? -ne 0 ]; then
         echo "❌ Error: $1"
