@@ -29,7 +29,7 @@ This script will:
 1. Create a monitoring script to check RAM usage
 2. Set up a cron job to run the monitoring script every 10 minutes
 3. The monitoring script will restart the ceremonyclient service 
-if RAM usage exceeds 97%
+if RAM usage exceeds 95%
 
 Made with 🔥 by LaMat - https://quilibrium.one
 ====================================================================
