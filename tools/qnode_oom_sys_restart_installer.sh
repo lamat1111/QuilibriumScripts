@@ -83,8 +83,9 @@ get_ram_usage() {
 # Function to restart the ceremonyclient service
 restart_service() {
     local timestamp=$(date +"%Y-%m-%d %H:%M:%S")
-    echo "$timestamp: RAM usage is above 98%. Restarting ceremonyclient service..." | tee -a $LOG_DIR/monitor.log
+    echo "$timestamp: RAM usage is above 95%. Restarting ceremonyclient service..." | tee -a $LOG_DIR/monitor.log
     if sudo service ceremonyclient restart; then
+        sleep 5
         echo "$timestamp: ceremonyclient service restarted successfully." >> $LOG_DIR/qnode_oom_sys_restart.log
     else
         echo "$timestamp: Failed to restart ceremonyclient service." >> $LOG_DIR/qnode_oom_sys_restart.log
@@ -93,7 +94,7 @@ restart_service() {
 
 # Check RAM usage and restart service if necessary
 RAM_USAGE=$(get_ram_usage)
-if (( $(echo "$RAM_USAGE > 98.00" | bc -l) )); then
+if (( $(echo "$RAM_USAGE > 95.00" | bc -l) )); then
     restart_service
 fi
 EOF
