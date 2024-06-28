@@ -83,7 +83,7 @@ get_ram_usage() {
 # Function to restart the ceremonyclient service
 restart_service() {
     local timestamp=$(date +"%Y-%m-%d %H:%M:%S")
-    echo "$timestamp: RAM usage is above 98%. Restarting ceremonyclient service..." | tee -a $LOG_DIR/monitor.log
+    echo "$timestamp: RAM usage is above 97%. Restarting ceremonyclient service..." | tee -a $LOG_DIR/monitor.log
     if sudo service ceremonyclient restart; then
         echo "$timestamp: ceremonyclient service restarted successfully." >> $LOG_DIR/qnode_oom_sys_restart.log
     else
