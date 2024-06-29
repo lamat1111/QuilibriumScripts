@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.7.4"
+SCRIPT_VERSION="1.7.5"
 
 # Function to check if wget is installed, and install it if it is not
 check_wget() {
@@ -629,10 +629,10 @@ Let your node run for 30 minutes, then choose option 3. Done!
 2) Install node               11) Balance log
 3) Set up gRPCurl             12) Backup your node
                               13) Restore backup                
-4) Node Log                                    
-5) Update node                14) Peer manifest         
-6) Stop node                  15) Check visibility                              
-7) Restart node               16) System cleaner 
+4) Node Log                                   
+5) Update node                15) Check visibility         
+6) Stop node                  16) System cleaner                              
+7) Restart node                
 8) Node version                 
 9) Node info                     
 ----------------------------------------------------------------------
@@ -671,7 +671,7 @@ while true; do
         11) confirm_action "$(wrap_text "$balance_log_message" "")" "Balance log" balance_log;;
         12) confirm_action "$(wrap_text "$backup_storj_message" "")" "Backup your node on StorJ" backup_storj;;
         13) confirm_action "$(wrap_text "$backup_restore_storj_message" "")" "Restore a node backup frm STorJ" backup_restore_storj;;
-        14) confirm_action "$(wrap_text "$peer_manifest_message" "")" "Peer manifest" peer_manifest;;
+        #14) confirm_action "$(wrap_text "$peer_manifest_message" "")" "Peer manifest" peer_manifest;;
         15) check_visibility;;
 	    16) system_cleaner;;
 	    20) confirm_action "$(wrap_text "$test_script_message" "")" "Test Script" test_script;;
