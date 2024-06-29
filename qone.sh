@@ -40,31 +40,29 @@ upgrade_qone() {
 
 # Function to check for newer script version
 check_for_updates() {
-    echo "Checking for updates..."
     LATEST_VERSION=$(wget --no-cache -qO- "https://github.com/lamat1111/QuilibriumScripts/raw/main/qone.sh" | grep 'SCRIPT_VERSION=' | head -1 | cut -d'"' -f2)
     if [ $? -ne 0 ] || [ -z "$LATEST_VERSION" ]; then
-        echo "Failed to check for updates or retrieve version. Continuing with current version."
+        echo "Failed to check for updates. Continuing with current version."
         return 0
     fi
     
     if [ "$SCRIPT_VERSION" != "$LATEST_VERSION" ]; then
-        echo "New version available: $LATEST_VERSION (current: $SCRIPT_VERSION)"
+        echo "New version available. Attempting update..."
         if wget --no-cache -O ~/qone_new.sh "https://github.com/lamat1111/QuilibriumScripts/raw/main/qone.sh"; then
-            # Verify the downloaded file
-            if grep -q "SCRIPT_VERSION=$LATEST_VERSION" ~/qone_new.sh; then
+            DOWNLOADED_VERSION=$(grep 'SCRIPT_VERSION=' ~/qone_new.sh | head -1 | cut -d'"' -f2)
+            
+            if [ "$DOWNLOADED_VERSION" = "$LATEST_VERSION" ]; then
                 mv ~/qone_new.sh ~/qone.sh
                 chmod +x ~/qone.sh
-                echo "✅ New version downloaded and installed. Restarting script..."
+                echo "✅ New version ($LATEST_VERSION) installed. Restarting script..."
                 exec ~/qone.sh
             else
-                echo "Downloaded file seems invalid. Continuing with current version."
+                echo "Error: Version mismatch in downloaded file. Update aborted."
                 rm ~/qone_new.sh
             fi
         else
-            echo "Failed to download the new version. Continuing with current version."
+            echo "Error: Failed to download the new version. Update aborted."
         fi
-    else
-        echo "You're running the latest version: $SCRIPT_VERSION"
     fi
 }
 
