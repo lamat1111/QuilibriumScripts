@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.7.6"
+SCRIPT_VERSION="1.7.7"
 
 # Function to check if wget is installed, and install it if it is not
 check_wget() {
@@ -26,15 +26,15 @@ upgrade_qone() {
             return 1
         else
             echo "✅ qone.sh upgraded!"
-            echo ""
+            echo
             echo "🟢 You can now use 'Q1', 'q1', or 'qone' to launch the Node Quickstart Menu."
             sleep 1
             echo "🟢 The menu will also load automatically every time you log in."
-            echo ""
+            echo
             sleep 5
         fi
     else
-        echo "ℹ️ qone.sh is already upgraded."
+        echo "✅ qone.sh is already upgraded."
     fi
 }
 
@@ -152,56 +152,56 @@ MISSING_SERVICE_MSG="⚠️ Your service file does not exist. Looks like you do 
 
 # Function definitions
 install_prerequisites() {
-    echo ""
+    echo
     echo "⌛️  Preparing server with necessary apps and settings..."
     wget --no-cache -O - "$PREREQUISITES_URL" | bash
     prompt_return_to_menu
 }
 
 install_node() {
-    echo ""
+    echo
     echo "⌛️  Installing node..."
     wget --no-cache -O - "$NODE_INSTALL_URL" | bash
     prompt_return_to_menu
 }
 
 configure_grpcurl() {
-    echo ""
+    echo
     echo "⌛️  Setting up gRPCurl..."
     wget --no-cache -O - "$GRPCURL_CONFIG_URL" | bash
     prompt_return_to_menu
 }
 
 update_node() {
-    echo ""
+    echo
     echo "⌛️  Updating node..."
     wget --no-cache -O - "$UPDATE_URL" | bash
     prompt_return_to_menu
 }
 
 check_visibility() {
-    echo ""
+    echo
     echo "⌛️  Checking node visibility..."
     wget -O - "$CHECK_VISIBILITY_URL" | bash
     prompt_return_to_menu
 }
 
 system_cleaner() {
-    echo ""
+    echo
     echo "⌛️  Cleaning your system..."
     wget -O - "$SYSTEM_CLEANER_URL" | bash
     prompt_return_to_menu
 }
 
 balance_log() {
-    echo ""
+    echo
     echo "⌛️  Installing the balance log script..."
     wget -O - "$BALANCE_LOG_URL" | bash
     prompt_return_to_menu
 }
 
 backup_storj() {
-    echo ""
+    echo
     echo "⌛️  Downloading Storj backup script..."
     mkdir -p ~/scripts && wget -P ~/scripts -O ~/scripts/qnode_backup_storj.sh "$BACKUP_STORJ_URL"
     if [ -f ~/scripts/qnode_backup_storj.sh ]; then
@@ -214,7 +214,7 @@ backup_storj() {
 }
 
 backup_restore_storj() {
-    echo ""
+    echo
     echo "⌛️  Downloading Storj backup restore script..."
     mkdir -p ~/scripts && wget -P ~/scripts -O ~/scripts/qnode_backup_restore_storj.sh "$BACKUP_RESTORE_STORJ_URL"
     if [ -f ~/scripts/qnode_backup_restore_storj.sh ]; then
@@ -231,15 +231,15 @@ node_info() {
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
         read -n 1 -s -r -p "✅  Press any key to continue..."
-        echo ""  # Add an empty line for better readability
+        echo  # Add an empty line for better readability
     else
-        echo ""
+        echo
 	echo "⌛️  Displaying node info..."
     echo "If this doesn't work you can try the direct commands: https://iri.quest/q-node-info"
-	echo ""
+	echo
     	sleep 1
         cd ~/ceremonyclient/node && ./"$NODE_BINARY" -node-info
-	echo ""
+	echo
 	read -n 1 -s -r -p "✅  Press any key to continue..."  # Pause and wait for user input
     fi
 }
@@ -248,15 +248,15 @@ quil_balance() {
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
         read -n 1 -s -r -p "Press any key to continue..."
-        echo ""  # Add an empty line for better readability
+        echo  # Add an empty line for better readability
     else
-        echo ""
+        echo
         echo "⌛️  Displaying your QUIL balance..."
         echo "If this doesn't work you can try the direct commands: https://iri.quest/q-node-info"
-	    echo ""
+	    echo
     	sleep 1
         cd ~/ceremonyclient/node && ./"$NODE_BINARY" -balance
-	echo ""
+	echo
 	read -n 1 -s -r -p "✅  Press any key to continue..."  # Pause and wait for user input
     fi
 }
@@ -265,11 +265,11 @@ node_logs() {
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
         read -n 1 -s -r -p "✅  Press any key to continue..."
-        echo ""  # Add an empty line for better readability
+        echo  # Add an empty line for better readability
     fi
-    echo ""
+    echo
     echo "⌛️  Displaying your node log...  (Press CTRL+C to return to the main menu)"
-    echo ""
+    echo
     trap 'echo "Returning to main menu..."; return_to_menu' INT  # Trap CTRL+C to return to main menu
     sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
 }
@@ -283,16 +283,16 @@ restart_node() {
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
 		read -n 1 -s -r -p "✅  Press any key to continue..."
-        echo ""  # Add an empty line for better readability
+        echo  # Add an empty line for better readability
     fi
-    echo ""
+    echo
     echo "⌛️   Restarting node service..."
-    echo ""
+    echo
     sleep 1
     service ceremonyclient restart
     sleep 5
     echo "✅   Node restarted"
-    echo ""
+    echo
     read -n 1 -s -r -p "Press any key to continue..."  # Pause and wait for user input
 }
 
@@ -300,16 +300,16 @@ stop_node() {
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
 	read -n 1 -s -r -p "Press any key to continue..."
-        echo ""  # Add an empty line for better readability
+        echo  # Add an empty line for better readability
     fi
-    echo ""
+    echo
     echo "⌛️  Stopping node service..."
-    echo ""
+    echo
     sleep 1
     service ceremonyclient stop
     sleep 3
     echo "✅   Node stopped"
-    echo ""
+    echo
     read -n 1 -s -r -p "Press any key to continue..."  # Pause and wait for user input
 }
 
@@ -323,20 +323,20 @@ node_version() {
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
 		read -n 1 -s -r -p "Press any key to continue..."
-        echo ""  # Add an empty line for better readability
+        echo  # Add an empty line for better readability
     fi
-    echo ""
+    echo
     echo "⌛️   Displaying node version..."
-    echo ""
+    echo
     sleep 1
     journalctl -u ceremonyclient -r --no-hostname  -n 1 -g "Quilibrium Node" -o cat
-    echo ""
+    echo
     read -n 1 -s -r -p "✅ Press any key to continue..."  # Pause and wait for user input
 }
 
 best_providers() {
     wrap_text "$best_providers_message"
-    echo ""
+    echo
     echo "-------------------------------"
     read -n 1 -s -r -p "✅  Press any key to continue..."  # Pause and wait for user input
 }
@@ -344,7 +344,7 @@ best_providers() {
 
 donations() {
     wrap_text "$donations_message"
-    echo ""
+    echo
     echo "-------------------------------"
     read -n 1 -s -r -p "✅  Press any key to continue..."  # Pause and wait for user input
 }
@@ -352,7 +352,7 @@ donations() {
 
 help_message() {
     echo "$help_message"
-    echo ""
+    echo
     prompt_return_to_menu
 }
 
