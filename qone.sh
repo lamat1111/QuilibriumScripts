@@ -588,7 +588,7 @@ To remove the script fomr your system, run: rm ~/qone.sh
 display_menu() {
     clear
     source ~/.bashrc
-    cat << "EOF"
+    cat << EOF
 
                   QQQQQQQQQ       1111111   
                 QQ:::::::::QQ    1::::::1   
@@ -610,36 +610,37 @@ display_menu() {
                            QQQQQQ  QUILIBRIUM.ONE                                                                                                                                  
 
 
-=======================================================================
-                ✨✨✨ Q.ONE QUICKSTART MENU ✨✨✨
-=======================================================================
-           Follow the guide at https://docs.quilibrium.one
+==================================================================
+            ✨✨✨ Q.ONE QUICKSTART MENU ✨✨✨
+                         v $SCRIPT_VERSION
+==================================================================
+        Follow the guide at https://docs.quilibrium.one
 
-                       Made with 🔥 by LaMat
-=======================================================================
-
+                    Made with 🔥 by LaMat
+==================================================================
 EOF
     cat << "EOF"
+
 HOW TO INSTALL A NEW NODE?
 Choose option 1, reboot and and then choose 2.
 Let your node run for 30 minutes, then choose option 3. Done!
 
-----------------------------------------------------------------------
+-----------------------------------------------------------------
 1) Prepare your server        10) Check balance
 2) Install node               11) Balance log
 3) Set up gRPCurl             12) Backup your node
                               13) Restore backup                
-4) Node Log                                   
+4) Node Log                                    
 5) Update node                14) Peer manifest         
 6) Stop node                  15) Check visibility                              
-7) Restart node               16) System cleaner   
+7) Restart node               16) System cleaner 
 8) Node version                 
 9) Node info                     
-----------------------------------------------------------------------
+-----------------------------------------------------------------
 B) ⭐️ Best server providers
 D) 💜 Donations
-----------------------------------------------------------------------     
-E) Exit                       H) Help
+-----------------------------------------------------------------    
+E) Exit                        H) Help
                         
 
 EOF
