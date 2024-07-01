@@ -3,13 +3,46 @@
 # This script installs grpcurl, jq, and base58 if they are not already installed,
 # then retrieves peer information from a Quilibrium node.
 
-# Step 0: Welcome
-echo "✨ Welcome! This script will retrieve your Qnode peer manifest  ✨"
-echo "Made with 🔥 by LaMat - https://quilibrium.one"
-echo "====================================================================================="
-echo ""
-echo "Processing... ⏳"
+
+
+cat << "EOF"
+
+                    QQQQQQQQQ       1111111   
+                  QQ:::::::::QQ    1::::::1   
+                QQ:::::::::::::QQ 1:::::::1   
+               Q:::::::QQQ:::::::Q111:::::1   
+               Q::::::O   Q::::::Q   1::::1   
+               Q:::::O     Q:::::Q   1::::1   
+               Q:::::O     Q:::::Q   1::::1   
+               Q:::::O     Q:::::Q   1::::l   
+               Q:::::O     Q:::::Q   1::::l   
+               Q:::::O     Q:::::Q   1::::l   
+               Q:::::O  QQQQ:::::Q   1::::l   
+               Q::::::O Q::::::::Q   1::::l   
+               Q:::::::QQ::::::::Q111::::::111
+                QQ::::::::::::::Q 1::::::::::1
+                  QQ:::::::::::Q  1::::::::::1
+                    QQQQQQQQ::::QQ111111111111
+                            Q:::::Q           
+                             QQQQQQ  QUILIBRIUM.ONE                                                                                                                                
+
+                              
+===========================================================================
+                    ✨ QNODE PEER MANIFEST CHECKER ✨
+===========================================================================
+This script will retrieve your Quilibrium node peer manifest.
+
+Follow the guide at https://docs.quilibrium.one
+
+Made with 🔥 by LaMat - https://quilibrium.one
+===========================================================================
+
+Processing... ⏳
+
+EOF
+
 sleep 7  # Add a 7-second delay
+
 
 # Export some variables ot solve the gRPCurl not found error
 export GOROOT=/usr/local/go
@@ -26,13 +59,13 @@ else
     # Try installing gRPCurl using go install
     if go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest; then
         echo "✅ gRPCurl installed successfully via go install."
-        echo ""
+        echo
     else
         echo "⚠️ Failed to install gRPCurl via go install. Trying apt-get..."
         # Try installing gRPCurl using apt-get
         if sudo apt-get install grpcurl -y; then
             echo "✅ gRPCurl installed successfully via apt-get."
-            echo ""
+            echo
         else
             echo "❌ Failed to install gRPCurl via apt-get! Please install it manually."
             exit 1
@@ -53,7 +86,10 @@ if ! command_exists base58; then
 fi
 
 # Command to retrieve peer information
-get_peer_info_command="peer_id_base64=\$(grpcurl -plaintext localhost:8337 quilibrium.node.node.pb.NodeService.GetNodeInfo | jq -r .peerId | base58 -d | base64) && grpcurl -plaintext localhost:8337 quilibrium.node.node.pb.NodeService.GetPeerManifests | grep -A 15 -B 1 \"\$peer_id_base64\""
+get_peer_info_command="peer_id_base64=\$(grpcurl -plaintext localhost:8337 quilibrium.node.node.pb.NodeService.GetNodeInfo | jq -r .peerId | base58 -d | base64) && grpcurl -plaintext -max-msg-sz 5000000 localhost:8337 quilibrium.node.node.pb.NodeService.GetPeerManifests | grep -A 15 -B 1 \"\$peer_id_base64\""
+
+# Demipoet code https://quilibrium.guide/manage-node/node-difficulty-metric#2-getting-your-node-difficulty-metric
+#grpcurl -plaintext -max-msg-sz 5000000 localhost:8337 quilibrium.node.node.pb.NodeService.GetPeerManifests | less | grep -B 1 -A 16 $(echo -n Qmxxxxxxxxx | base58 -d | base64)
 
 # Execute the command
 echo "🚀 Retrieving peer information..."
@@ -66,6 +102,6 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-echo ""
-echo ""
+echo
+echo
 echo "🎉 Peer information retrieved successfully!"
