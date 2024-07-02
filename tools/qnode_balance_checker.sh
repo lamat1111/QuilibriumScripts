@@ -72,24 +72,42 @@ get_unclaimed_balance() {
 }
 
 # Function to write data to CSV file
+#OLD VERSION (decimal bug)
+# write_to_csv() {
+#     local filename="$HOME/scripts/balance_log.csv"
+#     local data="$1"
+
+#     if [ ! -f "$filename" ] || [ ! -s "$filename" ]; then
+#         echo "\"time\",\"balance\"" > "$filename"
+#     fi
+
+#     # Split the data into time and balance
+#     local time=$(echo "$data" | cut -d',' -f1)
+#     local balance=$(echo "$data" | cut -d',' -f2)
+
+#     # Replace dot with comma in balance for correct CSV formatting
+#     balance=$(echo "$balance" | sed 's/\./,/')
+
+#     # Format the data with quotes
+#     local formatted_data="\"$time\",\"$balance\""
+
+#     echo "$formatted_data" >> "$filename"
+# }
+
+# Function to write data to CSV file
 write_to_csv() {
     local filename="$HOME/scripts/balance_log.csv"
     local data="$1"
-
     if [ ! -f "$filename" ] || [ ! -s "$filename" ]; then
-        echo "\"time\",\"balance\"" > "$filename"
+        echo "time,balance" > "$filename"
     fi
-
     # Split the data into time and balance
     local time=$(echo "$data" | cut -d',' -f1)
     local balance=$(echo "$data" | cut -d',' -f2)
-
-    # Replace dot with comma in balance for correct CSV formatting
-    balance=$(echo "$balance" | sed 's/\./,/')
-
+    # Round to 2 decimal places and replace dot with comma
+    balance=$(printf "%.2f" "$balance" | sed 's/\./,/')
     # Format the data with quotes
     local formatted_data="\"$time\",\"$balance\""
-
     echo "$formatted_data" >> "$filename"
 }
 
