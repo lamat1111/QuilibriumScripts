@@ -84,11 +84,14 @@ git checkout -- node/release_autorun.sh
 #===========================
 # Download Binary
 #===========================
-echo "⏳ Downloading New Release..."
 cd  ~/ceremonyclient
-git remote set-url origin https://source.quilibrium.com/quilibrium/ceremonyclient.git || git remote set-url origin https://git.quilibrium-mirror.ch/agostbiro/ceremonyclient.git
+git remote set-url origin https://github.com/QuilibriumNetwork/ceremonyclient.git
+#git remote set-url origin https://source.quilibrium.com/quilibrium/ceremonyclient.git || git remote set-url origin https://git.quilibrium-mirror.ch/agostbiro/ceremonyclient.git
+git checkout main
+git branch -D release
 git pull
-git checkout release-cdn
+git checkout release
+
 
 sleep 1
 

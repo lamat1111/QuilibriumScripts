@@ -37,35 +37,17 @@ if [ -d ~/ceremonyclient ]; then
 fi
 
 # Step 3: Download Ceremonyclient
+# Download Ceremonyclient
 echo "⏳ Downloading Ceremonyclient"
 sleep 1  # Add a 1-second delay
 cd ~
 if [ -d "ceremonyclient" ]; then
   echo "Directory ceremonyclient already exists, skipping git clone..."
 else
-  attempt=0
-  max_attempts=3
-  while [ $attempt -lt $max_attempts ]; do
-    if git clone https://source.quilibrium.com/quilibrium/ceremonyclient.git; then
-      echo "✅ Successfully cloned from https://source.quilibrium.com/quilibrium/ceremonyclient.git"
-      break
-    elif git clone https://git.quilibrium-mirror.ch/agostbiro/ceremonyclient.git; then
-      echo "✅ Successfully cloned from https://git.quilibrium-mirror.ch/agostbiro/ceremonyclient.git"
-      break
-    elif git clone https://github.com/QuilibriumNetwork/ceremonyclient.git; then
-      echo "✅ Successfully cloned from https://github.com/QuilibriumNetwork/ceremonyclient.git"
-      break
-    else
-      attempt=$((attempt+1))
-      echo "Git clone failed (attempt $attempt of $max_attempts), retrying..."
-      sleep 2
-    fi
+  until git clone https://github.com/QuilibriumNetwork/ceremonyclient.git || git clone  git clone https://git.quilibrium-mirror.ch/agostbiro/ceremonyclient.git; do
+    echo "Git clone failed, retrying..."
+    sleep 2
   done
-
-  if [ $attempt -ge $max_attempts ]; then
-    echo "❌ Error: Failed to clone the repository after $max_attempts attempts." >&2
-    exit 1
-  fi
 fi
 
 cd ~/ceremonyclient/
@@ -76,21 +58,21 @@ export GOROOT=/usr/local/go
 export GOPATH=$HOME/go
 export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
 
-# Step 5: Verify if go is correctly installed
-if ! command -v go &> /dev/null; then
-    echo "❌ Go is not installed or not found in PATH"
-    exit 1
-fi
+# # Step 5: Verify if go is correctly installed
+# if ! command -v go &> /dev/null; then
+#     echo "❌ Go is not installed or not found in PATH"
+#     exit 1
+# fi
 
-# Step 6: Build Ceremonyclient qClient
-echo "⏳ Building qClient..."
-sleep 1  # Add a 1-second delay
-cd ~/ceremonyclient/client
-GOEXPERIMENT=arenas go build -o qclient main.go
-if [ $? -ne 0 ]; then
-    echo "❌ Build failed"
-    exit 1
-fi
+# # Step 6: Build Ceremonyclient qClient
+# echo "⏳ Building qClient..."
+# sleep 1  # Add a 1-second delay
+# cd ~/ceremonyclient/client
+# GOEXPERIMENT=arenas go build -o qclient main.go
+# if [ $? -ne 0 ]; then
+#     echo "❌ Build failed"
+#     exit 1
+# fi
 
 # Step 9: Determine the ExecStart line based on the architecture
 HOME=$(eval echo ~$USER)

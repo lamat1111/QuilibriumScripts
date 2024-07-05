@@ -39,6 +39,8 @@ EOF
 
 sleep 7  # Add a 7-second delay
 
+VERSION="1.4.20.1"
+
 #==========================
 # GO UPGRADE
 #==========================
@@ -109,35 +111,61 @@ cd ~/ceremonyclient || { echo "❌ Error: Directory ~/ceremonyclient does not ex
 echo "✅ Discarding local changes in release_autorun.sh..."
 git checkout -- node/release_autorun.sh
 
-# # Function to install a package if it is not already installed
-# install_package() {
-#     echo "⏳ Installing $1..."
-#     if apt-get install -y $1; then
-#         echo "✅ $1 installed successfully."
-#     else
-#         echo "❌ Failed to install $1. You will have to do this manually."
-#     fi
-# }
-
-# # Install cpulimit
-# install_package cpulimit
-
-# # Install gawk
-# install_package gawk
-
-# echo "✅ cpulimit and gawk are installed and up to date."
-
-
 # Step 4: Download Binary
-echo "⏳ Downloading New Release..."
+echo "⏳ Downloading new release v$VERSION"
 
 # Set the remote URL and download
 cd  ~/ceremonyclient
-git remote set-url origin https://source.quilibrium.com/quilibrium/ceremonyclient.git || git remote set-url origin https://git.quilibrium-mirror.ch/agostbiro/ceremonyclient.git
+git remote set-url origin https://github.com/QuilibriumNetwork/ceremonyclient.git
+#git remote set-url origin https://source.quilibrium.com/quilibrium/ceremonyclient.git || git remote set-url origin https://git.quilibrium-mirror.ch/agostbiro/ceremonyclient.git
+git checkout main
+git branch -D release
 git pull
-git checkout release-cdn
+git checkout release
+
 
 echo "✅ Downloaded the latest changes successfully."
+
+#==========================
+# CREATE PATH VARIABLES
+#==========================
+
+# Determine the ExecStart line based on the architecture
+ARCH=$(uname -m)
+OS=$(uname -s)
+
+# Determine the Node binary name based on the architecture and OS
+if [ "$ARCH" = "x86_64" ]; then
+    if [ "$OS" = "Linux" ]; then
+        NODE_BINARY="node-$VERSION-linux-amd64"
+        GO_BINARY="go1.22.4.linux-amd64.tar.gz"
+        QCLIENT_BINARY="qclient-$VERSION-linux-amd64"
+    elif [ "$OS" = "Darwin" ]; then
+        NODE_BINARY="node-$VERSION-darwin-amd64"
+        GO_BINARY="go1.22.44.linux-amd64.tar.gz"
+        QCLIENT_BINARY="qclient-$VERSION-darwin-arm64"
+    fi
+
+# Determine the qClient binary name based on the architecture and OS
+elif [ "$ARCH" = "aarch64" ]; then
+    if [ "$OS" = "Linux" ]; then
+        NODE_BINARY="node-$VERSION-linux-arm64"
+        GO_BINARY="go1.22.4.linux-arm64.tar.gz"
+    elif [ "$OS" = "Darwin" ]; then
+        NODE_BINARY="node-$VERSION-darwin-arm64"
+        GO_BINARY="go1.22.4.linux-arm64.tar.gz"
+        QCLIENT_BINARY="qclient-$VERSION-linux-arm64"
+    fi
+fi
+
+#==========================
+# QCLIENT UPDATE
+#==========================
+
+# Build qClient
+echo "⏳ Building qCiient..."
+sleep 1  # Add a 1-second delay
+GOEXPERIMENT=arenas go build -o qclient main.go
 
 # Get the current user's home directory
 HOME=$(eval echo ~$HOME_DIR)
@@ -197,7 +225,7 @@ systemctl enable ceremonyclient
 service ceremonyclient start
 
 # Showing the node version and logs
-echo "🌟Your Qnode is now updated!"
+echo "🌟Your Qnode is now updated to V$VERSION !"
 echo ""
 echo "⏳ Showing the node log... (CTRL+C to exit)"
 echo ""

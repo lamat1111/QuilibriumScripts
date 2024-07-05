@@ -1,4 +1,4 @@
-# [SCRIPT HEADER]
+#!/bin/bash
 
 cat << "EOF"
 
@@ -95,12 +95,15 @@ get_backup_type() {
     fi
 }
 
+#====================
+# USER PROMPTS
+#====================
+
 # Prompt the user for StorJ S3 credentials
 echo
-echo "Your SECRET key won't be showed. Just right click to paste and press ENTER"
 echo
 read -p "🔒 Enter your StorJ access key: " access_key
-read -sp "🔒 Enter your StorJ SECRET key: " secret_key
+read -p "🔒 Enter your StorJ SECRET key: " secret_key
 echo
 
 # Initialize a flag to check if a new bucket needs to be created
@@ -141,7 +144,7 @@ fi
 
 # Prompt for the target folder name
 echo "Enter the target folder name where you want to store this backup, must be unique for each node!"
-echo "No spaces or special characters, only [a-z][0-9][-.]"
+echo "Only lowercase characters [a-z][0-9][-.]"
 read -p "▶️ Enter the target folder name, e.g., 'quil-01': " target_folder
 echo
 
@@ -166,12 +169,55 @@ echo "Your backups for this node will be stored in '$bucket/$target_folder/'"
 echo "Backup type selected: $backup_type"
 echo
 
-# Install rclone silently
-echo "⌛️ Installing rclone..."
-sudo -v
-curl -s https://rclone.org/install.sh | sudo bash > /dev/null
-echo "✅ rclone installed successfully."
-echo
+
+#====================
+# APPS INSTALLATION 
+#====================
+
+# Function to check if a package is installed
+is_installed() {
+    command -v "$1" &> /dev/null
+}
+
+# Function to install a package
+install_package() {
+    pkg=$1
+    if ! is_installed "$pkg"; then
+        echo "⌛️ Installing $pkg..."
+        sudo apt-get install -y "$pkg" > /dev/null 2>&1 || { echo "❌ Failed to install $pkg! This is a necessary app, so I will exit..."; exit_message; exit 1; }
+        echo "✅ $pkg installed successfully."
+    else
+        echo "$pkg is already installed."
+    fi
+}
+
+# Install curl if not installed
+install_package "curl"
+
+# Install cron if not installed
+install_package "cron"
+
+# Function to install rclone
+install_rclone() {
+    if ! is_installed "rclone"; then
+        echo "⌛️ Installing rclone..."
+        sudo -v
+        curl -s https://rclone.org/install.sh | sudo bash > /dev/null
+        echo "✅ rclone installed successfully."
+    else
+        echo "rclone is already installed."
+    fi
+}
+
+# Install rclone if not installed
+install_rclone
+
+echo "✅ All packages installed successfully or already present."
+
+#====================
+# RCLONE + STORJ CONFIGS
+#====================
+
 
 # Ensure rclone config directory exists
 mkdir -p $HOME/.config/rclone
@@ -204,16 +250,22 @@ if [[ $create_bucket_flag == true ]]; then
     fi
 fi
 
-# # Backup node keys.yml and config.yml if selected
-# read -p "❔ Do you want to backup your node 'keys.yml' and 'config.yml' files? (y/n): " backup_keys
-# if [[ $backup_keys =~ ^[Yy]$ ]]; then
-#     echo "⌛️ Copying node 'keys.yml' and 'config.yml' files... (I will back up these only once)."
-#     rclone copy $HOME/ceremonyclient/node/.config/keys.yml storj:/$bucket/$target_folder/keys/
-#     rclone copy $HOME/ceremonyclient/node/.config/config.yml storj:/$bucket/$target_folder/keys/
-#     echo "✅ Your keys are now backed up in 'storj:/$bucket/$target_folder/keys'"
-#     echo
-# fi
+# Backup node keys.yml and config.yml if selected
+echo "It's not very secure to backup your keys as an object on StorJ, but if you want to do it, here you are..."
+echo
+read -p "❔ Do you want to backup your node 'keys.yml' and 'config.yml' files? (y/n): " backup_keys
+if [[ $backup_keys =~ ^[Yy]$ ]]; then
+    echo "⌛️ Copying node 'keys.yml' and 'config.yml' files... (I will back up these only once)."
+    rclone copy $HOME/ceremonyclient/node/.config/keys.yml storj:/$bucket/$target_folder/.config/
+    rclone copy $HOME/ceremonyclient/node/.config/config.yml storj:/$bucket/$target_folder/.config/
+    echo "✅ Your keys are now backed up in 'storj:/$bucket/$target_folder/.config"
+    echo "Your keys are backed up only once."
+    echo
+fi
 
+#====================
+# CRONJOBS SETUP
+#====================
 
 # Function to check if a cron job with a specific pattern exists
 cron_job_exists() {
@@ -228,21 +280,39 @@ add_new_cronjob() {
     echo "$cron_schedule $cron_command" | crontab -
 }
 
-#!/bin/bash
 
 # Backup node store folder if selected
 read -p "❔ Do you want to backup your node 'store' folder? (y/n): " backup_node_folder
 if [[ $backup_node_folder =~ ^[Yy]$ ]]; then
+    # Prompt user for backup interval
     read -p "▶️ Backup 'store' folder every how many hours? (1-100): " backup_interval
+
+    # Generate a random minute for the cron job
     random_minute=$(shuf -i 0-59 -n 1)
+
+    # Define the cron schedule
     cron_schedule="$random_minute */$backup_interval * * *"
-    cron_command="rclone $backup_type --transfers 10 --checkers 20 --disable-http2 --retries 1 $HOME/ceremonyclient/node/.config/store storj:/$bucket/$target_folder/store"
-    existing_store_pattern="/ceremonyclient/node/.config/store storj:"
+
+    # Define the cron command
+    cron_command="rclone sync --transfers 10 --checkers 20 --disable-http2 --retries 1 --filter '+ store/**' --filter '+ store' --filter '- SELF_TEST' --filter '- keys.yml' --filter '- config.yml' /root/ceremonyclient/node/.config/ storj:/$bucket/$target_folder/.config/"
+
+    # Remove existing cron jobs generated by the old script version
+    if crontab -l | grep -q "ceremonyclient/node/.config/store storj:"; then
+        crontab -l | grep -v "ceremonyclient/node/.config/store storj:" | crontab -
+        echo "🗑️ Removed existing cron job matching the pattern: ceremonyclient/node/.config/store storj:"
+    fi
+
+    # Pattern to check if the cron job already exists
+    existing_store_pattern="/ceremonyclient/node/.config/ storj:"
+
+    # Check if the cron job already exists
     if ! crontab -l | grep -q "$existing_store_pattern"; then
+        # Add the new cron job
         (crontab -l ; echo "$cron_schedule $cron_command") | crontab -
         echo "⌛️ Setting cron job to backup node 'store' folder every $backup_interval hours at a random minute..."
         echo
     else
+        # Inform user that the cron job already exists
         echo "⚠️ Cron job to backup node 'store' folder already exists. Skipping..."
         echo
     fi

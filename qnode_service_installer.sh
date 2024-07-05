@@ -46,74 +46,54 @@ sleep 7  # Add a 7-second delay
 # Exit on any error
 set -e
 
-# Step 1: Define a function for displaying exit messages
+# Define a function for displaying exit messages
 exit_message() {
     echo "❌ Oops! There was an error during the script execution and the process stopped. No worries!"
     echo "🔄 You can try to run the script from scratch again."
     echo "🛠️ If you still receive an error, you may want to proceed manually, step by step instead of using the auto-installer."
 }
 
-# # Function to install a package if it is not already installed
-# install_package() {
-#     echo "⏳ Installing $1..."
-#     if apt-get install -y $1; then
-#         echo "✅ $1 installed successfully."
-#     else
-#         echo "❌ Failed to install $1. You will have to do this manually."
-#     fi
-# }
-
-# # Install cpulimit
-# install_package cpulimit
-
-# # Install gawk
-# install_package gawk
-
-# echo "✅ cpulimit and gawk are installed and up to date."
-
-
-# Step 2: Set a trap to call exit_message on any error
+# Set a trap to call exit_message on any error
 trap exit_message ERR
 
-# Step 3: Backup existing configuration files if they exist
+# Fof DEBIAN OS - Check if sudo and git is installed
+if ! command -v sudo &> /dev/null
+then
+    echo "sudo could not be found"
+    echo "Installing sudo..."
+    su -c "apt update && apt install sudo -y"
+else
+    echo "sudo is installed"
+fi
+
+if ! command -v git &> /dev/null
+then
+    echo "git could not be found"
+    echo "Installing git..."
+    su -c "apt update && apt install git -y"
+else
+    echo "git is installed"
+fi
+
+# Backup existing configuration files if they exist
 if [ -d ~/ceremonyclient ]; then
     mkdir -p ~/backup/qnode_keys
     [ -f ~/ceremonyclient/node/.config/keys.yml ] && cp ~/ceremonyclient/node/.config/keys.yml ~/backup/qnode_keys/ && echo "✅ Backup of keys.yml created in ~/backup/qnode_keys folder"
     [ -f ~/ceremonyclient/node/.config/config.yml ] && cp ~/ceremonyclient/node/.config/config.yml ~/backup/qnode_keys/ && echo "✅ Backup of config.yml created in ~/backup/qnode_keys folder"
 fi
 
-# Step 4: Download Ceremonyclient
-echo "⏳ Downloading Ceremonyclient"
+# Download Ceremonyclient
+echo "⏳Downloading Ceremonyclient"
 sleep 1  # Add a 1-second delay
 cd ~
 if [ -d "ceremonyclient" ]; then
   echo "Directory ceremonyclient already exists, skipping git clone..."
 else
-  attempt=0
-  max_attempts=3
-  while [ $attempt -lt $max_attempts ]; do
-    if git clone https://source.quilibrium.com/quilibrium/ceremonyclient.git; then
-      echo "✅ Successfully cloned from https://source.quilibrium.com/quilibrium/ceremonyclient.git"
-      break
-    elif git clone https://git.quilibrium-mirror.ch/agostbiro/ceremonyclient.git; then
-      echo "✅ Successfully cloned from https://git.quilibrium-mirror.ch/agostbiro/ceremonyclient.git"
-      break
-    elif git clone https://github.com/QuilibriumNetwork/ceremonyclient.git; then
-      echo "✅ Successfully cloned from https://github.com/QuilibriumNetwork/ceremonyclient.git"
-      break
-    else
-      attempt=$((attempt+1))
-      echo "Git clone failed (attempt $attempt of $max_attempts), retrying..."
-      sleep 2
-    fi
+  until git clone https://github.com/QuilibriumNetwork/ceremonyclient.git || git clone https://source.quilibrium.com/quilibrium/ceremonyclient.git; do
+    echo "Git clone failed, retrying..."
+    sleep 2
   done
-
-  if [ $attempt -ge $max_attempts ]; then
-    echo "❌ Error: Failed to clone the repository after $max_attempts attempts." >&2
-    exit 1
-  fi
 fi
-
 cd ~/ceremonyclient/
 git checkout release
 
@@ -122,13 +102,41 @@ export GOROOT=/usr/local/go
 export GOPATH=$HOME/go
 export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
 
-# Step 4.1: Build Ceremonyclient qClient
-# echo "⏳ Building qClient..."
-# sleep 1  # Add a 1-second delay
-# cd ~/ceremonyclient/client
-# GOEXPERIMENT=arenas go build -o qclient main.go
 
-# Step 5: Determine the ExecStart line based on the architecture
+# Determine the ExecStart line based on the architecture
+ARCH=$(uname -m)
+OS=$(uname -s)
+
+# Determine the Node binary name based on the architecture and OS
+if [ "$ARCH" = "x86_64" ]; then
+    if [ "$OS" = "Linux" ]; then
+        NODE_BINARY="node-$VERSION-linux-amd64"
+        GO_BINARY="go1.22.4.linux-amd64.tar.gz"
+        QCLIENT_BINARY="qclient-$VERSION-linux-amd64"
+    elif [ "$OS" = "Darwin" ]; then
+        NODE_BINARY="node-$VERSION-darwin-amd64"
+        GO_BINARY="go1.22.44.linux-amd64.tar.gz"
+        QCLIENT_BINARY="qclient-$VERSION-darwin-arm64"
+    fi
+
+# Determine the qClient binary name based on the architecture and OS
+elif [ "$ARCH" = "aarch64" ]; then
+    if [ "$OS" = "Linux" ]; then
+        NODE_BINARY="node-$VERSION-linux-arm64"
+        GO_BINARY="go1.22.4.linux-arm64.tar.gz"
+    elif [ "$OS" = "Darwin" ]; then
+        NODE_BINARY="node-$VERSION-darwin-arm64"
+        GO_BINARY="go1.22.4.linux-arm64.tar.gz"
+        QCLIENT_BINARY="qclient-$VERSION-linux-arm64"
+    fi
+fi
+
+# Download qClient
+echo "⏳ Building qCiient..."
+sleep 1  # Add a 1-second delay
+cd ~/ceremonyclient/client
+GOEXPERIMENT=arenas go build -o qclient main.go
+
 # Get the current user's home directory
 HOME=$(eval echo ~$USER)
 
@@ -148,7 +156,7 @@ calculate_gomaxprocs() {
     if [ $gomaxprocs -gt $cpu_cores ]; then
         gomaxprocs=$cpu_cores
     fi
-    gomaxprocs=$((gomaxprocs + 1))
+    gomaxprocs=$((gomaxprocs))
     echo $gomaxprocs
 }
 
@@ -180,7 +188,7 @@ Environment="GOMAXPROCS=$GOMAXPROCS"
 WantedBy=multi-user.target
 EOF
 
-# Step 7: Start the ceremonyclient service
+# Start the ceremonyclient service
 echo "✅ Starting Ceremonyclient Service"
 
 sleep 2  # Add a 2-second delay
@@ -188,17 +196,19 @@ sudo systemctl daemon-reload
 sudo systemctl enable ceremonyclient
 sudo service ceremonyclient start
 
-# Step 8: Final messages
-echo "🎉 Now your node is starting!"
-echo "🕒 Let it run for at least 30 minutes to generate your keys."
+# Final messages
+echo "✅ Now your node is starting!"
+echo "⏳ Let it run for at least 15-30 minutes to generate your keys."
 echo ""
-echo "🔐 You can logout of your server if you want and login again later."
-echo "🔒 After 30 minutes, backup your keys.yml and config.yml files."
-echo "ℹ️ More info about this in the online guide: https://docs.quilibrium.one"
+echo "✅ You can logout of your server if you want and login again later."
+echo "After 30 minutes, backup your keys.yml and config.yml files."
+echo "The proceed to set up your gRPC calls,"
+echo "and lastly set up an automatica backup for your .config folder"
+echo "More info about all this in the online guide: https://docs.quilibrium.one"
 echo ""
-echo "📜 Now I will show the node log below..."
+echo "⏳ Now I will show the node log below..."
 echo "To exit the log, just type CTRL +C."
 
-# Step 9: See the logs of the ceremonyclient service
+# See the logs of the ceremonyclient service
 sleep 5  # Add a 5-second delay
 sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat

@@ -1,63 +1,80 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.5"
+SCRIPT_VERSION="1.7.8"
 
 # Function to check if wget is installed, and install it if it is not
 check_wget() {
     if ! command -v wget &> /dev/null; then
-        echo "❌ wget is not installed."
-        sleep 1
-        echo "⌛️ Installing wget... "
-        sleep 1
-        sudo apt-get update && sudo apt-get install -y wget
-
-        # Verify that wget was successfully installed
-        if ! command -v wget &> /dev/null; then
-            echo "❌ Failed to install wget. Please install wget manually and try again."
-            sleep 1
-            exit 1
-        fi
+        echo "❌ wget not found. Installing..."
+        sudo apt-get update && sudo apt-get install -y wget || { echo "❌ wget installation failed."; exit 1; }
     fi
 }
 
 # Check if wget is installed
 check_wget
 
-# Function to check if the qone.sh setup section is present in .bashrc
-if ! grep -Fxq "# === qone.sh setup ===" ~/.bashrc; then
-    # Run the setup script
-    echo "⌛️ Upgrading the qone.sh script... just one minute!"
-    sleep 3
-    echo "ℹ️ Downloading qone_setup.sh..."
-    if ! wget -qO- https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/qone_setup.sh | bash; then
-        echo "❌ Error: Failed to download and execute qone-setup.sh"
-        exit 1
+upgrade_qone() {
+    # Function to check if the qone.sh setup section is present in .bashrc
+    if ! grep -Fxq "# === qone.sh setup ===" ~/.bashrc; then
+        # Run the setup script
+        echo "⌛️ Upgrading the qone.sh script... just one minute!"
+        sleep 3
+        echo "ℹ️ Downloading qone_setup.sh..."
+        if ! wget -qO- https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/qone_setup.sh | bash; then
+            echo "❌ Error: Failed to download and execute qone-setup.sh"
+            return 1
+        else
+            echo "✅ qone.sh upgraded!"
+            echo
+            echo "🟢 You can now use 'Q1', 'q1', or 'qone' to launch the Node Quickstart Menu."
+            sleep 1
+            echo "🟢 The menu will also load automatically every time you log in."
+            echo
+            sleep 5
+        fi
     else
-        echo "✅ qone.sh upgraded!"
-        echo ""
-        echo "🟢 You can now use 'Q1', 'q1', or 'qone' to launch the Node Quickstart Menu."
-        sleep 1
-        echo "🟢 The menu will also load automatically every time you log in."
-        echo ""
-        sleep 5
-    fi
-else
-    echo "ℹ️ qone.sh is already upgraded."
-fi
-
-# Function to check for newer script version
-check_for_updates() {
-    LATEST_VERSION=$(wget -qO- "https://github.com/lamat1111/QuilibriumScripts/raw/main/qone.sh" | grep 'SCRIPT_VERSION="' | head -1 | cut -d'"' -f2)
-    if [ "$SCRIPT_VERSION" != "$LATEST_VERSION" ]; then
-        wget -O ~/qone.sh "https://github.com/lamat1111/QuilibriumScripts/raw/main/qone.sh"
-        echo "✅ New version downloaded: V $SCRIPT_VERSION."
-	sleep 1
+        echo "✅ qone.sh is already upgraded."
     fi
 }
 
+# Function to check for newer script version
+check_for_updates() {
+    LATEST_VERSION=$(wget --no-cache -qO- "https://github.com/lamat1111/QuilibriumScripts/raw/main/qone.sh" | grep 'SCRIPT_VERSION=' | head -1 | cut -d'"' -f2)
+    if [ $? -ne 0 ] || [ -z "$LATEST_VERSION" ]; then
+        echo "Failed to check for updates. Continuing with current version."
+        return 0
+    fi
+    
+    if [ "$SCRIPT_VERSION" != "$LATEST_VERSION" ]; then
+        echo "New version available. Attempting update..."
+        if wget --no-cache -O ~/qone_new.sh "https://github.com/lamat1111/QuilibriumScripts/raw/main/qone.sh"; then
+            DOWNLOADED_VERSION=$(grep 'SCRIPT_VERSION=' ~/qone_new.sh | head -1 | cut -d'"' -f2)
+            
+            if [ "$DOWNLOADED_VERSION" = "$LATEST_VERSION" ]; then
+                mv ~/qone_new.sh ~/qone.sh
+                chmod +x ~/qone.sh
+                echo "✅ New version ($LATEST_VERSION) installed. Restarting script..."
+                exec ~/qone.sh
+            else
+                echo "Error: Version mismatch in downloaded file. Update aborted."
+                rm ~/qone_new.sh
+            fi
+        else
+            echo "Error: Failed to download the new version. Update aborted."
+        fi
+    fi
+}
+
+# Upgrade QONE
+upgrade_qone
+
 # Check for updates
 check_for_updates
+
+#=============================
+# VARIABLES
+#=============================
 
 # Service file path
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
@@ -69,30 +86,46 @@ USER_HOME=$(eval echo ~$USER)
 NODE_PATH="$HOME/ceremonyclient/node"
 
 # Version number
-VERSION=$(cat $NODE_PATH/config/version.go | grep -A 1 "func GetVersion() \[\]byte {" | grep -Eo '0x[0-9a-fA-F]+' | xargs printf "%d.%d.%d")
-#VERSION="1.4.19"
+#NODE_VERSION="1.4.19.1"
 
-# Get the system architecture
-ARCH=$(uname -m)
-OS=$(uname -s)
+#=============================
+# DETERMINE NODE BINARY PATH
+#=============================
 
-if [ "$ARCH" = "x86_64" ]; then
-    if [ "$OS" = "Linux" ]; then
-        NODE_BINARY="node-$VERSION-linux-amd64"
-        GO_BINARY="go1.20.14.linux-amd64.tar.gz"
-    elif [ "$OS" = "Darwin" ]; then
-        NODE_BINARY="node-$VERSION-darwin-amd64"
-        GO_BINARY="go1.20.14.linux-amd64.tar.gz"
+# Determine OS and architecture
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    release_os="linux"
+    release_arch=$(uname -m)
+    if [[ "$release_arch" == "aarch64" ]]; then
+        release_arch="arm64"
+    else
+        release_arch="amd64"
     fi
-elif [ "$ARCH" = "aarch64" ]; then
-    if [ "$OS" = "Linux" ]; then
-        NODE_BINARY="node-$VERSION-linux-arm64"
-        GO_BINARY="go1.20.14.linux-arm64.tar.gz"
-    elif [ "$OS" = "Darwin" ]; then
-        NODE_BINARY="node-$VERSION-darwin-arm64"
-        GO_BINARY="go1.20.14.linux-arm64.tar.gz"
-    fi
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    release_os="darwin"
+    release_arch="arm64"
+else
+    echo "unsupported OS for releases, please build from source"
+    exit 1
 fi
+
+fetch() {
+    # Fetch available files for the determined OS and architecture
+    files=$(curl -s https://releases.quilibrium.com/release | grep $release_os-$release_arch)
+
+    # Extract the version from the first matching file
+    for file in $files; do
+        version=$(echo "$file" | cut -d '-' -f 2)
+        break
+    done
+}
+
+fetch
+
+# Set the node binary name based on the determined OS, architecture, and version
+NODE_BINARY=node-$version-$release_os-$release_arch
+
+
 
 #=====================
 # Function Definitions
@@ -108,63 +141,65 @@ PEER_MANIFEST_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts
 CHECK_VISIBILITY_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/master/tools/qnode_visibility_check.sh"
 SYSTEM_CLEANER_URL="https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/tools/qnode_system_cleanup.sh"
 BACKUP_STORJ_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_backup_storj.sh"
+BACKUP_RESTORE_STORJ_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_backup_restore_storj.sh"
+BALANCE_LOG_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_balance_checker_installer.sh"
 TEST_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/test/test_script.sh"
 
 # Common message for missing service file
 MISSING_SERVICE_MSG="⚠️ Your service file does not exist. Looks like you do not have a node running as a service yet!"
 
 # Function definitions
-best_providers() {
-    wrap_text "$best_providers_message"
-    echo ""
-    echo "-------------------------------"
-    read -n 1 -s -r -p "✅  Press any key to continue..."  # Pause and wait for user input
-}
-
 install_prerequisites() {
-    echo ""
+    echo
     echo "⌛️  Preparing server with necessary apps and settings..."
     wget --no-cache -O - "$PREREQUISITES_URL" | bash
     prompt_return_to_menu
 }
 
 install_node() {
-    echo ""
+    echo
     echo "⌛️  Installing node..."
     wget --no-cache -O - "$NODE_INSTALL_URL" | bash
     prompt_return_to_menu
 }
 
 configure_grpcurl() {
-    echo ""
+    echo
     echo "⌛️  Setting up gRPCurl..."
     wget --no-cache -O - "$GRPCURL_CONFIG_URL" | bash
     prompt_return_to_menu
 }
 
 update_node() {
-    echo ""
+    echo
     echo "⌛️  Updating node..."
     wget --no-cache -O - "$UPDATE_URL" | bash
     prompt_return_to_menu
 }
 
 check_visibility() {
-    echo ""
+    echo
     echo "⌛️  Checking node visibility..."
     wget -O - "$CHECK_VISIBILITY_URL" | bash
     prompt_return_to_menu
 }
 
 system_cleaner() {
-    echo ""
+    echo
     echo "⌛️  Cleaning your system..."
     wget -O - "$SYSTEM_CLEANER_URL" | bash
     prompt_return_to_menu
 }
 
+balance_log() {
+    echo
+    echo "⌛️  Installing the balance log script..."
+    wget -O - "$BALANCE_LOG_URL" | bash
+    prompt_return_to_menu
+}
+
 backup_storj() {
-    echo ""
+    echo
     echo "⌛️  Downloading Storj backup script..."
     mkdir -p ~/scripts && wget -P ~/scripts -O ~/scripts/qnode_backup_storj.sh "$BACKUP_STORJ_URL"
     if [ -f ~/scripts/qnode_backup_storj.sh ]; then
@@ -176,19 +211,33 @@ backup_storj() {
     prompt_return_to_menu
 }
 
+backup_restore_storj() {
+    echo
+    echo "⌛️  Downloading Storj backup restore script..."
+    mkdir -p ~/scripts && wget -P ~/scripts -O ~/scripts/qnode_backup_restore_storj.sh "$BACKUP_RESTORE_STORJ_URL"
+    if [ -f ~/scripts/qnode_backup_restore_storj.sh ]; then
+        chmod +x ~/scripts/qnode_backup_restore_storj.sh
+        ~/scripts/qnode_backup_restore_storj.sh
+    else
+        echo "❌ Failed to download Storj backup restore script."
+    fi
+    prompt_return_to_menu
+}
+
 
 node_info() {
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
         read -n 1 -s -r -p "✅  Press any key to continue..."
-        echo ""  # Add an empty line for better readability
+        echo  # Add an empty line for better readability
     else
-        echo ""
+        echo
 	echo "⌛️  Displaying node info..."
-	echo ""
+    echo "If this doesn't work you can try the direct commands: https://iri.quest/q-node-info"
+	echo
     	sleep 1
-        cd ~/ceremonyclient/node && ./$NODE_BINARY -node-info
-	echo ""
+        cd ~/ceremonyclient/node && ./"$NODE_BINARY" -node-info
+	echo
 	read -n 1 -s -r -p "✅  Press any key to continue..."  # Pause and wait for user input
     fi
 }
@@ -197,14 +246,15 @@ quil_balance() {
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
         read -n 1 -s -r -p "Press any key to continue..."
-        echo ""  # Add an empty line for better readability
+        echo  # Add an empty line for better readability
     else
-        echo ""
+        echo
         echo "⌛️  Displaying your QUIL balance..."
-	echo ""
+        echo "If this doesn't work you can try the direct commands: https://iri.quest/q-node-info"
+	    echo
     	sleep 1
-        cd ~/ceremonyclient/node && ./$NODE_BINARY -balance
-	echo ""
+        cd ~/ceremonyclient/node && ./"$NODE_BINARY" -balance
+	echo
 	read -n 1 -s -r -p "✅  Press any key to continue..."  # Pause and wait for user input
     fi
 }
@@ -213,11 +263,11 @@ node_logs() {
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
         read -n 1 -s -r -p "✅  Press any key to continue..."
-        echo ""  # Add an empty line for better readability
+        echo  # Add an empty line for better readability
     fi
-    echo ""
+    echo
     echo "⌛️  Displaying your node log...  (Press CTRL+C to return to the main menu)"
-    echo ""
+    echo
     trap 'echo "Returning to main menu..."; return_to_menu' INT  # Trap CTRL+C to return to main menu
     sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
 }
@@ -231,16 +281,16 @@ restart_node() {
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
 		read -n 1 -s -r -p "✅  Press any key to continue..."
-        echo ""  # Add an empty line for better readability
+        echo  # Add an empty line for better readability
     fi
-    echo ""
+    echo
     echo "⌛️   Restarting node service..."
-    echo ""
+    echo
     sleep 1
     service ceremonyclient restart
     sleep 5
     echo "✅   Node restarted"
-    echo ""
+    echo
     read -n 1 -s -r -p "Press any key to continue..."  # Pause and wait for user input
 }
 
@@ -248,16 +298,16 @@ stop_node() {
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
 	read -n 1 -s -r -p "Press any key to continue..."
-        echo ""  # Add an empty line for better readability
+        echo  # Add an empty line for better readability
     fi
-    echo ""
+    echo
     echo "⌛️  Stopping node service..."
-    echo ""
+    echo
     sleep 1
     service ceremonyclient stop
     sleep 3
     echo "✅   Node stopped"
-    echo ""
+    echo
     read -n 1 -s -r -p "Press any key to continue..."  # Pause and wait for user input
 }
 
@@ -271,20 +321,36 @@ node_version() {
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
 		read -n 1 -s -r -p "Press any key to continue..."
-        echo ""  # Add an empty line for better readability
+        echo  # Add an empty line for better readability
     fi
-    echo ""
+    echo
     echo "⌛️   Displaying node version..."
-    echo ""
+    echo
     sleep 1
     journalctl -u ceremonyclient -r --no-hostname  -n 1 -g "Quilibrium Node" -o cat
-    echo ""
+    echo
     read -n 1 -s -r -p "✅ Press any key to continue..."  # Pause and wait for user input
 }
 
+best_providers() {
+    wrap_text "$best_providers_message"
+    echo
+    echo "-------------------------------"
+    read -n 1 -s -r -p "✅  Press any key to continue..."  # Pause and wait for user input
+}
+
+
+donations() {
+    wrap_text "$donations_message"
+    echo
+    echo "-------------------------------"
+    read -n 1 -s -r -p "✅  Press any key to continue..."  # Pause and wait for user input
+}
+
+
 help_message() {
     echo "$help_message"
-    echo ""
+    echo
     prompt_return_to_menu
 }
 
@@ -351,12 +417,6 @@ wrap_text_2() {
 #=====================
 
 # Define messages
-best_providers_message='
-Check out the best server providers for your node
-at ⭐️ https://iri.quest/q-best-providers ⭐️
-
-Avoid using providers that specifically ban crypto and mining.
-'
 
 prepare_server_message='
 This action will install the necessary prerequisites for your server. 
@@ -388,10 +448,41 @@ This action will check the peer manifest to provide information about the diffic
 It only works after 15-30 minutes that the node has been running.
 '
 
+balance_log_message='
+This installer sets up a script to check your node balance
+and then sets up a cronjob to log your balance every hour in a CSV file.
+
+For more info on how to see/download your balance CSV log, please visit:
+https://docs.quilibrium.one/start/tutorials/log-your-node-balance-every-1-hour
+'
+
 backup_storj_message='
 This action automates the backup of your node data to StorJ.
 You need a StorJ account https://www.storj.io/ and a Public/Secret access key.
 For security we suggest you to create a bucket specific to Quilibrium, and specific keys for accessing only that bucket.
+'
+
+backup_restore_storj_message='
+This action restores a backup of the node '.config' folder from StorJ.
+It will only work if you performed the .config folder backup via the script
+in the Q.One Quickstart menu.
+'
+
+best_providers_message='
+Check out the best server providers for your node
+at ⭐️ https://iri.quest/q-best-providers ⭐️
+
+Avoid using providers that specifically ban crypto and mining.
+'
+
+donations_message='
+Quilbrium.one is a one-man volunteer effort.
+If you would like to chip in some financial help, thank you!
+
+You can send ERC-20 tokens at this address:
+0x0fd383A1cfbcf4d1F493Dd71b798ebca89e8a013
+
+Or visit this page: https://iri.quest/q-donations
 '
 
 test_script_message='
@@ -399,10 +490,27 @@ This will run the test script.
 '
 
 help_message='
-Here are all the options of the Quickstart Node Menu
-====================================================
+=================================
+            Q.ONE HELP
+=================================
 
- 0) Best server providers:
+If something does not work in Q.ONE please try to update to the
+latest version manually by running the code that you find here:
+https://docs.quilibrium.one/quilibrium-node-setup-guide/node-quickstart
+
+
+>> STOP Q.ONE FROM LOADING ON LOGIN
+Please find here: https://docs.quilibrium.one/start/node-quickstart
+the command to do this
+
+>> UNINSTALL Q.ONE
+To remove the script fomr your system, run: rm ~/qone.sh
+
+
+>> Q:ONE MENU OPTIONS DETAILS
+------------------------------------------------------
+
+ B) Best server providers:
     Check out the best server providers for your node
     at ⭐️ https://iri.quest/q-best-providers ⭐️
     Avoid using providers that specifically ban crypto and mining.
@@ -443,22 +551,32 @@ Here are all the options of the Quickstart Node Menu
  9) Node info (peerID & balance):
     Display information about your node peerID and balance.
 
-10) QUIL balance:
+10) Check balance:
     Display the balance of QUIL tokens.
 
-11) Peer manifest (Difficulty metric):
+11) Balance log:
+    Log your balance every 1 hour on a CSV file.
+    For more info on how to see/download your balance CSV log, please visit:
+    https://docs.quilibrium.one/start/tutorials/log-your-node-balance-every-1-hour
+
+12) Backup your node:
+    Backup of your node .config folder and other data on StorJ.
+    You need a Storj account https://www.storj.io/ and a Public/Secret access key.
+
+13) Restore backup:
+    This script will restore your node backup from StorJ.
+    You need a Storj account https://www.storj.io/ and a Public/Secret access key.
+
+14) Peer manifest (Difficulty metric):
     Check the peer manifest to provide information about the difficulty metric score of your node. 
     It only works after the node has been running for 15-30 minutes.
 
-12) Check visibility:
+15) Check visibility:
     Check the visibility status of the node.
 
-13) System cleaner:
+16) System cleaner:
     Perform system cleanup tasks. It will not affect your node.
 
-14) Backup your node:
-    Backup of your node stoe folder and other data on StorJ.
-    You need a Storj account https://www.storj.io/ and a Public/Secret access key.
 '
 
 #=====================
@@ -468,7 +586,7 @@ Here are all the options of the Quickstart Node Menu
 display_menu() {
     clear
     source ~/.bashrc
-    cat << "EOF"
+    cat << EOF
 
                   QQQQQQQQQ       1111111   
                 QQ:::::::::QQ    1::::::1   
@@ -490,30 +608,38 @@ display_menu() {
                            QQQQQQ  QUILIBRIUM.ONE                                                                                                                                  
 
 
-===================================================================
-                      ✨ QNODE QUICKSTART ✨
-===================================================================
-         Follow the guide at https://docs.quilibrium.one
+==================================================================
+            ✨✨✨ Q.ONE QUICKSTART MENU ✨✨✨
+                         v $SCRIPT_VERSION
+==================================================================
+        Follow the guide at https://docs.quilibrium.one
 
-                      Made with 🔥 by LaMat
-====================================================================
-
+                    Made with 🔥 by LaMat
+==================================================================
 EOF
-
     cat << "EOF"
-If you want to install a new node, choose option 1, and then 2
 
-------------------------------------------------------------------
-0) Best server providers      8) Node version
-1) Prepare your server        9) Node info (peerID & balance)    
-2) Install node              10) QUIL balance
-3) Set up gRPCurl            11) Peer manifest (Difficulty metric)
-4) Node Log                  12) Check visibility
-5) Update node               13) System cleaner
-6) Stop node                 14) Backup your node
-7) Restart node
-------------------------------------------------------------------
-E) Exit                       H) Help
+HOW TO INSTALL A NEW NODE?
+Choose option 1, reboot and and then choose 2.
+Let your node run for 30 minutes, then choose option 3. Done!
+
+-----------------------------------------------------------------
+1) Prepare your server        10) Check balance
+2) Install node               11) Balance log
+3) Set up gRPCurl             12) Backup your node
+                              13) Restore backup                
+4) Node Log                                    
+5) Update node                14) Peer manifest         
+6) Stop node                  15) Check visibility                              
+7) Restart node               16) System cleaner 
+8) Node version                 
+9) Node info                     
+-----------------------------------------------------------------
+B) ⭐️ Best server providers
+D) 💜 Donations
+-----------------------------------------------------------------    
+E) Exit                        H) Help
+                        
 
 EOF
 }
@@ -531,7 +657,6 @@ while true; do
     action_performed=0
     
     case $choice in
-    	0) best_providers;;
         1) confirm_action "$(wrap_text "$prepare_server_message" "")" "Prepare your server" install_prerequisites;;
         2) confirm_action "$(wrap_text "$install_node_message" "")" "Install node" install_node;;
 	    3) confirm_action "$(wrap_text "$setup_grpcurl_message" "")" "Set up gRPCurl" configure_grpcurl;;
@@ -542,11 +667,15 @@ while true; do
 	    8) node_version action_performed=1;;
         9) node_info action_performed=1;;
  	    10) quil_balance action_performed=1;;
-        11) confirm_action "$(wrap_text "$peer_manifest_message" "")" "Peer manifest" peer_manifest;;
-        12) check_visibility;;
-	    13) system_cleaner;;
-        14) confirm_action "$(wrap_text "$backup_storj_message" "")" "Backup your node on StorJ" backup_storj;;
+        11) confirm_action "$(wrap_text "$balance_log_message" "")" "Balance log" balance_log;;
+        12) confirm_action "$(wrap_text "$backup_storj_message" "")" "Backup your node on StorJ" backup_storj;;
+        13) confirm_action "$(wrap_text "$backup_restore_storj_message" "")" "Restore a node backup frm STorJ" backup_restore_storj;;
+        14) confirm_action "$(wrap_text "$peer_manifest_message" "")" "Peer manifest" peer_manifest;;
+        15) check_visibility;;
+	    16) system_cleaner;;
 	    20) confirm_action "$(wrap_text "$test_script_message" "")" "Test Script" test_script;;
+        [bB]) best_providers;;
+        [dD]) donations;;
         [eE]) exit ;;
 	    [hH]) help_message;;
         *) echo "Invalid option, please try again." ;;

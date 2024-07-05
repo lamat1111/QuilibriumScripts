@@ -43,9 +43,9 @@ sleep 7
 # you will need to manually change this variable at the beginning of the script:
 # '~/scripts/qnode_balance_checker.sh'
 
-echo "⚙️ Installing Python 3 and pip3..."
-sudo apt install -y python3 python3-pip > /dev/null || { echo "❌ Failed to install Python 3 and pip3."; exit 1; } 
-sleep 1
+#echo "⚙️ Installing Python 3 and pip3..."
+#sudo apt install -y python3 python3-pip > /dev/null || { echo "❌ Failed to install Python 3 and pip3."; exit 1; } 
+#sleep 1
 
 
 echo "⚙️ Removing existing script if it exists..."
@@ -73,16 +73,17 @@ echo "⚙️ Setting up cronjob to run the script once every hour..."
 (crontab -l ; echo "0 * * * * $HOME/scripts/qnode_balance_checker.sh") | crontab -
 sleep 1
 
+echo "⚙️ Installing the balance log downloader script..."
+wget -O ~/scripts/qnode_balance_log_download.sh https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_balance_log_download.sh
+chmod +x ~/scripts/qnode_balance_log_download.sh
+
 echo
-echo "✅ Installer script completed!"
-echo "✅ Cronjob set!"
-echo "ℹ️ The script will now log your node balance every hour in $HOME/scripts/balance_log.csv"
+echo "✅ The script will now log your node balance every hour in $HOME/scripts/balance_log.csv"
 echo
 echo "Testing..."
 $HOME/scripts/qnode_balance_checker.sh
 echo
 echo "ℹ️ To see the log just run 'cat $HOME/scripts/balance_log.csv'"
 echo
-#echo "ℹ️ If you need to change your node version or sys archiutecture run:"
-#echo "nano ~/scripts/balance_checker.sh"
-
+echo "ℹ️ To download your balance CSV file you can run '$HOME/scripts/qnode_balance_log_download.sh'"
+sleep 5
