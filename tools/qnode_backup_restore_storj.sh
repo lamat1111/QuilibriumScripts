@@ -268,21 +268,24 @@ echo "✅ All done!"
 echo "If there were cronjobs or custom scripts backups, I restored them as well."
 echo
 echo "✅ Here are the contents of your .config folder:"
+echo "------------------------------------------------------------"
 ls -la ~/ceremonyclient/node/.config/
-echo "----------------------------------------"
+echo "============================================================"
 echo "⚠️ If you don't see your keys.yml and config.yml files,"
 echo "it means you did not back them up via StorJ." 
 echo "Please upload them manually before restarting your node."
 echo
 echo "Remember to restart your node service manually when you are done".
-echo "----------------------------------------"
+echo "============================================================"
 echo
 echo "✅ Here are the contents of your scripts folder:"
+echo "------------------------------------------------------------"
 ls -la ~/scripts/
-echo "----------------------------------------"
+echo "============================================================"
 echo
 echo "✅ Here are your existing cronjobs:"
+echo "------------------------------------------------------------"
 crontab -l
-echo "----------------------------------------"
+echo "============================================================"
 echo
 
