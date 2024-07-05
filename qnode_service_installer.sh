@@ -49,8 +49,10 @@ set -e
 # Define a function for displaying exit messages
 exit_message() {
     echo "❌ Oops! There was an error during the script execution and the process stopped. No worries!"
-    echo "🔄 You can try to run the script from scratch again."
-    echo "🛠️ If you still receive an error, you may want to proceed manually, step by step instead of using the auto-installer."
+    echo "You can try to run the script from scratch again."
+    echo
+    echo "If you still receive an error, you may want to proceed manually, step by step instead of using the auto-installer."
+    echo "The step by step installation instructions are here: https://iri.quest/q-node-step-by-step"
 }
 
 # Set a trap to call exit_message on any error
