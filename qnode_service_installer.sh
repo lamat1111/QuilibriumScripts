@@ -2,7 +2,7 @@
 
 # Step 0: Welcome
 
-NODE_VERSION=1.4.20.1
+NODE_VERSION=1.4.21
 #Node version not used - executiuon via release_autorun 
 QCLIENT_VERSION=1.4.19.1
 
