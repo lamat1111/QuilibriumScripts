@@ -2,6 +2,10 @@
 
 # Step 0: Welcome
 
+NODE_VERSION=1.4.20.1
+#Node version not used - executiuon via release_autorun 
+QCLIENT_VERSION=1.4.19.1
+
 cat << "EOF"
 
                   QQQQQQQQQ       1111111   
@@ -109,19 +113,17 @@ export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
 ARCH=$(uname -m)
 OS=$(uname -s)
 
-# Determine the Node binary name based on the architecture and OS
+# Determine the node binary name based on the architecture and OS
 if [ "$ARCH" = "x86_64" ]; then
     if [ "$OS" = "Linux" ]; then
-        NODE_BINARY="node-$VERSION-linux-amd64"
+        NODE_BINARY="node-$NODE_VERSION-linux-amd64"
         GO_BINARY="go1.22.4.linux-amd64.tar.gz"
-        QCLIENT_BINARY="qclient-$VERSION-linux-amd64"
+        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-amd64"
     elif [ "$OS" = "Darwin" ]; then
-        NODE_BINARY="node-$VERSION-darwin-amd64"
+        NODE_BINARY="node-$NODE_VERSION-darwin-amd64"
         GO_BINARY="go1.22.44.linux-amd64.tar.gz"
-        QCLIENT_BINARY="qclient-$VERSION-darwin-arm64"
+        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-arm64"
     fi
-
-# Determine the qClient binary name based on the architecture and OS
 elif [ "$ARCH" = "aarch64" ]; then
     if [ "$OS" = "Linux" ]; then
         NODE_BINARY="node-$VERSION-linux-arm64"
@@ -129,15 +131,23 @@ elif [ "$ARCH" = "aarch64" ]; then
     elif [ "$OS" = "Darwin" ]; then
         NODE_BINARY="node-$VERSION-darwin-arm64"
         GO_BINARY="go1.22.4.linux-arm64.tar.gz"
-        QCLIENT_BINARY="qclient-$VERSION-linux-arm64"
+        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-arm64"
     fi
 fi
 
-# Download qClient
-echo "⏳ Building qCiient..."
+# Building qClient with GO
+# echo "⏳ Building qCiient..."
+# sleep 1  # Add a 1-second delay
+# cd ~/ceremonyclient/client
+# GOEXPERIMENT=arenas go build -o qclient main.go
+
+# Building qClient binary
+echo "⏳Downloading qClient"
 sleep 1  # Add a 1-second delay
 cd ~/ceremonyclient/client
-GOEXPERIMENT=arenas go build -o qclient main.go
+wget https://releases.quilibrium.com/$QCLIENT_BINARY
+mv $QCLIENT_BINARY qclient
+chmod +x qclient
 
 # Get the current user's home directory
 HOME=$(eval echo ~$USER)
