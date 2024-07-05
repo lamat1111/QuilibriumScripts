@@ -200,14 +200,15 @@ sudo service ceremonyclient start
 
 # Final messages
 echo "✅ Now your node is starting!"
-echo "⏳ Let it run for at least 15-30 minutes to generate your keys."
-echo ""
+echo "Let it run for at least 15-30 minutes to generate your keys."
+echo
 echo "✅ You can logout of your server if you want and login again later."
+echo
 echo "After 30 minutes, backup your keys.yml and config.yml files."
 echo "The proceed to set up your gRPC calls,"
-echo "and lastly set up an automatica backup for your .config folder"
+echo "and lastly set up an automatic backup for your .config folder"
 echo "More info about all this in the online guide: https://docs.quilibrium.one"
-echo ""
+echo
 echo "⏳ Now I will show the node log below..."
 echo "To exit the log, just type CTRL +C."
 
