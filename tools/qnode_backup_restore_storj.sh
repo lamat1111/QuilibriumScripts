@@ -235,7 +235,7 @@ else
     exit 1
 fi
 
-# Perform the restore operation
+# Restore .config folder
 echo "⌛️ Restoring backup from StorJ..."
 rclone copy "storj:/$bucket/$source_folder/.config/" ~/ceremonyclient/node/.config/ -v
 if [[ $? -ne 0 ]]; then
@@ -243,18 +243,46 @@ if [[ $? -ne 0 ]]; then
     exit 1
 fi
 echo
-echo "✅ Restore completed successfully."
+echo "✅ .Config folder backup restored successfully."
 echo
 sleep 1
 
-# Show contents of restored .config folder
-echo "ℹ️ Here are the contents of your .config folder:"
-ls -la ~/ceremonyclient/node/.config/
+# Restore cron jobs
+if check_file_exists "storj:/$bucket/$source_folder/cron_jobs.txt/cron_jobs.txt"; then
+    echo "⌛️ Restoring your cron jobs..."
+    rclone cat storj:/$bucket/$source_folder/cron_jobs.txt/cron_jobs.txt | crontab -
+else
+    echo "❌ Error: cron_jobs.txt not found on Storj. Skipping cron job restoration."
+fi
 
+# Restore scripts
+if check_file_exists "storj:/$bucket/$source_folder/scripts"; then
+    echo "⌛️ Restoring your custom scripts..."
+    rclone sync storj:/$bucket/$source_folder/scripts ~/scripts
+else
+    echo "❌ Error: scripts folder not found on Storj. Skipping script restoration."
+fi
+
+# Show contents of restored .config folder
+echo "✅ All done!"
+echo "If there were cronjobs or custom scripts backups, I restored them as well."
 echo
-echo "------------------------------------------------------"
+echo "✅ Here are the contents of your .config folder:"
+ls -la ~/ceremonyclient/node/.config/
+echo "----------------------------------------"
 echo "⚠️ If you don't see your keys.yml and config.yml files,"
 echo "it means you did not back them up via StorJ." 
 echo "Please upload them manually before restarting your node."
 echo
-echo "Remember to restart your node service manually whe you are done".
+echo "Remember to restart your node service manually when you are done".
+echo "----------------------------------------"
+echo
+echo "✅ Here are the contents of your scripts folder:"
+ls -la ~/scripts/
+echo "----------------------------------------"
+echo
+echo "✅ Here are your existing cronjobs:"
+crontab -l
+echo "----------------------------------------"
+echo
+
