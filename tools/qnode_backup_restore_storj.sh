@@ -259,6 +259,8 @@ fi
 if check_file_exists "storj:/$bucket/$source_folder/scripts"; then
     echo "⌛️ Restoring your custom scripts..."
     rclone sync storj:/$bucket/$source_folder/scripts ~/scripts
+    echo "⌛️ Making all files in ~/scripts executable..."
+    chmod +x ~/scripts/*
 else
     echo "❌ Error: scripts folder not found on Storj. Skipping script restoration."
 fi
