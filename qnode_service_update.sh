@@ -238,7 +238,7 @@ if [ -f "$config_file" ]; then
     if [ "$current_version" = "$config_version" ]; then
         echo "Versions match. No update needed."
     else
-        echo "Versions differ. Updating config file..."
+        echo "⏳ Versions differ. Updating config file..."
         
         # Update the config file
         sed -i "s/NODE_BINARY=node-.*-"$OS-$ARCH"/NODE_BINARY=node-${current_version}-"$OS-$ARCH"/" "$config_file"
