@@ -1,10 +1,11 @@
 #!/bin/bash
 
-#Node version not used - executiuon via release_autorun 
+#Node version is not used - executiuon via release_autorun 
 #Comment out for automatic creation of the node version
 #NODE_VERSION=1.4.21
 
-QCLIENT_VERSION=1.4.19.1
+#Comment out for automatic creation of the qclient version
+#QCLIENT_VERSION=1.4.19.1
 
 cat << "EOF"
 
@@ -54,31 +55,21 @@ sleep 7  # Add a 7-second delay
 ARCH=$(uname -m)
 OS=$(uname -s)
 
-## Determine node latest version
+# Determine node latest version
 # Check if NODE_VERSION is empty
 if [ -z "$NODE_VERSION" ]; then
-    echo "Debug: OS=$OS, ARCH=$ARCH"
-    
-    echo "Debug: Curl output"
-    curl -s https://releases.quilibrium.com/release
-    
-    echo "Debug: After first grep"
-    curl -s https://releases.quilibrium.com/release | grep -E "^node-[0-9]+\.[0-9]+\.[0-9]+"
-    
-    echo "Debug: After second grep (excluding dgst)"
-    curl -s https://releases.quilibrium.com/release | grep -E "^node-[0-9]+\.[0-9]+\.[0-9]+" | grep -v "dgst"
-    
-    echo "Debug: After first cut"
-    curl -s https://releases.quilibrium.com/release | grep -E "^node-[0-9]+\.[0-9]+\.[0-9]+" | grep -v "dgst" | cut -d '-' -f 2-4
-    
-    echo "Debug: After sort and tail"
-    curl -s https://releases.quilibrium.com/release | grep -E "^node-[0-9]+\.[0-9]+\.[0-9]+" | grep -v "dgst" | cut -d '-' -f 2-4 | sort -V | tail -n 1
-    
-    echo "Debug: Final result"
-    NODE_VERSION=$(curl -s https://releases.quilibrium.com/release | grep -E "^node-[0-9]+\.[0-9]+\.[0-9]+" | grep -v "dgst" | cut -d '-' -f 2-4 | sort -V | tail -n 1 | cut -d '-' -f 1)
+    NODE_VERSION=$(curl -s https://releases.quilibrium.com/release | grep -E "^node-[0-9]+(\.[0-9]+)*" | grep -v "dgst" | sed 's/^node-//' | cut -d '-' -f 1 | sort -V | tail -n 1)
     echo "Automatically determined NODE_VERSION: $NODE_VERSION"
 else
     echo "Using specified NODE_VERSION: $NODE_VERSION"
+fi
+
+# Determine qclient latest version
+if [ -z "$QCLIENT_VERSION" ]; then
+    QCLIENT_VERSION=$(curl -s https://releases.quilibrium.com/qclient-release | grep -E "^qclient-[0-9]+(\.[0-9]+)*" | sed 's/^qclient-//' | cut -d '-' -f 1 | sort -V | tail -n 1)
+    echo "Automatically determined QCLIENT_VERSION: $QCLIENT_VERSION"
+else
+    echo "Using specified QCLIENT_VERSION: $QCLIENT_VERSION"
 fi
 
 # Determine the node binary name based on the architecture and OS
