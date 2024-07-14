@@ -57,7 +57,18 @@ OS=$(uname -s)
 # Determine node latest version
 # Check if NODE_VERSION is empty
 if [ -z "$NODE_VERSION" ]; then
-    # If empty, determine node latest version automatically
+    echo "Debug: OS=$OS, ARCH=$ARCH"
+    
+    echo "Debug: Curl output"
+    curl -s https://releases.quilibrium.com/release
+    
+    echo "Debug: After grep"
+    curl -s https://releases.quilibrium.com/release | grep "$OS-$ARCH"
+    
+    echo "Debug: After cut"
+    curl -s https://releases.quilibrium.com/release | grep "$OS-$ARCH" | cut -d '-' -f 2
+    
+    echo "Debug: Final result"
     NODE_VERSION=$(curl -s https://releases.quilibrium.com/release | grep "$OS-$ARCH" | cut -d '-' -f 2 | sort -V | tail -n 1)
     echo "Automatically determined NODE_VERSION: $NODE_VERSION"
 else
