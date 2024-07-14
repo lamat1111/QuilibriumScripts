@@ -59,18 +59,20 @@ OS=$(uname -s)
 # Check if NODE_VERSION is empty
 if [ -z "$NODE_VERSION" ]; then
     NODE_VERSION=$(curl -s https://releases.quilibrium.com/release | grep -E "^node-[0-9]+(\.[0-9]+)*" | grep -v "dgst" | sed 's/^node-//' | cut -d '-' -f 1 | sort -V | tail -n 1)
-    echo "Automatically determined NODE_VERSION: $NODE_VERSION"
+    echo "✅ Automatically determined NODE_VERSION: $NODE_VERSION"
 else
-    echo "Using specified NODE_VERSION: $NODE_VERSION"
+    echo "✅ Using specified NODE_VERSION: $NODE_VERSION"
 fi
 
 # Determine qclient latest version
 if [ -z "$QCLIENT_VERSION" ]; then
     QCLIENT_VERSION=$(curl -s https://releases.quilibrium.com/qclient-release | grep -E "^qclient-[0-9]+(\.[0-9]+)*" | sed 's/^qclient-//' | cut -d '-' -f 1 | sort -V | tail -n 1)
-    echo "Automatically determined QCLIENT_VERSION: $QCLIENT_VERSION"
+    echo "✅ Automatically determined QCLIENT_VERSION: $QCLIENT_VERSION"
 else
-    echo "Using specified QCLIENT_VERSION: $QCLIENT_VERSION"
+    echo "✅ Using specified QCLIENT_VERSION: $QCLIENT_VERSION"
 fi
+
+echo
 
 # Determine the node binary name based on the architecture and OS
 if [ "$ARCH" = "x86_64" ]; then
@@ -108,7 +110,7 @@ fi
 
 # If the installed version is not 1.22.4, proceed with the installation
 if [ "$INSTALLED_VERSION" != "1.22.4" ]; then
-    echo "Current Go version is $INSTALLED_VERSION. Proceeding with installation of Go 1.22.4..."
+    echo "⏳ Current Go version is $INSTALLED_VERSION. Proceeding with installation of Go 1.22.4..."
 
     # Download and install Go
     wget https://go.dev/dl/$GO_BINARY > /dev/null 2>&1 || echo "Failed to download Go!"
@@ -117,9 +119,11 @@ if [ "$INSTALLED_VERSION" != "1.22.4" ]; then
     sudo mv go /usr/local || echo "Failed to move Go!"
     sudo rm $GO_BINARY || echo "Failed to remove downloaded archive!"
     
-    echo "Go 1.22.4 has been installed successfully."
+    echo "✅ Go 1.22.4 has been installed successfully."
+    echo
 else
-    echo "Go version 1.22.4 is already installed. No action needed."
+    echo "✅ Go version 1.22.4 is already installed. No action needed."
+    echo
 fi
 
 #==========================
@@ -130,21 +134,26 @@ fi
 echo "⏳ Stopping the ceremonyclient service if it exists..."
 if systemctl is-active --quiet ceremonyclient && service ceremonyclient stop; then
     echo "🔴 Service stopped successfully."
+    echo
 else
     echo "❌ Ceremonyclient service either does not exist or could not be stopped." >&2
+    echo
 fi
 sleep 1
 
 # Step 2: Move to the ceremonyclient directory
-echo "Step 2: Moving to the ceremonyclient directory..."
+echo "⏳ Moving to the ceremonyclient directory..."
 cd ~/ceremonyclient || { echo "❌ Error: Directory ~/ceremonyclient does not exist."; exit 1; }
+echo
 
 # Step 3: Discard local changes in release_autorun.sh
 echo "✅ Discarding local changes in release_autorun.sh..."
+echo
 git checkout -- node/release_autorun.sh
 
 # Step 4: Download Binary
 echo "⏳ Downloading new release v$NODE_VERSION"
+echo
 
 # Set the remote URL and download
 cd  ~/ceremonyclient
@@ -155,8 +164,8 @@ git branch -D release
 git pull
 git checkout release
 
-
 echo "✅ Downloaded the latest changes successfully."
+echo
 
 #==========================
 # QCLIENT UPDATE
@@ -168,7 +177,8 @@ echo "✅ Downloaded the latest changes successfully."
 # GOEXPERIMENT=arenas go build -o qclient main.go
 
 # Step 4:Update qClient with binary
-echo "Updating qClient"
+echo "⏳ Updating qClient..."
+echo
 sleep 1  # Add a 1-second delay
 cd ~/ceremonyclient/client
 rm -f qclient
@@ -188,11 +198,12 @@ EXEC_START="$NODE_PATH/release_autorun.sh"
 #==========================
 
 # Step 5: Re-Create or Update Ceremonyclient Service
-echo "🔧 Rebuilding Ceremonyclient Service..."
+echo "⏳ Rebuilding Ceremonyclient Service..."
+echo
 sleep 2  # Add a 2-second delay
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
 if [ ! -f "$SERVICE_FILE" ]; then
-    echo "📝 Creating new ceremonyclient service file..."
+    echo "⏳ Creating new ceremonyclient service file..."
     if ! sudo tee "$SERVICE_FILE" > /dev/null <<EOF
 [Unit]
 Description=Ceremony Client Go App Service
@@ -212,11 +223,11 @@ EOF
         exit 1
     fi
 else
-    echo "🔍 Checking existing ceremonyclient service file..."
+    echo "⏳ Checking existing ceremonyclient service file..."
     
     # Check if the required lines exist or if CPUQuota exists
     if ! grep -q "WorkingDirectory=$NODE_PATH" "$SERVICE_FILE" || ! grep -q "ExecStart=$EXEC_START" "$SERVICE_FILE"; then
-        echo "🔄 Updating existing ceremonyclient service file..."
+        echo "⏳ Updating existing ceremonyclient service file..."
         # Replace the existing lines with new values
         sudo sed -i "s|WorkingDirectory=.*|WorkingDirectory=$NODE_PATH|" "$SERVICE_FILE"
         sudo sed -i "s|ExecStart=.*|ExecStart=$EXEC_START|" "$SERVICE_FILE"
@@ -224,6 +235,8 @@ else
         echo "✅ No changes needed."
     fi
 fi
+
+echo
 
 #==========================
 # CONFIG FILE UPDATE
@@ -263,6 +276,7 @@ else
     exit 1
 fi
 
+echo
 
 # Step 6: Start the ceremonyclient service
 echo "✅ Starting Ceremonyclient Service"
@@ -273,9 +287,9 @@ service ceremonyclient start
 
 # Showing the node version and logs
 echo "🌟Your node is now updated to v$NODE_VERSION !"
-echo ""
+echo
 echo "⏳ Showing the node log... (CTRL+C to exit)"
-echo ""
-echo ""
+echo
+echo
 sleep 3  # Add a 5-second delay
 sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
