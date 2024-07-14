@@ -2,9 +2,12 @@
 
 # Step 0: Welcome
 
-NODE_VERSION=1.4.21
-#Node version not used - executiuon via release_autorun 
-QCLIENT_VERSION=1.4.19.1
+#Node version is not used - executiuon via release_autorun 
+#Comment out for automatic creation of the node version
+#NODE_VERSION=1.4.21
+
+#Comment out for automatic creation of the qclient version
+#QCLIENT_VERSION=1.4.19.1
 
 cat << "EOF"
 
@@ -46,6 +49,56 @@ EOF
 
 sleep 7  # Add a 7-second delay
 
+#==========================
+# CREATE PATH VARIABLES
+#==========================
+
+# Determine the ExecStart line based on the architecture
+ARCH=$(uname -m)
+OS=$(uname -s)
+
+# Determine node latest version
+# Check if NODE_VERSION is empty
+if [ -z "$NODE_VERSION" ]; then
+    NODE_VERSION=$(curl -s https://releases.quilibrium.com/release | grep -E "^node-[0-9]+(\.[0-9]+)*" | grep -v "dgst" | sed 's/^node-//' | cut -d '-' -f 1 | sort -V | tail -n 1)
+    echo "✅ Automatically determined NODE_VERSION: $NODE_VERSION"
+else
+    echo "✅ Using specified NODE_VERSION: $NODE_VERSION"
+fi
+
+# Determine qclient latest version
+if [ -z "$QCLIENT_VERSION" ]; then
+    QCLIENT_VERSION=$(curl -s https://releases.quilibrium.com/qclient-release | grep -E "^qclient-[0-9]+(\.[0-9]+)*" | sed 's/^qclient-//' | cut -d '-' -f 1 | sort -V | tail -n 1)
+    echo "✅ Automatically determined QCLIENT_VERSION: $QCLIENT_VERSION"
+else
+    echo "✅ Using specified QCLIENT_VERSION: $QCLIENT_VERSION"
+fi
+
+echo
+
+# Determine the node binary name based on the architecture and OS
+if [ "$ARCH" = "x86_64" ]; then
+    if [ "$OS" = "Linux" ]; then
+        NODE_BINARY="node-$NODE_VERSION-linux-amd64"
+        GO_BINARY="go1.22.4.linux-amd64.tar.gz"
+        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-amd64"
+    elif [ "$OS" = "Darwin" ]; then
+        NODE_BINARY="node-$NODE_VERSION-darwin-amd64"
+        GO_BINARY="go1.22.4.darwin-amd64.tar.gz"
+        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-arm64"
+    fi
+elif [ "$ARCH" = "aarch64" ]; then
+    if [ "$OS" = "Linux" ]; then
+        NODE_BINARY="node-$NODE_VERSION-linux-arm64"
+        GO_BINARY="go1.22.4.linux-arm64.tar.gz"
+        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-arm64"
+    elif [ "$OS" = "Darwin" ]; then
+        NODE_BINARY="node-$NODE_VERSION-darwin-arm64"
+        GO_BINARY="go1.22.4.darwin-arm64.tar.gz"
+        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-arm64"
+    fi
+fi
+
 
 # Exit on any error
 set -e
@@ -66,19 +119,23 @@ trap exit_message ERR
 if ! command -v sudo &> /dev/null
 then
     echo "sudo could not be found"
-    echo "Installing sudo..."
+    echo "⏳ Installing sudo..."
     su -c "apt update && apt install sudo -y"
+    echo
 else
-    echo "sudo is installed"
+    echo "✅ sudo is installed"
+    echo
 fi
 
 if ! command -v git &> /dev/null
 then
     echo "git could not be found"
-    echo "Installing git..."
+    echo "⏳ Installing git..."
     su -c "apt update && apt install git -y"
+    echo
 else
-    echo "git is installed"
+    echo "✅ git is installed"
+    echo
 fi
 
 # Backup existing configuration files if they exist
@@ -86,10 +143,11 @@ if [ -d ~/ceremonyclient ]; then
     mkdir -p ~/backup/qnode_keys
     [ -f ~/ceremonyclient/node/.config/keys.yml ] && cp ~/ceremonyclient/node/.config/keys.yml ~/backup/qnode_keys/ && echo "✅ Backup of keys.yml created in ~/backup/qnode_keys folder"
     [ -f ~/ceremonyclient/node/.config/config.yml ] && cp ~/ceremonyclient/node/.config/config.yml ~/backup/qnode_keys/ && echo "✅ Backup of config.yml created in ~/backup/qnode_keys folder"
+    echo
 fi
 
 # Download Ceremonyclient
-echo "⏳Downloading Ceremonyclient"
+echo "⏳ Downloading Ceremonyclient..."
 sleep 1  # Add a 1-second delay
 cd ~
 if [ -d "ceremonyclient" ]; then
@@ -102,38 +160,12 @@ else
 fi
 cd ~/ceremonyclient/
 git checkout release
+echo
 
 # Set up environment variables (redundant but solves the command go not found error)
 export GOROOT=/usr/local/go
 export GOPATH=$HOME/go
 export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
-
-
-# Determine the ExecStart line based on the architecture
-ARCH=$(uname -m)
-OS=$(uname -s)
-
-# Determine the node binary name based on the architecture and OS
-if [ "$ARCH" = "x86_64" ]; then
-    if [ "$OS" = "Linux" ]; then
-        NODE_BINARY="node-$NODE_VERSION-linux-amd64"
-        GO_BINARY="go1.22.4.linux-amd64.tar.gz"
-        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-amd64"
-    elif [ "$OS" = "Darwin" ]; then
-        NODE_BINARY="node-$NODE_VERSION-darwin-amd64"
-        GO_BINARY="go1.22.44.linux-amd64.tar.gz"
-        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-arm64"
-    fi
-elif [ "$ARCH" = "aarch64" ]; then
-    if [ "$OS" = "Linux" ]; then
-        NODE_BINARY="node-$VERSION-linux-arm64"
-        GO_BINARY="go1.22.4.linux-arm64.tar.gz"
-    elif [ "$OS" = "Darwin" ]; then
-        NODE_BINARY="node-$VERSION-darwin-arm64"
-        GO_BINARY="go1.22.4.linux-arm64.tar.gz"
-        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-arm64"
-    fi
-fi
 
 # Building qClient with GO
 # echo "⏳ Building qCiient..."
@@ -142,12 +174,13 @@ fi
 # GOEXPERIMENT=arenas go build -o qclient main.go
 
 # Building qClient binary
-echo "⏳Downloading qClient"
+echo "⏳ Downloading qClient..."
 sleep 1  # Add a 1-second delay
 cd ~/ceremonyclient/client
 wget https://releases.quilibrium.com/$QCLIENT_BINARY
 mv $QCLIENT_BINARY qclient
 chmod +x qclient
+echo
 
 # Get the current user's home directory
 HOME=$(eval echo ~$USER)
@@ -175,6 +208,7 @@ calculate_gomaxprocs() {
 GOMAXPROCS=$(calculate_gomaxprocs)
 
 echo "✅ GOMAXPROCS has been set to $GOMAXPROCS based on your server's resources."
+echo
 
 # Check if the file exists before attempting to remove it
 if [ -f "/lib/systemd/system/ceremonyclient.service" ]; then
@@ -202,6 +236,7 @@ EOF
 
 # Start the ceremonyclient service
 echo "✅ Starting Ceremonyclient Service"
+echo
 
 sleep 2  # Add a 2-second delay
 sudo systemctl daemon-reload
