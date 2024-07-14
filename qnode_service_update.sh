@@ -1,8 +1,11 @@
 #!/bin/bash
 
-NODE_VERSION=1.4.21
-#Node version not used - executiuon via release_autorun 
-QCLIENT_VERSION=1.4.19.1
+#Node version is not used - executiuon via release_autorun 
+#Comment out for automatic creation of the node version
+#NODE_VERSION=1.4.21
+
+#Comment out for automatic creation of the qclient version
+#QCLIENT_VERSION=1.4.19.1
 
 cat << "EOF"
 
@@ -43,6 +46,57 @@ EOF
 
 sleep 7  # Add a 7-second delay
 
+
+#==========================
+# CREATE PATH VARIABLES
+#==========================
+
+# Determine the ExecStart line based on the architecture
+ARCH=$(uname -m)
+OS=$(uname -s)
+
+# Determine node latest version
+# Check if NODE_VERSION is empty
+if [ -z "$NODE_VERSION" ]; then
+    NODE_VERSION=$(curl -s https://releases.quilibrium.com/release | grep -E "^node-[0-9]+(\.[0-9]+)*" | grep -v "dgst" | sed 's/^node-//' | cut -d '-' -f 1 | sort -V | tail -n 1)
+    echo "✅ Automatically determined NODE_VERSION: $NODE_VERSION"
+else
+    echo "✅ Using specified NODE_VERSION: $NODE_VERSION"
+fi
+
+# Determine qclient latest version
+if [ -z "$QCLIENT_VERSION" ]; then
+    QCLIENT_VERSION=$(curl -s https://releases.quilibrium.com/qclient-release | grep -E "^qclient-[0-9]+(\.[0-9]+)*" | sed 's/^qclient-//' | cut -d '-' -f 1 | sort -V | tail -n 1)
+    echo "✅ Automatically determined QCLIENT_VERSION: $QCLIENT_VERSION"
+else
+    echo "✅ Using specified QCLIENT_VERSION: $QCLIENT_VERSION"
+fi
+
+echo
+
+# Determine the node binary name based on the architecture and OS
+if [ "$ARCH" = "x86_64" ]; then
+    if [ "$OS" = "Linux" ]; then
+        NODE_BINARY="node-$NODE_VERSION-linux-amd64"
+        GO_BINARY="go1.22.4.linux-amd64.tar.gz"
+        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-amd64"
+    elif [ "$OS" = "Darwin" ]; then
+        NODE_BINARY="node-$NODE_VERSION-darwin-amd64"
+        GO_BINARY="go1.22.4.darwin-amd64.tar.gz"
+        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-arm64"
+    fi
+elif [ "$ARCH" = "aarch64" ]; then
+    if [ "$OS" = "Linux" ]; then
+        NODE_BINARY="node-$NODE_VERSION-linux-arm64"
+        GO_BINARY="go1.22.4.linux-arm64.tar.gz"
+        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-arm64"
+    elif [ "$OS" = "Darwin" ]; then
+        NODE_BINARY="node-$NODE_VERSION-darwin-arm64"
+        GO_BINARY="go1.22.4.darwin-arm64.tar.gz"
+        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-arm64"
+    fi
+fi
+
 #==========================
 # GO UPGRADE
 #==========================
@@ -56,29 +110,7 @@ fi
 
 # If the installed version is not 1.22.4, proceed with the installation
 if [ "$INSTALLED_VERSION" != "1.22.4" ]; then
-    echo "Current Go version is $INSTALLED_VERSION. Proceeding with installation of Go 1.22.4..."
-
-    # Determine the architecture and OS only if installing a new version
-    ARCH=$(uname -m)
-    OS=$(uname -s)
-
-    # Determine the Go binary name based on the architecture and OS
-    if [ "$ARCH" = "x86_64" ]; then
-        if [ "$OS" = "Linux" ]; then
-            GO_BINARY="go1.22.4.linux-amd64.tar.gz"
-        elif [ "$OS" = "Darwin" ]; then
-            GO_BINARY="go1.22.4.darwin-amd64.tar.gz"
-        fi
-    elif [ "$ARCH" = "aarch64" ]; then
-        if [ "$OS" = "Linux" ]; then
-            GO_BINARY="go1.22.4.linux-arm64.tar.gz"
-        elif [ "$OS" = "Darwin" ]; then
-            GO_BINARY="go1.22.4.darwin-arm64.tar.gz"
-        fi
-    else
-        echo "Unsupported architecture: $ARCH"
-        exit 1
-    fi
+    echo "⏳ Current Go version is $INSTALLED_VERSION. Proceeding with installation of Go 1.22.4..."
 
     # Download and install Go
     wget https://go.dev/dl/$GO_BINARY > /dev/null 2>&1 || echo "Failed to download Go!"
@@ -87,9 +119,11 @@ if [ "$INSTALLED_VERSION" != "1.22.4" ]; then
     sudo mv go /usr/local || echo "Failed to move Go!"
     sudo rm $GO_BINARY || echo "Failed to remove downloaded archive!"
     
-    echo "Go 1.22.4 has been installed successfully."
+    echo "✅ Go 1.22.4 has been installed successfully."
+    echo
 else
-    echo "Go version 1.22.4 is already installed. No action needed."
+    echo "✅ Go version 1.22.4 is already installed. No action needed."
+    echo
 fi
 
 #==========================
@@ -100,21 +134,26 @@ fi
 echo "⏳ Stopping the ceremonyclient service if it exists..."
 if systemctl is-active --quiet ceremonyclient && service ceremonyclient stop; then
     echo "🔴 Service stopped successfully."
+    echo
 else
     echo "❌ Ceremonyclient service either does not exist or could not be stopped." >&2
+    echo
 fi
 sleep 1
 
 # Step 2: Move to the ceremonyclient directory
-echo "Step 2: Moving to the ceremonyclient directory..."
+echo "⏳ Moving to the ceremonyclient directory..."
 cd ~/ceremonyclient || { echo "❌ Error: Directory ~/ceremonyclient does not exist."; exit 1; }
+echo
 
 # Step 3: Discard local changes in release_autorun.sh
 echo "✅ Discarding local changes in release_autorun.sh..."
+echo
 git checkout -- node/release_autorun.sh
 
 # Step 4: Download Binary
-echo "⏳ Downloading new release v$VERSION"
+echo "⏳ Downloading new release v$NODE_VERSION"
+echo
 
 # Set the remote URL and download
 cd  ~/ceremonyclient
@@ -125,38 +164,8 @@ git branch -D release
 git pull
 git checkout release
 
-
 echo "✅ Downloaded the latest changes successfully."
-
-#==========================
-# CREATE PATH VARIABLES
-#==========================
-
-# Determine the ExecStart line based on the architecture
-ARCH=$(uname -m)
-OS=$(uname -s)
-
-# Determine the node binary name based on the architecture and OS
-if [ "$ARCH" = "x86_64" ]; then
-    if [ "$OS" = "Linux" ]; then
-        NODE_BINARY="node-$NODE_VERSION-linux-amd64"
-        GO_BINARY="go1.22.4.linux-amd64.tar.gz"
-        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-amd64"
-    elif [ "$OS" = "Darwin" ]; then
-        NODE_BINARY="node-$NODE_VERSION-darwin-amd64"
-        GO_BINARY="go1.22.44.linux-amd64.tar.gz"
-        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-arm64"
-    fi
-elif [ "$ARCH" = "aarch64" ]; then
-    if [ "$OS" = "Linux" ]; then
-        NODE_BINARY="node-$VERSION-linux-arm64"
-        GO_BINARY="go1.22.4.linux-arm64.tar.gz"
-    elif [ "$OS" = "Darwin" ]; then
-        NODE_BINARY="node-$VERSION-darwin-arm64"
-        GO_BINARY="go1.22.4.linux-arm64.tar.gz"
-        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-arm64"
-    fi
-fi
+echo
 
 #==========================
 # QCLIENT UPDATE
@@ -168,7 +177,8 @@ fi
 # GOEXPERIMENT=arenas go build -o qclient main.go
 
 # Step 4:Update qClient with binary
-echo "Updating qClient"
+echo "⏳ Updating qClient..."
+echo
 sleep 1  # Add a 1-second delay
 cd ~/ceremonyclient/client
 rm -f qclient
@@ -188,11 +198,12 @@ EXEC_START="$NODE_PATH/release_autorun.sh"
 #==========================
 
 # Step 5: Re-Create or Update Ceremonyclient Service
-echo "🔧 Rebuilding Ceremonyclient Service..."
+echo "⏳ Rebuilding Ceremonyclient Service..."
+echo
 sleep 2  # Add a 2-second delay
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
 if [ ! -f "$SERVICE_FILE" ]; then
-    echo "📝 Creating new ceremonyclient service file..."
+    echo "⏳ Creating new ceremonyclient service file..."
     if ! sudo tee "$SERVICE_FILE" > /dev/null <<EOF
 [Unit]
 Description=Ceremony Client Go App Service
@@ -212,11 +223,11 @@ EOF
         exit 1
     fi
 else
-    echo "🔍 Checking existing ceremonyclient service file..."
+    echo "⏳ Checking existing ceremonyclient service file..."
     
     # Check if the required lines exist or if CPUQuota exists
     if ! grep -q "WorkingDirectory=$NODE_PATH" "$SERVICE_FILE" || ! grep -q "ExecStart=$EXEC_START" "$SERVICE_FILE"; then
-        echo "🔄 Updating existing ceremonyclient service file..."
+        echo "⏳ Updating existing ceremonyclient service file..."
         # Replace the existing lines with new values
         sudo sed -i "s|WorkingDirectory=.*|WorkingDirectory=$NODE_PATH|" "$SERVICE_FILE"
         sudo sed -i "s|ExecStart=.*|ExecStart=$EXEC_START|" "$SERVICE_FILE"
@@ -225,6 +236,47 @@ else
     fi
 fi
 
+echo
+
+#==========================
+# CONFIG FILE UPDATE
+#==========================
+
+# Path to the config file
+config_file=~/scripts/qnode_rewards_to_gsheet.config
+
+# Check if the config file exists
+if [ -f "$config_file" ]; then
+     echo "✅ Updating node version in config file 'Rewards to GSheet'."
+     sleep 1
+    # Get the current version
+    current_version=$(curl -s https://releases.quilibrium.com/release | grep "$OS-$ARCH" | cut -d '-' -f 2 | sort -V | tail -n 1)
+
+    # Get the version from the config file
+    config_version=$(grep "NODE_BINARY=node-" "$config_file" | cut -d '-' -f 2)
+
+    # Compare versions
+    if [ "$current_version" = "$config_version" ]; then
+        echo "Versions match. No update needed."
+    else
+        echo "⏳ Versions differ. Updating config file..."
+        
+        # Update the config file
+        sed -i "s/NODE_BINARY=node-.*-"$OS-$ARCH"/NODE_BINARY=node-${current_version}-"$OS-$ARCH"/" "$config_file"
+        
+        if [ $? -eq 0 ]; then
+            echo "✅ Config file updated successfully."
+        else
+            echo "❌ Failed to update config file."
+            exit 1
+        fi
+    fi
+else
+    echo "Config file not found: $config_file"
+    exit 1
+fi
+
+echo
 
 # Step 6: Start the ceremonyclient service
 echo "✅ Starting Ceremonyclient Service"
@@ -235,9 +287,9 @@ service ceremonyclient start
 
 # Showing the node version and logs
 echo "🌟Your node is now updated to v$NODE_VERSION !"
-echo ""
+echo
 echo "⏳ Showing the node log... (CTRL+C to exit)"
-echo ""
-echo ""
+echo
+echo
 sleep 3  # Add a 5-second delay
 sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
