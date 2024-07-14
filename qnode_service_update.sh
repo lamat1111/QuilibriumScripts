@@ -54,7 +54,7 @@ sleep 7  # Add a 7-second delay
 ARCH=$(uname -m)
 OS=$(uname -s)
 
-# Determine node latest version
+## Determine node latest version
 # Check if NODE_VERSION is empty
 if [ -z "$NODE_VERSION" ]; then
     echo "Debug: OS=$OS, ARCH=$ARCH"
@@ -62,14 +62,20 @@ if [ -z "$NODE_VERSION" ]; then
     echo "Debug: Curl output"
     curl -s https://releases.quilibrium.com/release
     
-    echo "Debug: After grep"
-    curl -s https://releases.quilibrium.com/release | grep "$OS-$ARCH"
+    echo "Debug: After first grep"
+    curl -s https://releases.quilibrium.com/release | grep -E "^node-[0-9]+\.[0-9]+\.[0-9]+"
     
-    echo "Debug: After cut"
-    curl -s https://releases.quilibrium.com/release | grep "$OS-$ARCH" | cut -d '-' -f 2
+    echo "Debug: After second grep (excluding dgst)"
+    curl -s https://releases.quilibrium.com/release | grep -E "^node-[0-9]+\.[0-9]+\.[0-9]+" | grep -v "dgst"
+    
+    echo "Debug: After first cut"
+    curl -s https://releases.quilibrium.com/release | grep -E "^node-[0-9]+\.[0-9]+\.[0-9]+" | grep -v "dgst" | cut -d '-' -f 2-4
+    
+    echo "Debug: After sort and tail"
+    curl -s https://releases.quilibrium.com/release | grep -E "^node-[0-9]+\.[0-9]+\.[0-9]+" | grep -v "dgst" | cut -d '-' -f 2-4 | sort -V | tail -n 1
     
     echo "Debug: Final result"
-    NODE_VERSION=$(curl -s https://releases.quilibrium.com/release | grep "$OS-$ARCH" | cut -d '-' -f 2 | sort -V | tail -n 1)
+    NODE_VERSION=$(curl -s https://releases.quilibrium.com/release | grep -E "^node-[0-9]+\.[0-9]+\.[0-9]+" | grep -v "dgst" | cut -d '-' -f 2-4 | sort -V | tail -n 1 | cut -d '-' -f 1)
     echo "Automatically determined NODE_VERSION: $NODE_VERSION"
 else
     echo "Using specified NODE_VERSION: $NODE_VERSION"
