@@ -247,8 +247,8 @@ config_file=~/scripts/qnode_rewards_to_gsheet.config
 
 # Check if the config file exists
 if [ -f "$config_file" ]; then
-     echo "✅ Updating node version in config file 'Rewards to GSheet'."
-     sleep 1
+    echo "✅ Updating node version in config file 'Rewards to GSheet'."
+    sleep 1
     # Get the current version
     current_version=$(curl -s https://releases.quilibrium.com/release | grep "$OS-$ARCH" | cut -d '-' -f 2 | sort -V | tail -n 1)
 
@@ -267,13 +267,12 @@ if [ -f "$config_file" ]; then
         if [ $? -eq 0 ]; then
             echo "✅ Config file updated successfully."
         else
-            echo "❌ Failed to update config file."
-            exit 1
+            echo "❌ Failed to update config file. Continuing to next step..."
         fi
     fi
 else
     echo "Config file not found: $config_file"
-    exit 1
+    echo "Continuing to next step..."
 fi
 
 echo
