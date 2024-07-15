@@ -277,7 +277,11 @@ fi
 
 echo
 
-# Step 6: Start the ceremonyclient service
+#==========================
+# START NODE VIA SERVICE
+#==========================
+
+# Start the ceremonyclient service
 echo "✅ Starting Ceremonyclient Service"
 sleep 2  # Add a 2-second delay
 systemctl daemon-reload
