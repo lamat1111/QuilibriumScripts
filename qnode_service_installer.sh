@@ -177,10 +177,17 @@ export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
 echo "⏳ Downloading qClient..."
 sleep 1  # Add a 1-second delay
 cd ~/ceremonyclient/client
-wget https://releases.quilibrium.com/$QCLIENT_BINARY
-mv $QCLIENT_BINARY qclient
-chmod +x qclient
-echo
+
+if ! wget https://releases.quilibrium.com/$QCLIENT_BINARY; then
+    echo "❌ Error: Failed to download qClient binary."
+    echo "Your node will still work, you can install the qclient manually later."
+    echo
+else
+    mv $QCLIENT_BINARY qclient
+    chmod +x qclient
+    echo "✅ qClient binary downloaded successfully."
+    echo
+fi
 
 # Get the current user's home directory
 HOME=$(eval echo ~$USER)
