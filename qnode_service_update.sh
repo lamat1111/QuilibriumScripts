@@ -176,15 +176,21 @@ echo
 # sleep 1  # Add a 1-second delay
 # GOEXPERIMENT=arenas go build -o qclient main.go
 
-# Step 4:Update qClient with binary
-echo "⏳ Updating qClient..."
-echo
+# Building qClient binary
+echo "⏳ Downloading qClient..."
 sleep 1  # Add a 1-second delay
 cd ~/ceremonyclient/client
-rm -f qclient
-wget https://releases.quilibrium.com/$QCLIENT_BINARY
-mv $QCLIENT_BINARY qclient
-chmod +x qclient
+
+if ! wget https://releases.quilibrium.com/$QCLIENT_BINARY; then
+    echo "❌ Error: Failed to download qClient binary."
+    echo "Your node will still work, you can install the qclient manually later."
+    echo
+else
+    mv $QCLIENT_BINARY qclient
+    chmod +x qclient
+    echo "✅ qClient binary downloaded successfully."
+    echo
+fi
 
 # Get the current user's home directory
 HOME=$(eval echo ~$HOME_DIR)
