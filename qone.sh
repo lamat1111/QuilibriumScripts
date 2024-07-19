@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.7.8"
+SCRIPT_VERSION="1.7.9"
 
 # Function to check if wget is installed, and install it if it is not
 check_wget() {
@@ -250,7 +250,8 @@ quil_balance() {
     else
         echo
         echo "⌛️  Displaying your QUIL balance..."
-        echo "If this doesn't work you can try the direct commands: https://iri.quest/q-node-info"
+        echo "The node has to be running for at least 10 minutes for this command to work."
+        echo "If is still doesn't work you can try the direct commands: https://iri.quest/q-node-info"
 	    echo
     	sleep 1
         cd ~/ceremonyclient/node && ./"$NODE_BINARY" -balance
