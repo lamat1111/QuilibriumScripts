@@ -2,7 +2,7 @@
 
 # Step 0: Welcome
 
-#Node version is not used - executiuon via release_autorun 
+#Node version is not used - executiu via release_autorun 
 #Comment out for automatic creation of the node version
 #NODE_VERSION=1.4.21
 
