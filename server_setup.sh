@@ -92,8 +92,8 @@ for pkg in git wget tar; do
     fi
 done
 
-# Install tmux and cron and move on if it fails
-for pkg in tmux cron; do
+# Install tmux, cron and jq and move on if it fails
+for pkg in tmux cron jq; do
     if ! is_installed "$pkg"; then
         echo "Installing $pkg..."
         sudo apt-get install -y "$pkg" > /dev/null 2>&1 || { echo "❌ Failed to install $pkg! These are optional apps, so I will continue..."; }
