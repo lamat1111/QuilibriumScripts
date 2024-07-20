@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#Node version is not used - executiuon via release_autorun 
+#Node version is not used - execution via release_autorun 
 #Comment out for automatic creation of the node version
 #NODE_VERSION=1.4.21
 
@@ -89,7 +89,7 @@ if [ "$ARCH" = "x86_64" ]; then
     elif [ "$OS" = "Darwin" ]; then
         NODE_BINARY="node-$NODE_VERSION-darwin-amd64"
         GO_BINARY="go1.22.4.darwin-amd64.tar.gz"
-        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-arm64"
+        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-amd64"
     fi
 elif [ "$ARCH" = "aarch64" ]; then
     if [ "$OS" = "Linux" ]; then
