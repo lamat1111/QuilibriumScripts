@@ -60,6 +60,9 @@ OS=$(uname -s)
 # Determine node latest version
 # Check if NODE_VERSION is empty
 if [ -z "$NODE_VERSION" ]; then
+    # new version withoout tail and sortng -to be tested
+    #NODE_VERSION=$(curl -s https://releases.quilibrium.com/release | grep -E "^node-[0-9]+(\.[0-9]+)*" | grep -v "dgst" | sed 's/^node-//' | cut -d '-' -f 1 | head -n 1)
+    #new version end
     NODE_VERSION=$(curl -s https://releases.quilibrium.com/release | grep -E "^node-[0-9]+(\.[0-9]+)*" | grep -v "dgst" | sed 's/^node-//' | cut -d '-' -f 1 | sort -V | tail -n 1)
     echo "✅ Automatically determined NODE_VERSION: $NODE_VERSION"
 else
@@ -68,6 +71,9 @@ fi
 
 # Determine qclient latest version
 if [ -z "$QCLIENT_VERSION" ]; then
+    # new version withoout tail and sortng -to be tested
+    #QCLIENT_VERSION=$(curl -s https://releases.quilibrium.com/qclient-release | grep -E "^qclient-[0-9]+(\.[0-9]+)*" | sed 's/^qclient-//' | cut -d '-' -f 1 |  head -n 1)
+    # new version end
     QCLIENT_VERSION=$(curl -s https://releases.quilibrium.com/qclient-release | grep -E "^qclient-[0-9]+(\.[0-9]+)*" | sed 's/^qclient-//' | cut -d '-' -f 1 | sort -V | tail -n 1)
     echo "✅ Automatically determined QCLIENT_VERSION: $QCLIENT_VERSION"
 else
