@@ -110,9 +110,10 @@ add_line_to_file() {
 
 # Update and Upgrade the Machine
 echo "⏳ Updating the machine..."
-echo "⏳ Processing... "
 sleep 2  # Add a 2-second delay
 sudo apt-get update -y && sudo apt-get upgrade -y
+echo "✅ Machine updated."
+echo
 
 # Install required packages
 
@@ -123,7 +124,7 @@ done
 echo "✅ Packages installed successfully or already present."
 echo
 
-echo "⏳ Installin: tmux cron jq..."
+echo "⏳ Installing: tmux cron jq..."
 for pkg in tmux cron jq; do
     install_package "$pkg" || echo "These are optional apps, so I will continue..."
 done
