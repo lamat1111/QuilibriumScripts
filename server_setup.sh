@@ -61,20 +61,24 @@ elif [ "$ARCH" = "aarch64" ]; then
     fi
 fi
 
-# Step 1: Check sudo availability
+# Check sudo availability
 if ! [ -x "$(command -v sudo)" ]; then
   echo "⚠️ Sudo is not installed! This script requires sudo to run. Exiting..."
   exit_message
   exit 1
 fi
 
-# Step 2: Update and Upgrade the Machine
+#################################
+# APPS
+#################################
+
+# Update and Upgrade the Machine
 echo "⏳ Updating the machine..."
 echo "⏳ Processing... "
 sleep 2  # Add a 2-second delay
 sudo apt-get update -y && sudo apt-get upgrade -y
 
-# Step 3: Install required packages
+# Install required packages
 echo "⏳ Installing useful packages..."
 
 # Function to check if a package is installed
@@ -103,6 +107,11 @@ for pkg in tmux cron jq; do
 done
 
 echo "✅ All packages installed successfully or already present."
+echo
+
+#################################
+# GO
+#################################
 
 
 # Installing Go
@@ -147,6 +156,7 @@ else
     echo "export GOPROXY=https://goproxy.cn,direct" >> ~/.bashrc
     echo "✅ GOPROXY set in ~/.bashrc."
 fi
+echo
 
 # Source .bashrc to apply changes
 source ~/.bashrc
@@ -165,29 +175,40 @@ else
   echo -e "\n# Change made to increase buffer sizes for better network performance for ceremonyclient\nnet.core.wmem_max=600000000" | sudo tee -a /etc/sysctl.conf > /dev/null
 fi
 sudo sysctl -p
+echo
 
 export GOROOT=/usr/local/go
 export GOPATH=$HOME/go
 export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
 
-# Step 7: Install gRPCurl
+#################################
+# gRPCurl
+#################################
+
+# Install gRPCurl
 echo "⏳ Installing gRPCurl..."
 sleep 1  # Add a 1-second delay
 
 # Try installing gRPCurl using go install
 if go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest; then
     echo "✅ gRPCurl installed successfully via go install."
+    echo
 else
     echo "❌ Failed to install gRPCurl via go install. Trying apt-get..."
     # Try installing gRPCurl using apt-get
     if sudo apt-get install grpcurl -y; then
         echo "✅ gRPCurl installed successfully via apt-get."
+        echo
     else
         echo "❌ Failed to install gRPCurl via apt-get! Moving on to the next step..."
+        echo
         # Optionally, perform additional error handling here
     fi
 fi
 
+#################################
+# UFW FIREWALL
+#################################
 
 # Install ufw and configure firewall
 echo "⏳ Installing ufw (Uncomplicated Firewall)..."
@@ -214,22 +235,93 @@ if command -v ufw >/dev/null 2>&1 && sudo ufw status | grep -q "Status: active";
     # Display firewall status
     sudo ufw status
     echo "✅ Firewall setup was successful."
+    echo
 else
     echo "⚠️ Failed to configure firewall or ufw is not installed. No worries, you can do it later manually. Moving on to the next step..."
+    echo
 fi
 
+#################################
+# FAIL2BAN
+#################################
+
+echo "⏳ Installing Fail2ban to protect you from brute force attacks..."
+
+# Function to log errors
+log_error() {
+    echo "❌ Error: $1" >&2
+}
+
+# Check if Fail2Ban is already installed
+if dpkg -s fail2ban &> /dev/null; then
+    echo "✅ Fail2Ban is already installed. Skipping installation."
+else
+    # Install Fail2Ban
+    if ! sudo apt install fail2ban -y; then
+        log_error "Failed to install Fail2Ban. Skipping configuration."
+    else
+        echo "✅ Fail2Ban has been successfully installed."
+    fi
+fi
+
+# Only proceed with configuration if Fail2Ban is installed
+if dpkg -s fail2ban &> /dev/null; then
+    # Check if a custom configuration already exists
+    if [ -f "/etc/fail2ban/jail.d/sshd.conf" ]; then
+        echo "⚠️ Custom Fail2Ban configuration already exists. Skipping configuration."
+    else
+        # Create a backup of the original jail.conf file
+        sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.conf.backup
+
+        # Create SSH jail configuration
+        if ! cat << EOF | sudo tee /etc/fail2ban/jail.d/sshd.conf > /dev/null
+[sshd]
+enabled = true
+port = ssh
+filter = sshd
+logpath = %(sshd_log)s
+maxretry = 3
+findtime = 300
+bantime = 1800
+EOF
+        then
+            log_error "Failed to create custom Fail2Ban configuration."
+        else
+            echo "✅ Custom Fail2Ban configuration has been created."
+        fi
+
+        # Restart Fail2Ban to apply changes
+        if ! sudo systemctl restart fail2ban; then
+            log_error "Failed to restart Fail2Ban service."
+        else
+            echo "✅ Fail2Ban service has been restarted."
+        fi
+
+        # Enable Fail2Ban to start on boot
+        if ! sudo systemctl enable fail2ban; then
+            log_error "Failed to enable Fail2Ban service on boot."
+        else
+            echo "✅ Fail2Ban has been enabled to start on boot."
+        fi
+    fi
+else
+    echo "⚠️ Fail2Ban is not installed. Skipping configuration."
+fi
+
+echo "✅ Fail2Ban installation and configuration process completed."
+echo
+
+#################################
+# FINISH
+#################################
+
 # Creating some useful folders
-echo "⏳ Creating /root/backup/ folder..."
+echo "⏳ Creating backup, scripts and scripts/log folders..."
 sudo mkdir -p /root/backup/
-echo "✅ Done."
-
-echo "⏳ Creating /root/scripts/ folder..."
 sudo mkdir -p /root/scripts/
-echo "✅ Done."
-
-echo "⏳ Creating /root/scripts/log/ folder..."
 sudo mkdir -p /root/scripts/log/
-echo "✅ Done."
+echo "✅ Folders created."
+echo
 
 # Prompt for reboot
 echo "🎉 Server setup is finished!"
