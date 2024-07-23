@@ -68,6 +68,42 @@ if ! [ -x "$(command -v sudo)" ]; then
   exit 1
 fi
 
+
+#################################
+# USEFUL FUNCTIONS
+#################################
+
+# Function to check if a package is installed
+is_installed() {
+    dpkg -l "$1" &> /dev/null
+}
+
+# Function to log errors (reusable throughout the script)
+log_error() {
+    echo "❌ Error: $1" >&2
+}
+
+# Function to install a package if not already installed
+install_package() {
+    if ! is_installed "$1"; then
+        echo "Installing $1..."
+        sudo apt-get install -y "$1" > /dev/null 2>&1 || log_error "Failed to install $1"
+    else
+        echo "$1 is already installed."
+    fi
+}
+
+# Function to add a line to a file if it doesn't exist
+add_line_to_file() {
+    if ! grep -q "$1" "$2"; then
+        echo "$1" >> "$2"
+        echo "✅ Added '$1' to $2."
+    else
+        echo "✅ '$1' already exists in $2."
+    fi
+}
+
+
 #################################
 # APPS
 #################################
@@ -79,90 +115,56 @@ sleep 2  # Add a 2-second delay
 sudo apt-get update -y && sudo apt-get upgrade -y
 
 # Install required packages
-echo "⏳ Installing useful packages..."
 
-# Function to check if a package is installed
-is_installed() {
-    dpkg -l "$1" &> /dev/null
-}
-
-# Install git, wget, tar and exit if it fails
+echo "⏳ Installing: git wget tar..."
 for pkg in git wget tar; do
-    if ! is_installed "$pkg"; then
-        echo "Installing $pkg..."
-        sudo apt-get install -y "$pkg" > /dev/null 2>&1 || { echo "❌ Failed to install $pkg! These are necessary apps, so I will exiting..."; exit_message; exit 1; }
-    else
-        echo "$pkg is already installed."
-    fi
+    install_package "$pkg" || { echo "These are necessary apps, so I will exit..."; exit_message; exit 1; }
 done
+echo "✅ Packages installed successfully or already present."
+echo
 
-# Install tmux, cron and jq and move on if it fails
+echo "⏳ Installin: tmux cron jq..."
 for pkg in tmux cron jq; do
-    if ! is_installed "$pkg"; then
-        echo "Installing $pkg..."
-        sudo apt-get install -y "$pkg" > /dev/null 2>&1 || { echo "❌ Failed to install $pkg! These are optional apps, so I will continue..."; }
-    else
-        echo "$pkg is already installed."
-    fi
+    install_package "$pkg" || echo "These are optional apps, so I will continue..."
 done
-
-echo "✅ All packages installed successfully or already present."
+echo "✅ Packages installed successfully or already present."
 echo
 
 #################################
 # GO
 #################################
 
-
 # Installing Go
 echo "⏳ Downloading and installing GO..."
-wget https://go.dev/dl/$GO_BINARY > /dev/null 2>&1 || echo "❌ Failed to download GO!"    
-sudo tar -xvf $GO_BINARY > /dev/null 2>&1 || echo "❌ Failed to extract GO!"
-sudo rm -rf /usr/local/go || echo "❌ Failed to remove existing GO!"
-sudo mv go /usr/local || echo "❌ Failed to move GO!"
-sudo rm $GO_BINARY || echo "❌ Failed to remove downloaded archive!"
+if wget https://go.dev/dl/$GO_BINARY > /dev/null 2>&1; then
+    if sudo tar -xvf $GO_BINARY > /dev/null 2>&1; then
+        sudo rm -rf /usr/local/go || log_error "Failed to remove existing GO!"
+        if sudo mv go /usr/local; then
+            sudo rm $GO_BINARY || log_error "Failed to remove downloaded archive!"
+            echo "✅ GO has been successfully downloaded and installed."
+        else
+            log_error "Failed to move GO!"
+        fi
+    else
+        log_error "Failed to extract GO!"
+    fi
+else
+    log_error "Failed to download GO!"
+fi
 
 # Set Go environment variables
 echo "⏳ Setting Go environment variables..."
-
-# Check if PATH is already set
-if grep -q 'export PATH=$PATH:/usr/local/go/bin' ~/.bashrc; then
-    echo "✅ PATH already set in ~/.bashrc."
-else
-    echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
-    echo "✅ PATH set in ~/.bashrc."
-fi
-
-# Check if GOPATH is already set
-if grep -q "export GOPATH=$HOME/go" ~/.bashrc; then
-    echo "✅ GOPATH already set in ~/.bashrc."
-else
-    echo "export GOPATH=$HOME/go" >> ~/.bashrc
-    echo "✅ GOPATH set in ~/.bashrc."
-fi
-
-# Check if GO111MODULE is already set
-if grep -q "export GO111MODULE=on" ~/.bashrc; then
-    echo "✅ GO111MODULE already set in ~/.bashrc."
-else
-    echo "export GO111MODULE=on" >> ~/.bashrc
-    echo "✅ GO111MODULE set in ~/.bashrc."
-fi
-
-# Check if GOPROXY is already set
-if grep -q "export GOPROXY=https://goproxy.cn,direct" ~/.bashrc; then
-    echo "✅ GOPROXY already set in ~/.bashrc."
-else
-    echo "export GOPROXY=https://goproxy.cn,direct" >> ~/.bashrc
-    echo "✅ GOPROXY set in ~/.bashrc."
-fi
+add_line_to_file 'export PATH=$PATH:/usr/local/go/bin' ~/.bashrc
+add_line_to_file "export GOPATH=$HOME/go" ~/.bashrc
+add_line_to_file "export GO111MODULE=on" ~/.bashrc
+add_line_to_file "export GOPROXY=https://goproxy.cn,direct" ~/.bashrc
 echo
 
 # Source .bashrc to apply changes
 source ~/.bashrc
 sleep 1  # Add a 1-second delay
 
-# Step 6: Adjust network buffer sizes
+# Adjust network buffer sizes
 echo "⏳ Adjusting network buffer sizes..."
 if grep -q "^net.core.rmem_max=600000000$" /etc/sysctl.conf; then
   echo "✅ net.core.rmem_max=600000000 found inside /etc/sysctl.conf, skipping..."
@@ -212,7 +214,6 @@ fi
 
 # Install ufw and configure firewall
 echo "⏳ Installing ufw (Uncomplicated Firewall)..."
-sudo apt-get update
 sudo apt-get install ufw -y || { echo "❌ Failed to install ufw! Moving on to the next step..."; }
 
 # Attempt to enable ufw
@@ -247,22 +248,13 @@ fi
 
 echo "⏳ Installing Fail2ban to protect you from brute force attacks..."
 
-# Function to log errors
-log_error() {
-    echo "❌ Error: $1" >&2
-}
-
 # Check if Fail2Ban is already installed
-if dpkg -s fail2ban &> /dev/null; then
-    echo "✅ Fail2Ban is already installed. Skipping installation."
+if ! is_installed "fail2ban"; then
+    install_package "fail2ban" || log_error "Failed to install Fail2Ban. Skipping configuration."
 else
-    # Install Fail2Ban
-    if ! sudo apt install fail2ban -y; then
-        log_error "Failed to install Fail2Ban. Skipping configuration."
-    else
-        echo "✅ Fail2Ban has been successfully installed."
-    fi
+    echo "✅ Fail2Ban is already installed. Skipping installation."
 fi
+
 
 # Only proceed with configuration if Fail2Ban is installed
 if dpkg -s fail2ban &> /dev/null; then
