@@ -259,22 +259,20 @@ config_file=~/scripts/qnode_rewards_to_gsheet.config
 
 # Check if the config file exists
 if [ -f "$config_file" ]; then
-    echo "✅ Updating node version in config file 'Rewards to GSheet'."
+    echo "✅ Checking node version in config file 'Rewards to GSheet'."
     sleep 1
-    # Get the current version
-    current_version=$(curl -s https://releases.quilibrium.com/release | grep "$OS-$ARCH" | cut -d '-' -f 2 | sort -V | tail -n 1)
 
-    # Get the version from the config file
-    config_version=$(grep "NODE_BINARY=node-" "$config_file" | cut -d '-' -f 2)
+    # Get the current NODE_BINARY from the config file
+    config_node_binary=$(grep "NODE_BINARY=" "$config_file" | cut -d '=' -f 2)
 
-    # Compare versions
-    if [ "$current_version" = "$config_version" ]; then
-        echo "Versions match. No update needed."
+    # Compare NODE_BINARY values
+    if [ "$config_node_binary" = "$NODE_BINARY" ]; then
+        echo "NODE_BINARY values match. No update needed."
     else
-        echo "⏳ Versions differ. Updating config file..."
+        echo "⏳ NODE_BINARY values differ. Updating config file..."
         
         # Update the config file
-        sed -i "s/NODE_BINARY=node-.*-"$OS-$ARCH"/NODE_BINARY=node-${current_version}-"$OS-$ARCH"/" "$config_file"
+        sed -i "s|NODE_BINARY=.*|NODE_BINARY=$NODE_BINARY|" "$config_file"
         
         if [ $? -eq 0 ]; then
             echo "✅ Config file updated successfully."
@@ -284,7 +282,7 @@ if [ -f "$config_file" ]; then
     fi
 else
     echo "Config file not found: $config_file"
-    echo "Continuing to next step..."
+    echo "Not a problem! Continuing to next step..."
 fi
 
 echo
