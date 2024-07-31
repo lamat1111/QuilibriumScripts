@@ -14,6 +14,19 @@ print_color() {
     echo -e "${color}${text}${NC}"
 }
 
+# Function to check if a command exists
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+# Function to install a package if it doesn't exist
+install_package() {
+    if ! command_exists "$1"; then
+        echo "Installing $1..."
+        sudo apt-get update && sudo apt-get install -y "$1"
+    fi
+}
+
 # Function to get CPU information
 get_cpu_info() {
     lscpu | grep -E "Model name|CPU MHz"
@@ -40,16 +53,22 @@ check_cpu_boost() {
 
 # Function to check CPU governor (performance mode)
 check_cpu_governor() {
-    governor=$(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor)
-    echo "CPU Governor: $governor"
+    if [ -f "/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor" ]; then
+        governor=$(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor)
+        echo "CPU Governor: $governor"
+    else
+        echo "CPU Governor: Not available"
+    fi
 }
 
 # Install necessary tools
-sudo apt-get update
-sudo apt-get install -y sysbench stress-ng lm-sensors
+install_package sysbench
+install_package stress-ng
+install_package lm-sensors
+install_package dmidecode
 
 # Create log file
-LOG_FILE=~/CPU_check.txt
+LOG_FILE=~/CPU_benchmark_results.txt
 
 # Function to run tests and output results
 run_tests() {
@@ -63,20 +82,32 @@ run_tests() {
         echo
 
         print_color $BLUE "CPU Information:"
+        print_color $BLUE "================="
         get_cpu_info
         echo "CPU Cores: $(nproc)"
         echo "Total RAM: $(get_ram_info)"
         echo
 
         print_color $BLUE "CPU Settings:"
+        print_color $BLUE "=============="
         check_cpu_boost
         check_cpu_governor
+        echo
+
+        print_color $BLUE "CPU Frequency Information:"
+        print_color $BLUE "==========================="
+        cat /proc/cpuinfo | grep "MHz"
+        echo
+
+        print_color $BLUE "Memory Information:"
+        print_color $BLUE "===================="
+        free -h
         echo
 
         print_color $GREEN "CPU Benchmark Results:"
         print_color $GREEN "======================"
         
-        print_color $YELLOW "1. Sysbench CPU Test (Prime Numbers):"
+        print_color $YELLOW "1. Sysbench CPU Test (Multi-threaded, Prime Numbers):"
         sysbench cpu --cpu-max-prime=20000 --threads=$(nproc) run | grep -E "total time:|events per second:|total number of events:"
         echo
         
@@ -85,7 +116,7 @@ run_tests() {
         echo
         
         print_color $YELLOW "3. Stress-ng CPU Test (1 minute):"
-        stress-ng --cpu $(nproc) --timeout 60s --metrics-brief
+        stress-ng --cpu $(nproc) --timeout 1m --metrics-brief
         echo
         
         print_color $YELLOW "4. Sysbench Memory Test:"
@@ -97,16 +128,20 @@ run_tests() {
         echo
         
         print_color $YELLOW "6. CPU Temperature (if available):"
-        if command -v sensors &> /dev/null; then
+        if command_exists sensors; then
             sensors | grep -i "core"
         else
             echo "Temperature information not available (lm-sensors not installed)"
         fi
+        echo
+
+        print_color $YELLOW "7. Additional CPU Details:"
+        sudo dmidecode -t processor
+        echo
 
     } | tee $LOG_FILE
 }
 
 # Run tests and display results
 run_tests
-
 print_color $GREEN "Comprehensive CPU benchmark completed. Results are saved in $LOG_FILE"
