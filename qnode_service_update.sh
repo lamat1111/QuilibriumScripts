@@ -2,7 +2,7 @@
 
 #Node version is not used - execution via release_autorun 
 #Comment out for automatic creation of the node version
-#NODE_VERSION=1.4.21
+#NODE_VERSION=1.4.21.1
 
 #Comment out for automatic creation of the qclient version
 #QCLIENT_VERSION=1.4.19.1
@@ -237,7 +237,7 @@ EOF
 else
     echo "⏳ Checking existing ceremonyclient service file..."
     
-    # Check if the required lines exist or if CPUQuota exists
+    # Check if the required lines exist
     if ! grep -q "WorkingDirectory=$NODE_PATH" "$SERVICE_FILE" || ! grep -q "ExecStart=$EXEC_START" "$SERVICE_FILE"; then
         echo "⏳ Updating existing ceremonyclient service file..."
         # Replace the existing lines with new values
