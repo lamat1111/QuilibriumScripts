@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.7.9"
+SCRIPT_VERSION="1.8"
 
 # Function to check if wget is installed, and install it if it is not
 check_wget() {
@@ -92,40 +92,23 @@ NODE_PATH="$HOME/ceremonyclient/node"
 # DETERMINE NODE BINARY PATH
 #=============================
 
-# Determine OS and architecture
-if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    release_os="linux"
-    release_arch=$(uname -m)
-    if [[ "$release_arch" == "aarch64" ]]; then
-        release_arch="arm64"
-    else
-        release_arch="amd64"
+# Determine the node version
+NODE_VERSION=$(curl -s https://releases.quilibrium.com/release | grep -E "^node-[0-9]+(\.[0-9]+)*" | grep -v "dgst" | sed 's/^node-//' | cut -d '-' -f 1 | head -n 1)
+
+# Determine the node binary name based on the architecture and OS
+if [ "$ARCH" = "x86_64" ]; then
+    if [ "$OS" = "Linux" ]; then
+        NODE_BINARY="node-$NODE_VERSION-linux-amd64"
+    elif [ "$OS" = "Darwin" ]; then
+        NODE_BINARY="node-$NODE_VERSION-darwin-amd64"
     fi
-elif [[ "$OSTYPE" == "darwin"* ]]; then
-    release_os="darwin"
-    release_arch="arm64"
-else
-    echo "unsupported OS for releases, please build from source"
-    exit 1
+elif [ "$ARCH" = "aarch64" ]; then
+    if [ "$OS" = "Linux" ]; then
+        NODE_BINARY="node-$NODE_VERSION-linux-arm64"
+    elif [ "$OS" = "Darwin" ]; then
+        NODE_BINARY="node-$NODE_VERSION-darwin-arm64"
+    fi
 fi
-
-fetch() {
-    # Fetch available files for the determined OS and architecture
-    files=$(curl -s https://releases.quilibrium.com/release | grep $release_os-$release_arch)
-
-    # Extract the version from the first matching file
-    for file in $files; do
-        version=$(echo "$file" | cut -d '-' -f 2)
-        break
-    done
-}
-
-fetch
-
-# Set the node binary name based on the determined OS, architecture, and version
-NODE_BINARY=node-$version-$release_os-$release_arch
-
-
 
 #=====================
 # Function Definitions
