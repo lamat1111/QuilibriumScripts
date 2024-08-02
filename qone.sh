@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.8"
+SCRIPT_VERSION="1.9"
 
 # Function to check if wget is installed, and install it if it is not
 check_wget() {
@@ -91,6 +91,10 @@ NODE_PATH="$HOME/ceremonyclient/node"
 #=============================
 # DETERMINE NODE BINARY PATH
 #=============================
+
+# Determine the ExecStart line based on the architecture
+ARCH=$(uname -m)
+OS=$(uname -s)
 
 # Determine the node version
 NODE_VERSION=$(curl -s https://releases.quilibrium.com/release | grep -E "^node-[0-9]+(\.[0-9]+)*" | grep -v "dgst" | sed 's/^node-//' | cut -d '-' -f 1 | head -n 1)
