@@ -251,20 +251,16 @@ fi
 echo
 
 #==========================
-# CONFIG FILE UPDATE
+# CONFIG FILE UPDATE for "REWARDS TO GOOGLE SHEET SCRIPT"
 #==========================
 
-# Path to the config file
-config_file=~/scripts/qnode_rewards_to_gsheet.config
-
-# Check if the config file exists
-if [ -f "$config_file" ]; then
-    echo "✅ Checking node version in config file 'Rewards to GSheet'."
+# Function to update config file
+update_config_file() {
+    local config_file=$1
+    echo "✅ Checking node version in config file '$(basename "$config_file")'."
     sleep 1
-
     # Get the current NODE_BINARY from the config file
     config_node_binary=$(grep "NODE_BINARY=" "$config_file" | cut -d '=' -f 2)
-
     # Compare NODE_BINARY values
     if [ "$config_node_binary" = "$NODE_BINARY" ]; then
         echo "NODE_BINARY values match. No update needed."
@@ -280,10 +276,25 @@ if [ -f "$config_file" ]; then
             echo "❌ Failed to update config file. Continuing to next step..."
         fi
     fi
-else
-    echo "Config file not found: $config_file"
-    echo "Not a problem! Continuing to next step..."
-fi
+}
+
+# Array of config files
+config_files=(
+    "~/scripts/qnode_rewards_to_gsheet.config"
+    "~/scripts/qnode_rewards_to_gsheet_2.config"
+)
+
+# Loop through config files
+for config_file in "${config_files[@]}"; do
+    if [ -f "$config_file" ]; then
+        update_config_file "$config_file"
+    else
+        echo "Config file not found: $config_file"
+        echo "Not a problem! Continuing to next file..."
+    fi
+done
+
+echo "All config files processed."
 
 echo
 
