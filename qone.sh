@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.9"
+SCRIPT_VERSION="1.8.2"
 
 # Function to check if wget is installed, and install it if it is not
 check_wget() {
@@ -79,14 +79,11 @@ check_for_updates
 # Service file path
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
 
-# User working folder
-USER_HOME=$(eval echo ~$USER)
+# Common message for missing service file
+MISSING_SERVICE_MSG="⚠️ Your service file does not exist. Looks like you do not have a node running as a service yet!"
 
-#Node path
-NODE_PATH="$HOME/ceremonyclient/node"
-
-# Version number
-#NODE_VERSION="1.4.19.1"
+# Node version
+#NODE_VERSION="1.4.20.1"
 
 #=============================
 # DETERMINE NODE BINARY PATH
@@ -115,7 +112,7 @@ elif [ "$ARCH" = "aarch64" ]; then
 fi
 
 #=====================
-# Function Definitions
+# URLs for scripts
 #=====================
 
 # URLs for scripts
@@ -132,8 +129,9 @@ BACKUP_RESTORE_STORJ_URL="https://raw.githubusercontent.com/lamat1111/Quilibrium
 BALANCE_LOG_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_balance_checker_installer.sh"
 TEST_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/test/test_script.sh"
 
-# Common message for missing service file
-MISSING_SERVICE_MSG="⚠️ Your service file does not exist. Looks like you do not have a node running as a service yet!"
+#=====================
+# Function Definitions
+#=====================
 
 # Function definitions
 install_prerequisites() {
