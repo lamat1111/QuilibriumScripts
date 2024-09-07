@@ -103,6 +103,31 @@ add_line_to_file() {
     fi
 }
 
+#################################
+# HOSTNAME CHANGE
+#################################
+
+# Display current hostname
+echo
+current_hostname=$(hostname)
+echo "Current hostname is: $current_hostname"
+
+# Ask if user wants to change the hostname
+read -p "Do you want to change it? (y/n): " answer
+
+if [[ $answer == "y" || $answer == "Y" ]]; then
+    # Prompt for new hostname
+    read -p "Enter new hostname: " new_hostname
+    
+    # Change the hostname
+    sudo hostnamectl set-hostname "$new_hostname"
+    
+    echo "✅  Hostname changed to: $new_hostname"
+else
+    echo "✅  Hostname not changed."
+fi
+echo
+
 
 #################################
 # APPS
