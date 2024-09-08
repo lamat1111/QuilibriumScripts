@@ -89,7 +89,7 @@ display_system_info() {
     cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_driver | sort | uniq
     echo ""
     echo "CPU frequency info:"
-    cpupower frequency-info | grep -E "CPU|driver|frequency|governor"
+    cpupower frequency-info
     echo "================================================"
 }
 
@@ -122,6 +122,6 @@ echo "After reboot, the new kernel version (if installed) and GRUB changes will 
 echo "To reboot, use the command: sudo reboot"
 echo ""
 echo "After rebooting, run these commands to see the updated system state:"
-echo "sudo cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_driver"
+echo "cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_driver | sort | uniq"
 echo "sudo cpupower frequency-info"
 echo "================================================"
