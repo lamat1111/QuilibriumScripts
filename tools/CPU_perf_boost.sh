@@ -1,5 +1,23 @@
 #!/bin/bash
 
+# Function to check if the system is Linux and has an AMD processor
+check_system_compatibility() {
+    # Check if the system is Linux
+    if [[ "$(uname)" != "Linux" ]]; then
+        echo "Error: This script is intended for Linux systems only."
+        exit 1
+    fi
+
+    # Check if the processor is AMD
+    if ! grep -qi "amd" /proc/cpuinfo; then
+        echo "Error: This script is intended for AMD processors only."
+        exit 1
+    fi
+
+    echo "System compatibility check passed. Proceeding with the script."
+}
+
+
 # Function to check if the script is run with sudo
 check_sudo() {
     if [ "$EUID" -ne 0 ]; then
@@ -56,6 +74,7 @@ display_system_info() {
 }
 
 # Main script execution
+check_system_compatibility
 check_sudo
 
 echo "Updating system..."
