@@ -26,6 +26,26 @@ check_sudo() {
     fi
 }
 
+# Function to check and install dependencies
+check_and_install_dependencies() {
+    local dependencies=("linux-tools-generic" "cpufrequtils")
+    local to_install=()
+
+    for dep in "${dependencies[@]}"; do
+        if ! dpkg -s "$dep" >/dev/null 2>&1; then
+            to_install+=("$dep")
+        fi
+    done
+
+    if [ ${#to_install[@]} -ne 0 ]; then
+        echo "Installing required dependencies: ${to_install[*]}"
+        apt-get update
+        apt-get install -y "${to_install[@]}"
+    else
+        echo "All required dependencies are already installed."
+    fi
+}
+
 # Function to perform system updates
 update_system() {
     apt-get update
@@ -76,6 +96,7 @@ display_system_info() {
 # Main script execution
 check_system_compatibility
 check_sudo
+check_and_install_dependencies
 
 echo "Updating system..."
 update_system
@@ -100,7 +121,7 @@ echo "Please manually reboot your system to complete the process."
 echo "After reboot, the new kernel version (if installed) and GRUB changes will take effect."
 echo "To reboot, use the command: sudo reboot"
 echo ""
-echo "After rebooting, run these command to see the updated system state:"
-echo "cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_driver"
-echo "cpupower frequency-info"
+echo "After rebooting, run these commands to see the updated system state:"
+echo "sudo cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_driver"
+echo "sudo cpupower frequency-info"
 echo "================================================"
