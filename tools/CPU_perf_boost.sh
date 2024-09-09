@@ -26,7 +26,7 @@ check_sudo() {
     fi
 }
 
-# Function to check and install dependencies
+# Updated function to check and install dependencies
 check_and_install_dependencies() {
     local dependencies=("linux-tools-generic" "cpufrequtils")
     local to_install=()
@@ -36,6 +36,18 @@ check_and_install_dependencies() {
             to_install+=("$dep")
         fi
     done
+
+    # Check for kernel-specific tools
+    local kernel_version=$(uname -r)
+    local kernel_tools="linux-tools-$kernel_version"
+    local cloud_tools="linux-cloud-tools-$kernel_version"
+
+    if ! dpkg -s "$kernel_tools" >/dev/null 2>&1; then
+        to_install+=("$kernel_tools")
+    fi
+    if ! dpkg -s "$cloud_tools" >/dev/null 2>&1; then
+        to_install+=("$cloud_tools")
+    fi
 
     if [ ${#to_install[@]} -ne 0 ]; then
         echo "Installing required dependencies: ${to_install[*]}"
