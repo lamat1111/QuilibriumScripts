@@ -46,6 +46,29 @@ EOF
 
 sleep 7  # Add a 7-second delay
 
+#==========================
+# INSTALL APPS
+#==========================
+
+# Function to check and install a package
+check_and_install() {
+    if ! command -v $1 &> /dev/null
+    then
+        echo "$1 could not be found"
+        echo "⏳ Installing $1..."
+        su -c "apt update && apt install $1 -y"
+        echo
+    else
+        echo "✅ $1 is installed"
+        echo
+    fi
+}
+
+# For DEBIAN OS - Check if sudo, git, and curl are installed
+check_and_install sudo
+check_and_install git
+check_and_install curl
+
 
 #==========================
 # CREATE PATH VARIABLES
