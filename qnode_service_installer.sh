@@ -78,7 +78,7 @@ check_and_install() {
     then
         echo "$1 could not be found"
         echo "⏳ Installing $1..."
-        su -c "apt update && apt install $1 -y"
+        su -c "apt install $1 -y"
         echo
     else
         echo "✅ $1 is installed"
