@@ -142,7 +142,7 @@ echo
 
 # Install required packages
 
-echo "⏳ Installing: git wget tar..."
+echo "⏳ Installing: git wget tar curl..."
 for pkg in git wget tar; do
     install_package "$pkg" || { echo "These are necessary apps, so I will exit..."; exit_message; exit 1; }
 done
