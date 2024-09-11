@@ -50,6 +50,49 @@ EOF
 sleep 7  # Add a 7-second delay
 
 #==========================
+# MANAGE ERRORS
+#==========================
+
+# Exit on any error
+set -e
+
+# Define a function for displaying exit messages
+exit_message() {
+    echo "❌ Oops! There was an error during the script execution and the process stopped. No worries!"
+    echo "You can try to run the script from scratch again."
+    echo
+    echo "If you still receive an error, you may want to proceed manually, step by step instead of using the auto-installer."
+    echo "The step by step installation instructions are here: https://iri.quest/q-node-step-by-step"
+}
+
+# Set a trap to call exit_message on any error
+trap exit_message ERR
+
+#==========================
+# INSTALL APPS
+#==========================
+
+# Function to check and install a package
+check_and_install() {
+    if ! command -v $1 &> /dev/null
+    then
+        echo "$1 could not be found"
+        echo "⏳ Installing $1..."
+        su -c "apt update && apt install $1 -y"
+        echo
+    else
+        echo "✅ $1 is installed"
+        echo
+    fi
+}
+
+# For DEBIAN OS - Check if sudo, git, and curl are installed
+check_and_install sudo
+check_and_install git
+check_and_install curl
+
+
+#==========================
 # CREATE PATH VARIABLES
 #==========================
 
@@ -100,44 +143,6 @@ elif [ "$ARCH" = "aarch64" ]; then
     fi
 fi
 
-
-# Exit on any error
-set -e
-
-# Define a function for displaying exit messages
-exit_message() {
-    echo "❌ Oops! There was an error during the script execution and the process stopped. No worries!"
-    echo "You can try to run the script from scratch again."
-    echo
-    echo "If you still receive an error, you may want to proceed manually, step by step instead of using the auto-installer."
-    echo "The step by step installation instructions are here: https://iri.quest/q-node-step-by-step"
-}
-
-# Set a trap to call exit_message on any error
-trap exit_message ERR
-
-# Fof DEBIAN OS - Check if sudo and git is installed
-if ! command -v sudo &> /dev/null
-then
-    echo "sudo could not be found"
-    echo "⏳ Installing sudo..."
-    su -c "apt update && apt install sudo -y"
-    echo
-else
-    echo "✅ sudo is installed"
-    echo
-fi
-
-if ! command -v git &> /dev/null
-then
-    echo "git could not be found"
-    echo "⏳ Installing git..."
-    su -c "apt update && apt install git -y"
-    echo
-else
-    echo "✅ git is installed"
-    echo
-fi
 
 # Backup existing configuration files if they exist
 if [ -d ~/ceremonyclient ]; then
