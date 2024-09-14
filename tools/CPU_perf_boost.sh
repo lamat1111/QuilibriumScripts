@@ -51,8 +51,8 @@ check_and_install_dependencies() {
 
     if [ ${#to_install[@]} -ne 0 ]; then
         echo "Installing required dependencies: ${to_install[*]}"
-        apt-get update
-        apt-get install -y "${to_install[@]}"
+        apt install update
+        apt install install -y "${to_install[@]}"
     else
         echo "All required dependencies are already installed."
     fi
@@ -60,11 +60,11 @@ check_and_install_dependencies() {
 
 # Function to perform system updates
 update_system() {
-    apt-get update
-    apt-get upgrade -y
-    apt-get dist-upgrade -y
-    apt-get autoremove -y
-    apt-get autoclean
+    apt install update
+    apt install upgrade -y
+    apt install dist-upgrade -y
+    apt install autoremove -y
+    apt install autoclean
 }
 
 # Function to check and install specific kernel version
@@ -74,7 +74,7 @@ check_and_install_kernel() {
         echo "Kernel $desired_kernel is already installed. Skipping kernel installation."
     else
         echo "Installing kernel $desired_kernel..."
-        apt-get install linux-image-$desired_kernel linux-headers-$desired_kernel -y
+        apt install install linux-image-$desired_kernel linux-headers-$desired_kernel -y
     fi
 }
 
