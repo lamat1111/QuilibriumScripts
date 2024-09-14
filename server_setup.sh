@@ -87,7 +87,7 @@ log_error() {
 install_package() {
     if ! is_installed "$1"; then
         echo "Installing $1..."
-        sudo apt-get install -y "$1" > /dev/null 2>&1 || log_error "Failed to install $1"
+        sudo apt install -y "$1" > /dev/null 2>&1 || log_error "Failed to install $1"
     else
         echo "$1 is already installed."
     fi
@@ -136,7 +136,7 @@ echo
 # Update and Upgrade the Machine
 echo "⏳ Updating the machine..."
 sleep 2  # Add a 2-second delay
-sudo apt-get update -y && sudo apt-get upgrade -y
+sudo apt update -y && sudo apt upgrade -y
 echo "✅ Machine updated."
 echo
 
@@ -222,13 +222,13 @@ if go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest; then
     echo "✅ gRPCurl installed successfully via go install."
     echo
 else
-    echo "❌ Failed to install gRPCurl via go install. Trying apt-get..."
-    # Try installing gRPCurl using apt-get
-    if sudo apt-get install grpcurl -y; then
-        echo "✅ gRPCurl installed successfully via apt-get."
+    echo "❌ Failed to install gRPCurl via go install. Trying apt install..."
+    # Try installing gRPCurl using apt install
+    if sudo apt install grpcurl -y; then
+        echo "✅ gRPCurl installed successfully via apt install."
         echo
     else
-        echo "❌ Failed to install gRPCurl via apt-get! Moving on to the next step..."
+        echo "❌ Failed to install gRPCurl via apt install! Moving on to the next step..."
         echo
         # Optionally, perform additional error handling here
     fi
@@ -240,7 +240,7 @@ fi
 
 # Install ufw and configure firewall
 echo "⏳ Installing ufw (Uncomplicated Firewall)..."
-sudo apt-get install ufw -y || { echo "❌ Failed to install ufw! Moving on to the next step..."; }
+sudo apt install ufw -y || { echo "❌ Failed to install ufw! Moving on to the next step..."; }
 
 # Attempt to enable ufw
 echo "⏳ Configuring firewall..."
