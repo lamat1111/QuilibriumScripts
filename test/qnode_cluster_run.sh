@@ -16,6 +16,15 @@ fi
 START_CORE=${CORE_ARRAY[0]}
 END_CORE=${CORE_ARRAY[1]}
 
+# Automatically determine if this is a master or slave node
+if [ $START_CORE -eq 0 ]; then
+    NODE_TYPE="master"
+else
+    NODE_TYPE="slave"
+fi
+
+echo "Detected node type: $NODE_TYPE"
+
 # Automatically detect the node binary
 NODE_DIR="/root/ceremonyclient/node"
 NODE_BINARY=$(find "$NODE_DIR" -name "node-*-linux-amd64" -type f -executable -printf "%f\n" | sort -V | tail -n 1)
@@ -27,13 +36,16 @@ fi
 
 echo "Using node binary: $NODE_BINARY"
 
-# Initialize parent_pid with the script's PID
+# Initialize parent_pid
 parent_pid=$$
 
 # Function to start processes
 start_processes() {
-    # If starting from core 0, launch the master process
-    if [ $START_CORE -eq 0 ]; then
+    # Kill any existing node processes
+    pkill -f "$NODE_BINARY"
+    sleep 5  # Wait for processes to terminate
+
+    if [ "$NODE_TYPE" = "master" ]; then
         echo "Starting master node..."
         $NODE_DIR/$NODE_BINARY &
         parent_pid=$!
@@ -41,7 +53,7 @@ start_processes() {
         # Adjust the range to exclude the master process
         START_CORE=1
     else
-        echo "Starting worker node..."
+        echo "Running in slave mode, using script PID as parent."
     fi
 
     echo "Parent process ID: $parent_pid"
@@ -54,22 +66,39 @@ start_processes() {
     done
 }
 
-# Function to kill all node processes
-kill_all_nodes() {
-    pkill -f "$NODE_BINARY"
-    sleep 5  # Wait for processes to terminate
+# Function to check if the parent process is running
+is_parent_process_running() {
+    if [ -n "$parent_pid" ]; then
+        if kill -0 $parent_pid 2>/dev/null; then
+            return 0  # Process is running
+        else
+            return 1  # Process is not running
+        fi
+    else
+        return 1  # No parent process ID set
+    fi
 }
 
 # Trap to handle script termination
-trap 'kill_all_nodes; exit' EXIT INT TERM
+trap 'pkill -f "$NODE_BINARY"; exit' EXIT INT TERM
 
-# Kill any existing node processes
-kill_all_nodes
-
-# Start processes
+# Start processes initially
 start_processes
 
-# Keep the script running
-while true; do
-    sleep 3600
-done
+# Main loop
+if [ "$NODE_TYPE" = "master" ]; then
+    echo "Running in master mode, monitoring parent process..."
+    while true; do
+        if ! is_parent_process_running; then
+            echo "Parent process crashed or stopped. Restarting all processes..."
+            start_processes
+        fi
+        sleep 60  # Sleep for 1 minute before next check
+    done
+else
+    echo "Running in slave mode, no monitoring needed."
+    # Keep the script running
+    while true; do
+        sleep 3600
+    done
+fi
