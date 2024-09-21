@@ -82,7 +82,16 @@ OS=$(uname -s)
 # Check if NODE_VERSION is empty
 if [ -z "$NODE_VERSION" ]; then
     NODE_VERSION=$(curl -s https://releases.quilibrium.com/release | grep -E "^node-[0-9]+(\.[0-9]+)*" | grep -v "dgst" | sed 's/^node-//' | cut -d '-' -f 1 | head -n 1)
-    echo "✅ Automatically determined NODE_VERSION: $NODE_VERSION"
+    if [ -z "$NODE_VERSION" ]; then
+        echo "❌ Error: Unable to determine NODE_VERSION automatically."
+        echo "The script cannot proceed without a correct node version number." 
+        echo "Please try the manual step by step installation instead:"
+        echo "https://docs.quilibrium.one/start/tutorials/node-step-by-step-installation"
+        echo
+        exit 1
+    else
+        echo "✅ Automatically determined NODE_VERSION: $NODE_VERSION"
+    fi
 else
     echo "✅ Using specified NODE_VERSION: $NODE_VERSION"
 fi
@@ -91,7 +100,15 @@ fi
 # Check if QCLIENT_VERSION is empty
 if [ -z "$QCLIENT_VERSION" ]; then
     QCLIENT_VERSION=$(curl -s https://releases.quilibrium.com/qclient-release | grep -E "^qclient-[0-9]+(\.[0-9]+)*" | sed 's/^qclient-//' | cut -d '-' -f 1 |  head -n 1)
-    echo "✅ Automatically determined QCLIENT_VERSION: $QCLIENT_VERSION"
+    if [ -z "$QCLIENT_VERSION" ]; then
+        echo "⚠️ Warning: Unable to determine QCLIENT_VERSION automatically. Continuing without it."
+        echo "The script won't be able to install the qclient, but it will still install your node."
+        echo "You can install the qclient later manually if you need to."
+        echo
+        sleep 1
+    else
+        echo "✅ Automatically determined QCLIENT_VERSION: $QCLIENT_VERSION"
+    fi
 else
     echo "✅ Using specified QCLIENT_VERSION: $QCLIENT_VERSION"
 fi
@@ -103,22 +120,25 @@ if [ "$ARCH" = "x86_64" ]; then
     if [ "$OS" = "Linux" ]; then
         NODE_BINARY="node-$NODE_VERSION-linux-amd64"
         GO_BINARY="go1.22.4.linux-amd64.tar.gz"
-        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-amd64"
+        [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-amd64"
     elif [ "$OS" = "Darwin" ]; then
         NODE_BINARY="node-$NODE_VERSION-darwin-amd64"
         GO_BINARY="go1.22.4.darwin-amd64.tar.gz"
-        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-amd64"
+        [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-amd64"
     fi
 elif [ "$ARCH" = "aarch64" ]; then
     if [ "$OS" = "Linux" ]; then
         NODE_BINARY="node-$NODE_VERSION-linux-arm64"
         GO_BINARY="go1.22.4.linux-arm64.tar.gz"
-        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-arm64"
+        [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-arm64"
     elif [ "$OS" = "Darwin" ]; then
         NODE_BINARY="node-$NODE_VERSION-darwin-arm64"
         GO_BINARY="go1.22.4.darwin-arm64.tar.gz"
-        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-arm64"
+        [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-arm64"
     fi
+else
+    echo "❌ Error: Unsupported system architecture ($ARCH) or operating system ($OS)."
+    exit 1
 fi
 
 #==========================
@@ -195,26 +215,31 @@ echo
 # QCLIENT UPDATE
 #==========================
 
-# Build qClient with GO
-# echo "⏳ Building qCiient..."
-# sleep 1  # Add a 1-second delay
-# GOEXPERIMENT=arenas go build -o qclient main.go
-
 # Building qClient binary
-echo "⏳ Downloading qClient..."
-sleep 1  # Add a 1-second delay
-cd ~/ceremonyclient/client
+if [ -n "$QCLIENT_BINARY" ]; then
+    echo "⏳ Downloading qClient..."
+    sleep 1  # Add a 1-second delay
+    cd ~/ceremonyclient/client
 
-if ! wget https://releases.quilibrium.com/$QCLIENT_BINARY; then
-    echo "❌ Error: Failed to download qClient binary."
-    echo "Your node will still work, you can install the qclient manually later."
-    echo
+    if ! wget https://releases.quilibrium.com/$QCLIENT_BINARY; then
+        echo "❌ Error: Failed to download qClient binary."
+        echo "Your node will still work, but you'll need to install the qclient manually later if needed."
+        echo
+    else
+        mv $QCLIENT_BINARY qclient
+        chmod +x qclient
+        echo "✅ qClient binary downloaded successfully."
+        echo
+    fi
 else
-    mv $QCLIENT_BINARY qclient
-    chmod +x qclient
-    echo "✅ qClient binary downloaded successfully."
+    echo "ℹ️ Skipping qClient download as QCLIENT_BINARY could not be determined earlier."
+    echo "Your node will still work, but you'll need to install the qclient manually later if needed."
     echo
 fi
+
+#==========================
+# SERVICE UPDATE
+#==========================
 
 # Get the current user's home directory
 HOME=$(eval echo ~$HOME_DIR)
@@ -223,11 +248,7 @@ HOME=$(eval echo ~$HOME_DIR)
 NODE_PATH="$HOME/ceremonyclient/node"
 EXEC_START="$NODE_PATH/release_autorun.sh"
 
-#==========================
-# SERVICE UPDATE
-#==========================
-
-# Step 5: Re-Create or Update Ceremonyclient Service
+# Re-Create or Update Ceremonyclient Service
 echo "⏳ Rebuilding Ceremonyclient Service..."
 echo
 sleep 2  # Add a 2-second delay
