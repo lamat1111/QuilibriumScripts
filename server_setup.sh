@@ -150,7 +150,7 @@ echo "✅ Packages installed successfully or already present."
 echo
 
 echo "⏳ Installing: tmux cron jq..."
-for pkg in tmux cron jq; do
+for pkg in tmux cron jq htop; do
     install_package "$pkg" || echo "These are optional apps, so I will continue..."
 done
 echo "✅ Packages installed successfully or already present."
