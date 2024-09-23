@@ -116,7 +116,6 @@ fi
 #=====================
 
 # URLs for scripts
-UPDATE_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/master/qnode_service_update.sh"
 PREREQUISITES_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/server_setup.sh"
 NODE_INSTALL_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/master/qnode_service_installer.sh"
 GRPCURL_CONFIG_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/tools/qnode_gRPC_calls_setup.sh"
@@ -144,9 +143,20 @@ install_prerequisites() {
 install_node() {
     echo
     echo "⌛️  Installing node..."
-    wget --no-cache -O - "$NODE_INSTALL_URL" | bash
+    mkdir -p ~/scripts
+    rm -f ~/scripts/qnode_service_installer.sh
+    wget -O ~/scripts/qnode_service_installer.sh "$NODE_INSTALL_URL"
+    chmod +x ~/scripts/qnode_service_installer.sh
+    ~/scripts/qnode_service_installer.sh
     prompt_return_to_menu
 }
+
+# install_node() {
+#     echo
+#     echo "⌛️  Installing node..."
+#     wget --no-cache -O - "$NODE_INSTALL_URL" | bash
+#     prompt_return_to_menu
+# }
 
 configure_grpcurl() {
     echo
@@ -158,9 +168,21 @@ configure_grpcurl() {
 update_node() {
     echo
     echo "⌛️  Updating node..."
-    wget --no-cache -O - "$UPDATE_URL" | bash
+    mkdir -p ~/scripts
+    rm -f ~/scripts/qnode_service_update.sh
+    wget -O ~/scripts/qnode_service_update.sh "$NODE_UPDATE_URL"
+    chmod +x ~/scripts/qnode_service_update.sh
+    ~/scripts/qnode_service_update.sh
+    
     prompt_return_to_menu
 }
+
+# update_node() {
+#     echo
+#     echo "⌛️  Updating node..."
+#     wget --no-cache -O - "$UPDATE_URL" | bash
+#     prompt_return_to_menu
+# }
 
 check_visibility() {
     echo
