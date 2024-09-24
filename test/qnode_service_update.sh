@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#NEW SCRIPT VERSION TO BE TESTED WITH IMPROVED ERROR HANDLING FOR NODE AND CLIENT VERSIONS DETERMINATION
+
 #Node version is not used - execution via release_autorun 
 #Comment out for automatic creation of the node version
 #NODE_VERSION=1.4.21.1
