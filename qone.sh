@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.8.5"
+SCRIPT_VERSION="1.8.8"
 
 # Function to check if wget is installed, and install it if it is not
 check_wget() {
@@ -138,6 +138,7 @@ install_prerequisites() {
     echo "⌛️  Preparing server with necessary apps and settings..."
     wget --no-cache -O - "$PREREQUISITES_URL" | bash
     prompt_return_to_menu
+    return $?
 }
 
 install_node() {
@@ -149,6 +150,7 @@ install_node() {
     chmod +x ~/scripts/qnode_service_installer.sh
     ~/scripts/qnode_service_installer.sh
     prompt_return_to_menu
+    return $?
 }
 
 # install_node() {
@@ -163,6 +165,7 @@ configure_grpcurl() {
     echo "⌛️  Setting up gRPCurl..."
     wget --no-cache -O - "$GRPCURL_CONFIG_URL" | bash
     prompt_return_to_menu
+    return $?
 }
 
 update_node() {
@@ -175,6 +178,7 @@ update_node() {
     ~/scripts/qnode_service_update.sh
     
     prompt_return_to_menu
+    return $?
 }
 
 # update_node() {
@@ -189,6 +193,7 @@ check_visibility() {
     echo "⌛️  Checking node visibility..."
     wget -O - "$CHECK_VISIBILITY_URL" | bash
     prompt_return_to_menu
+    return $?
 }
 
 system_cleaner() {
@@ -196,6 +201,7 @@ system_cleaner() {
     echo "⌛️  Cleaning your system..."
     wget -O - "$SYSTEM_CLEANER_URL" | bash
     prompt_return_to_menu
+    return $?
 }
 
 balance_log() {
@@ -203,67 +209,76 @@ balance_log() {
     echo "⌛️  Installing the balance log script..."
     wget -O - "$BALANCE_LOG_URL" | bash
     prompt_return_to_menu
+    return $?
 }
 
 backup_storj() {
     echo
     echo "⌛️  Downloading Storj backup script..."
-    mkdir -p ~/scripts && wget -P ~/scripts -O ~/scripts/qnode_backup_storj.sh "$BACKUP_STORJ_URL"
-    if [ -f ~/scripts/qnode_backup_storj.sh ]; then
+    mkdir -p ~/scripts
+    rm -f ~/scripts/qnode_backup_storj.sh
+    if wget -O ~/scripts/qnode_backup_storj.sh "$BACKUP_STORJ_URL"; then
         chmod +x ~/scripts/qnode_backup_storj.sh
-        ~/scripts/qnode_backup_storj.sh
+        if ~/scripts/qnode_backup_storj.sh; then
+            echo "✅ Storj backup completed successfully."
+        else
+            echo "❌ Storj backup script encountered an error."
+        fi
     else
         echo "❌ Failed to download Storj backup script."
     fi
     prompt_return_to_menu
+    return $?
 }
 
 backup_restore_storj() {
     echo
     echo "⌛️  Downloading Storj backup restore script..."
-    mkdir -p ~/scripts && wget -P ~/scripts -O ~/scripts/qnode_backup_restore_storj.sh "$BACKUP_RESTORE_STORJ_URL"
-    if [ -f ~/scripts/qnode_backup_restore_storj.sh ]; then
+    mkdir -p ~/scripts
+    rm -f ~/scripts/qnode_backup_restore_storj.sh
+    if wget -O ~/scripts/qnode_backup_restore_storj.sh "$BACKUP_RESTORE_STORJ_URL"; then
         chmod +x ~/scripts/qnode_backup_restore_storj.sh
-        ~/scripts/qnode_backup_restore_storj.sh
+        if ~/scripts/qnode_backup_restore_storj.sh; then
+            echo "✅ Storj backup restore completed successfully."
+        else
+            echo "❌ Storj backup restore script encountered an error."
+        fi
     else
         echo "❌ Failed to download Storj backup restore script."
     fi
     prompt_return_to_menu
+    return $?
 }
-
 
 node_info() {
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
-        read -n 1 -s -r -p "✅  Press any key to continue..."
-        echo  # Add an empty line for better readability
     else
         echo
-	echo "⌛️  Displaying node info..."
-    echo "If this doesn't work you can try the direct commands: https://iri.quest/q-node-info"
-	echo
-    	sleep 1
+        echo "⌛️  Displaying node info..."
+        echo "If this doesn't work you can try the direct commands: https://iri.quest/q-node-info"
+        echo
+        sleep 1
         cd ~/ceremonyclient/node && ./"$NODE_BINARY" -node-info
-	echo
-	read -n 1 -s -r -p "✅  Press any key to continue..."  # Pause and wait for user input
+        echo
     fi
 }
+
 
 quil_balance() {
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
-        read -n 1 -s -r -p "Press any key to continue..."
-        echo  # Add an empty line for better readability
+        return 1
     else
         echo
         echo "⌛️  Displaying your QUIL balance..."
         echo "The node has to be running for at least 10 minutes for this command to work."
         echo "If is still doesn't work you can try the direct commands: https://iri.quest/q-node-info"
-	    echo
-    	sleep 1
+        echo
+        sleep 1
         cd ~/ceremonyclient/node && ./"$NODE_BINARY" -balance
-	echo
-	read -n 1 -s -r -p "✅  Press any key to continue..."  # Pause and wait for user input
+        echo
+        return 0
     fi
 }
 
@@ -272,11 +287,12 @@ node_logs() {
         echo "$MISSING_SERVICE_MSG"
         read -n 1 -s -r -p "✅  Press any key to continue..."
         echo  # Add an empty line for better readability
+        return 0
     fi
     echo
     echo "⌛️  Displaying your node log...  (Press CTRL+C to return to the main menu)"
     echo
-    trap 'echo "Returning to main menu..."; return_to_menu' INT  # Trap CTRL+C to return to main menu
+    trap 'return' INT  # Trap CTRL+C to just return from the function
     sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
 }
 
@@ -288,71 +304,63 @@ return_to_menu() {
 restart_node() {
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
-		read -n 1 -s -r -p "✅  Press any key to continue..."
-        echo  # Add an empty line for better readability
+    else
+        echo
+        echo "⌛️   Restarting node service..."
+        echo
+        sleep 1
+        service ceremonyclient restart
+        sleep 5
+        echo "✅   Node restarted"
+        echo
     fi
-    echo
-    echo "⌛️   Restarting node service..."
-    echo
-    sleep 1
-    service ceremonyclient restart
-    sleep 5
-    echo "✅   Node restarted"
-    echo
-    read -n 1 -s -r -p "Press any key to continue..."  # Pause and wait for user input
 }
 
 stop_node() {
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
-	read -n 1 -s -r -p "Press any key to continue..."
-        echo  # Add an empty line for better readability
+    else
+        echo
+        echo "⌛️  Stopping node service..."
+        echo
+        sleep 1
+        service ceremonyclient stop
+        sleep 3
+        echo "✅   Node stopped"
+        echo
     fi
-    echo
-    echo "⌛️  Stopping node service..."
-    echo
-    sleep 1
-    service ceremonyclient stop
-    sleep 3
-    echo "✅   Node stopped"
-    echo
-    read -n 1 -s -r -p "Press any key to continue..."  # Pause and wait for user input
 }
 
 peer_manifest() {
     echo "⌛️  Checking peer manifest (Difficulty metric)..."
     wget --no-cache -O - "$PEER_MANIFEST_URL" | bash
     prompt_return_to_menu
+    return $? # This ensures we go back to the main loop
 }
 
 node_version() {
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
-		read -n 1 -s -r -p "Press any key to continue..."
-        echo  # Add an empty line for better readability
+    else
+        echo
+        echo "⌛️   Displaying node version..."
+        echo
+        sleep 1
+        journalctl -u ceremonyclient -r --no-hostname  -n 1 -g "Quilibrium Node" -o cat
+        echo
     fi
-    echo
-    echo "⌛️   Displaying node version..."
-    echo
-    sleep 1
-    journalctl -u ceremonyclient -r --no-hostname  -n 1 -g "Quilibrium Node" -o cat
-    echo
-    read -n 1 -s -r -p "✅ Press any key to continue..."  # Pause and wait for user input
 }
 
 best_providers() {
     wrap_text "$best_providers_message"
     echo
     echo "-------------------------------"
-    read -n 1 -s -r -p "✅  Press any key to continue..."  # Pause and wait for user input
 }
-
 
 donations() {
     wrap_text "$donations_message"
     echo
     echo "-------------------------------"
-    read -n 1 -s -r -p "✅  Press any key to continue..."  # Pause and wait for user input
 }
 
 
@@ -360,6 +368,7 @@ help_message() {
     echo "$help_message"
     echo
     prompt_return_to_menu
+    return $?
 }
 
 
@@ -369,8 +378,6 @@ echo "⌛️   Running test script..."
 }
 
 
-
-# Function to prompt for returning to the main menu
 prompt_return_to_menu() {
     echo -e "\n\n"  # Add two empty lines for readability
     echo "---------------------------------------------"
@@ -393,20 +400,12 @@ $1
 EOF
     read -p "> " confirm
     if [[ "$confirm" =~ ^[Yy]$ ]]; then
-        if $3; then
-            if [ $? -eq 0 ]; then  # Check if action returns success
-                prompt_return_to_menu
-            fi
-        else
-            echo "❌ Action \"$2\" failed."
-        fi
+        $3
         return 0
     else
-        echo "❌ Action \"$2\" canceled."
         return 1
     fi
 }
-
 
 # Function to wrap and indent text
 wrap_text() {
@@ -662,34 +661,32 @@ while true; do
     display_menu
     
     read -rp "Enter your choice: " choice
-    action_performed=0
     
     case $choice in
-        1) confirm_action "$(wrap_text "$prepare_server_message" "")" "Prepare your server" install_prerequisites;;
-        2) confirm_action "$(wrap_text "$install_node_message" "")" "Install node" install_node;;
-	    3) confirm_action "$(wrap_text "$setup_grpcurl_message" "")" "Set up gRPCurl" configure_grpcurl;;
-        4) node_logs action_performed=1;;
-        5) confirm_action "$(wrap_text "$update_node_message" "")" "Update node" update_node;;
-	    6) stop_node action_performed=1;;
-        7) restart_node action_performed=1;;
-	    8) node_version action_performed=1;;
-        9) node_info action_performed=1;;
- 	    10) quil_balance action_performed=1;;
-        11) confirm_action "$(wrap_text "$balance_log_message" "")" "Balance log" balance_log;;
-        12) confirm_action "$(wrap_text "$backup_storj_message" "")" "Backup your node on StorJ" backup_storj;;
-        13) confirm_action "$(wrap_text "$backup_restore_storj_message" "")" "Restore a node backup frm STorJ" backup_restore_storj;;
-        14) confirm_action "$(wrap_text "$peer_manifest_message" "")" "Peer manifest" peer_manifest;;
-        15) check_visibility;;
-	    16) system_cleaner;;
-	    20) confirm_action "$(wrap_text "$test_script_message" "")" "Test Script" test_script;;
-        [bB]) best_providers;;
-        [dD]) donations;;
+        1) confirm_action "$(wrap_text "$prepare_server_message" "")" "Prepare your server" install_prerequisites && continue ;;
+        2) confirm_action "$(wrap_text "$install_node_message" "")" "Install node" install_node && continue ;;
+        3) confirm_action "$(wrap_text "$setup_grpcurl_message" "")" "Set up gRPCurl" configure_grpcurl && continue ;;
+        4) node_logs; continue ;;
+        5) confirm_action "$(wrap_text "$update_node_message" "")" "Update node" update_node && continue ;;
+        6) stop_node ;;
+        7) restart_node ;;
+        8) node_version ;;
+        9) node_info ;;
+        10) quil_balance ;;
+        11) confirm_action "$(wrap_text "$balance_log_message" "")" "Balance log" balance_log && continue ;;
+        12) confirm_action "$(wrap_text "$backup_storj_message" "")" "Backup your node on StorJ" backup_storj && continue ;;
+        13) confirm_action "$(wrap_text "$backup_restore_storj_message" "")" "Restore a node backup from StorJ" backup_restore_storj && continue ;;
+        14) confirm_action "$(wrap_text "$peer_manifest_message" "")" "Peer manifest" peer_manifest && continue ;;
+        15) check_visibility && continue ;;
+        16) system_cleaner && continue ;;
+        20) confirm_action "$(wrap_text "$test_script_message" "")" "Test Script" test_script && continue ;;
+        [bB]) best_providers ;;
+        [dD]) donations ;;
         [eE]) exit ;;
-	    [hH]) help_message;;
+        [hH]) help_message && continue ;;
         *) echo "Invalid option, please try again." ;;
     esac
     
-    if [ $action_performed -eq 1 ]; then
-        read -n 1 -s -r -p "Press any key to continue..."
-    fi
+    # Only prompt if the action didn't use continue
+    read -n 1 -s -r -p "Press any key to continue..."
 done
