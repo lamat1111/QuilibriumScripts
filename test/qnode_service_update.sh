@@ -444,9 +444,9 @@ echo
 # Start the ceremonyclient service
 echo "✅ Starting Ceremonyclient Service"
 sleep 2  # Add a 2-second delay
-systemctl daemon-reload
-systemctl enable ceremonyclient
-service ceremonyclient start
+sudo systemctl daemon-reload
+sudo systemctl enable ceremonyclient
+sudo service ceremonyclient start
 
 # Showing the node version and logs
 echo "🌟Your node is now updated to v$NODE_VERSION !"
