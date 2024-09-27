@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.8.8"
+SCRIPT_VERSION="1.8.9"
 
 # Function to check if wget is installed, and install it if it is not
 check_wget() {
@@ -627,7 +627,7 @@ EOF
     cat << "EOF"
 
 HOW TO INSTALL A NEW NODE?
-Choose option 1, reboot and and then choose 2.
+Choose option 1, reboot and then choose 2.
 Let your node run for 30 minutes, then choose option 3. Done!
 
 -----------------------------------------------------------------
