@@ -166,23 +166,51 @@ else
 fi
 
 #==========================
-# DOWNLOAD NODE
+# CHECK FOR EXISTING .CONFIG FOLDER
 #==========================
 
-# Backup existing configuration files if they exist
-if [ -d ~/ceremonyclient ]; then
-    mkdir -p ~/backup/qnode_keys
-    [ -f ~/ceremonyclient/node/.config/keys.yml ] && cp ~/ceremonyclient/node/.config/keys.yml ~/backup/qnode_keys/ && echo "✅ Backup of keys.yml created in ~/backup/qnode_keys folder"
-    [ -f ~/ceremonyclient/node/.config/config.yml ] && cp ~/ceremonyclient/node/.config/config.yml ~/backup/qnode_keys/ && echo "✅ Backup of config.yml created in ~/backup/qnode_keys folder"
-    echo
-fi
+# No need if checking if ceremonyclient folder exist (next step)
+
+# # Check if the .config folder exists
+# if [ -d "$HOME/ceremonyclient/node/.config" ]; then
+#     echo "⚠️ Warning: Existing 'node/.config' folder found. Do you want to back it up? (y/n)"
+#     read -r response
+
+#     case $response in
+#         [yY])
+#             # Create backup directory
+#             mkdir -p "$HOME/backup"
+            
+#             # Move the .config folder to backup
+#             mv "$HOME/ceremonyclient/node/.config" "$HOME/backup/.config_bak"
+            
+#             echo "✅ Backup of existing '.config' folder created in $HOME/backup/.config_bak"
+#             echo
+#             ;;
+#         [nN])
+#             echo "⏳ Skipping backup and continuing script..."
+#             ;;
+#         *)
+#             echo "⏳ Invalid input. Skipping backup and continuing script..."
+#             ;;
+#     esac
+# else
+#     echo "✅ No existing .config folder found. Continuing script..."
+#     echo
+# fi
+
+#==========================
+# DOWNLOAD NODE
+#==========================
 
 # Download Ceremonyclient
 echo "⏳ Downloading Ceremonyclient..."
 sleep 1  # Add a 1-second delay
 cd ~
 if [ -d "ceremonyclient" ]; then
-  echo "Directory ceremonyclient already exists, skipping git clone..."
+  echo "⚠️ Looks like you already have a node installed!"
+  echo "The directory 'ceremonyclient' already exists. Skipping git clone..."
+  echo
 else
   until git clone https://github.com/QuilibriumNetwork/ceremonyclient.git || git clone https://source.quilibrium.com/quilibrium/ceremonyclient.git; do
     echo "Git clone failed, retrying..."
