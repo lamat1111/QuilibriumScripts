@@ -329,7 +329,7 @@ for config_file in "${config_files[@]}"; do
         update_config_file "$config_file"
     else
         echo "Config file not found: $config_file"
-        echo "Not a problem! Continuing to next file..."
+        echo "This is not a problem (it's not related to your node). Continuing to next file..."
     fi
 done
 
