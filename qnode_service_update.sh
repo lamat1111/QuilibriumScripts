@@ -248,14 +248,22 @@ HOME=$(eval echo ~$HOME_DIR)
 NODE_PATH="$HOME/ceremonyclient/node"
 EXEC_START="$NODE_PATH/release_autorun.sh"
 
-# Re-Create or Update Ceremonyclient Service
-echo "⏳ Rebuilding Ceremonyclient Service..."
-echo
-sleep 2  # Add a 2-second delay
+#!/bin/bash
+
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
-if [ ! -f "$SERVICE_FILE" ]; then
-    echo "⏳ Creating new ceremonyclient service file..."
-    if ! sudo tee "$SERVICE_FILE" > /dev/null <<EOF
+
+# Check if the service file exists and contains the specific ExecStart line with any parameters
+if [ -f "$SERVICE_FILE" ] && grep -q "ExecStart=/root/scripts/qnode_cluster_run.sh" "$SERVICE_FILE"; then
+    echo "⚠️ You are runnig a cluster. Skipping service file update..."
+    echo
+else
+    echo "⏳ Rebuilding Ceremonyclient Service..."
+    echo
+    sleep 1
+
+    if [ ! -f "$SERVICE_FILE" ]; then
+        echo "⏳ Creating new ceremonyclient service file..."
+        if ! sudo tee "$SERVICE_FILE" > /dev/null <<EOF
 [Unit]
 Description=Ceremony Client Go App Service
 
@@ -269,23 +277,27 @@ ExecStart=$EXEC_START
 [Install]
 WantedBy=multi-user.target
 EOF
-    then
-        echo "❌ Error: Failed to create ceremonyclient service file." >&2
-        exit 1
-    fi
-else
-    echo "⏳ Checking existing ceremonyclient service file..."
-    
-    # Check if the required lines exist
-    if ! grep -q "WorkingDirectory=$NODE_PATH" "$SERVICE_FILE" || ! grep -q "ExecStart=$EXEC_START" "$SERVICE_FILE"; then
-        echo "⏳ Updating existing ceremonyclient service file..."
-        # Replace the existing lines with new values
-        sudo sed -i "s|WorkingDirectory=.*|WorkingDirectory=$NODE_PATH|" "$SERVICE_FILE"
-        sudo sed -i "s|ExecStart=.*|ExecStart=$EXEC_START|" "$SERVICE_FILE"
+        then
+            echo "❌ Error: Failed to create ceremonyclient service file." >&2
+            exit 1
+        fi
     else
-        echo "✅ No changes needed."
+        echo "⏳ Checking existing ceremonyclient service file..."
+        
+        # Check if the required lines exist
+        if ! grep -q "WorkingDirectory=$NODE_PATH" "$SERVICE_FILE" || ! grep -q "ExecStart=$EXEC_START" "$SERVICE_FILE"; then
+            echo "⏳ Updating existing ceremonyclient service file..."
+            # Replace the existing lines with new values
+            sudo sed -i "s|WorkingDirectory=.*|WorkingDirectory=$NODE_PATH|" "$SERVICE_FILE"
+            sudo sed -i "s|ExecStart=.*|ExecStart=$EXEC_START|" "$SERVICE_FILE"
+        else
+            echo "✅ No changes needed."
+        fi
     fi
 fi
+
+# The script continues here with any code that should run after the conditional block
+echo "Continuing with the rest of the script..."
 
 echo
 
