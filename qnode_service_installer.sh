@@ -212,13 +212,11 @@ if [ -d "ceremonyclient" ]; then
   echo "The directory 'ceremonyclient' already exists. Skipping git clone..."
   echo
 else
-  until git clone https://github.com/QuilibriumNetwork/ceremonyclient.git || git clone https://source.quilibrium.com/quilibrium/ceremonyclient.git; do
+  until git clone --depth 1 --branch release https://github.com/QuilibriumNetwork/ceremonyclient.git || git clone https://source.quilibrium.com/quilibrium/ceremonyclient.git; do
     echo "Git clone failed, retrying..."
     sleep 2
   done
 fi
-cd ~/ceremonyclient/
-git checkout release
 echo
 
 # Set up environment variables (redundant but solves the command go not found error)
