@@ -44,7 +44,7 @@ Processing... ⏳
 
 EOF
 
-sleep 7  # Add a 7-second delay
+sleep 5  # Add a 7-second delay
 
 #==========================
 # INSTALL APPS
@@ -174,7 +174,7 @@ fi
 # NODE UPDATE
 #==========================
 
-# Step 1: Stop the ceremonyclient service if it exists
+# Stop the ceremonyclient service if it exists
 echo "⏳ Stopping the ceremonyclient service if it exists..."
 if systemctl is-active --quiet ceremonyclient && service ceremonyclient stop; then
     echo "🔴 Service stopped successfully."
@@ -185,21 +185,13 @@ else
 fi
 sleep 1
 
-# Step 2: Move to the ceremonyclient directory
-echo "⏳ Moving to the ceremonyclient directory..."
-cd ~/ceremonyclient || { echo "❌ Error: Directory ~/ceremonyclient does not exist."; exit 1; }
-echo
-
-# Step 3: Discard local changes in release_autorun.sh
-echo "✅ Discarding local changes in release_autorun.sh..."
-echo
-git checkout -- node/release_autorun.sh
-
-# Step 4: Download Binary
-echo "⏳ Downloading new release v$NODE_VERSION"
-echo
+# Discard local changes in release_autorun.sh
+# echo "✅ Discarding local changes in release_autorun.sh..."
+# echo
+# git checkout -- node/release_autorun.sh
 
 # Set the remote URL and download
+echo "⏳ Downloading new release v$NODE_VERSION"
 cd  ~/ceremonyclient
 git remote set-url origin https://github.com/QuilibriumNetwork/ceremonyclient.git
 #git remote set-url origin https://source.quilibrium.com/quilibrium/ceremonyclient.git || git remote set-url origin https://git.quilibrium-mirror.ch/agostbiro/ceremonyclient.git
@@ -207,7 +199,6 @@ git checkout main
 git branch -D release
 git pull
 git checkout release
-
 echo "✅ Downloaded the latest changes successfully."
 echo
 
@@ -353,9 +344,7 @@ echo
 # START NODE VIA SERVICE
 #==========================
 
-# Start the ceremonyclient service
 echo "✅ Starting Ceremonyclient Service"
-sleep 2  # Add a 2-second delay
 sudo systemctl daemon-reload
 sudo systemctl enable ceremonyclient
 sudo service ceremonyclient start
@@ -366,5 +355,5 @@ echo
 echo "⏳ Showing the node log... (CTRL+C to exit)"
 echo
 echo
-sleep 3  # Add a 5-second delay
+sleep 2
 sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
