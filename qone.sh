@@ -27,11 +27,14 @@ upgrade_qone() {
         else
             echo "✅ qone.sh upgraded!"
             echo
-            echo "🟢 You can now use 'Q1', 'q1', or 'qone' to launch the Node Quickstart Menu."
+            echo "🟢 To launch the QONE Quickstart Menu."
+            echo "You can simply type 'q1', or run './qone.sh'"
             sleep 1
-            echo "🟢 The menu will also load automatically every time you log in."
+            echo "The menu will also load automatically every time you log in."
+            echo "You can disable this feature by running:"
+            echo "sed -i 's|^~/qone.sh|#&|' ~/.bashrc && source ~/.bashrc" 
             echo
-            sleep 5
+            sleep 3
         fi
     else
         echo "✅ qone.sh is already upgraded."
