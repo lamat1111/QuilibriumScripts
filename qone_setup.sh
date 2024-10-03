@@ -50,9 +50,7 @@ else
         
 # === qone.sh setup ===
 # The following lines are added to create aliases for qone.sh
-alias qone='~/qone.sh'
 alias q1='~/qone.sh'
-alias Q1='~/qone.sh'
 # === end qone.sh setup ===
 EOF
 )
@@ -63,9 +61,7 @@ EOF
 # === qone.sh setup ===
 # The following lines are added to run qone.sh on login and create aliases for qone.sh
 ~/qone.sh #this runs .qone on login
-alias qone='~/qone.sh'
 alias q1='~/qone.sh'
-alias Q1='~/qone.sh'
 # === end qone.sh setup ===
 EOF
 )
