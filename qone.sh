@@ -136,7 +136,11 @@ TEST_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tes
 install_prerequisites() {
     echo
     echo "⌛️  Preparing server with necessary apps and settings..."
-    wget --no-cache -O - "$PREREQUISITES_URL" | bash
+    mkdir -p ~/scripts
+    rm -f ~/scripts/server_setup.sh
+    wget -O ~/scripts/server_setup.sh "$PREREQUISITES_URL"
+    chmod +x ~/scripts/server_setup.sh
+    ~/scripts/server_setup.sh
     prompt_return_to_menu
     return $?
 }
@@ -258,7 +262,6 @@ node_info() {
         echo "⌛️  Displaying node info..."
         echo "If this doesn't work you can try the direct commands: https://iri.quest/q-node-info"
         echo
-        sleep 1
         cd ~/ceremonyclient/node && ./"$NODE_BINARY" -node-info
         echo
     fi
@@ -275,7 +278,6 @@ quil_balance() {
         echo "The node has to be running for at least 10 minutes for this command to work."
         echo "If is still doesn't work you can try the direct commands: https://iri.quest/q-node-info"
         echo
-        sleep 1
         cd ~/ceremonyclient/node && ./"$NODE_BINARY" -balance
         echo
         return 0
@@ -308,9 +310,7 @@ restart_node() {
         echo
         echo "⌛️   Restarting node service..."
         echo
-        sleep 1
         service ceremonyclient restart
-        sleep 5
         echo "✅   Node restarted"
         echo
     fi
@@ -323,9 +323,7 @@ stop_node() {
         echo
         echo "⌛️  Stopping node service..."
         echo
-        sleep 1
         service ceremonyclient stop
-        sleep 3
         echo "✅   Node stopped"
         echo
     fi
@@ -345,7 +343,6 @@ node_version() {
         echo
         echo "⌛️   Displaying node version..."
         echo
-        sleep 1
         journalctl -u ceremonyclient -r --no-hostname  -n 1 -g "Quilibrium Node" -o cat
         echo
     fi
