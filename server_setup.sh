@@ -342,11 +342,11 @@ echo "✅ Folders created."
 echo
 
 # Prompt for reboot
-echo "🎉 Server setup is finished!"
-echo ""
+echo "✅ Server setup is finished!"
+echo
 echo "🟡 YOU NEED TO REBOOT YOUR SERVER NOW 🟡"
 echo "Type 'sudo reboot' and press ENTER to reboot your server."
-echo ""
+echo
 echo "Then follow the online guide for the next steps"
 echo "to install your Quilibrium node as a service: https://docs.quilibrium.one" 
 sleep 7
