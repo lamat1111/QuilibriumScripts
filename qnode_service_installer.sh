@@ -322,13 +322,14 @@ echo
 echo "✅ You can logout of your server if you want and login again later."
 echo
 echo "After 30 minutes, backup your keys.yml and config.yml files."
-echo "The proceed to set up your gRPC calls,"
-echo "and lastly set up an automatic backup for your .config folder"
+echo "Then proceed to set up your gRPC calls,"
+echo "and lastly set up an automatic backup for your .config folder."
+echo
 echo "More info about all this in the online guide: https://docs.quilibrium.one"
 echo
 echo "⏳ Now I will show the node log below..."
 echo "To exit the log, just type CTRL +C."
-
+echo
 # See the logs of the ceremonyclient service
-sleep 5  # Add a 5-second delay
+sleep 3  # Add a 5-second delay
 sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
