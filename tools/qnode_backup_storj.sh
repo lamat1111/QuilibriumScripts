@@ -184,7 +184,7 @@ install_package() {
     pkg=$1
     if ! is_installed "$pkg"; then
         echo "⌛️ Installing $pkg..."
-        sudo apt-get install -y "$pkg" > /dev/null 2>&1 || { echo "❌ Failed to install $pkg! This is a necessary app, so I will exit..."; exit_message; exit 1; }
+        sudo apt install -y "$pkg" > /dev/null 2>&1 || { echo "❌ Failed to install $pkg! This is a necessary app, so I will exit..."; exit_message; exit 1; }
         echo "✅ $pkg installed successfully."
     else
         echo "$pkg is already installed."
@@ -289,10 +289,10 @@ perform_backup() {
 }
 
 # Backup node store folder if selected
-read -p "❔ Do you want to backup your node 'store' folder? (y/n): " backup_node_folder
+read -p "❔ Do you want to setup a recurring backup for your 'node/.config' folder? (y/n): " backup_node_folder
 if [[ $backup_node_folder =~ ^[Yy]$ ]]; then
     # Prompt user for backup interval
-    read -p "▶️ Backup 'store' folder every how many hours? (1-100): " backup_interval
+    read -p "▶️ Backup 'node/.config' folder every how many hours? (1-100): " backup_interval
 
     # Generate a random minute for the cron job
     random_minute=$(shuf -i 0-59 -n 1)
@@ -301,19 +301,19 @@ if [[ $backup_node_folder =~ ^[Yy]$ ]]; then
     cron_schedule="$random_minute */$backup_interval * * *"
 
     # Define the cron command
-    cron_command="rclone sync --transfers 10 --checkers 20 --disable-http2 --retries 1 --filter '+ store/**' --filter '+ store' --filter '- SELF_TEST' --filter '- keys.yml' --filter '- config.yml' /root/ceremonyclient/node/.config/ storj:/$bucket/$target_folder/.config/"
+    cron_command="rclone $backup_type --transfers 10 --checkers 20 --disable-http2 --retries 1 --filter '+ store/**' --filter '+ store' --filter '- SELF_TEST' --filter '- keys.yml' --filter '- config.yml' /root/ceremonyclient/node/.config/ storj:/$bucket/$target_folder/.config/"
 
     # Pattern to check if the cron job already exists
     existing_store_pattern="/ceremonyclient/node/.config/ storj:"
 
     # Add or update the cron job
     add_or_update_cronjob "$cron_command" "$cron_schedule" "$existing_store_pattern"
-    echo "⌛️ Setting/updating cron job to backup node 'store' folder every $backup_interval hours at a random minute..."
+    echo "⌛️ Setting/updating cron job to backup node 'node/.config' folder every $backup_interval hours at a random minute..."
     echo
 fi
 
 # Backup existing cron jobs if selected
-read -p "❔ Do you want to backup your existing cronjobs? (y/n): " backup_cronjobs
+read -p "❔ Do you want to setup a recurring backup your existing cronjobs? (y/n): " backup_cronjobs
 if [[ $backup_cronjobs =~ ^[Yy]$ ]]; then
     cron_command="crontab -l > $HOME/cron_jobs.txt && rclone $backup_type $HOME/cron_jobs.txt storj:/$bucket/$target_folder/cron_jobs.txt"
     existing_cronjobs_pattern="/cron_jobs.txt storj:"
@@ -332,14 +332,14 @@ fi
 
 # Backup third-party scripts folder if selected
 if [ -d "$HOME/scripts/" ]; then
-    read -p "❔ Do you want to backup your third-party scripts folder? (y/n): " backup_scripts
+    read -p "❔ Do you want to setup a recurring backup your '$HOME/scripts' folder? (y/n): " backup_scripts
     if [[ $backup_scripts =~ ^[Yy]$ ]]; then
         cron_command="rclone $backup_type $HOME/scripts storj:/$bucket/$target_folder/scripts"
         existing_scripts_pattern="/scripts storj:"
 
         # Perform immediate backup
         perform_backup "$cron_command"
-        echo "⌛️ Backing up your 'scripts' folder immediately..."
+        echo "⌛️ Backing up your '$HOME/scripts' folder immediately..."
 
         # Schedule cron job
         random_minute=$(shuf -i 0-59 -n 1)
@@ -350,12 +350,33 @@ if [ -d "$HOME/scripts/" ]; then
     fi
 fi
 
+#====================
+# FINAL ACTIONS
+#====================
 
-# Done
 echo
 echo "✅ Your automatic backups are all set!"
 echo
 echo "Here is a summary of your cronjobs:"
-echo
+echo "====================================="
 crontab -l
+echo "====================================="
 echo
+echo "Your 'node.config' folder has not been backed up yet, but it will be according to the time interval you have set."
+echo
+# Ask user if they want to perform an immediate backup of node/.config folder
+echo "❔ Do you want to perform an immediate backup of your 'node/.config' folder?"
+echo "   The backup may require several minutes depending on your server bandwidth."
+read -p "   Enter (y/n): " immediate_backup
+
+if [[ $immediate_backup =~ ^[Yy]$ ]]; then
+    echo "⌛️ Performing immediate backup of 'node/.config' folder..."
+    if rclone $backup_type --transfers 10 --checkers 20 --disable-http2 --retries 1 --filter '+ store/**' --filter '+ store' --filter '- SELF_TEST' --filter '- keys.yml' --filter '- config.yml' /root/ceremonyclient/node/.config/ storj:/$bucket/$target_folder/.config/ --progress; then
+        echo "✅ 'node/.config' backup completed successfully."
+    else
+        echo "❌ Error: 'node/.config' backup failed. Please check your settings/connection and try again."
+        echo "   You can also manually run the backup later using the following command:"
+        echo "   rclone $backup_type --transfers 10 --checkers 20 --disable-http2 --retries 1 --filter '+ store/**' --filter '+ store' --filter '- SELF_TEST' --filter '- keys.yml' --filter '- config.yml' /root/ceremonyclient/node/.config/ storj:/$bucket/$target_folder/.config/ --progress"
+    fi
+fi
+
