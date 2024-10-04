@@ -122,7 +122,7 @@ else
         sleep 1
         
         # Prompt for StorJ secret key
-        read -p "🔒 Enter your StorJ access key: " access_key
+        read -p "▶️ Enter your StorJ access key: " access_key
         read -p "🔒 Enter your StorJ SECRET key: " secret_key
         echo
         
@@ -151,7 +151,7 @@ else
         read -p "⚠️ Do you want to keep the existing StorJ access keys? [y/n]: " keep_keys
         if [[ "$keep_keys" == "N" || "$keep_keys" == "n" ]]; then
             # Prompt for new StorJ keys
-            read -p "🔒 Enter your new StorJ access key: " access_key
+            read -p "▶️ Enter your new StorJ access key: " access_key
             read -p "🔒 Enter your new StorJ SECRET key: " secret_key
             echo
             
@@ -208,7 +208,7 @@ fi
 echo "ℹ️ Now I will restore the whole .config folder from StorJ."
 read -p "ℹ️ What do you want to do with your existing .config folder on this server?
 1 - Back it up
-2 - Remove it
+2 - Remove it (this will delete your existing keys)
 Choose an option [1/2]: " config_action
 
 # Handle the existing .config folder based on user's choice
@@ -237,7 +237,7 @@ fi
 
 # Restore .config folder
 echo "⌛️ Restoring backup from StorJ..."
-rclone copy "storj:/$bucket/$source_folder/.config/" ~/ceremonyclient/node/.config/ -v
+rclone copy "storj:/$bucket/$source_folder/.config/" ~/ceremonyclient/node/.config/ --progress
 if [[ $? -ne 0 ]]; then
     echo "❌ Restore failed. Exiting..."
     exit 1
