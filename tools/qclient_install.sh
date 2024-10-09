@@ -1,16 +1,16 @@
 #!/bin/bash
 
-#Comment out for automatic creation of the qClient version
+#Comment out for automatic creation of the qclient version
 #QCLIENT_VERSION=1.4.19.1
 
 # Determine the ExecStart line based on the architecture
 ARCH=$(uname -m)
 OS=$(uname -s)
 
-# Determine qClient latest version
+# Determine qclient latest version
 # Check if QCLIENT_VERSION is empty
 if [ -z "$QCLIENT_VERSION" ]; then
-    QCLIENT_VERSION=$(curl -s https://releases.quilibrium.com/qClient-release | grep -E "^qclient-[0-9]+(\.[0-9]+)*" | sed 's/^qclient-//' | cut -d '-' -f 1 |  head -n 1)
+    QCLIENT_VERSION=$(curl -s https://releases.quilibrium.com/qclient-release | grep -E "^qclient-[0-9]+(\.[0-9]+)*" | sed 's/^qclient-//' | cut -d '-' -f 1 |  head -n 1)
     if [ -z "$QCLIENT_VERSION" ]; then
         echo "❌ Error: Unable to determine QCLIENT_VERSION automatically."
         exit 1
@@ -45,25 +45,25 @@ else
     exit 1
 fi
 
-# Building qClient binary
+# Building qclient binary
 if [ -n "$QCLIENT_BINARY" ]; then
-    echo "⏳ Downloading qClient..."
+    echo "⏳ Downloading qclient..."
     sleep 1  # Add a 1-second delay
     cd ~/ceremonyclient/client
 
     if ! wget https://releases.quilibrium.com/$QCLIENT_BINARY; then
-        echo "❌ Error: Failed to download qClient binary."
+        echo "❌ Error: Failed to download qclient binary."
         echo
     else
-        echo "✅ qClient binary downloaded successfully."
+        echo "✅ qclient binary downloaded successfully."
         echo
         mv $QCLIENT_BINARY qclient
         echo "$QCLIENT_BINARY renamed to 'qclient'"
-        chmod +x qClient
+        chmod +x qclient
         echo
-        echo "✅ qClient is ready."
+        echo "✅ qclient is ready."
         echo
     fi
 else
-    echo "ℹ❌ Error: Skipping qClient download as QCLIENT_BINARY could not be determined."
+    echo "ℹ❌ Error: Skipping qclient download as QCLIENT_BINARY could not be determined."
 fi
