@@ -4,6 +4,10 @@
 #Comment out for automatic creation of the qclient version
 #QCLIENT_VERSION=1.4.19.1
 
+# Determine the ExecStart line based on the architecture
+ARCH=$(uname -m)
+OS=$(uname -s)
+
 # Determine qclient latest version
 # Check if QCLIENT_VERSION is empty
 if [ -z "$QCLIENT_VERSION" ]; then
