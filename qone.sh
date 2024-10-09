@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.9.0"
+SCRIPT_VERSION="1.9.1"
 
 # Function to check if wget is installed, and install it if it is not
 check_wget() {
@@ -121,6 +121,7 @@ fi
 # URLs for scripts
 PREREQUISITES_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/server_setup.sh"
 NODE_INSTALL_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/master/qnode_service_installer.sh"
+QCLIENT_INSTALL_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qclient_install.sh"
 GRPCURL_CONFIG_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/tools/qnode_gRPC_calls_setup.sh"
 NODE_UPDATE_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/master/qnode_service_update.sh"
 PEER_MANIFEST_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/tools/qnode_peermanifest_checker.sh"
@@ -194,6 +195,19 @@ update_node() {
 #     wget --no-cache -O - "$UPDATE_URL" | bash
 #     prompt_return_to_menu
 # }
+
+qclient_install() {
+    echo
+    echo "⌛️  Installing qClient..."
+    mkdir -p ~/scripts
+    rm -f ~/scripts/qclient_install.sh
+    wget -O ~/scripts/qclient_install.sh "QCLIENT_INSTALL_URL"
+    chmod +x ~/scripts/qclient_install.sh
+    ~/scripts/qclient_install.sh
+    
+    prompt_return_to_menu
+    return $?
+}
 
 check_visibility() {
     echo
@@ -445,6 +459,10 @@ Only use this if you have installed the node via the guide at
 https://docs.quilibrium.one/
 '
 
+qclient_install_message='
+This action will install or update the qClient.
+'
+
 setup_grpcurl_message='
 This action will make some edit to your config.yml to enable communication with the network. 
 If this a fresh node installation, let the node run for 30 minutes before doing this.
@@ -574,9 +592,8 @@ To remove the script fomr your system, run: rm ~/qone.sh
     This script will restore your node backup from StorJ.
     You need a Storj account https://www.storj.io/ and a Public/Secret access key.
 
-14) Peer manifest (Difficulty metric):
-    Check the peer manifest to provide information about the difficulty metric score of your node. 
-    It only works after the node has been running for 15-30 minutes.
+14) qClient install:
+    Install or update the qClient, to manage your QUIL tokens via CLI.
 
 15) Check visibility:
     Check the visibility status of the node.
@@ -636,11 +653,11 @@ Let your node run for 30 minutes, then choose option 3. Done!
 3) Set up gRPCurl             12) Backup your node
                               13) Restore backup                
 4) Node Log                                    
-5) Update node                14) Peer manifest         
-6) Stop node                  15) Check visibility                              
-7) Restart node               16) System cleaner 
-8) Node version                 
-9) Node info                     
+5) Update node                14) qClient install      
+6) Stop node                                               
+7) Restart node               15) Check visibility                 
+8) Node version               16) System cleaner               
+9) Node info                                      
 -----------------------------------------------------------------
 B) ⭐️ Best server providers
 D) 💜 Donations
@@ -676,7 +693,8 @@ while true; do
         11) confirm_action "$(wrap_text "$balance_log_message" "")" "Balance log" balance_log && continue ;;
         12) confirm_action "$(wrap_text "$backup_storj_message" "")" "Backup your node on StorJ" backup_storj && continue ;;
         13) confirm_action "$(wrap_text "$backup_restore_storj_message" "")" "Restore a node backup from StorJ" backup_restore_storj && continue ;;
-        14) confirm_action "$(wrap_text "$peer_manifest_message" "")" "Peer manifest" peer_manifest && continue ;;
+        14) confirm_action "$(wrap_text "$qclient_install_message" "")" "qClient install" qclient_install && continue ;;
+        #14) confirm_action "$(wrap_text "$peer_manifest_message" "")" "Peer manifest" peer_manifest && continue ;;
         15) check_visibility && continue ;;
         16) system_cleaner && continue ;;
         20) confirm_action "$(wrap_text "$test_script_message" "")" "Test Script" test_script && continue ;;
