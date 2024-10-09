@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.9.1"
+SCRIPT_VERSION="1.9.2"
 
 # Function to check if wget is installed, and install it if it is not
 check_wget() {
@@ -201,7 +201,7 @@ qclient_install() {
     echo "⌛️  Installing qClient..."
     mkdir -p ~/scripts
     rm -f ~/scripts/qclient_install.sh
-    wget -O ~/scripts/qclient_install.sh "QCLIENT_INSTALL_URL"
+    wget -O ~/scripts/qclient_install.sh "$QCLIENT_INSTALL_URL"
     chmod +x ~/scripts/qclient_install.sh
     ~/scripts/qclient_install.sh
     
