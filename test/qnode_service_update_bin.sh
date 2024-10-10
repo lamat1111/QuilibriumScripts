@@ -247,11 +247,8 @@ if [ -f "$SERVICE_FILE" ] && grep -q "ExecStart=/root/scripts/qnode_cluster_run.
 else
     echo "⏳ Rebuilding Ceremonyclient Service..."
     echo
-    sleep 1
-
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "⏳ Creating new ceremonyclient service file..."
-        echo
         if ! sudo tee "$SERVICE_FILE" > /dev/null <<EOF
 [Unit]
 Description=Ceremony Client Go App Service
@@ -273,14 +270,11 @@ EOF
             exit 1
         fi
     else
-        echo "⏳ Checking existing ceremonyclient service file..."
-        echo
-        
+        echo "⏳ Checking existing ceremonyclient service file..."  
         # Check if the required lines exist
         if ! grep -q "WorkingDirectory=$NODE_PATH" "$SERVICE_FILE" || \
         ! grep -q "ExecStart=$EXEC_START" "$SERVICE_FILE"; then
             echo "⏳ Updating existing ceremonyclient service file..."
-            echo
             # Replace the lines with new values
             sudo sed -i "s|WorkingDirectory=.*|WorkingDirectory=$NODE_PATH|" "$SERVICE_FILE"
             sudo sed -i "s|ExecStart=.*|ExecStart=$EXEC_START|" "$SERVICE_FILE"
