@@ -2,7 +2,7 @@
 
 #Node version is not used - execution via release_autorun 
 #Comment out for automatic creation of the node version
-#NODE_VERSION=1.4.21.1
+#NODE_VERSION=2.0
 
 #Comment out for automatic creation of the qclient version
 #QCLIENT_VERSION=1.4.19.1
@@ -287,13 +287,19 @@ EOF
             sudo sed -i "s|WorkingDirectory=.*|WorkingDirectory=$NODE_PATH|" "$SERVICE_FILE"
             sudo sed -i "s|ExecStart=.*|ExecStart=$EXEC_START|" "$SERVICE_FILE"
             
-            # Add KillSignal and TimeoutStopSec if they don't exist
-            if ! grep -q "KillSignal=SIGINT" "$SERVICE_FILE"; then
-                sudo sed -i '/\[Service\]/a KillSignal=SIGINT' "$SERVICE_FILE"
-            fi
-            if ! grep -q "TimeoutStopSec=30s" "$SERVICE_FILE"; then
-                sudo sed -i '/\[Service\]/a TimeoutStopSec=30s' "$SERVICE_FILE"
-            fi
+            # Remove KillSignal and TimeoutStopSec if they exist (to re-add them at the end)
+            sudo sed -i '/KillSignal=SIGINT/d' "$SERVICE_FILE"
+            sudo sed -i '/TimeoutStopSec=30s/d' "$SERVICE_FILE"
+            
+            # Add KillSignal and TimeoutStopSec at the end of the [Service] section
+            sudo sed -i '/\[Service\]/,/^\[/ {
+                /^\[/!{
+                    $a KillSignal=SIGINT\nTimeoutStopSec=30s
+                }
+                /^\[/{
+                    i KillSignal=SIGINT\nTimeoutStopSec=30s
+                }
+            }' "$SERVICE_FILE"
         else
             echo "✅ No changes needed."
         fi
