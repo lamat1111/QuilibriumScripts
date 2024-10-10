@@ -2,7 +2,7 @@
 
 #Node version is not used - execution via release_autorun 
 #Comment out for automatic creation of the node version
-#NODE_VERSION=1.4.21.1
+#NODE_VERSION=2.0
 
 #Comment out for automatic creation of the qclient version
 #QCLIENT_VERSION=1.4.19.1
