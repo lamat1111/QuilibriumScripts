@@ -223,18 +223,13 @@ fi
 # Get the current user's home directory
 HOME=$(eval echo ~$USER)
 
-
-#===========================
-# Determine the ExecStart line based on the architecture
-#===========================
-
 # Use the home directory in the path
 NODE_PATH="$HOME/ceremonyclient/node"
-EXEC_START="$NODE_PATH/$NODE_BINARY"
+EXEC_START="$NODE_PATH/release_autorun.sh"
 
 # Step 6: Create Ceremonyclient Service
 echo "⏳ Creating Ceremonyclient Service"
-sleep 2  # Add a 2-second delay
+sleep 1  # Add a 2-second delay
 
 # Calculate GOMAXPROCS based on the system's RAM
 calculate_gomaxprocs() {
