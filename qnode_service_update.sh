@@ -232,14 +232,11 @@ fi
 # SERVICE UPDATE
 #==========================
 
-# Get the current user's home directory
+#Set variables
 HOME=$(eval echo ~$HOME_DIR)
 
-# Use the home directory in the path
 NODE_PATH="$HOME/ceremonyclient/node"
 EXEC_START="$NODE_PATH/release_autorun.sh"
-
-#!/bin/bash
 
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
 
