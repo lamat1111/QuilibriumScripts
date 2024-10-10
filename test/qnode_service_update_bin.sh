@@ -278,37 +278,47 @@ EOF
         
         # Check if the required lines exist
         if ! grep -q "WorkingDirectory=$NODE_PATH" "$SERVICE_FILE" || \
-        ! grep -q "ExecStart=$EXEC_START" "$SERVICE_FILE" || \
-        ! grep -q "KillSignal=SIGINT" "$SERVICE_FILE" || \
-        ! grep -q "TimeoutStopSec=" "$SERVICE_FILE"; then
+        ! grep -q "ExecStart=$EXEC_START" "$SERVICE_FILE"; then
             echo "⏳ Updating existing ceremonyclient service file..."
             echo
-            # Replace or add the lines with new values
+            # Replace the lines with new values
             sudo sed -i "s|WorkingDirectory=.*|WorkingDirectory=$NODE_PATH|" "$SERVICE_FILE"
             sudo sed -i "s|ExecStart=.*|ExecStart=$EXEC_START|" "$SERVICE_FILE"
-            
-            # Remove KillSignal and TimeoutStopSec if they exist (to re-add them at the end)
-            sudo sed -i '/KillSignal=SIGINT/d' "$SERVICE_FILE"
-            sudo sed -i '/TimeoutStopSec=/d' "$SERVICE_FILE"
-            
-            # Add KillSignal and TimeoutStopSec at the end of the [Service] section
+        else
+            echo "✅ WorkingDirectory and ExecStart are up to date."
+        fi
+
+        # Check if KillSignal exists
+        if ! grep -q "KillSignal=SIGINT" "$SERVICE_FILE"; then
+            echo "⏳ Adding KillSignal=SIGINT to the service file..."
             sudo sed -i '/\[Service\]/,/^\[/ {
                 /^\[/!{
-                    $a KillSignal=SIGINT\nTimeoutStopSec=30s
+                    $a KillSignal=SIGINT
                 }
                 /^\[/{
-                    i KillSignal=SIGINT\nTimeoutStopSec=30s
+                    i KillSignal=SIGINT
                 }
             }' "$SERVICE_FILE"
         else
-            echo "✅ No changes needed."
+            echo "✅ KillSignal=SIGINT already exists."
+        fi
+
+        # Check if TimeoutStopSec exists
+        if ! grep -q "TimeoutStopSec=" "$SERVICE_FILE"; then
+            echo "⏳ Adding TimeoutStopSec=30s to the service file..."
+            sudo sed -i '/\[Service\]/,/^\[/ {
+                /^\[/!{
+                    $a TimeoutStopSec=30s
+                }
+                /^\[/{
+                    i TimeoutStopSec=30s
+                }
+            }' "$SERVICE_FILE"
+        else
+            echo "✅ TimeoutStopSec already exists."
         fi
     fi
 fi
-
-# The script continues here with any code that should run after the conditional block
-echo "Continuing with the rest of the script..."
-
 echo
 
 #==========================
