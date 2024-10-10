@@ -58,10 +58,8 @@ check_and_install() {
         echo "$1 could not be found"
         echo "⏳ Installing $1..."
         su -c "apt install $1 -y"
-        echo
     else
         echo "✅ $1 is installed"
-        echo
     fi
 }
 
@@ -70,6 +68,7 @@ check_and_install sudo
 check_and_install git
 check_and_install curl
 
+echo
 
 #==========================
 # CREATE PATH VARIABLES
@@ -165,11 +164,10 @@ if [ "$INSTALLED_VERSION" != "1.22.4" ]; then
     sudo rm $GO_BINARY || echo "Failed to remove downloaded archive!"
     
     echo "✅ Go 1.22.4 has been installed successfully."
-    echo
 else
     echo "✅ Go version 1.22.4 is already installed. No action needed."
-    echo
 fi
+echo
 
 #==========================
 # NODE UPDATE
@@ -211,19 +209,17 @@ if [ -n "$QCLIENT_BINARY" ]; then
     if ! wget https://releases.quilibrium.com/$QCLIENT_BINARY; then
         echo "❌ Error: Failed to download qClient binary."
         echo "Your node will still work, but you'll need to install the qclient manually later if needed."
-        echo
     else
         mv $QCLIENT_BINARY qclient
         chmod +x qclient
         echo "✅ qClient binary downloaded successfully."
-        echo
     fi
 else
     echo "ℹ️ Skipping qClient download as QCLIENT_BINARY could not be determined earlier."
     echo "Your node will still work, but you'll need to install the qclient manually later if needed."
-    echo
 fi
 
+echo
 #==========================
 # SERVICE UPDATE
 #==========================
@@ -243,7 +239,6 @@ if [ -f "$SERVICE_FILE" ] && grep -q "ExecStart=/root/scripts/qnode_cluster_run.
 else
     # Build service file
     echo "⏳ Rebuilding Ceremonyclient Service..."
-    echo
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "⏳ Creating new ceremonyclient service file..."
         if ! sudo tee "$SERVICE_FILE" > /dev/null <<EOF
@@ -298,6 +293,7 @@ EOF
 fi
 
 echo "✅ Service file update completed."
+echo
 
 #==========================
 # CONFIG FILE UPDATE for "REWARDS TO GOOGLE SHEET SCRIPT"
