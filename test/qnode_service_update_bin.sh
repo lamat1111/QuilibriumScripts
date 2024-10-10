@@ -278,9 +278,9 @@ EOF
         
         # Check if the required lines exist
         if ! grep -q "WorkingDirectory=$NODE_PATH" "$SERVICE_FILE" || \
-           ! grep -q "ExecStart=$EXEC_START" "$SERVICE_FILE" || \
-           ! grep -q "KillSignal=SIGINT" "$SERVICE_FILE" || \
-           ! grep -q "TimeoutStopSec=30s" "$SERVICE_FILE"; then
+        ! grep -q "ExecStart=$EXEC_START" "$SERVICE_FILE" || \
+        ! grep -q "KillSignal=SIGINT" "$SERVICE_FILE" || \
+        ! grep -q "TimeoutStopSec=" "$SERVICE_FILE"; then
             echo "⏳ Updating existing ceremonyclient service file..."
             echo
             # Replace or add the lines with new values
@@ -289,7 +289,7 @@ EOF
             
             # Remove KillSignal and TimeoutStopSec if they exist (to re-add them at the end)
             sudo sed -i '/KillSignal=SIGINT/d' "$SERVICE_FILE"
-            sudo sed -i '/TimeoutStopSec=30s/d' "$SERVICE_FILE"
+            sudo sed -i '/TimeoutStopSec=/d' "$SERVICE_FILE"
             
             # Add KillSignal and TimeoutStopSec at the end of the [Service] section
             sudo sed -i '/\[Service\]/,/^\[/ {
