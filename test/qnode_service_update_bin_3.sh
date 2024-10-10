@@ -288,37 +288,34 @@ EOF
             echo "✅ WorkingDirectory and ExecStart are up to date."
         fi
 
-        # Check if KillSignal exists
-        if ! grep -q "KillSignal=SIGINT" "$SERVICE_FILE"; then
-            echo "⏳ Adding KillSignal=SIGINT to the service file..."
-            sudo sed -i '/\[Service\]/,/^\[/ {
-                /^\[/!{
-                    $a KillSignal=SIGINT
-                }
-                /^\[/{
-                    i KillSignal=SIGINT
-                }
-            }' "$SERVICE_FILE"
-        else
-            echo "✅ KillSignal=SIGINT already exists."
-        fi
+        # Function to add or update a line in the [Service] section
+        update_service_section() {
+            local key="$1"
+            local value="$2"
+            if grep -q "^$key=" "$SERVICE_FILE"; then
+                current_value=$(grep "^$key=" "$SERVICE_FILE" | cut -d'=' -f2-)
+                if [ "$current_value" != "$value" ]; then
+                    echo "⏳ Updating $key from $current_value to $value in the service file..."
+                    sudo sed -i "s/^$key=.*/$key=$value/" "$SERVICE_FILE"
+                else
+                    echo "✅ $key=$value already exists and is correct."
+                fi
+            else
+                echo "⏳ Adding $key=$value to the service file..."
+                sudo sed -i "/^\[Service\]/,/^\[/ {
+                    /^\[Install\]/i $key=$value
+                }" "$SERVICE_FILE"
+            fi
+        }
 
-        # Check if TimeoutStopSec exists
-        if ! grep -q "TimeoutStopSec=" "$SERVICE_FILE"; then
-            echo "⏳ Adding TimeoutStopSec=30s to the service file..."
-            sudo sed -i '/\[Service\]/,/^\[/ {
-                /^\[/!{
-                    $a TimeoutStopSec=30s
-                }
-                /^\[/{
-                    i TimeoutStopSec=30s
-                }
-            }' "$SERVICE_FILE"
-        else
-            echo "✅ TimeoutStopSec already exists."
-        fi
+        # Update KillSignal and TimeoutStopSec in the [Service] section
+        update_service_section "KillSignal" "SIGINT"
+        update_service_section "TimeoutStopSec" "30s"
     fi
 fi
+
+
+echo "✅ Service file update completed."
 echo
 
 #==========================
