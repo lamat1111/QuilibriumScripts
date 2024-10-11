@@ -182,7 +182,10 @@ EOF
     fi
 fi
 
+sudo systemctl daemon-reload
+
 echo "✅ Service file update completed."
+sleep 1
 echo
 echo "Showing your current service file:"
 echo "================================="
