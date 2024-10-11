@@ -104,7 +104,7 @@ OS=$(uname -s)
 
 # ONLY NECESSARY IF RUNNING THE NODE VIA BINARY IN THE SERVICE
 # Determine node latest version
-Check if NODE_VERSION is empty
+# Check if NODE_VERSION is empty
 if [ -z "$NODE_VERSION" ]; then
     NODE_VERSION=$(curl -s https://releases.quilibrium.com/release | grep -E "^node-[0-9]+(\.[0-9]+)*" | grep -v "dgst" | sed 's/^node-//' | cut -d '-' -f 1 | head -n 1)
     if [ -z "$NODE_VERSION" ]; then
