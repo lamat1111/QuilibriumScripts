@@ -1,6 +1,5 @@
 #!/bin/bash
 
-#Node version is not used - execution via release_autorun 
 #Comment out for automatic creation of the node version
 #NODE_VERSION=2.0
 
@@ -33,7 +32,8 @@ cat << "EOF"
                        ✨ QNODE SERVICE UPDATER ✨
 ===========================================================================
 This script will update your Quilibrium node when running it as a service.
-It will run your node from the release_autostart.sh file.
+It will run your node from the binary file, and you will have to
+update manually.
 
 Follow the guide at https://docs.quilibrium.one
 
@@ -44,7 +44,7 @@ Processing... ⏳
 
 EOF
 
-sleep 5  # Add a 7-second delay
+sleep 5  
 
 #==========================
 # INSTALL APPS
@@ -57,10 +57,8 @@ check_and_install() {
         echo "$1 could not be found"
         echo "⏳ Installing $1..."
         su -c "apt install $1 -y"
-        echo
     else
         echo "✅ $1 is installed"
-        echo
     fi
 }
 
@@ -69,6 +67,7 @@ check_and_install sudo
 check_and_install git
 check_and_install curl
 
+echo
 
 #==========================
 # CREATE PATH VARIABLES
@@ -164,11 +163,10 @@ if [ "$INSTALLED_VERSION" != "1.22.4" ]; then
     sudo rm $GO_BINARY || echo "Failed to remove downloaded archive!"
     
     echo "✅ Go 1.22.4 has been installed successfully."
-    echo
 else
     echo "✅ Go version 1.22.4 is already installed. No action needed."
-    echo
 fi
+echo
 
 #==========================
 # NODE UPDATE
@@ -176,19 +174,19 @@ fi
 
 # Stop the ceremonyclient service if it exists
 echo "⏳ Stopping the ceremonyclient service if it exists..."
-if systemctl is-active --quiet ceremonyclient && service ceremonyclient stop; then
-    echo "🔴 Service stopped successfully."
-    echo
+if systemctl is-active --quiet ceremonyclient; then
+    if sudo systemctl stop ceremonyclient; then
+        echo "🔴 Service stopped successfully."
+        echo
+    else
+        echo "❌ Failed to stop the ceremonyclient service." >&2
+        echo
+    fi
 else
-    echo "❌ Ceremonyclient service either does not exist or could not be stopped." >&2
+    echo "ℹ️ Ceremonyclient service is not active or does not exist."
     echo
 fi
 sleep 1
-
-# Discard local changes in release_autorun.sh
-# echo "✅ Discarding local changes in release_autorun.sh..."
-# echo
-# git checkout -- node/release_autorun.sh
 
 # Set the remote URL and download
 echo "⏳ Downloading new release v$NODE_VERSION"
@@ -215,18 +213,17 @@ if [ -n "$QCLIENT_BINARY" ]; then
     if ! wget https://releases.quilibrium.com/$QCLIENT_BINARY; then
         echo "❌ Error: Failed to download qClient binary."
         echo "Your node will still work, but you'll need to install the qclient manually later if needed."
-        echo
     else
         mv $QCLIENT_BINARY qclient
         chmod +x qclient
         echo "✅ qClient binary downloaded successfully."
-        echo
     fi
 else
     echo "ℹ️ Skipping qClient download as QCLIENT_BINARY could not be determined earlier."
     echo "Your node will still work, but you'll need to install the qclient manually later if needed."
-    echo
 fi
+
+echo
 
 #==========================
 # SERVICE UPDATE
@@ -236,19 +233,17 @@ fi
 HOME=$(eval echo ~$HOME_DIR)
 
 NODE_PATH="$HOME/ceremonyclient/node"
-EXEC_START="$NODE_PATH/release_autorun.sh"
+EXEC_START="$NODE_PATH/$NODE_BINARY"
 
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
 
-# Check if the service file exists and contains the specific ExecStart line with any parameters
+# Check if the node is running via cluster script and skip
 if [ -f "$SERVICE_FILE" ] && grep -q "ExecStart=/root/scripts/qnode_cluster_run.sh" "$SERVICE_FILE"; then
-    echo "⚠️ You are runnig a cluster. Skipping service file update..."
+    echo "⚠️ You are running a cluster. Skipping service file update..."
     echo
 else
+    # Build service file
     echo "⏳ Rebuilding Ceremonyclient Service..."
-    echo
-    sleep 1
-
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "⏳ Creating new ceremonyclient service file..."
         if ! sudo tee "$SERVICE_FILE" > /dev/null <<EOF
@@ -261,6 +256,8 @@ Restart=always
 RestartSec=5s
 WorkingDirectory=$NODE_PATH
 ExecStart=$EXEC_START
+KillSignal=SIGINT
+TimeoutStopSec=30s
 
 [Install]
 WantedBy=multi-user.target
@@ -270,23 +267,37 @@ EOF
             exit 1
         fi
     else
-        echo "⏳ Checking existing ceremonyclient service file..."
-        
-        # Check if the required lines exist
-        if ! grep -q "WorkingDirectory=$NODE_PATH" "$SERVICE_FILE" || ! grep -q "ExecStart=$EXEC_START" "$SERVICE_FILE"; then
-            echo "⏳ Updating existing ceremonyclient service file..."
-            # Replace the existing lines with new values
-            sudo sed -i "s|WorkingDirectory=.*|WorkingDirectory=$NODE_PATH|" "$SERVICE_FILE"
-            sudo sed -i "s|ExecStart=.*|ExecStart=$EXEC_START|" "$SERVICE_FILE"
-        else
-            echo "✅ No changes needed."
-        fi
+        echo "⏳ Checking existing ceremonyclient service file..."  
+
+        # Function to add or update a line in the [Service] section
+        update_service_section() {
+            local key="$1"
+            local value="$2"
+            if grep -q "^$key=" "$SERVICE_FILE"; then
+                current_value=$(grep "^$key=" "$SERVICE_FILE" | cut -d'=' -f2-)
+                if [ "$current_value" != "$value" ]; then
+                    echo "⏳ Updating $key from $current_value to $value in the service file..."
+                    sudo sed -i "s|^$key=.*|$key=$value|" "$SERVICE_FILE"
+                else
+                    echo "✅ $key=$value already exists and is correct."
+                fi
+            else
+                echo "⏳ Adding $key=$value to the service file..."
+                sudo sed -i "/^\[Service\]/,/^\[/ {
+                    /^\[Install\]/i $key=$value
+                }" "$SERVICE_FILE"
+            fi
+        }
+
+        # Update all required lines in the [Service] section
+        update_service_section "WorkingDirectory" "$NODE_PATH"
+        update_service_section "ExecStart" "$EXEC_START"
+        update_service_section "KillSignal" "SIGINT"
+        update_service_section "TimeoutStopSec" "30s"
     fi
 fi
 
-# The script continues here with any code that should run after the conditional block
-echo "Continuing with the rest of the script..."
-
+echo "✅ Service file update completed."
 echo
 
 #==========================
@@ -344,7 +355,7 @@ echo
 echo "✅ Starting Ceremonyclient Service"
 sudo systemctl daemon-reload
 sudo systemctl enable ceremonyclient
-sudo service ceremonyclient start
+sudo systemctl start ceremonyclient
 
 # Showing the node version and logs
 echo "🌟Your node is now updated to v$NODE_VERSION !"

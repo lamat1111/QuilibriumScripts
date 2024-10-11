@@ -35,7 +35,8 @@ cat << "EOF"
                  ✨ QNODE SERVICE INSTALLER ✨
 ===================================================================
 This script will install your Quilibrum node as a service.
-It will run your node from the release_autostart.sh file.
+It will run your node from the binary file, and you will have to
+update manually.
 
 Be sure to run the 'Server Setup' script first.
 Follow the guide at https://docs.quilibrium.one
@@ -103,22 +104,22 @@ OS=$(uname -s)
 
 # ONLY NECESSARY IF RUNNING THE NODE VIA BINARY IN THE SERVICE
 # Determine node latest version
-# Check if NODE_VERSION is empty
-# if [ -z "$NODE_VERSION" ]; then
-#     NODE_VERSION=$(curl -s https://releases.quilibrium.com/release | grep -E "^node-[0-9]+(\.[0-9]+)*" | grep -v "dgst" | sed 's/^node-//' | cut -d '-' -f 1 | head -n 1)
-#     if [ -z "$NODE_VERSION" ]; then
-#         echo "❌ Error: Unable to determine NODE_VERSION automatically."
-#         echo "The script cannot proceed without a correct node version number." 
-#         echo "Please try the manual step by step installation instead:"
-#         echo "https://docs.quilibrium.one/start/tutorials/node-step-by-step-installation"
-#         echo
-#         exit 1
-#     else
-#         echo "✅ Automatically determined NODE_VERSION: $NODE_VERSION"
-#     fi
-# else
-#     echo "✅ Using specified NODE_VERSION: $NODE_VERSION"
-# fi
+Check if NODE_VERSION is empty
+if [ -z "$NODE_VERSION" ]; then
+    NODE_VERSION=$(curl -s https://releases.quilibrium.com/release | grep -E "^node-[0-9]+(\.[0-9]+)*" | grep -v "dgst" | sed 's/^node-//' | cut -d '-' -f 1 | head -n 1)
+    if [ -z "$NODE_VERSION" ]; then
+        echo "❌ Error: Unable to determine NODE_VERSION automatically."
+        echo "The script cannot proceed without a correct node version number." 
+        echo "Please try the manual step by step installation instead:"
+        echo "https://docs.quilibrium.one/start/tutorials/node-step-by-step-installation"
+        echo
+        exit 1
+    else
+        echo "✅ Automatically determined NODE_VERSION: $NODE_VERSION"
+    fi
+else
+    echo "✅ Using specified NODE_VERSION: $NODE_VERSION"
+fi
 
 # Determine qclient latest version
 # Check if QCLIENT_VERSION is empty
@@ -142,21 +143,21 @@ echo
 # Determine the node binary name based on the architecture and OS
 if [ "$ARCH" = "x86_64" ]; then
     if [ "$OS" = "Linux" ]; then
-        #NODE_BINARY="node-$NODE_VERSION-linux-amd64"
+        NODE_BINARY="node-$NODE_VERSION-linux-amd64"
         GO_BINARY="go1.22.4.linux-amd64.tar.gz"
         [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-amd64"
     elif [ "$OS" = "Darwin" ]; then
-        #NODE_BINARY="node-$NODE_VERSION-darwin-amd64"
+        NODE_BINARY="node-$NODE_VERSION-darwin-amd64"
         GO_BINARY="go1.22.4.darwin-amd64.tar.gz"
         [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-amd64"
     fi
 elif [ "$ARCH" = "aarch64" ]; then
     if [ "$OS" = "Linux" ]; then
-        #NODE_BINARY="node-$NODE_VERSION-linux-arm64"
+        NODE_BINARY="node-$NODE_VERSION-linux-arm64"
         GO_BINARY="go1.22.4.linux-arm64.tar.gz"
         [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-arm64"
     elif [ "$OS" = "Darwin" ]; then
-        #NODE_BINARY="node-$NODE_VERSION-darwin-arm64"
+        NODE_BINARY="node-$NODE_VERSION-darwin-arm64"
         GO_BINARY="go1.22.4.darwin-arm64.tar.gz"
         [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-arm64"
     fi
@@ -164,40 +165,6 @@ else
     echo "❌ Error: Unsupported system architecture ($ARCH) or operating system ($OS)."
     exit 1
 fi
-
-#==========================
-# CHECK FOR EXISTING .CONFIG FOLDER
-#==========================
-
-# No need if checking if ceremonyclient folder exist (next step)
-
-# # Check if the .config folder exists
-# if [ -d "$HOME/ceremonyclient/node/.config" ]; then
-#     echo "⚠️ Warning: Existing 'node/.config' folder found. Do you want to back it up? (y/n)"
-#     read -r response
-
-#     case $response in
-#         [yY])
-#             # Create backup directory
-#             mkdir -p "$HOME/backup"
-            
-#             # Move the .config folder to backup
-#             mv "$HOME/ceremonyclient/node/.config" "$HOME/backup/.config_bak"
-            
-#             echo "✅ Backup of existing '.config' folder created in $HOME/backup/.config_bak"
-#             echo
-#             ;;
-#         [nN])
-#             echo "⏳ Skipping backup and continuing script..."
-#             ;;
-#         *)
-#             echo "⏳ Invalid input. Skipping backup and continuing script..."
-#             ;;
-#     esac
-# else
-#     echo "✅ No existing .config folder found. Continuing script..."
-#     echo
-# fi
 
 #==========================
 # DOWNLOAD NODE
@@ -263,7 +230,7 @@ EXEC_START="$NODE_PATH/release_autorun.sh"
 
 # Step 6: Create Ceremonyclient Service
 echo "⏳ Creating Ceremonyclient Service"
-sleep 2  # Add a 2-second delay
+sleep 1  # Add a 2-second delay
 
 # Calculate GOMAXPROCS based on the system's RAM
 calculate_gomaxprocs() {
@@ -300,6 +267,8 @@ Restart=always
 RestartSec=5s
 WorkingDirectory=$NODE_PATH
 ExecStart=$EXEC_START
+KillSignal=SIGINT
+TimeoutStopSec=30s
 Environment="GOMAXPROCS=$GOMAXPROCS"
 
 [Install]
@@ -313,7 +282,7 @@ echo
 sleep 2  # Add a 2-second delay
 sudo systemctl daemon-reload
 sudo systemctl enable ceremonyclient
-sudo service ceremonyclient start
+sudo systemctl start ceremonyclient
 
 # Final messages
 echo "✅ Now your node is starting!"
