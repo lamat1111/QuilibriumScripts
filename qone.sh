@@ -1,18 +1,31 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.9.3"
+SCRIPT_VERSION="1.9.4"
 
-# Function to check if wget is installed, and install it if it is not
-check_wget() {
-    if ! command -v wget &> /dev/null; then
-        echo "❌ wget not found. Installing..."
-        sudo apt-get update && sudo apt-get install -y wget || { echo "❌ wget installation failed."; exit 1; }
+#==========================
+# INSTALL APPS
+#==========================
+
+# Function to check and install a package
+check_and_install() {
+    if ! command -v $1 &> /dev/null
+    then
+        echo "$1 could not be found"
+        echo "⏳ Installing $1..."
+        su -c "apt install $1 -y"
+    else
+        echo "✅ $1 is installed"
     fi
 }
 
-# Check if wget is installed
-check_wget
+# For DEBIAN OS - Check if sudo, git, and curl are installed
+check_and_install sudo
+check_and_install git
+check_and_install wget
+check_and_install curl
+
+echo
 
 upgrade_qone() {
     # Function to check if the qone.sh setup section is present in .bashrc
@@ -141,7 +154,7 @@ install_prerequisites() {
     echo "⌛️  Preparing server with necessary apps and settings..."
     mkdir -p ~/scripts
     rm -f ~/scripts/server_setup.sh
-    wget -O ~/scripts/server_setup.sh "$PREREQUISITES_URL"
+    curl -sSL "$PREREQUISITES_URL" -o ~/scripts/server_setup.sh
     chmod +x ~/scripts/server_setup.sh
     ~/scripts/server_setup.sh
     prompt_return_to_menu
@@ -153,24 +166,17 @@ install_node() {
     echo "⌛️  Installing node..."
     mkdir -p ~/scripts
     rm -f ~/scripts/qnode_service_installer.sh
-    wget -O ~/scripts/qnode_service_installer.sh "$NODE_INSTALL_URL"
+    curl -sSL "$NODE_INSTALL_URL" -o ~/scripts/qnode_service_installer.sh
     chmod +x ~/scripts/qnode_service_installer.sh
     ~/scripts/qnode_service_installer.sh
     prompt_return_to_menu
     return $?
 }
 
-# install_node() {
-#     echo
-#     echo "⌛️  Installing node..."
-#     wget --no-cache -O - "$NODE_INSTALL_URL" | bash
-#     prompt_return_to_menu
-# }
-
 configure_grpcurl() {
     echo
     echo "⌛️  Setting up gRPCurl..."
-    wget --no-cache -O - "$GRPCURL_CONFIG_URL" | bash
+    curl -sSL "$GRPCURL_CONFIG_URL" | bash
     prompt_return_to_menu
     return $?
 }
@@ -180,7 +186,7 @@ update_node() {
     echo "⌛️  Updating node..."
     mkdir -p ~/scripts
     rm -f ~/scripts/qnode_service_update.sh
-    wget -O ~/scripts/qnode_service_update.sh "$NODE_UPDATE_URL"
+    curl -sSL "$NODE_UPDATE_URL" -o ~/scripts/qnode_service_update.sh
     chmod +x ~/scripts/qnode_service_update.sh
     ~/scripts/qnode_service_update.sh
     
@@ -188,19 +194,12 @@ update_node() {
     return $?
 }
 
-# update_node() {
-#     echo
-#     echo "⌛️  Updating node..."
-#     wget --no-cache -O - "$UPDATE_URL" | bash
-#     prompt_return_to_menu
-# }
-
 qclient_install() {
     echo
     echo "⌛️  Installing qClient..."
     mkdir -p ~/scripts
     rm -f ~/scripts/qclient_install.sh
-    wget -O ~/scripts/qclient_install.sh "$QCLIENT_INSTALL_URL"
+    curl -sSL "$QCLIENT_INSTALL_URL" -o ~/scripts/qclient_install.sh
     chmod +x ~/scripts/qclient_install.sh
     ~/scripts/qclient_install.sh
     
@@ -211,7 +210,7 @@ qclient_install() {
 check_visibility() {
     echo
     echo "⌛️  Checking node visibility..."
-    wget -O - "$CHECK_VISIBILITY_URL" | bash
+    curl -sSL "$CHECK_VISIBILITY_URL" | bash
     prompt_return_to_menu
     return $?
 }
@@ -219,7 +218,7 @@ check_visibility() {
 system_cleaner() {
     echo
     echo "⌛️  Cleaning your system..."
-    wget -O - "$SYSTEM_CLEANER_URL" | bash
+    curl -sSL "$SYSTEM_CLEANER_URL" | bash
     prompt_return_to_menu
     return $?
 }
@@ -227,7 +226,7 @@ system_cleaner() {
 balance_log() {
     echo
     echo "⌛️  Installing the balance log script..."
-    wget -O - "$BALANCE_LOG_URL" | bash
+    curl -sSL "$BALANCE_LOG_URL" | bash
     prompt_return_to_menu
     return $?
 }
@@ -237,7 +236,7 @@ backup_storj() {
     echo "⌛️  Downloading Storj backup script..."
     mkdir -p ~/scripts
     rm -f ~/scripts/qnode_backup_storj.sh
-    if wget -O ~/scripts/qnode_backup_storj.sh "$BACKUP_STORJ_URL"; then
+    if curl -sSL "$BACKUP_STORJ_URL" -o ~/scripts/qnode_backup_storj.sh; then
         chmod +x ~/scripts/qnode_backup_storj.sh
         if ~/scripts/qnode_backup_storj.sh; then
             echo "✅ Storj backup completed successfully."
@@ -256,7 +255,7 @@ backup_restore_storj() {
     echo "⌛️  Downloading Storj backup restore script..."
     mkdir -p ~/scripts
     rm -f ~/scripts/qnode_backup_restore_storj.sh
-    if wget -O ~/scripts/qnode_backup_restore_storj.sh "$BACKUP_RESTORE_STORJ_URL"; then
+    if curl -sSL "$BACKUP_RESTORE_STORJ_URL" -o ~/scripts/qnode_backup_restore_storj.sh; then
         chmod +x ~/scripts/qnode_backup_restore_storj.sh
         if ~/scripts/qnode_backup_restore_storj.sh; then
             echo "✅ Storj backup restore completed successfully."
@@ -347,7 +346,7 @@ stop_node() {
 
 peer_manifest() {
     echo "⌛️  Checking peer manifest (Difficulty metric)..."
-    wget --no-cache -O - "$PEER_MANIFEST_URL" | bash
+    curl -sSL "$PEER_MANIFEST_URL" | bash
     prompt_return_to_menu
     return $? # This ensures we go back to the main loop
 }
