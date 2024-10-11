@@ -1,6 +1,5 @@
 #!/bin/bash
 
-#Node version is not used - execution via release_autorun 
 #Comment out for automatic creation of the node version
 #NODE_VERSION=2.0
 
@@ -45,7 +44,7 @@ Processing... ⏳
 
 EOF
 
-sleep 5  # Add a 7-second delay
+sleep 5  
 
 #==========================
 # INSTALL APPS
@@ -220,6 +219,7 @@ else
 fi
 
 echo
+
 #==========================
 # SERVICE UPDATE
 #==========================
