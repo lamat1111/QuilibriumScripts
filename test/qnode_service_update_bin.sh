@@ -174,11 +174,16 @@ echo
 
 # Stop the ceremonyclient service if it exists
 echo "⏳ Stopping the ceremonyclient service if it exists..."
-if systemctl is-active --quiet ceremonyclient && service ceremonyclient stop; then
-    echo "🔴 Service stopped successfully."
-    echo
+if systemctl is-active --quiet ceremonyclient; then
+    if sudo systemctl stop ceremonyclient; then
+        echo "🔴 Service stopped successfully."
+        echo
+    else
+        echo "❌ Failed to stop the ceremonyclient service." >&2
+        echo
+    fi
 else
-    echo "❌ Ceremonyclient service either does not exist or could not be stopped." >&2
+    echo "ℹ️ Ceremonyclient service is not active or does not exist."
     echo
 fi
 sleep 1
@@ -350,7 +355,7 @@ echo
 echo "✅ Starting Ceremonyclient Service"
 sudo systemctl daemon-reload
 sudo systemctl enable ceremonyclient
-sudo service ceremonyclient start
+sudo systemctl start ceremonyclient
 
 # Showing the node version and logs
 echo "🌟Your node is now updated to v$NODE_VERSION !"

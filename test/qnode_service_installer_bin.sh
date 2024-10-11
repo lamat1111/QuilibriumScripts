@@ -282,7 +282,7 @@ echo
 sleep 2  # Add a 2-second delay
 sudo systemctl daemon-reload
 sudo systemctl enable ceremonyclient
-sudo service ceremonyclient start
+sudo systemctl start ceremonyclient
 
 # Final messages
 echo "✅ Now your node is starting!"
