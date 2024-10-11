@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.9.2"
+SCRIPT_VERSION="1.9.3"
 
 # Function to check if wget is installed, and install it if it is not
 check_wget() {
@@ -43,29 +43,28 @@ upgrade_qone() {
 
 # Function to check for newer script version
 check_for_updates() {
-    LATEST_VERSION=$(wget --no-cache -qO- "https://github.com/lamat1111/QuilibriumScripts/raw/main/qone.sh" | grep 'SCRIPT_VERSION=' | head -1 | cut -d'"' -f2)
+    local GITHUB_RAW_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/qone.sh"
+    local LATEST_VERSION
+    LATEST_VERSION=$(curl -sS "$GITHUB_RAW_URL" | grep 'SCRIPT_VERSION=' | head -1 | cut -d'"' -f2)
+    
     if [ $? -ne 0 ] || [ -z "$LATEST_VERSION" ]; then
         echo "Failed to check for updates. Continuing with current version."
-        return 0
+        return 1
     fi
     
     if [ "$SCRIPT_VERSION" != "$LATEST_VERSION" ]; then
         echo "New version available. Attempting update..."
-        if wget --no-cache -O ~/qone_new.sh "https://github.com/lamat1111/QuilibriumScripts/raw/main/qone.sh"; then
-            DOWNLOADED_VERSION=$(grep 'SCRIPT_VERSION=' ~/qone_new.sh | head -1 | cut -d'"' -f2)
-            
-            if [ "$DOWNLOADED_VERSION" = "$LATEST_VERSION" ]; then
-                mv ~/qone_new.sh ~/qone.sh
-                chmod +x ~/qone.sh
-                echo "✅ New version ($LATEST_VERSION) installed. Restarting script..."
-                exec ~/qone.sh
-            else
-                echo "Error: Version mismatch in downloaded file. Update aborted."
-                rm ~/qone_new.sh
-            fi
+        if curl -sS -o ~/qone_new.sh "$GITHUB_RAW_URL"; then
+            chmod +x ~/qone_new.sh
+            mv ~/qone_new.sh ~/qone.sh
+            echo "✅ New version ($LATEST_VERSION) installed. Restarting script..."
+            exec ~/qone.sh
         else
             echo "Error: Failed to download the new version. Update aborted."
+            return 1
         fi
+    else
+        echo "Current version is up to date."
     fi
 }
 
