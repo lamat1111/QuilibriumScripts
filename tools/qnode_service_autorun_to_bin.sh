@@ -182,13 +182,25 @@ EOF
     fi
 fi
 
-sudo systemctl daemon-reload
-
-echo "✅ Service file update completed."
-sleep 1
+# Show the current service file
 echo
-echo "Showing your current service file:"
+echo "Showing your updated service file:"
 echo "================================="
 cat /lib/systemd/system/ceremonyclient.service
 echo "================================="
 echo
+
+# Ask for user confirmation
+read -p "Is everything correct in the service file? (Y/N): " confirm
+
+if [[ $confirm == [Yy]* ]]; then
+    echo "⏳ Reloading daemon and restarting the node to apply the new settings..."
+    sudo systemctl daemon-reload
+    sudo systemctl restart ceremonyclient
+    echo "✅ Service file update completed and applied."
+else
+    echo "Please manually correct the service file at /lib/systemd/system/ceremonyclient.service"
+    echo "After corrections, please run the following commands:"
+    echo "sudo systemctl daemon-reload"
+    echo "sudo systemctl restart ceremonyclient"
+fi
