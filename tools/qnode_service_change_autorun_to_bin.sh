@@ -42,6 +42,8 @@ Processing... ⏳
 
 EOF
 
+sleep 3
+
 #==========================
 # INSTALL APPS
 #==========================
@@ -62,6 +64,8 @@ check_and_install() {
 check_and_install sudo
 check_and_install git
 check_and_install curl
+
+sleep 1
 
 echo
 
@@ -109,6 +113,8 @@ else
     echo "❌ Error: Unsupported system architecture ($ARCH) or operating system ($OS)."
     exit 1
 fi
+
+sleep 1
 
 #==========================
 # SERVICE UPDATE
@@ -182,6 +188,8 @@ EOF
     fi
 fi
 
+sleep 1
+
 # Show the current service file
 echo
 echo "Showing your updated service file:"
@@ -190,6 +198,7 @@ cat /lib/systemd/system/ceremonyclient.service
 echo "================================="
 echo
 
+sleep 1
 # Ask for user confirmation
 read -p "Is everything correct in the service file? (Y/N): " confirm
 
