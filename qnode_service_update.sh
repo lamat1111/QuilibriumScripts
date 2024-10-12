@@ -240,9 +240,9 @@ EXEC_START="$NODE_PATH/$NODE_BINARY"
 
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
 
-# Check if the node is running via cluster script and skip
-if [ -f "$SERVICE_FILE" ] && grep -q "ExecStart=/root/scripts/qnode_cluster_run.sh" "$SERVICE_FILE"; then
-    echo "⚠️ You are running a cluster. Skipping service file update..."
+# Check if the node is running via cluster script or para.sh and skip
+if [ -f "$SERVICE_FILE" ] && (grep -q "ExecStart=/root/scripts/qnode_cluster_run.sh" "$SERVICE_FILE" || grep -q "ExecStart=.*para\.sh" "$SERVICE_FILE"); then
+    echo "⚠️ You are running a cluster or para.sh script. Skipping service file update..."
     echo
 else
     # Build service file
