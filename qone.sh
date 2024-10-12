@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.9.4"
+SCRIPT_VERSION="1.9.5"
 
 #==========================
 # INSTALL APPS
@@ -318,15 +318,15 @@ return_to_menu() {
     display_menu
 }
 
-restart_node() {
+start_node() {
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
     else
         echo
-        echo "⌛️   Restarting node service..."
+        echo "⌛️   Starting node service..."
         echo
-        service ceremonyclient restart
-        echo "✅   Node restarted"
+        service ceremonyclient start
+        echo "✅   Node started"
         echo
     fi
 }
@@ -563,10 +563,10 @@ To remove the script fomr your system, run: rm ~/qone.sh
     https://docs.quilibrium.one/
 
  6) Stop node:
-    Stop the node.
+    Stops the node.
 
- 7) Restart node:
-    Restart the node.
+ 7) Start node:
+    Starts the node.
 
  8) Node version:
     Display the version of the node.
@@ -653,7 +653,7 @@ Let your node run for 30 minutes, then choose option 3. Done!
 4) Node Log                                    
 5) Update node                14) qClient install      
 6) Stop node                                               
-7) Restart node               15) Check visibility                 
+7) Start node               15) Check visibility                 
 8) Node version               16) System cleaner               
 9) Node info                                      
 -----------------------------------------------------------------
@@ -684,7 +684,7 @@ while true; do
         4) node_logs; continue ;;
         5) confirm_action "$(wrap_text "$update_node_message" "")" "Update node" update_node && continue ;;
         6) stop_node ;;
-        7) restart_node ;;
+        7) start_node ;;
         8) node_version ;;
         9) node_info ;;
         10) quil_balance ;;
