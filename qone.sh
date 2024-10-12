@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.9.5"
+SCRIPT_VERSION="1.9.6"
 
 #==========================
 # INSTALL APPS
@@ -653,7 +653,7 @@ Let your node run for 30 minutes, then choose option 3. Done!
 4) Node Log                                    
 5) Update node                14) qClient install      
 6) Stop node                                               
-7) Start node               15) Check visibility                 
+7) Start node                 15) Check visibility                 
 8) Node version               16) System cleaner               
 9) Node info                                      
 -----------------------------------------------------------------
