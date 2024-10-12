@@ -147,7 +147,9 @@ Restart=always
 RestartSec=5s
 WorkingDirectory=$NODE_PATH
 ExecStart=$EXEC_START
+ExecStop=/bin/kill -s SIGINT $MAINPID
 KillSignal=SIGINT
+FinalKillSignal=SIGINT
 TimeoutStopSec=30s
 
 [Install]
@@ -160,6 +162,7 @@ EOF
     else
         echo "⏳ Checking existing ceremonyclient service file..."  
 
+        # Function to add or update a line in the [Service] section
         # Function to add or update a line in the [Service] section
         update_service_section() {
             local key="$1"
@@ -174,17 +177,36 @@ EOF
                 fi
             else
                 echo "⏳ Adding $key=$value to the service file..."
-                sudo sed -i "/^\[Service\]/,/^\[/ {
-                    /^\[Install\]/i $key=$value
+                sudo sed -i "/^\[Service\]/,/^\[Install\]/ {
+                    /^$/,/^\[Install\]/ {
+                        /^$/i $key=$value
+                        /^\[Install\]/i \\
+
+                    }
                 }" "$SERVICE_FILE"
             fi
+        }
+
+        # Function to ensure proper formatting of the service file
+        ensure_proper_formatting() {
+            # Remove any duplicate empty lines
+            sudo sed -i '/^$/N;/^\n$/D' "$SERVICE_FILE"
+            
+            # Ensure there's exactly one empty line before [Install]
+            sudo sed -i '/^\[Install\]/i \\' "$SERVICE_FILE"
+            sudo sed -i '/^\[Install\]/!{/^$/N;/^\n$/D}' "$SERVICE_FILE"
         }
 
         # Update all required lines in the [Service] section
         update_service_section "WorkingDirectory" "$NODE_PATH"
         update_service_section "ExecStart" "$EXEC_START"
+        update_service_section "ExecStop" "/bin/kill -s SIGINT \$MAINPID"
         update_service_section "KillSignal" "SIGINT"
+        update_service_section "FinalKillSignal" "SIGINT"
         update_service_section "TimeoutStopSec" "30s"
+
+        # Ensure proper formatting after all updates
+        ensure_proper_formatting
     fi
 fi
 
