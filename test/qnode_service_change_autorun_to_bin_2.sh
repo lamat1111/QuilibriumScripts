@@ -3,6 +3,9 @@
 #Comment out for automatic creation of the node version
 #NODE_VERSION=2.0
 
+#BUGS!!!
+# 
+
 
 cat << "EOF"
 
