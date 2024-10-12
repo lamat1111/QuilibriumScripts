@@ -40,11 +40,14 @@ Follow the guide at https://docs.quilibrium.one
 Made with 🔥 by LaMat - https://quilibrium.one
 ===========================================================================
 
+⚠️ THIS SCRIPT DOES NOT SUPPORT CLUSTERS! ⚠️
+IF YOU ARE RUNNING A NODE CLUSTER PRESS 'CTRL+C' IMMEDIATELY
+
 Processing... ⏳
 
 EOF
 
-sleep 5  
+sleep 7  
 
 #==========================
 # INSTALL APPS
