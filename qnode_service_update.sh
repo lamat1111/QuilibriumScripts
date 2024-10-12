@@ -49,6 +49,15 @@ EOF
 
 sleep 7  
 
+SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
+
+# Check if the service file exists
+if [ ! -f "$SERVICE_FILE" ]; then
+    echo "❌ Error: you are not runnign your node via service file:  $SERVICE_FILE"
+    echo "This update script won't work for you. Exiting."
+    exit 1
+fi
+
 #==========================
 # INSTALL APPS
 #==========================
@@ -237,8 +246,6 @@ HOME=$(eval echo ~$HOME_DIR)
 
 NODE_PATH="$HOME/ceremonyclient/node"
 EXEC_START="$NODE_PATH/$NODE_BINARY"
-
-SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
 
 # Check if the node is running via cluster script or para.sh and skip
 if [ -f "$SERVICE_FILE" ] && (grep -q "ExecStart=/root/scripts/qnode_cluster_run.sh" "$SERVICE_FILE" || grep -q "ExecStart=.*para\.sh" "$SERVICE_FILE"); then
