@@ -152,6 +152,7 @@ WorkingDirectory=$NODE_PATH
 ExecStart=$EXEC_START
 ExecStop=/bin/kill -s SIGINT $MAINPID
 KillSignal=SIGINT
+RestartKillSignal=SIGINT
 FinalKillSignal=SIGINT
 TimeoutStopSec=30s
 
