@@ -200,8 +200,8 @@ else
 fi
 sleep 1
 
-echo "⏳ Killing all node processes if there are any remaining..."
-sudo pkill node
+#echo "⏳ Killing all node processes if there are any remaining..."
+#sudo pkill node
 echo
 
 #==========================
