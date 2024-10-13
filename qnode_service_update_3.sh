@@ -213,47 +213,66 @@ sleep 1
 # echo
 
 
-echo "⏳ Checking for new node releases..."
+#!/bin/bash
 
-# Use existing OS and ARCH variables
-release_os=$(echo $OS | tr '[:upper:]' '[:lower:]')
-release_arch=$ARCH
-[ "$release_arch" = "x86_64" ] && release_arch="amd64"
-[ "$release_arch" = "aarch64" ] && release_arch="arm64"
+get_os_arch() {
+    local os=$(uname -s | tr '[:upper:]' '[:lower:]')
+    local arch=$(uname -m)
 
-# Construct the expected binary name
-EXPECTED_BINARY="node-$NODE_VERSION-$release_os-$release_arch"
+    case "$os" in
+        linux|darwin) ;;
+        *) echo "Unsupported operating system: $os" >&2; return 1 ;;
+    esac
 
-# Fetch and filter the list of release files
-files=$(curl -s https://releases.quilibrium.com/release | grep "node-.*-$release_os-$release_arch" | grep -v '.sha256')
-new_release=false
+    case "$arch" in
+        x86_64|amd64) arch="amd64" ;;
+        arm64|aarch64) arch="arm64" ;;
+        *) echo "Unsupported architecture: $arch" >&2; return 1 ;;
+    esac
 
-# Create a directory for node binaries if it doesn't exist
-mkdir -p ~/ceremonyclient/node
+    echo "${os}-${arch}"
+}
 
-# Process each file in the list
-for file in $files; do
-    version=$(echo "$file" | cut -d '-' -f 2)
-    if [ "$file" != "$EXPECTED_BINARY" ] && [ "$version" != "$NODE_VERSION" ]; then
-        echo "⏳ Downloading new release: $file"
-        curl -s "https://releases.quilibrium.com/$file" > ~/ceremonyclient/node/"$file"
-        chmod +x ~/ceremonyclient/node/"$file"
-        new_release=true
-        NODE_BINARY="$file"
-        NODE_VERSION="$version"
-        break  # Exit the loop after downloading the new version
+# Base URL for the Quilibrium releases
+RELEASE_FILES_URL="https://releases.quilibrium.com/release"
+
+cd ~/ceremonyclient/node
+
+# Get the current OS and architecture
+OS_ARCH=$(get_os_arch)
+
+# Fetch the list of files from the release page
+RELEASE_FILES=$(curl -s $RELEASE_FILES_URL | grep -oE "node-[0-9]+\.[0-9]+\.[0-9]+-${OS_ARCH}(\.dgst)?(\.sig\.[0-9]+)?")
+
+# Change to the download directory
+cd ~/ceremonyclient/node
+
+# Download each file
+for file in $RELEASE_FILES; do
+    echo "Downloading $file..."
+    wget "https://releases.quilibrium.com/$file"
+    
+    # Check if the download was successful
+    if [ $? -eq 0 ]; then
+        echo "Successfully downloaded $file"
+        # Check if the file is the base binary (without .dgst or .sig suffix)
+        if [[ $file =~ ^node-[0-9]+\.[0-9]+\.[0-9]+-${OS_ARCH}$ ]]; then
+            echo "Making $file executable..."
+            chmod +x "$file"
+            if [ $? -eq 0 ]; then
+                echo "Successfully made $file executable"
+            else
+                echo "Failed to make $file executable"
+            fi
+        fi
+    else
+        echo "Failed to download $file"
     fi
+    
+    echo "------------------------"
 done
 
-if [ "$new_release" = true ]; then
-    echo "✅ Downloaded new node release v$NODE_VERSION"
-    # Update EXEC_START for the service file update later
-    EXEC_START="$HOME/ceremonyclient/node/$NODE_BINARY"
-else
-    echo "✅ Your node is already up to date with version v$NODE_VERSION"
-fi
-
-echo
+echo "Download process completed."
 
 
 #==========================
