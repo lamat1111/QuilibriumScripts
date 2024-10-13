@@ -200,8 +200,9 @@ else
 fi
 sleep 1
 
+#causes the script to stop, not sure why...
 #echo "⏳ Killing all node processes if there are any remaining..."
-#sudo pkill node
+#sudo pkill -SIGKILL node
 echo
 
 #==========================
@@ -338,7 +339,6 @@ WorkingDirectory=$NODE_PATH
 ExecStart=$EXEC_START
 KillSignal=SIGINT
 TimeoutStopSec=30s
-FinalKillSignal=SIGTERM
 
 [Install]
 WantedBy=multi-user.target
@@ -375,7 +375,6 @@ EOF
         update_service_section "ExecStart" "$EXEC_START"
         update_service_section "KillSignal" "SIGINT"
         update_service_section "TimeoutStopSec" "30s"
-        update_service_section "FinalKillSignal" "SIGTERM"
     fi
 fi
 
