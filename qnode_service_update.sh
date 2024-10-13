@@ -253,7 +253,7 @@ cd ~/ceremonyclient/node
 # Download each file
 for file in $RELEASE_FILES; do
     echo "Downloading $file..."
-    wget "https://releases.quilibrium.com/$file"
+    wget -O "https://releases.quilibrium.com/$file"
     
     # Check if the download was successful
     if [ $? -eq 0 ]; then
