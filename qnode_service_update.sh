@@ -233,8 +233,6 @@ get_os_arch() {
 # Base URL for the Quilibrium releases
 RELEASE_FILES_URL="https://releases.quilibrium.com/release"
 
-cd ~/ceremonyclient/node
-
 # Get the current OS and architecture
 OS_ARCH=$(get_os_arch)
 
