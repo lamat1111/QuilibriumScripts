@@ -200,17 +200,25 @@ else
 fi
 sleep 1
 
+#==========================
+# CEREMONYCLIENT REPO UPDATE
+#==========================
+
 # # Set the remote URL and download
-# echo "⏳ Downloading new release v$NODE_VERSION"
-# cd  ~/ceremonyclient
-# git remote set-url origin https://github.com/QuilibriumNetwork/ceremonyclient.git
-# #git remote set-url origin https://source.quilibrium.com/quilibrium/ceremonyclient.git || git remote set-url origin https://git.quilibrium-mirror.ch/agostbiro/ceremonyclient.git
-# git checkout main
-# git branch -D release
-# git pull
-# git checkout release
-# echo "✅ Downloaded the latest changes successfully."
-# echo
+echo "⏳ Downloading new release v$NODE_VERSION"
+cd  ~/ceremonyclient
+git remote set-url origin https://github.com/QuilibriumNetwork/ceremonyclient.git
+#git remote set-url origin https://source.quilibrium.com/quilibrium/ceremonyclient.git || git remote set-url origin https://git.quilibrium-mirror.ch/agostbiro/ceremonyclient.git
+git checkout main
+git branch -D release
+git pull
+git checkout release
+echo "✅ Downloaded the latest changes successfully."
+echo
+
+#==========================
+# NODE BINARY DOWNLOAD
+#==========================
 
 get_os_arch() {
     local os=$(uname -s | tr '[:upper:]' '[:lower:]')
@@ -267,7 +275,7 @@ for file in $RELEASE_FILES; do
     echo "------------------------"
 done
 
-echo "Download process completed."
+echo "✅  Node binary download completed."
 
 
 #==========================
@@ -326,6 +334,7 @@ WorkingDirectory=$NODE_PATH
 ExecStart=$EXEC_START
 KillSignal=SIGINT
 TimeoutStopSec=30s
+FinalKillSignal=SIGTERM
 
 [Install]
 WantedBy=multi-user.target
@@ -362,6 +371,7 @@ EOF
         update_service_section "ExecStart" "$EXEC_START"
         update_service_section "KillSignal" "SIGINT"
         update_service_section "TimeoutStopSec" "30s"
+        update_service_section "FinalKillSignal" "SIGTERM"
     fi
 fi
 
