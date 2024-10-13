@@ -212,9 +212,6 @@ sleep 1
 # echo "✅ Downloaded the latest changes successfully."
 # echo
 
-
-#!/bin/bash
-
 get_os_arch() {
     local os=$(uname -s | tr '[:upper:]' '[:lower:]')
     local arch=$(uname -m)
