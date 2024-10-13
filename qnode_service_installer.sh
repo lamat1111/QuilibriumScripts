@@ -269,6 +269,7 @@ WorkingDirectory=$NODE_PATH
 ExecStart=$EXEC_START
 KillSignal=SIGINT
 TimeoutStopSec=30s
+FinalKillSignal=SIGTERM
 Environment="GOMAXPROCS=$GOMAXPROCS"
 
 [Install]
