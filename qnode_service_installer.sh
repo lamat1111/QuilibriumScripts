@@ -228,7 +228,7 @@ cd ~/ceremonyclient/node
 # Download each file
 for file in $RELEASE_FILES; do
     echo "Downloading $file..."
-    wget -O "https://releases.quilibrium.com/$file"
+    curl -L -o "$file" "https://releases.quilibrium.com/$file"
     
     # Check if the download was successful
     if [ $? -eq 0 ]; then
@@ -251,6 +251,7 @@ for file in $RELEASE_FILES; do
 done
 
 echo "✅  Node binary download completed."
+echo
 
 #==========================
 # DOWNLOAD QCLIENT
@@ -264,18 +265,17 @@ if [ -n "$QCLIENT_BINARY" ]; then
     if ! wget https://releases.quilibrium.com/$QCLIENT_BINARY; then
         echo "❌ Error: Failed to download qClient binary."
         echo "Your node will still work, but you'll need to install the qclient manually later if needed."
-        echo
     else
         mv $QCLIENT_BINARY qclient
         chmod +x qclient
         echo "✅ qClient binary downloaded successfully."
-        echo
     fi
 else
     echo "ℹ️ Skipping qClient download as QCLIENT_BINARY could not be determined earlier."
     echo "Your node will still work, but you'll need to install the qclient manually later if needed."
     echo
 fi
+echo
 
 #==========================
 # SETUP SERVICE
@@ -329,7 +329,6 @@ WorkingDirectory=$NODE_PATH
 ExecStart=$EXEC_START
 KillSignal=SIGINT
 TimeoutStopSec=30s
-FinalKillSignal=SIGTERM
 Environment="GOMAXPROCS=$GOMAXPROCS"
 
 [Install]
