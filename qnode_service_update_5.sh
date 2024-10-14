@@ -290,22 +290,6 @@ echo "✅  Node binary download completed."
 # Base URL for the Quilibrium releases
 BASE_URL="https://releases.quilibrium.com"
 
-# Determine the qclient binary name based on the architecture and OS
-if [ "$ARCH" = "x86_64" ]; then
-    if [ "$OS" = "Linux" ]; then
-        QCLIENT_BINARY="qclient-${QCLIENT_VERSION}-linux-amd64"
-    elif [ "$OS" = "Darwin" ]; then
-        QCLIENT_BINARY="qclient-${QCLIENT_VERSION}-darwin-arm64"  # Note: There's no darwin-amd64 in the list
-    fi
-elif [ "$ARCH" = "aarch64" ]; then
-    if [ "$OS" = "Linux" ]; then
-        QCLIENT_BINARY="qclient-${QCLIENT_VERSION}-linux-arm64"
-    elif [ "$OS" = "Darwin" ]; then
-        QCLIENT_BINARY="qclient-${QCLIENT_VERSION}-darwin-arm64"
-    fi
-fi
-
-echo "QCLIENT_BINARY set to: $QCLIENT_BINARY"
 
 # Change to the download directory
 if ! cd ~/ceremonyclient/client; then
@@ -346,8 +330,14 @@ download_and_overwrite "$BASE_URL/${QCLIENT_BINARY}.dgst" "${QCLIENT_BINARY}.dgs
 echo "Downloading signature files..."
 for i in {1..20}; do
     sig_file="${QCLIENT_BINARY}.dgst.sig.${i}"
-    if curl -s --head "$BASE_URL/$sig_file" | head -n 1 | grep "HTTP/1.[01] [23].." > /dev/null; then
-        download_and_overwrite "$BASE_URL/$sig_file" "$sig_file"
+    if file_exists "$BASE_URL/$sig_file"; then
+        if download_and_overwrite "$BASE_URL/$sig_file" "$sig_file"; then
+            echo "Downloaded $sig_file"
+        else
+            echo "Failed to download $sig_file"
+        fi
+    else
+        echo "Signature file $sig_file does not exist, skipping"
     fi
 done
 
