@@ -6,20 +6,45 @@ OS=$(uname -s)
 
 BASE_URL="https://releases.quilibrium.com"
 
-# Determine the qclient binary name based on the architecture and OS
+#QCLIENT_VERSION=2.0.0
+
+# Determine qclient latest version
+# Check if QCLIENT_VERSION is empty
+if [ -z "$QCLIENT_VERSION" ]; then
+    QCLIENT_VERSION=$(curl -s https://releases.quilibrium.com/qclient-release | grep -E "^qclient-[0-9]+(\.[0-9]+)*" | sed 's/^qclient-//' | cut -d '-' -f 1 |  head -n 1)
+    if [ -z "$QCLIENT_VERSION" ]; then
+        echo "⚠️ Warning: Unable to determine QCLIENT_VERSION automatically. Continuing without it."
+        echo "The script won't be able to install the qclient, but it will still install your node."
+        echo "You can install the qclient later manually if you need to."
+        echo
+        sleep 1
+    else
+        echo "✅ Automatically determined QCLIENT_VERSION: $QCLIENT_VERSION"
+    fi
+else
+    echo "✅ Using specified QCLIENT_VERSION: $QCLIENT_VERSION"
+fi
+
+echo
+
+# Determine the node binary name based on the architecture and OS
 if [ "$ARCH" = "x86_64" ]; then
     if [ "$OS" = "Linux" ]; then
-        QCLIENT_BINARY="qclient-2.0.0-linux-amd64"
+        [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-amd64"
     elif [ "$OS" = "Darwin" ]; then
-        QCLIENT_BINARY="qclient-2.0.0-darwin-arm64"  # Note: There's no darwin-amd64 in the list
+        [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-amd64"
     fi
 elif [ "$ARCH" = "aarch64" ]; then
     if [ "$OS" = "Linux" ]; then
-        QCLIENT_BINARY="qclient-2.0.0-linux-arm64"
+        [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-arm64"
     elif [ "$OS" = "Darwin" ]; then
-        QCLIENT_BINARY="qclient-2.0.0-darwin-arm64"
+        [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-arm64"
     fi
+else
+    echo "❌ Error: Unsupported system architecture ($ARCH) or operating system ($OS)."
+    exit 1
 fi
+
 
 echo "QCLIENT_BINARY set to: $QCLIENT_BINARY"
 

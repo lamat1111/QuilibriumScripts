@@ -6,7 +6,9 @@ OS=$(uname -s)
 
 BASE_URL="https://releases.quilibrium.com"
 
- Determine qclient latest version
+#QCLIENT_VERSION=2.0.0
+
+# Determine qclient latest version
 # Check if QCLIENT_VERSION is empty
 if [ -z "$QCLIENT_VERSION" ]; then
     QCLIENT_VERSION=$(curl -s https://releases.quilibrium.com/qclient-release | grep -E "^qclient-[0-9]+(\.[0-9]+)*" | sed 's/^qclient-//' | cut -d '-' -f 1 |  head -n 1)
