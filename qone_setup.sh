@@ -59,8 +59,9 @@ EOF
         bashrc_section=$(cat << 'EOF'
         
 # === qone.sh setup ===
-# The following lines are added to run qone.sh on login and create aliases for qone.sh
-~/qone.sh #this runs .qone on login
+#this runs .qone on login - comment out to activate
+# ~/qone.sh
+#this allows you to call the qone menu with "q1"
 alias q1='~/qone.sh'
 # === end qone.sh setup ===
 EOF
@@ -75,5 +76,3 @@ EOF
         # Continue execution even if adding section to .bashrc fails
     fi
 fi
-
-echo "To launch the Quickstart Node Menu run './qone.sh'"
