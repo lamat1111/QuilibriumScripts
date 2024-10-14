@@ -289,48 +289,56 @@ echo "✅  Node binary download completed."
 #==========================
 
 # Base URL for the Quilibrium releases
-RELEASE_FILES_URL="https://releases.quilibrium.com"
-# Updated regex to match qclient files
+BASE_URL="https://releases.quilibrium.com"
 
-# Fetch the list of files from the release page
-RELEASE_FILES=$(curl -s $RELEASE_FILES_URL | grep -oE "qclient-[0-9]+\.[0-9]+\.[0-9]+-${OS_ARCH}(\.dgst)?(\.sig\.[0-9]+)?")
 
 # Change to the download directory
-cd ~/ceremonyclient/client
+if ! cd ~/ceremonyclient/client; then
+    echo "❌ Error: Unable to change to the download directory"
+    exit 1
+fi
 
-# Download each file
-for file in $RELEASE_FILES; do
-    echo "Downloading $file..."
-    curl -L -O "$RELEASE_FILES_URL/$file"
-    
-    # Check if the download was successful
-    if [ $? -eq 0 ]; then
-        echo "Successfully downloaded $file"
-        # Check if the file is the main binary (without .dgst or .sig suffix)
-        if [[ $file =~ ^qclient-[0-9]+\.[0-9]+\.[0-9]+-${OS_ARCH}$ ]]; then
-            echo "Making $file executable..."
-            chmod +x "$file"
-            if [ $? -eq 0 ]; then
-                echo "Successfully made $file executable"
-                echo "Renaming $file to qclient..."
-                mv -f "$file" "qclient"
-                if [ $? -eq 0 ]; then
-                    echo "Successfully renamed $file to qclient"
-                else
-                    echo "Failed to rename $file to qclient"
-                fi
-            else
-                echo "Failed to make $file executable"
-            fi
-        fi
+# Function to download file and overwrite if it exists
+download_and_overwrite() {
+    local url="$1"
+    local filename="$2"
+    if curl -L -o "$filename" "$url" --fail --silent; then
+        echo "✅ Successfully downloaded $filename"
+        return 0
     else
-        echo "Failed to download $file"
+        return 1
     fi
-    
-    echo "------------------------"
+}
+
+# Download the main binary
+echo "Downloading $QCLIENT_BINARY..."
+if download_and_overwrite "$BASE_URL/$QCLIENT_BINARY" "$QCLIENT_BINARY"; then
+    # Rename the binary to qclient, overwriting if it exists
+    mv -f "$QCLIENT_BINARY" qclient
+    chmod +x qclient
+    echo "✅ Renamed to qclient and made executable"
+else
+    echo "❌ Failed to download qclient binary. Manual installation may be required."
+    exit 1
+fi
+
+# Download the .dgst file
+echo "Downloading ${QCLIENT_BINARY}.dgst..."
+if ! download_and_overwrite "$BASE_URL/${QCLIENT_BINARY}.dgst" "${QCLIENT_BINARY}.dgst"; then
+    echo "❌ Failed to download .dgst file. Continuing without it."
+fi
+
+# Download signature files
+echo "Downloading signature files..."
+for i in {1..20}; do
+    sig_file="${QCLIENT_BINARY}.dgst.sig.${i}"
+    if download_and_overwrite "$BASE_URL/$sig_file" "$sig_file"; then
+        echo "Downloaded $sig_file"
+    fi
 done
 
-echo "✅  Qclient download completed."
+echo "✅ Qclient download completed."
+echo "The qclient binary is now available as 'qclient' in the current directory."
 
 #==========================
 # SERVICE UPDATE
