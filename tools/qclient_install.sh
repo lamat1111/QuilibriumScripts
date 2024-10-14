@@ -29,39 +29,42 @@ if ! cd ~/ceremonyclient/client; then
     exit 1
 fi
 
+# Function to download file and overwrite if it exists
+download_and_overwrite() {
+    local url="$1"
+    local filename="$2"
+    if wget -q -O "$filename" "$url"; then
+        echo "✅ Successfully downloaded $filename"
+        return 0
+    else
+        echo "❌ Error: Failed to download $filename"
+        return 1
+    fi
+}
+
 # Download the main binary
 echo "Downloading $QCLIENT_BINARY..."
-if wget -q "$BASE_URL/$QCLIENT_BINARY"; then
-    echo "✅ Successfully downloaded $QCLIENT_BINARY"
+if download_and_overwrite "$BASE_URL/$QCLIENT_BINARY" "$QCLIENT_BINARY"; then
     # Rename the binary to qclient, overwriting if it exists
     mv -f "$QCLIENT_BINARY" qclient
     chmod +x qclient
     echo "✅ Renamed to qclient and made executable"
 else
-    echo "❌ Error: Failed to download $QCLIENT_BINARY"
     echo "Manual installation may be required."
     exit 1
 fi
 
 # Download the .dgst file
 echo "Downloading ${QCLIENT_BINARY}.dgst..."
-if wget -q "$BASE_URL/${QCLIENT_BINARY}.dgst"; then
-    echo "✅ Successfully downloaded ${QCLIENT_BINARY}.dgst"
-else
-    echo "❌ Error: Failed to download ${QCLIENT_BINARY}.dgst"
-fi
+download_and_overwrite "$BASE_URL/${QCLIENT_BINARY}.dgst" "${QCLIENT_BINARY}.dgst"
 
 # Fetch and download all signature files
 echo "Downloading signature files..."
 sig_files=$(curl -s "$BASE_URL" | grep -oP "${QCLIENT_BINARY}\.dgst\.sig\.\K[0-9]+")
 for sig_num in $sig_files; do
     sig_file="${QCLIENT_BINARY}.dgst.sig.${sig_num}"
-    if wget -q "$BASE_URL/$sig_file"; then
-        echo "✅ Downloaded $sig_file"
-    else
-        echo "❌ Failed to download $sig_file"
-    fi
+    download_and_overwrite "$BASE_URL/$sig_file" "$sig_file"
 done
 
-echo "✅ Download process completed."
+echo "Download process completed."
 echo "The qclient binary is now available as 'qclient' in the current directory."
