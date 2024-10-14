@@ -57,7 +57,6 @@ FILES=$(curl -s "$BASE_URL" | grep -oE "qclient-$QCLIENT_VERSION-${OS_ARCH}(\.dg
 debug_print "FILES: $FILES"
 
 # Create and change to the download directory
-mkdir -p ~/ceremonyclient/client
 cd ~/ceremonyclient/client
 debug_print "Changed directory to $(pwd)"
 
