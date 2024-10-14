@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -x  # Enable debug mode
-
 # Determine the architecture and OS
 ARCH=$(uname -m)
 OS=$(uname -s)
@@ -33,10 +31,9 @@ fi
 
 # Download the main binary
 echo "Downloading $QCLIENT_BINARY..."
-if wget "$BASE_URL/$QCLIENT_BINARY"; then
+if wget -q "$BASE_URL/$QCLIENT_BINARY"; then
     echo "✅ Successfully downloaded $QCLIENT_BINARY"
     chmod +x "$QCLIENT_BINARY"
-    echo "✅ Made $QCLIENT_BINARY executable"
 else
     echo "❌ Error: Failed to download $QCLIENT_BINARY"
     echo "Manual installation may be required."
@@ -45,30 +42,25 @@ fi
 
 # Download the .dgst file
 echo "Downloading ${QCLIENT_BINARY}.dgst..."
-if wget "$BASE_URL/${QCLIENT_BINARY}.dgst"; then
+if wget -q "$BASE_URL/${QCLIENT_BINARY}.dgst"; then
     echo "✅ Successfully downloaded ${QCLIENT_BINARY}.dgst"
 else
     echo "❌ Error: Failed to download ${QCLIENT_BINARY}.dgst"
 fi
 
 # Attempt to download signature files
-echo "Attempting to download signature files..."
+echo "Downloading signature files..."
 for i in {1..20}; do  # Adjust range as needed
     sig_file="${QCLIENT_BINARY}.dgst.sig.${i}"
-    if wget -q --method=HEAD "$BASE_URL/$sig_file"; then
-        echo "Downloading $sig_file..."
-        if wget "$BASE_URL/$sig_file"; then
-            echo "✅ Successfully downloaded $sig_file"
+    if wget -q --spider "$BASE_URL/$sig_file" 2>/dev/null; then
+        if wget -q "$BASE_URL/$sig_file"; then
+            echo "✅ Downloaded $sig_file"
         else
-            echo "❌ Error: Failed to download $sig_file"
+            echo "❌ Failed to download $sig_file"
         fi
     else
-        echo "No more signature files found after ${QCLIENT_BINARY}.dgst.sig.$((i-1))"
         break
     fi
 done
 
 echo "Download process completed."
-ls -l
-
-set +x  # Disable debug mode
