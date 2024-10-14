@@ -288,9 +288,15 @@ echo "✅  Node binary download completed."
 # QCLIENT UPDATE
 #==========================
 
-# Base URL for the Quilibrium releases
+#==========================
+# QCLIENT UPDATE
+#==========================
+
+# Base URL for the Quilibrium qclient releases
 RELEASE_FILES_URL="https://releases.quilibrium.com"
-# Updated regex to match qclient files
+
+# Get the current OS and architecture
+OS_ARCH=$(get_os_arch)
 
 # Fetch the list of files from the release page
 RELEASE_FILES=$(curl -s $RELEASE_FILES_URL | grep -oE "qclient-[0-9]+\.[0-9]+\.[0-9]+-${OS_ARCH}(\.dgst)?(\.sig\.[0-9]+)?")
