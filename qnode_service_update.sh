@@ -243,11 +243,11 @@ get_os_arch() {
     echo "${os}-${arch}"
 }
 
-# Base URL for the Quilibrium releases
-RELEASE_FILES_URL="https://releases.quilibrium.com/release"
-
 # Get the current OS and architecture
 OS_ARCH=$(get_os_arch)
+
+# Base URL for the Quilibrium releases
+RELEASE_FILES_URL="https://releases.quilibrium.com/release"
 
 # Fetch the list of files from the release page
 # Updated regex to allow for an optional fourth version number
@@ -288,26 +288,49 @@ echo "✅  Node binary download completed."
 # QCLIENT UPDATE
 #==========================
 
-# Building qClient binary
-if [ -n "$QCLIENT_BINARY" ]; then
-    echo "⏳ Downloading qClient..."
-    sleep 1  # Add a 1-second delay
-    cd ~/ceremonyclient/client
+# Base URL for the Quilibrium releases
+RELEASE_FILES_URL="https://releases.quilibrium.com"
+# Updated regex to match qclient files
 
-    if ! wget https://releases.quilibrium.com/$QCLIENT_BINARY; then
-        echo "❌ Error: Failed to download qClient binary."
-        echo "Your node will still work, but you'll need to install the qclient manually later if needed."
+# Fetch the list of files from the release page
+RELEASE_FILES=$(curl -s $RELEASE_FILES_URL | grep -oE "qclient-[0-9]+\.[0-9]+\.[0-9]+-${OS_ARCH}(\.dgst)?(\.sig\.[0-9]+)?")
+
+# Change to the download directory
+cd ~/ceremonyclient/client
+
+# Download each file
+for file in $RELEASE_FILES; do
+    echo "Downloading $file..."
+    curl -L -O "$RELEASE_FILES_URL/$file"
+    
+    # Check if the download was successful
+    if [ $? -eq 0 ]; then
+        echo "Successfully downloaded $file"
+        # Check if the file is the main binary (without .dgst or .sig suffix)
+        if [[ $file =~ ^qclient-[0-9]+\.[0-9]+\.[0-9]+-${OS_ARCH}$ ]]; then
+            echo "Making $file executable..."
+            chmod +x "$file"
+            if [ $? -eq 0 ]; then
+                echo "Successfully made $file executable"
+                echo "Renaming $file to qclient..."
+                mv -f "$file" "qclient"
+                if [ $? -eq 0 ]; then
+                    echo "Successfully renamed $file to qclient"
+                else
+                    echo "Failed to rename $file to qclient"
+                fi
+            else
+                echo "Failed to make $file executable"
+            fi
+        fi
     else
-        mv $QCLIENT_BINARY qclient
-        chmod +x qclient
-        echo "✅ qClient binary downloaded successfully."
+        echo "Failed to download $file"
     fi
-else
-    echo "ℹ️ Skipping qClient download as QCLIENT_BINARY could not be determined earlier."
-    echo "Your node will still work, but you'll need to install the qclient manually later if needed."
-fi
+    
+    echo "------------------------"
+done
 
-echo
+echo "✅  Qclient download completed."
 
 #==========================
 # SERVICE UPDATE
