@@ -70,10 +70,11 @@ download_and_overwrite() {
 # Download the main binary
 echo "Downloading $QCLIENT_BINARY..."
 if download_and_overwrite "$BASE_URL/$QCLIENT_BINARY" "$QCLIENT_BINARY"; then
+    chmod +x $QCLIENT_BINARY
     # Rename the binary to qclient, overwriting if it exists
-    mv -f "$QCLIENT_BINARY" qclient
-    chmod +x qclient
-    echo "✅ Renamed to qclient and made executable"
+    #mv -f "$QCLIENT_BINARY" qclient
+    #chmod +x qclient
+    #echo "✅ Renamed to qclient and made executable"
 else
     echo "Manual installation may be required."
     exit 1
@@ -93,4 +94,3 @@ for i in {1..20}; do
 done
 
 echo "Download process completed."
-echo "The qclient binary is now available as 'qclient' in the current directory."
