@@ -250,7 +250,8 @@ RELEASE_FILES_URL="https://releases.quilibrium.com/release"
 OS_ARCH=$(get_os_arch)
 
 # Fetch the list of files from the release page
-RELEASE_FILES=$(curl -s $RELEASE_FILES_URL | grep -oE "node-[0-9]+\.[0-9]+\.[0-9]+-${OS_ARCH}(\.dgst)?(\.sig\.[0-9]+)?")
+# Updated regex to allow for an optional fourth version number
+RELEASE_FILES=$(curl -s $RELEASE_FILES_URL | grep -oE "node-[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?-${OS_ARCH}(\.dgst)?(\.sig\.[0-9]+)?")
 
 # Change to the download directory
 cd ~/ceremonyclient/node
@@ -264,7 +265,7 @@ for file in $RELEASE_FILES; do
     if [ $? -eq 0 ]; then
         echo "Successfully downloaded $file"
         # Check if the file is the base binary (without .dgst or .sig suffix)
-        if [[ $file =~ ^node-[0-9]+\.[0-9]+\.[0-9]+-${OS_ARCH}$ ]]; then
+        if [[ $file =~ ^node-[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?-${OS_ARCH}$ ]]; then
             echo "Making $file executable..."
             chmod +x "$file"
             if [ $? -eq 0 ]; then
