@@ -307,7 +307,7 @@ for i in {1..20}; do
 done
 
 echo "✅ Qclient download completed."
-echo "The qclient binary is now available as 'qclient' in the current directory."
+echo "The qclient binary is now available as 'qclient' in '$HOME/ceremonyclient/node/client' directory."
 
 #==========================
 # SETUP SERVICE
