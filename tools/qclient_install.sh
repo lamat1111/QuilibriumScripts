@@ -39,39 +39,26 @@ else
     echo
 fi
 
-# Determine the binary names based on the architecture and OS
-if [ "$ARCH" = "x86_64" ]; then
-    if [ "$OS" = "Linux" ]; then
-        [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-amd64"
-    elif [ "$OS" = "Darwin" ]; then
-        GO_BINARY="go1.22.4.darwin-amd64.tar.gz"
-        [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-amd64"
-    fi
-elif [ "$ARCH" = "aarch64" ]; then
-    if [ "$OS" = "Linux" ]; then
-        [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-arm64"
-    elif [ "$OS" = "Darwin" ]; then
-        [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-arm64"
-    fi
-else
-    echo "❌ Error: Unsupported system architecture ($ARCH) or operating system ($OS)."
-    exit 1
-fi
-
-
 # Get the current OS and architecture
 OS_ARCH=$(get_os_arch)
 
-# Fetch the list of files from the release page
-FILES=$(curl -s $BASE_URL | grep -oE "qclient-[0-9]+\.[0-9]+\.[0-9]+-${OS_ARCH}(\.dgst)?(\.sig\.[0-9]+)?")
+# Set the QCLIENT_BINARY based on OS_ARCH
+QCLIENT_BINARY="qclient-$QCLIENT_VERSION-$OS_ARCH"
 
-# Change to the download directory
+# Set the BASE_URL
+BASE_URL="https://releases.quilibrium.com"
+
+# Fetch the list of files from the release page
+FILES=$(curl -s $BASE_URL | grep -oE "qclient-$QCLIENT_VERSION-${OS_ARCH}(\.dgst)?(\.sig\.[0-9]+)?")
+
+# Create and change to the download directory
+mkdir -p ~/ceremonyclient/client
 cd ~/ceremonyclient/client
 
 # Download each file
 for file in $FILES; do
     echo "Downloading $file..."
-    wget "https://releases.quilibrium.com/$file"
+    wget -O "$file" "$BASE_URL/$file"
     
     # Check if the download was successful
     if [ $? -eq 0 ]; then
@@ -84,6 +71,10 @@ for file in $FILES; do
     echo "------------------------"
 done
 
-mv $QCLIENT_BINARY qclient
-chmod +x qclient
-echo "✅ qClient binary downloaded and configured successfully."
+if [ -f "$QCLIENT_BINARY" ]; then
+    mv -f "$QCLIENT_BINARY" qclient
+    chmod +x qclient
+    echo "✅ qClient binary downloaded and configured successfully."
+else
+    echo "❌ Error: qClient binary not found. Please check the download process."
+fi
