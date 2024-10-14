@@ -2,7 +2,6 @@
 
 # Function to display current crontab
 show_crontab() {
-    echo
     echo "Current crontab:"
     echo "================================"
     crontab -l
@@ -17,13 +16,13 @@ modify_crontab() {
     crontab -l > "$temp_file"
     
     if [ "$action" = "deactivate" ]; then
-        sed -i '/qnode_rewards_to_gsheet\.sh$/ s/^/#/' "$temp_file"
-        sed -i '/qnode_rewards_to_gsheet_2\.sh$/ s/^/#/' "$temp_file"
-        sed -i '/qnode_balance_checker$/ s/^/#/' "$temp_file"
+        sed -i '/qnode_rewards_to_gsheet_2\.py/ s/^/#/' "$temp_file"
+        sed -i '/qnode_rewards_to_gsheet\.py/ s/^/#/' "$temp_file"
+        sed -i '/qnode_balance_checker\.sh/ s/^/#/' "$temp_file"
     elif [ "$action" = "activate" ]; then
-        sed -i '/qnode_rewards_to_gsheet\.sh$/ s/^#//' "$temp_file"
-        sed -i '/qnode_rewards_to_gsheet_2\.sh$/ s/^#//' "$temp_file"
-        sed -i '/qnode_balance_checker$/ s/^#//' "$temp_file"
+        sed -i '/qnode_rewards_to_gsheet_2\.py/ s/^#//' "$temp_file"
+        sed -i '/qnode_rewards_to_gsheet\.py/ s/^#//' "$temp_file"
+        sed -i '/qnode_balance_checker\.sh/ s/^#//' "$temp_file"
     fi
     
     crontab "$temp_file"
