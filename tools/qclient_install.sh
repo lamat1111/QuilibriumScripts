@@ -58,12 +58,13 @@ fi
 echo "Downloading ${QCLIENT_BINARY}.dgst..."
 download_and_overwrite "$BASE_URL/${QCLIENT_BINARY}.dgst" "${QCLIENT_BINARY}.dgst"
 
-# Fetch and download all signature files
+# Download signature files
 echo "Downloading signature files..."
-sig_files=$(curl -s "$BASE_URL" | grep -oP "${QCLIENT_BINARY}\.dgst\.sig\.\K[0-9]+")
-for sig_num in $sig_files; do
-    sig_file="${QCLIENT_BINARY}.dgst.sig.${sig_num}"
-    download_and_overwrite "$BASE_URL/$sig_file" "$sig_file"
+for i in {1..20}; do
+    sig_file="${QCLIENT_BINARY}.dgst.sig.${i}"
+    if wget -q --spider "$BASE_URL/$sig_file" 2>/dev/null; then
+        download_and_overwrite "$BASE_URL/$sig_file" "$sig_file"
+    fi
 done
 
 echo "Download process completed."
