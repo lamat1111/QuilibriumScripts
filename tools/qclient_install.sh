@@ -33,7 +33,10 @@ fi
 echo "Downloading $QCLIENT_BINARY..."
 if wget -q "$BASE_URL/$QCLIENT_BINARY"; then
     echo "✅ Successfully downloaded $QCLIENT_BINARY"
-    chmod +x "$QCLIENT_BINARY"
+    # Rename the binary to qclient, overwriting if it exists
+    mv -f "$QCLIENT_BINARY" qclient
+    chmod +x qclient
+    echo "✅ Renamed to qclient and made executable"
 else
     echo "❌ Error: Failed to download $QCLIENT_BINARY"
     echo "Manual installation may be required."
@@ -64,3 +67,4 @@ for i in {1..20}; do  # Adjust range as needed
 done
 
 echo "✅ Download process completed."
+echo "The qclient binary is now available as 'qclient' in the current directory."
