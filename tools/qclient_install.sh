@@ -7,6 +7,22 @@
 ARCH=$(uname -m)
 OS=$(uname -s)
 
+get_os_arch() {
+    local arch=$(uname -m)
+    local os=$(uname -s | tr '[:upper:]' '[:lower:]')
+    
+    case $arch in
+        x86_64)
+            arch="amd64"
+            ;;
+        aarch64)
+            arch="arm64"
+            ;;
+    esac
+    
+    echo "${os}-${arch}"
+}
+
 # Determine qclient latest version
 # Check if QCLIENT_VERSION is empty
 if [ -z "$QCLIENT_VERSION" ]; then
