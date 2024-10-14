@@ -257,25 +257,57 @@ echo "✅  Node binary download completed."
 # DOWNLOAD QCLIENT
 #==========================
 
-if [ -n "$QCLIENT_BINARY" ]; then
-    echo "⏳ Downloading qClient..."
-    sleep 1  
-    cd ~/ceremonyclient/client
+# Base URL for the Quilibrium releases
+BASE_URL="https://releases.quilibrium.com"
 
-    if ! wget https://releases.quilibrium.com/$QCLIENT_BINARY; then
-        echo "❌ Error: Failed to download qClient binary."
-        echo "Your node will still work, but you'll need to install the qclient manually later if needed."
-    else
-        mv $QCLIENT_BINARY qclient
-        chmod +x qclient
-        echo "✅ qClient binary downloaded successfully."
-    fi
-else
-    echo "ℹ️ Skipping qClient download as QCLIENT_BINARY could not be determined earlier."
-    echo "Your node will still work, but you'll need to install the qclient manually later if needed."
-    echo
+
+# Change to the download directory
+if ! cd ~/ceremonyclient/client; then
+    echo "❌ Error: Unable to change to the download directory"
+    exit 1
 fi
-echo
+
+# Function to download file and overwrite if it exists
+download_and_overwrite() {
+    local url="$1"
+    local filename="$2"
+    if curl -L -o "$filename" "$url" --fail --silent; then
+        echo "✅ Successfully downloaded $filename"
+        return 0
+    else
+        return 1
+    fi
+}
+
+# Download the main binary
+echo "Downloading $QCLIENT_BINARY..."
+if download_and_overwrite "$BASE_URL/$QCLIENT_BINARY" "$QCLIENT_BINARY"; then
+    # Rename the binary to qclient, overwriting if it exists
+    mv -f "$QCLIENT_BINARY" qclient
+    chmod +x qclient
+    echo "✅ Renamed to qclient and made executable"
+else
+    echo "❌ Failed to download qclient binary. Manual installation may be required."
+    exit 1
+fi
+
+# Download the .dgst file
+echo "Downloading ${QCLIENT_BINARY}.dgst..."
+if ! download_and_overwrite "$BASE_URL/${QCLIENT_BINARY}.dgst" "${QCLIENT_BINARY}.dgst"; then
+    echo "❌ Failed to download .dgst file. Continuing without it."
+fi
+
+# Download signature files
+echo "Downloading signature files..."
+for i in {1..20}; do
+    sig_file="${QCLIENT_BINARY}.dgst.sig.${i}"
+    if download_and_overwrite "$BASE_URL/$sig_file" "$sig_file"; then
+        echo "Downloaded $sig_file"
+    fi
+done
+
+echo "✅ Qclient download completed."
+echo "The qclient binary is now available as 'qclient' in the current directory."
 
 #==========================
 # SETUP SERVICE
