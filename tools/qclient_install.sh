@@ -84,10 +84,6 @@ else
     ls -la  # List directory contents for debugging
 fi
 
-# Clean up old files
-echo "Cleaning up old files..."
-find . -type f -name "qclient-*" ! -name "$QCLIENT_BINARY" -delete
-echo "✅ Cleanup completed."
 
 # Print debug information
 echo "Final Debug Information:"
