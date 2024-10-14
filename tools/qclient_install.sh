@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# Determine the ExecStart line based on the architecture
+set -x  # Enable debug mode
+
+# Determine the architecture and OS
 ARCH=$(uname -m)
 OS=$(uname -s)
 
@@ -11,7 +13,7 @@ if [ "$ARCH" = "x86_64" ]; then
     if [ "$OS" = "Linux" ]; then
         QCLIENT_BINARY="qclient-2.0.0-linux-amd64"
     elif [ "$OS" = "Darwin" ]; then
-        QCLIENT_BINARY="qclient-2.0.0-darwin-amd64"
+        QCLIENT_BINARY="qclient-2.0.0-darwin-arm64"  # Note: There's no darwin-amd64 in the list
     fi
 elif [ "$ARCH" = "aarch64" ]; then
     if [ "$OS" = "Linux" ]; then
@@ -21,27 +23,7 @@ elif [ "$ARCH" = "aarch64" ]; then
     fi
 fi
 
-get_os_arch() {
-    local arch=$(uname -m)
-    local os=$(uname -s | tr '[:upper:]' '[:lower:]')
-    
-    case $arch in
-        x86_64)
-            arch="amd64"
-            ;;
-        aarch64)
-            arch="arm64"
-            ;;
-    esac
-    
-    echo "${os}-${arch}"
-}
-
-# Get the current OS and architecture
-OS_ARCH=$(get_os_arch)
-
-# Fetch the list of files from the release page
-FILES=$(curl -s $BASE_URL | grep -oE "qclient-[0-9]+\.[0-9]+\.[0-9]+-${OS_ARCH}(\.dgst)?(\.sig\.[0-9]+)?")
+echo "QCLIENT_BINARY set to: $QCLIENT_BINARY"
 
 # Change to the download directory
 if ! cd ~/ceremonyclient/client; then
@@ -49,27 +31,41 @@ if ! cd ~/ceremonyclient/client; then
     exit 1
 fi
 
-# Download each file
-download_success=true
-for file in $FILES; do
-    echo "Downloading $file..."
-    if wget "$BASE_URL/$file"; then
-        echo "Successfully downloaded $file"
+# Download the main binary
+echo "Downloading $QCLIENT_BINARY..."
+if wget "$BASE_URL/$QCLIENT_BINARY"; then
+    echo "✅ Successfully downloaded $QCLIENT_BINARY"
+    chmod +x "$QCLIENT_BINARY"
+    echo "✅ Made $QCLIENT_BINARY executable"
+else
+    echo "❌ Error: Failed to download $QCLIENT_BINARY"
+    echo "Manual installation may be required."
+    exit 1
+fi
+
+# Download the .dgst file
+echo "Downloading ${QCLIENT_BINARY}.dgst..."
+if wget "$BASE_URL/${QCLIENT_BINARY}.dgst"; then
+    echo "✅ Successfully downloaded ${QCLIENT_BINARY}.dgst"
+else
+    echo "❌ Error: Failed to download ${QCLIENT_BINARY}.dgst"
+fi
+
+# Get the list of all files for the current binary
+echo "Fetching list of signature files..."
+ALL_FILES=$(curl -s $BASE_URL | grep -oE "${QCLIENT_BINARY}\.dgst\.sig\.[0-9]+")
+
+# Download all signature files
+for sig_file in $ALL_FILES; do
+    echo "Downloading $sig_file..."
+    if wget "$BASE_URL/$sig_file"; then
+        echo "✅ Successfully downloaded $sig_file"
     else
-        echo "❌ Error: Failed to download $file"
-        echo "Your node will still work, but you'll need to install the qclient manually later if needed."
-        download_success=false
+        echo "❌ Error: Failed to download $sig_file"
     fi
-    echo "------------------------"
 done
 
-# Move and configure qclient binary only if all downloads were successful
-if $download_success && [ -f "$QCLIENT_BINARY" ]; then
-    if mv "$QCLIENT_BINARY" qclient && chmod +x qclient; then
-        echo "✅ qClient binary downloaded and configured successfully."
-    else
-        echo "❌ Error: Failed to move or set permissions for qclient binary."
-    fi
-else
-    echo "❌ Error: qClient binary not found or download failed. Manual installation may be required."
-fi
+echo "Download process completed."
+ls -l
+
+set +x  # Disable debug mode
