@@ -301,11 +301,10 @@ fi
 download_and_overwrite() {
     local url="$1"
     local filename="$2"
-    if curl -L -o "$filename" "$url" --fail --silent --show-error; then
+    if curl -L -o "$filename" "$url" --fail --silent; then
         echo "✅ Successfully downloaded $filename"
         return 0
     else
-        echo "❌ File not found or unable to download: $filename"
         return 1
     fi
 }
@@ -318,13 +317,15 @@ if download_and_overwrite "$BASE_URL/$QCLIENT_BINARY" "$QCLIENT_BINARY"; then
     chmod +x qclient
     echo "✅ Renamed to qclient and made executable"
 else
-    echo "Manual installation may be required."
+    echo "❌ Failed to download qclient binary. Manual installation may be required."
     exit 1
 fi
 
 # Download the .dgst file
 echo "Downloading ${QCLIENT_BINARY}.dgst..."
-download_and_overwrite "$BASE_URL/${QCLIENT_BINARY}.dgst" "${QCLIENT_BINARY}.dgst"
+if ! download_and_overwrite "$BASE_URL/${QCLIENT_BINARY}.dgst" "${QCLIENT_BINARY}.dgst"; then
+    echo "❌ Failed to download .dgst file. Continuing without it."
+fi
 
 # Download signature files
 echo "Downloading signature files..."
