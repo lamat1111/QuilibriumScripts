@@ -63,4 +63,4 @@ for i in {1..20}; do  # Adjust range as needed
     fi
 done
 
-echo "Download process completed."
+echo "✅ Download process completed."
