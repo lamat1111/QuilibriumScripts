@@ -301,11 +301,11 @@ fi
 download_and_overwrite() {
     local url="$1"
     local filename="$2"
-    if curl -L -o "$filename" "$url"; then
+    if curl -L -o "$filename" "$url" --fail --silent --show-error; then
         echo "✅ Successfully downloaded $filename"
         return 0
     else
-        echo "❌ Error: Failed to download $filename"
+        echo "❌ File not found or unable to download: $filename"
         return 1
     fi
 }
@@ -330,14 +330,8 @@ download_and_overwrite "$BASE_URL/${QCLIENT_BINARY}.dgst" "${QCLIENT_BINARY}.dgs
 echo "Downloading signature files..."
 for i in {1..20}; do
     sig_file="${QCLIENT_BINARY}.dgst.sig.${i}"
-    if file_exists "$BASE_URL/$sig_file"; then
-        if download_and_overwrite "$BASE_URL/$sig_file" "$sig_file"; then
-            echo "Downloaded $sig_file"
-        else
-            echo "Failed to download $sig_file"
-        fi
-    else
-        echo "Signature file $sig_file does not exist, skipping"
+    if download_and_overwrite "$BASE_URL/$sig_file" "$sig_file"; then
+        echo "Downloaded $sig_file"
     fi
 done
 
