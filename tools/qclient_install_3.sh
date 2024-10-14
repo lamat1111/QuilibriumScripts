@@ -51,17 +51,20 @@ else
     echo "❌ Error: Failed to download ${QCLIENT_BINARY}.dgst"
 fi
 
-# Get the list of all files for the current binary
-echo "Fetching list of signature files..."
-ALL_FILES=$(curl -s $BASE_URL | grep -oE "${QCLIENT_BINARY}\.dgst\.sig\.[0-9]+")
-
-# Download all signature files
-for sig_file in $ALL_FILES; do
-    echo "Downloading $sig_file..."
-    if wget "$BASE_URL/$sig_file"; then
-        echo "✅ Successfully downloaded $sig_file"
+# Attempt to download signature files
+echo "Attempting to download signature files..."
+for i in {1..20}; do  # Adjust range as needed
+    sig_file="${QCLIENT_BINARY}.dgst.sig.${i}"
+    if wget -q --method=HEAD "$BASE_URL/$sig_file"; then
+        echo "Downloading $sig_file..."
+        if wget "$BASE_URL/$sig_file"; then
+            echo "✅ Successfully downloaded $sig_file"
+        else
+            echo "❌ Error: Failed to download $sig_file"
+        fi
     else
-        echo "❌ Error: Failed to download $sig_file"
+        echo "No more signature files found after ${QCLIENT_BINARY}.dgst.sig.$((i-1))"
+        break
     fi
 done
 
