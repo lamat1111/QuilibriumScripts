@@ -373,7 +373,10 @@ Restart=always
 RestartSec=5s
 WorkingDirectory=$NODE_PATH
 ExecStart=$EXEC_START
+ExecStop=/bin/kill -s SIGINT \$MAINPID
+ExecReload=/bin/kill -s SIGINT \$MAINPID && $EXEC_START
 KillSignal=SIGINT
+FinalKillSignal=SIGKILL
 TimeoutStopSec=30s
 Environment="GOMAXPROCS=$GOMAXPROCS"
 
