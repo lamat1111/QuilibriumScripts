@@ -129,18 +129,21 @@ EXEC_START="$NODE_PATH/$NODE_BINARY"
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
 TEMP_SERVICE_FILE="/tmp/ceremonyclient_temp.service"
 
-# Function to add or update a line in the [Service] section
-# Updated function to add or update a line in the [Service] section
+# Updated function to add or update a line in the [Service] section while preserving order
 update_service_section() {
     local key="$1"
     local value="$2"
     local file="$3"
     
-    # Remove any existing lines with this key
-    sed -i "/^$key=/d" "$file"
-    
-    # Add the new key-value pair
-    sed -i "/^\[Service\]/a $key=$value" "$file"
+    if grep -q "^$key=" "$file"; then
+        # If the key exists, update its value
+        sed -i "s|^$key=.*|$key=$value|" "$file"
+    else
+        # If the key doesn't exist, add it to the end of the [Service] section
+        sed -i "/^\[Service\]/,/^\[Install\]/ {
+            /^\[Install\]/i $key=$value
+        }" "$file"
+    fi
     
     echo "✅ Updated $key in the service file."
 }
