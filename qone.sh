@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.0.3"
+SCRIPT_VERSION="2.0.4"
 
 #==========================
 # INSTALL APPS
@@ -136,8 +136,8 @@ NODE_INSTALL_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/
 QCLIENT_INSTALL_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qclient_install.sh"
 GRPCURL_CONFIG_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/tools/qnode_gRPC_calls_setup.sh"
 NODE_UPDATE_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/master/qnode_service_update.sh"
-PEER_MANIFEST_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/tools/qnode_peermanifest_checker.sh"
-CHECK_VISIBILITY_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/master/tools/qnode_visibility_check.sh"
+#PEER_MANIFEST_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/tools/qnode_peermanifest_checker.sh"
+#CHECK_VISIBILITY_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/master/tools/qnode_visibility_check.sh"
 SYSTEM_CLEANER_URL="https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/tools/qnode_system_cleanup.sh"
 BACKUP_STORJ_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_backup_storj.sh"
 BACKUP_RESTORE_STORJ_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_backup_restore_storj.sh"
@@ -203,14 +203,6 @@ qclient_install() {
     chmod +x ~/scripts/qclient_install.sh
     ~/scripts/qclient_install.sh
     
-    prompt_return_to_menu
-    return $?
-}
-
-check_visibility() {
-    echo
-    echo "⌛️  Checking node visibility..."
-    curl -sSL "$CHECK_VISIBILITY_URL" | bash
     prompt_return_to_menu
     return $?
 }
@@ -607,8 +599,7 @@ To remove the script fomr your system, run: rm ~/qone.sh
 14) qClient install:
     Install or update the qClient, to manage your QUIL tokens via CLI.
 
-15) Check visibility:
-    Check the visibility status of the node.
+15) qclient actions (coming soon...)    
 
 16) System cleaner:
     Perform system cleanup tasks. It will not affect your node.
@@ -654,9 +645,9 @@ Let your node run for 30 minutes, then choose option 3. Done!
 3) Set up gRPCurl             12) Backup your node
                               13) Restore backup                
 4) Node Log                                    
-5) Update node                14) qClient install      
-6) Stop node                                               
-7) Start node                 15) Check visibility                 
+5) Update node                14) qclient install      
+6) Stop node                  15) qclient actions (coming soon...)                                            
+7) Start node                               
 8) Node version               16) System cleaner               
 9) Node info                                      
 -----------------------------------------------------------------
@@ -696,7 +687,7 @@ while true; do
         12) confirm_action "$(wrap_text "$backup_storj_message" "")" "Backup your node on StorJ" backup_storj && continue ;;
         13) confirm_action "$(wrap_text "$backup_restore_storj_message" "")" "Restore a node backup from StorJ" backup_restore_storj && continue ;;
         14) confirm_action "$(wrap_text "$qclient_install_message" "")" "qClient install" qclient_install && continue ;;
-        15) check_visibility && continue ;;
+        #15) check_visibility && continue ;;
         16) system_cleaner && continue ;;
         20) confirm_action "$(wrap_text "$test_script_message" "")" "Test Script" test_script && continue ;;
         [bB]) best_providers ;;
