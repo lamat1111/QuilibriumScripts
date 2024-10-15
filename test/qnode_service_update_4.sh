@@ -261,13 +261,12 @@ cd ~/ceremonyclient/node
 # Download each file
 for file in $RELEASE_FILES; do
     echo "Downloading $file..."
-    if curl -L -o "$file" "$RELEASE_FILES_URL/$file" --fail --silent; then
+    if curl -L -o "$file" "https://releases.quilibrium.com/$file" --fail --silent; then
         echo "✅ Successfully downloaded $file"
         # Check if the file is the base binary (without .dgst or .sig suffix)
         if [[ $file =~ ^node-[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?-${OS_ARCH}$ ]]; then
-            echo "Making $file executable..."
             if chmod +x "$file"; then
-                echo "✅ Successfully made $file executable"
+                echo "✅ Made $file executable"
             else
                 echo "❌ Failed to make $file executable"
             fi
@@ -280,7 +279,6 @@ done
 
 echo "✅ Node binary download completed."
 echo
-
 
 #==========================
 # QCLIENT UPDATE
