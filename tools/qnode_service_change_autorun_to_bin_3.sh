@@ -135,13 +135,8 @@ update_service_section() {
     local value="$2"
     local file="$3"
     if grep -q "^$key=" "$file"; then
-        current_value=$(grep "^$key=" "$file" | cut -d'=' -f2-)
-        if [ "$current_value" != "$value" ]; then
-            echo "⏳ Updating $key from $current_value to $value in the service file..."
-            sed -i "s|^$key=.*|$key=$value|" "$file"
-        else
-            echo "✅ $key=$value already exists and is correct."
-        fi
+        echo "⏳ Updating $key in the service file..."
+        sed -i "s|^$key=.*|$key=$value|" "$file"
     else
         echo "⏳ Adding $key=$value to the service file..."
         sed -i "/^\[Service\]/,/^\[Install\]/ {
