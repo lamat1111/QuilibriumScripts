@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.0.2"
+SCRIPT_VERSION="2.0.3"
 
 #==========================
 # INSTALL APPS
@@ -528,19 +528,19 @@ This will run the test script.
 
 help_message='
 =================================
-            Q.ONE HELP
+            Q1 HELP
 =================================
 
-If something does not work in Q.ONE please try to update to the
+If something does not work in Q1 please try to update to the
 latest version manually by running the code that you find here:
 https://docs.quilibrium.one/quilibrium-node-setup-guide/node-quickstart
 
 
->> STOP Q.ONE FROM LOADING ON LOGIN
+>> STOP Q1 FROM LOADING ON LOGIN
 Please find here: https://docs.quilibrium.one/start/node-quickstart
 the command to do this
 
->> UNINSTALL Q.ONE
+>> UNINSTALL Q1
 To remove the script fomr your system, run: rm ~/qone.sh
 
 
