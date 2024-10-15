@@ -60,9 +60,20 @@ if [ ! -f "$SERVICE_FILE" ]; then
     exit 1
 fi
 
+# Function to display section headers
+display_header() {
+    echo
+    echo "=============================================================="
+    echo "$1"
+    echo "=============================================================="
+    echo
+}
+
 #==========================
 # INSTALL APPS
 #==========================
+
+display_header "INSTALLING REQUIRED APPLICATIONS"
 
 # Function to check and install a package
 check_and_install() {
@@ -81,11 +92,11 @@ check_and_install sudo
 check_and_install git
 check_and_install curl
 
-echo
-
 #==========================
 # CREATE PATH VARIABLES
 #==========================
+
+display_header "CREATING PATH VARIABLES"
 
 # Determine the ExecStart line based on the architecture
 ARCH=$(uname -m)
@@ -126,8 +137,6 @@ else
     echo "✅ Using specified QCLIENT_VERSION: $QCLIENT_VERSION"
 fi
 
-echo
-
 # Determine the node binary name based on the architecture and OS
 if [ "$ARCH" = "x86_64" ]; then
     if [ "$OS" = "Linux" ]; then
@@ -158,6 +167,8 @@ fi
 # GO UPGRADE
 #==========================
 
+display_header "UPGRADING GO"
+
 # Check the currently installed Go version
 if go version &>/dev/null; then
     INSTALLED_VERSION=$(go version | awk '{print $3}' | sed 's/go//')
@@ -180,11 +191,12 @@ if [ "$INSTALLED_VERSION" != "$GO_VERSION" ]; then
 else
     echo "✅ Go version $GO_VERSION is already installed. No action needed."
 fi
-echo
 
 #==========================
 # NODE UPDATE
 #==========================
+
+display_header "UPDATING NODE"
 
 # Stop the ceremonyclient service if it exists
 echo "⏳ Stopping the ceremonyclient service if it exists..."
@@ -202,30 +214,27 @@ else
 fi
 sleep 1
 
-#causes the script to stop, not sure why...
-#echo "⏳ Killing all node processes if there are any remaining..."
-#sudo pkill -SIGKILL node
-echo
-
 #==========================
 # CEREMONYCLIENT REPO UPDATE
 #==========================
 
-# # Set the remote URL and download
-echo "⏳ Downloading new release v$NODE_VERSION"
+display_header "UPDATING CEREMONYCLIENT REPO"
+
+# Set the remote URL and download
+echo "⏳ Updating ceremonyclient repo for node v$NODE_VERSION"
 cd  ~/ceremonyclient
 git remote set-url origin https://github.com/QuilibriumNetwork/ceremonyclient.git
-#git remote set-url origin https://source.quilibrium.com/quilibrium/ceremonyclient.git || git remote set-url origin https://git.quilibrium-mirror.ch/agostbiro/ceremonyclient.git
 git checkout main
 git branch -D release
 git pull
 git checkout release
 echo "✅ Downloaded the latest changes successfully."
-echo
 
 #==========================
 # NODE BINARY DOWNLOAD
 #==========================
+
+display_header "DOWNLOADING NODE BINARY"
 
 get_os_arch() {
     local os=$(uname -s | tr '[:upper:]' '[:lower:]')
@@ -261,38 +270,32 @@ cd ~/ceremonyclient/node
 # Download each file
 for file in $RELEASE_FILES; do
     echo "Downloading $file..."
-    curl -L -o "$file" "https://releases.quilibrium.com/$file"
-    
-    # Check if the download was successful
-    if [ $? -eq 0 ]; then
-        echo "Successfully downloaded $file"
+    if curl -L -o "$file" "https://releases.quilibrium.com/$file" --fail --silent; then
+        echo "✅ Successfully downloaded $file"
         # Check if the file is the base binary (without .dgst or .sig suffix)
         if [[ $file =~ ^node-[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?-${OS_ARCH}$ ]]; then
-            echo "Making $file executable..."
-            chmod +x "$file"
-            if [ $? -eq 0 ]; then
-                echo "Successfully made $file executable"
+            if chmod +x "$file"; then
+                echo "✅ Made $file executable"
             else
-                echo "Failed to make $file executable"
+                echo "❌ Failed to make $file executable"
             fi
         fi
     else
-        echo "Failed to download $file"
+        echo "❌ Failed to download $file"
     fi
-    
     echo "------------------------"
 done
 
-echo "✅  Node binary download completed."
-
+echo "✅ Node binary download completed."
 
 #==========================
 # QCLIENT UPDATE
 #==========================
 
+display_header "UPDATING QCLIENT"
+
 # Base URL for the Quilibrium releases
 BASE_URL="https://releases.quilibrium.com"
-
 
 # Change to the download directory
 if ! cd ~/ceremonyclient/client; then
@@ -316,10 +319,6 @@ download_and_overwrite() {
 echo "Downloading $QCLIENT_BINARY..."
 if download_and_overwrite "$BASE_URL/$QCLIENT_BINARY" "$QCLIENT_BINARY"; then
     chmod +x $QCLIENT_BINARY
-    # Rename the binary to qclient, overwriting if it exists
-    #mv -f "$QCLIENT_BINARY" qclient
-    #chmod +x qclient
-    #echo "✅ Renamed to qclient and made executable"
 else
     echo "❌ Failed to download qclient binary. Manual installation may be required."
     exit 1
@@ -342,10 +341,50 @@ done
 
 echo "✅ Qclient download completed."
 
+#==========================
+# DELETE OLD RELEASES
+#==========================
+
+display_header "DELETING OLD RELEASES"
+
+# Function to clean up old releases
+cleanup_old_releases() {
+    local directory=$1
+    local current_binary=$2
+    local prefix=$3
+
+    echo "⏳ Cleaning up old $prefix releases in $directory..."
+
+    # Delete old binary files, .dgst files, and signature files in one go
+    if find "$directory" -type f \( \
+        -name "${prefix}-*-${OS_ARCH}" -o \
+        -name "${prefix}-*-${OS_ARCH}.dgst" -o \
+        -name "${prefix}-*-${OS_ARCH}.dgst.sig.*" \
+    \) ! -name "${current_binary}*" -delete; then
+        echo "✅ Removed old $prefix files (binary, .dgst, and signatures)."
+    else
+        echo "ℹ️ No old $prefix files to remove."
+    fi
+
+    echo "✅ Cleanup of old $prefix releases completed."
+    echo
+}
+
+# After node binary download and verification
+echo "⏳ Starting cleanup of old node releases..."
+sleep 1
+cleanup_old_releases "$HOME/ceremonyclient/node" "$NODE_BINARY" "node"
+
+# After qclient binary download and verification
+echo "⏳ Starting cleanup of old qclient releases..."
+sleep 1
+cleanup_old_releases "$HOME/ceremonyclient/client" "$QCLIENT_BINARY" "qclient"
 
 #==========================
 # SERVICE UPDATE
 #==========================
+
+display_header "UPDATING SERVICE"
 
 #Set variables
 HOME=$(eval echo ~$HOME_DIR)
@@ -414,11 +453,16 @@ EOF
 fi
 
 echo "✅ Service file update completed."
-echo
 
 #==========================
 # CONFIG FILE UPDATE for "REWARDS TO GOOGLE SHEET SCRIPT"
 #==========================
+
+display_header "UPDATING EXTRA CONFIG FILES (OPTIONAL)"
+
+echo "This is an optional section that almost nobody needs."
+echo "Don't worry if you receive errors."
+echo
 
 # Function to update config file
 update_config_file() {
@@ -462,11 +506,11 @@ done
 
 echo "All config files processed."
 
-echo
-
 #==========================
 # START NODE VIA SERVICE
 #==========================
+
+display_header "STARTING NODE"
 
 echo "✅ Starting Ceremonyclient Service"
 sudo systemctl daemon-reload
