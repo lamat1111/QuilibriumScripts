@@ -144,14 +144,14 @@ update_service_section() {
     fi
 }
 
-# Function to ensure correct formatting and order of entries
+# Updated function to ensure correct formatting and order of entries
 ensure_correct_formatting() {
     local file="$1"
     # Temporary file for reordering
     local temp_file="${file}.temp"
     
     # Ensure [Unit] section is first and formatted correctly
-    sed -n '1,/^\[Service\]/p' "$file" | sed '/^$/d' > "$temp_file"
+    sed -n '1,/^\[Service\]/p' "$file" | sed '/^$/d; /^\[Service\]$/d' > "$temp_file"
     echo >> "$temp_file"
     
     # Ensure [Service] section is formatted correctly and in the right order
