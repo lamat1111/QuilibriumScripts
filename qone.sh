@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.0.4"
+SCRIPT_VERSION="2.0.5"
 
 #==========================
 # INSTALL APPS
@@ -615,15 +615,16 @@ display_menu() {
     source ~/.bashrc
     cat << EOF
 
-                Q1Q1Q1\    Q1\   
-               Q1  __Q1\ Q1Q1 |  
-               Q1 |  Q1 |\_Q1 |  
-               Q1 |  Q1 |  Q1 |  
-               Q1 |  Q1 |  Q1 |  
-               Q1  Q1Q1 |  Q1 |  
-               \Q1Q1Q1 / Q1Q1Q1\ 
-                \___Q1Q\ \______|  QUILIBRIUM.ONE
-                    \___|        
+                    Q1Q1Q1\    Q1\   
+                   Q1  __Q1\ Q1Q1 |  
+                   Q1 |  Q1 |\_Q1 |  
+                   Q1 |  Q1 |  Q1 |  
+                   Q1 |  Q1 |  Q1 |  
+                   Q1  Q1Q1 |  Q1 |  
+                   \Q1Q1Q1 / Q1Q1Q1\ 
+                    \___Q1Q\ \______|  
+                        \___| 
+                              QUILIBRIUM.ONE
 
 ==================================================================
                ✨✨✨ Q1 QUICKSTART MENU ✨✨✨
