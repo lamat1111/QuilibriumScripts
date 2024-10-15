@@ -212,7 +212,7 @@ echo
 #==========================
 
 # # Set the remote URL and download
-echo "⏳ Downloading new release v$NODE_VERSION"
+echo "⏳ Updating ceremonyclient repo for node v$NODE_VERSION"
 cd  ~/ceremonyclient
 git remote set-url origin https://github.com/QuilibriumNetwork/ceremonyclient.git
 #git remote set-url origin https://source.quilibrium.com/quilibrium/ceremonyclient.git || git remote set-url origin https://git.quilibrium-mirror.ch/agostbiro/ceremonyclient.git
@@ -338,7 +338,7 @@ echo "✅ Qclient download completed."
 echo
 
 #==========================
-# DELET OLD RELEASES
+# DELETE OLD RELEASES
 #==========================
 
 # Function to clean up old releases
@@ -366,11 +366,12 @@ cleanup_old_releases() {
 
 # After node binary download and verification
 echo "⏳ Starting cleanup of old node releases..."
+sleep 1
 cleanup_old_releases "$HOME/ceremonyclient/node" "$NODE_BINARY" "node"
-echo
 
 # After qclient binary download and verification
 echo "⏳ Starting cleanup of old qclient releases..."
+sleep 1
 cleanup_old_releases "$HOME/ceremonyclient/client" "$QCLIENT_BINARY" "qclient"
 echo
 
