@@ -258,32 +258,39 @@ RELEASE_FILES=$(curl -s $RELEASE_FILES_URL | grep -oE "node-[0-9]+\.[0-9]+\.[0-9
 # Change to the download directory
 cd ~/ceremonyclient/node
 
+# Function to download file and overwrite if it exists
+download_and_overwrite() {
+    local url="$1"
+    local filename="$2"
+    if curl -L -o "$filename" "$url" --fail --silent; then
+        echo "✅ Successfully downloaded $filename"
+        return 0
+    else
+        return 1
+    fi
+}
+
 # Download each file
 for file in $RELEASE_FILES; do
     echo "Downloading $file..."
-    curl -L -o "$file" "https://releases.quilibrium.com/$file"
-    
-    # Check if the download was successful
-    if [ $? -eq 0 ]; then
-        echo "Successfully downloaded $file"
+    if download_and_overwrite "$RELEASE_FILES_URL/$file" "$file"; then
         # Check if the file is the base binary (without .dgst or .sig suffix)
         if [[ $file =~ ^node-[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?-${OS_ARCH}$ ]]; then
             echo "Making $file executable..."
-            chmod +x "$file"
-            if [ $? -eq 0 ]; then
-                echo "Successfully made $file executable"
+            if chmod +x "$file"; then
+                echo "✅ Successfully made $file executable"
             else
-                echo "Failed to make $file executable"
+                echo "❌ Failed to make $file executable"
             fi
         fi
     else
-        echo "Failed to download $file"
+        echo "❌ Failed to download $file"
     fi
-    
     echo "------------------------"
 done
 
-echo "✅  Node binary download completed."
+echo "✅ Node binary download completed."
+echo
 
 
 #==========================
