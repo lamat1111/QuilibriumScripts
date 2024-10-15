@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.0.0"
+SCRIPT_VERSION="2.0.1"
 
 #==========================
 # INSTALL APPS
@@ -624,25 +624,15 @@ display_menu() {
     source ~/.bashrc
     cat << EOF
 
-                  QQQQQQQQQ       1111111   
-                QQ:::::::::QQ    1::::::1   
-              QQ:::::::::::::QQ 1:::::::1   
-             Q:::::::QQQ:::::::Q111:::::1   
-             Q::::::O   Q::::::Q   1::::1   
-             Q:::::O     Q:::::Q   1::::1   
-             Q:::::O     Q:::::Q   1::::1   
-             Q:::::O     Q:::::Q   1::::l   
-             Q:::::O     Q:::::Q   1::::l   
-             Q:::::O     Q:::::Q   1::::l   
-             Q:::::O  QQQQ:::::Q   1::::l   
-             Q::::::O Q::::::::Q   1::::l   
-             Q:::::::QQ::::::::Q111::::::111
-              QQ::::::::::::::Q 1::::::::::1
-                QQ:::::::::::Q  1::::::::::1
-                  QQQQQQQQ::::QQ111111111111
-                          Q:::::Q           
-                           QQQQQQ  QUILIBRIUM.ONE                                                                                                                                  
-
+                Q1Q1Q1\    Q1\   
+               Q1  __Q1\ Q1Q1 |  
+               Q1 |  Q1 |\_Q1 |  
+               Q1 |  Q1 |  Q1 |  
+               Q1 |  Q1 |  Q1 |  
+               Q1  Q1Q1 |  Q1 |  
+               \Q1Q1Q1 / Q1Q1Q1\ 
+                \___Q1Q\ \______|  QUILIBRIUM.ONE
+                    \___|        
 
 ==================================================================
              ✨✨✨ Q1 QUICKSTART MENU ✨✨✨
