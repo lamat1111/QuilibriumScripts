@@ -127,17 +127,75 @@ NODE_PATH="$HOME/ceremonyclient/node"
 EXEC_START="$NODE_PATH/$NODE_BINARY"
 
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
+TEMP_SERVICE_FILE="/tmp/ceremonyclient_temp.service"
+
+# Function to add or update a line in the [Service] section while preserving order and custom lines
+update_service_section() {
+    local key="$1"
+    local value="$2"
+    local file="$3"
+    
+    if grep -q "^$key=" "$file"; then
+        # If the key exists, update its value
+        sed -i "s|^$key=.*|$key=$value|" "$file"
+    else
+        # If the key doesn't exist, add it before the [Install] section
+        sed -i "/^\[Install\]/i $key=$value" "$file"
+    fi
+}
+
+# Function to ensure correct formatting and order of entries while preserving custom lines
+ensure_correct_formatting() {
+    local file="$1"
+    local temp_file="${file}.temp"
+    
+    # Copy [Unit] section
+    sed -n '1,/^\[Service\]/p' "$file" | sed '/^$/d; /^\[Service\]$/d' > "$temp_file"
+    echo >> "$temp_file"
+    
+    # Start [Service] section
+    echo "[Service]" >> "$temp_file"
+    
+    # Standard keys we want to ensure are in a specific order
+    standard_keys="Type Restart RestartSec WorkingDirectory ExecStart ExecStop ExecReload KillSignal RestartKillSignal FinalKillSignal TimeoutStopSec"
+    
+    # Add standard keys if they exist
+    for key in $standard_keys; do
+        grep "^$key=" "$file" >> "$temp_file" || true
+    done
+    
+    # Add any custom lines that aren't part of the standard keys
+    sed -n '/^\[Service\]/,/^\[Install\]/p' "$file" | while read line; do
+        if [[ $line != \[Service\]* ]] && [[ $line != \[Install\]* ]]; then
+            key=$(echo "$line" | cut -d'=' -f1)
+            if ! echo "$standard_keys" | grep -q "$key"; then
+                echo "$line" >> "$temp_file"
+            fi
+        fi
+    done
+    
+    echo >> "$temp_file"
+    
+    # Copy [Install] section
+    echo "[Install]" >> "$temp_file"
+    sed -n '/^\[Install\]/,$ p' "$file" | grep -v '^\[Install\]' >> "$temp_file"
+    
+    # Replace original file with temp file
+    mv "$temp_file" "$file"
+}
 
 # Check if the node is running via cluster script or para.sh and skip
 if [ -f "$SERVICE_FILE" ] && (grep -q "ExecStart=/root/scripts/qnode_cluster_run.sh" "$SERVICE_FILE" || grep -q "ExecStart=.*para\.sh" "$SERVICE_FILE"); then
     echo "⚠️ You are running a cluster or para.sh script. Skipping service file update..."
     echo
-else
-    # Build service file
-    echo "⏳ Rebuilding Ceremonyclient Service..."
-    if [ ! -f "$SERVICE_FILE" ]; then
-        echo "⏳ Creating new ceremonyclient service file..."
-        if ! sudo tee "$SERVICE_FILE" > /dev/null <<EOF
+    exit 0
+fi
+
+# Build service file
+echo "⏳ Rebuilding Ceremonyclient Service..."
+if [ ! -f "$SERVICE_FILE" ]; then
+    echo "⏳ Creating new ceremonyclient service file..."
+    cat > "$TEMP_SERVICE_FILE" <<EOF
 [Unit]
 Description=Ceremony Client Go App Service
 
@@ -147,8 +205,8 @@ Restart=always
 RestartSec=5s
 WorkingDirectory=$NODE_PATH
 ExecStart=$EXEC_START
-ExecStop=/bin/kill -s SIGINT $MAINPID
-ExecReload=/bin/kill -s SIGINT $MAINPID && $EXEC_START
+ExecStop=/bin/kill -s SIGINT \$MAINPID
+ExecReload=/bin/kill -s SIGINT \$MAINPID && $EXEC_START
 KillSignal=SIGINT
 RestartKillSignal=SIGINT
 FinalKillSignal=SIGKILL
@@ -157,84 +215,46 @@ TimeoutStopSec=30s
 [Install]
 WantedBy=multi-user.target
 EOF
-        then
-            echo "❌ Error: Failed to create ceremonyclient service file." >&2
-            exit 1
-        fi
-    else
-        echo "⏳ Checking existing ceremonyclient service file..."  
+else
+    echo "⏳ Checking existing ceremonyclient service file..."
+    cp "$SERVICE_FILE" "$TEMP_SERVICE_FILE"
 
-        # Function to add or update a line in the [Service] section
-        update_service_section() {
-            local key="$1"
-            local value="$2"
-            if grep -q "^$key=" "$SERVICE_FILE"; then
-                current_value=$(grep "^$key=" "$SERVICE_FILE" | cut -d'=' -f2-)
-                if [ "$current_value" != "$value" ]; then
-                    echo "⏳ Updating $key from $current_value to $value in the service file..."
-                    sudo sed -i "s|^$key=.*|$key=$value|" "$SERVICE_FILE"
-                else
-                    echo "✅ $key=$value already exists and is correct."
-                fi
-            else
-                echo "⏳ Adding $key=$value to the service file..."
-                sudo sed -i "/^\[Service\]/,/^\[Install\]/ {
-                    /^\[Install\]/i $key=$value
-                }" "$SERVICE_FILE"
-            fi
-        }
+    # Update all required lines in the [Service] section
+    update_service_section "WorkingDirectory" "$NODE_PATH" "$TEMP_SERVICE_FILE"
+    update_service_section "ExecStart" "$EXEC_START" "$TEMP_SERVICE_FILE"
+    update_service_section "ExecStop" "/bin/kill -s SIGINT \$MAINPID" "$TEMP_SERVICE_FILE"
+    update_service_section "ExecReload" "/bin/kill -s SIGINT \$MAINPID && $EXEC_START" "$TEMP_SERVICE_FILE"
+    update_service_section "KillSignal" "SIGINT" "$TEMP_SERVICE_FILE"
+    update_service_section "RestartKillSignal" "SIGINT" "$TEMP_SERVICE_FILE"
+    update_service_section "FinalKillSignal" "SIGKILL" "$TEMP_SERVICE_FILE"
+    update_service_section "TimeoutStopSec" "30s" "$TEMP_SERVICE_FILE"
 
-        # Function to ensure a single empty line at the end of each section
-        ensure_section_formatting() {
-            sudo sed -i '
-                /^\[.*\]/ {
-                    N
-                    /\n$/!s/$/\n/
-                }
-                /^\[Install\]/ {
-                    N
-                    /\n$/!s/$/\n/
-                }
-            ' "$SERVICE_FILE"
-        }
-
-        # Update all required lines in the [Service] section
-        update_service_section "WorkingDirectory" "$NODE_PATH"
-        update_service_section "ExecStart" "$EXEC_START"
-        update_service_section "ExecStop" "/bin/kill -s SIGINT \$MAINPID"
-        update_service_section "ExecReload" "/bin/kill -s SIGINT \$MAINPID && $EXEC_START"
-        update_service_section "KillSignal" "SIGINT"
-        update_service_section "RestartKillSignal" "SIGINT"
-        update_service_section "FinalKillSignal" "SIGKILL"
-        update_service_section "TimeoutStopSec" "30s"
-
-        # Ensure proper formatting with a single empty line at the end of each section
-        ensure_section_formatting
-    fi
+    # Ensure proper formatting and order
+    ensure_correct_formatting "$TEMP_SERVICE_FILE"
 fi
 
-sleep 1
-
-# Show the current service file
+# Show the proposed service file content
 echo
-echo "Showing your updated service file:"
-echo "================================="
-cat /lib/systemd/system/ceremonyclient.service
-echo "================================="
+echo "Proposed content for the service file:"
+echo "======================================"
+cat "$TEMP_SERVICE_FILE"
+echo "======================================"
 echo
 
-sleep 1
 # Ask for user confirmation
-read -p "Is everything correct in the service file? (Y/N): " confirm
+read -p "Do you want to apply these changes? (Y/N): " confirm
 
 if [[ $confirm == [Yy]* ]]; then
+    echo "⏳ Applying changes to the service file..."
+    sudo cp "$TEMP_SERVICE_FILE" "$SERVICE_FILE"
     echo "⏳ Reloading daemon and restarting the node to apply the new settings..."
     sudo systemctl daemon-reload
     sudo systemctl restart ceremonyclient
     echo "✅ Service file update completed and applied."
 else
-    echo "Please manually correct the service file at /lib/systemd/system/ceremonyclient.service"
-    echo "After corrections, please run the following commands:"
-    echo "sudo systemctl daemon-reload"
-    echo "sudo systemctl restart ceremonyclient"
+    echo "Changes were not applied. The current service file remains unchanged."
 fi
+
+# Clean up temporary file
+rm "$TEMP_SERVICE_FILE"
+
