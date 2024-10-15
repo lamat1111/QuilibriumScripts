@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.9.7"
+SCRIPT_VERSION="2.0.0"
 
 #==========================
 # INSTALL APPS
@@ -375,6 +375,12 @@ donations() {
     echo "-------------------------------"
 }
 
+disclaimer() {
+    wrap_text "$disclaimer_message"
+    echo
+    echo "-------------------------------"
+}
+
 
 help_message() {
     echo "$help_message"
@@ -508,6 +514,14 @@ You can send ERC-20 tokens at this address:
 Or visit this page: https://iri.quest/q-donations
 '
 
+disclaimer_message='
+This tool and all related scripts are unofficial and are being shared as-is.
+I take no responsibility for potential bugs or any misuse of the available options. 
+All scripts are open source; feel free to inspect them before use. 
+
+Repo: https://github.com/lamat1111/QuilibriumScripts
+'
+
 test_script_message='
 This will run the test script.
 '
@@ -631,7 +645,7 @@ display_menu() {
 
 
 ==================================================================
-            ✨✨✨ Q.ONE QUICKSTART MENU ✨✨✨
+             ✨✨✨ Q1 QUICKSTART MENU ✨✨✨
                          v $SCRIPT_VERSION
 ==================================================================
         Follow the guide at https://docs.quilibrium.one
@@ -660,7 +674,8 @@ Let your node run for 30 minutes, then choose option 3. Done!
 B) ⭐️ Best server providers
 D) 💜 Donations
 -----------------------------------------------------------------    
-E) Exit                        H) Help
+X) Disclaimer                 E) Exit   
+H) Help  
                         
 
 EOF
@@ -699,6 +714,7 @@ while true; do
         [bB]) best_providers ;;
         [dD]) donations ;;
         [eE]) exit ;;
+        [xX]) disclaimer ;;
         [hH]) help_message && continue ;;
         *) echo "Invalid option, please try again." ;;
     esac
