@@ -137,8 +137,6 @@ else
     echo "✅ Using specified QCLIENT_VERSION: $QCLIENT_VERSION"
 fi
 
-echo
-
 # Determine the node binary name based on the architecture and OS
 if [ "$ARCH" = "x86_64" ]; then
     if [ "$OS" = "Linux" ]; then
