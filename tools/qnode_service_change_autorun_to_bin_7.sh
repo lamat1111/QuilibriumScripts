@@ -242,3 +242,4 @@ fi
 
 # Clean up temporary file
 rm "$TEMP_SERVICE_FILE"
+
