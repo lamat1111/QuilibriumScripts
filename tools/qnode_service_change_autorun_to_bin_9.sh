@@ -129,7 +129,7 @@ EXEC_START="$NODE_PATH/$NODE_BINARY"
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
 TEMP_SERVICE_FILE="/tmp/ceremonyclient_temp.service"
 
-# Function to add or update a line in the [Service] section while preserving order
+# Function to add or update a line in the [Service] section while preserving order and custom lines
 update_service_section() {
     local key="$1"
     local value="$2"
@@ -144,24 +144,39 @@ update_service_section() {
     fi
 }
 
-# Updated function to ensure correct formatting and order of entries
+# Function to ensure correct formatting and order of entries while preserving custom lines
 ensure_correct_formatting() {
     local file="$1"
-    # Temporary file for reordering
     local temp_file="${file}.temp"
     
-    # Ensure [Unit] section is first and formatted correctly
+    # Copy [Unit] section
     sed -n '1,/^\[Service\]/p' "$file" | sed '/^$/d; /^\[Service\]$/d' > "$temp_file"
     echo >> "$temp_file"
     
-    # Ensure [Service] section is formatted correctly and in the right order
+    # Start [Service] section
     echo "[Service]" >> "$temp_file"
-    for key in Type Restart RestartSec WorkingDirectory ExecStart ExecStop ExecReload KillSignal RestartKillSignal FinalKillSignal TimeoutStopSec; do
+    
+    # Standard keys we want to ensure are in a specific order
+    standard_keys="Type Restart RestartSec WorkingDirectory ExecStart ExecStop ExecReload KillSignal RestartKillSignal FinalKillSignal TimeoutStopSec"
+    
+    # Add standard keys if they exist
+    for key in $standard_keys; do
         grep "^$key=" "$file" >> "$temp_file" || true
     done
+    
+    # Add any custom lines that aren't part of the standard keys
+    sed -n '/^\[Service\]/,/^\[Install\]/p' "$file" | while read line; do
+        if [[ $line != \[Service\]* ]] && [[ $line != \[Install\]* ]]; then
+            key=$(echo "$line" | cut -d'=' -f1)
+            if ! echo "$standard_keys" | grep -q "$key"; then
+                echo "$line" >> "$temp_file"
+            fi
+        fi
+    done
+    
     echo >> "$temp_file"
     
-    # Ensure [Install] section is last and formatted correctly
+    # Copy [Install] section
     echo "[Install]" >> "$temp_file"
     sed -n '/^\[Install\]/,$ p' "$file" | grep -v '^\[Install\]' >> "$temp_file"
     
