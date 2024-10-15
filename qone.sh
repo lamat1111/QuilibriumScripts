@@ -696,7 +696,6 @@ while true; do
         12) confirm_action "$(wrap_text "$backup_storj_message" "")" "Backup your node on StorJ" backup_storj && continue ;;
         13) confirm_action "$(wrap_text "$backup_restore_storj_message" "")" "Restore a node backup from StorJ" backup_restore_storj && continue ;;
         14) confirm_action "$(wrap_text "$qclient_install_message" "")" "qClient install" qclient_install && continue ;;
-        #14) confirm_action "$(wrap_text "$peer_manifest_message" "")" "Peer manifest" peer_manifest && continue ;;
         15) check_visibility && continue ;;
         16) system_cleaner && continue ;;
         20) confirm_action "$(wrap_text "$test_script_message" "")" "Test Script" test_script && continue ;;
