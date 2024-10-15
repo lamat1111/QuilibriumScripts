@@ -130,33 +130,30 @@ SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
 TEMP_SERVICE_FILE="/tmp/ceremonyclient_temp.service"
 
 # Function to add or update a line in the [Service] section
+# Updated function to add or update a line in the [Service] section
 update_service_section() {
     local key="$1"
     local value="$2"
     local file="$3"
-    if grep -q "^$key=" "$file"; then
-        echo "⏳ Updating $key in the service file..."
-        sed -i "s|^$key=.*|$key=$value|" "$file"
-    else
-        echo "⏳ Adding $key=$value to the service file..."
-        sed -i "/^\[Service\]/,/^\[Install\]/ {
-            /^\[Install\]/i $key=$value
-        }" "$file"
-    fi
+    
+    # Remove any existing lines with this key
+    sed -i "/^$key=/d" "$file"
+    
+    # Add the new key-value pair
+    sed -i "/^\[Service\]/a $key=$value" "$file"
+    
+    echo "✅ Updated $key in the service file."
 }
 
 # Function to ensure a single empty line at the end of each section
 ensure_section_formatting() {
     local file="$1"
     sed -i '
-        /^\[.*\]/ {
-            N
-            /\n$/!s/$/\n/
+        /^\[.*\]/{
+            n
+            /^$/!G
         }
-        /^\[Install\]/ {
-            N
-            /\n$/!s/$/\n/
-        }
+        /^\[Install\]/G
     ' "$file"
 }
 
