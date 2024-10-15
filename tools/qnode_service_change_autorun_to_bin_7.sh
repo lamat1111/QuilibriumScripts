@@ -139,21 +139,34 @@ update_service_section() {
         # If the key exists, update its value
         sed -i "s|^$key=.*|$key=$value|" "$file"
     else
-        # If the key doesn't exist, add it to the end of the [Service] section
-        sed -i "/^\[Service\]/,/^\[Install\]/ {
-            /^\[Install\]/i $key=$value
-        }" "$file"
+        # If the key doesn't exist, add it before the [Install] section
+        sed -i "/^\[Install\]/i $key=$value" "$file"
     fi
 }
 
-# Function to ensure correct formatting with specific empty lines
+# Function to ensure correct formatting and order of entries
 ensure_correct_formatting() {
     local file="$1"
-    # Remove all empty lines
-    sed -i '/^$/d' "$file"
-    # Add empty line before [Service] and [Install]
-    sed -i '/^\[Service\]/i\ ' "$file"
-    sed -i '/^\[Install\]/i\ ' "$file"
+    # Temporary file for reordering
+    local temp_file="${file}.temp"
+    
+    # Ensure [Unit] section is first and formatted correctly
+    sed -n '1,/^\[Service\]/p' "$file" | sed '/^$/d' > "$temp_file"
+    echo >> "$temp_file"
+    
+    # Ensure [Service] section is formatted correctly and in the right order
+    echo "[Service]" >> "$temp_file"
+    for key in Type Restart RestartSec WorkingDirectory ExecStart ExecStop ExecReload KillSignal RestartKillSignal FinalKillSignal TimeoutStopSec; do
+        grep "^$key=" "$file" >> "$temp_file" || true
+    done
+    echo >> "$temp_file"
+    
+    # Ensure [Install] section is last and formatted correctly
+    echo "[Install]" >> "$temp_file"
+    sed -n '/^\[Install\]/,$ p' "$file" | grep -v '^\[Install\]' >> "$temp_file"
+    
+    # Replace original file with temp file
+    mv "$temp_file" "$file"
 }
 
 # Check if the node is running via cluster script or para.sh and skip
@@ -177,8 +190,8 @@ Restart=always
 RestartSec=5s
 WorkingDirectory=$NODE_PATH
 ExecStart=$EXEC_START
-ExecStop=/bin/kill -s SIGINT $MAINPID
-ExecReload=/bin/kill -s SIGINT $MAINPID && $EXEC_START
+ExecStop=/bin/kill -s SIGINT \$MAINPID
+ExecReload=/bin/kill -s SIGINT \$MAINPID && $EXEC_START
 KillSignal=SIGINT
 RestartKillSignal=SIGINT
 FinalKillSignal=SIGKILL
@@ -187,8 +200,6 @@ TimeoutStopSec=30s
 [Install]
 WantedBy=multi-user.target
 EOF
-    echo "New service file will be created with the following content:"
-    cat "$TEMP_SERVICE_FILE"
 else
     echo "⏳ Checking existing ceremonyclient service file..."
     cp "$SERVICE_FILE" "$TEMP_SERVICE_FILE"
@@ -203,17 +214,17 @@ else
     update_service_section "FinalKillSignal" "SIGKILL" "$TEMP_SERVICE_FILE"
     update_service_section "TimeoutStopSec" "30s" "$TEMP_SERVICE_FILE"
 
-    # Ensure proper formatting
+    # Ensure proper formatting and order
     ensure_correct_formatting "$TEMP_SERVICE_FILE"
-
-    # Show the difference between the current and proposed service file
-    echo
-    echo "Proposed changes to the service file:"
-    echo "====================================="
-    diff -u "$SERVICE_FILE" "$TEMP_SERVICE_FILE" || true
-    echo "====================================="
-    echo
 fi
+
+# Show the proposed service file content
+echo
+echo "Proposed content for the service file:"
+echo "======================================"
+cat "$TEMP_SERVICE_FILE"
+echo "======================================"
+echo
 
 # Ask for user confirmation
 read -p "Do you want to apply these changes? (Y/N): " confirm
