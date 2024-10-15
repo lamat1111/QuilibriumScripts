@@ -258,22 +258,11 @@ RELEASE_FILES=$(curl -s $RELEASE_FILES_URL | grep -oE "node-[0-9]+\.[0-9]+\.[0-9
 # Change to the download directory
 cd ~/ceremonyclient/node
 
-# Function to download file and overwrite if it exists
-download_and_overwrite() {
-    local url="$1"
-    local filename="$2"
-    if curl -L -o "$filename" "$url" --fail --silent; then
-        echo "✅ Successfully downloaded $filename"
-        return 0
-    else
-        return 1
-    fi
-}
-
 # Download each file
 for file in $RELEASE_FILES; do
     echo "Downloading $file..."
-    if download_and_overwrite "$RELEASE_FILES_URL/$file" "$file"; then
+    if curl -L -o "$file" "$RELEASE_FILES_URL/$file" --fail --silent; then
+        echo "✅ Successfully downloaded $file"
         # Check if the file is the base binary (without .dgst or .sig suffix)
         if [[ $file =~ ^node-[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?-${OS_ARCH}$ ]]; then
             echo "Making $file executable..."
