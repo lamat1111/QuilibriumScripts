@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.0.1"
+SCRIPT_VERSION="2.0.2"
 
 #==========================
 # INSTALL APPS
@@ -635,11 +635,10 @@ display_menu() {
                     \___|        
 
 ==================================================================
-             ✨✨✨ Q1 QUICKSTART MENU ✨✨✨
-                         v $SCRIPT_VERSION
+               ✨✨✨ Q1 QUICKSTART MENU ✨✨✨
+                           v $SCRIPT_VERSION
 ==================================================================
         Follow the guide at https://docs.quilibrium.one
-
                     Made with 🔥 by LaMat
 ==================================================================
 EOF
