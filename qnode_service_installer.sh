@@ -50,6 +50,15 @@ EOF
 
 sleep 7  # Add a 7-second delay
 
+# Function to display section headers
+display_header() {
+    echo
+    echo "=============================================================="
+    echo "$1"
+    echo "=============================================================="
+    echo
+}
+
 #==========================
 # MANAGE ERRORS
 #==========================
@@ -72,6 +81,8 @@ trap exit_message ERR
 #==========================
 # INSTALL APPS
 #==========================
+
+display_header "INSTALLING REQUIRED APPLICATIONS"
 
 # Function to check and install a package
 check_and_install() {
@@ -96,6 +107,8 @@ check_and_install curl
 #==========================
 # CREATE PATH VARIABLES
 #==========================
+
+display_header "CREATING PATH VARIABLES"
 
 # Determine the ExecStart line based on the architecture
 ARCH=$(uname -m)
@@ -138,8 +151,6 @@ else
     echo "✅ Using specified QCLIENT_VERSION: $QCLIENT_VERSION"
 fi
 
-echo
-
 # Determine the node binary name based on the architecture and OS
 if [ "$ARCH" = "x86_64" ]; then
     if [ "$OS" = "Linux" ]; then
@@ -167,8 +178,10 @@ else
 fi
 
 #==========================
-# CEREMONYCLIENT REPO DOWNLOAD
+# CEREMONYCLIENT REPO UPDATE
 #==========================
+
+display_header "UPDATING CEREMONYCLIENT REPO"
 
 # Download Ceremonyclient
 echo "⏳ Downloading Ceremonyclient..."
@@ -195,6 +208,8 @@ export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
 # NODE BINARY DOWNLOAD
 #==========================
 
+display_header "DOWNLOADING NODE BINARY"
+
 get_os_arch() {
     local os=$(uname -s | tr '[:upper:]' '[:lower:]')
     local arch=$(uname -m)
@@ -213,11 +228,11 @@ get_os_arch() {
     echo "${os}-${arch}"
 }
 
-# Base URL for the Quilibrium releases
-RELEASE_FILES_URL="https://releases.quilibrium.com/release"
-
 # Get the current OS and architecture
 OS_ARCH=$(get_os_arch)
+
+# Base URL for the Quilibrium releases
+RELEASE_FILES_URL="https://releases.quilibrium.com/release"
 
 # Fetch the list of files from the release page
 # Updated regex to allow for an optional fourth version number
@@ -229,33 +244,29 @@ cd ~/ceremonyclient/node
 # Download each file
 for file in $RELEASE_FILES; do
     echo "Downloading $file..."
-    curl -L -o "$file" "https://releases.quilibrium.com/$file"
-    
-    # Check if the download was successful
-    if [ $? -eq 0 ]; then
-        echo "Successfully downloaded $file"
+    if curl -L -o "$file" "https://releases.quilibrium.com/$file" --fail --silent; then
+        echo "✅ Successfully downloaded $file"
         # Check if the file is the base binary (without .dgst or .sig suffix)
         if [[ $file =~ ^node-[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?-${OS_ARCH}$ ]]; then
-            echo "Making $file executable..."
-            chmod +x "$file"
-            if [ $? -eq 0 ]; then
-                echo "Successfully made $file executable"
+            if chmod +x "$file"; then
+                echo "✅ Made $file executable"
             else
-                echo "Failed to make $file executable"
+                echo "❌ Failed to make $file executable"
             fi
         fi
     else
-        echo "Failed to download $file"
+        echo "❌ Failed to download $file"
     fi
-    
     echo "------------------------"
 done
 
-echo "✅  Node binary download completed."
+echo "✅ Node binary download completed."
 
 #==========================
 # DOWNLOAD QCLIENT
 #==========================
+
+display_header "UPDATING QCLIENT"
 
 # Base URL for the Quilibrium releases
 BASE_URL="https://releases.quilibrium.com"
@@ -314,6 +325,8 @@ echo "✅ Qclient download completed."
 # SETUP SERVICE
 #==========================
 
+display_header "CREATING SERVICE FILE"
+
 # Get the current user's home directory
 HOME=$(eval echo ~$USER)
 
@@ -367,6 +380,12 @@ Environment="GOMAXPROCS=$GOMAXPROCS"
 [Install]
 WantedBy=multi-user.target
 EOF
+
+#==========================
+# START NODE VIA SERVICE
+#==========================
+
+display_header "STARTING NODE"
 
 # Start the ceremonyclient service
 echo "✅ Starting Ceremonyclient Service"

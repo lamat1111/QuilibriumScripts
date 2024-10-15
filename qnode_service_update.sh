@@ -193,10 +193,10 @@ else
 fi
 
 #==========================
-# NODE UPDATE
+# STOP SERVICE
 #==========================
 
-display_header "UPDATING NODE"
+display_header "STOPPING SERVICE"
 
 # Stop the ceremonyclient service if it exists
 echo "⏳ Stopping the ceremonyclient service if it exists..."
