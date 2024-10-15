@@ -129,7 +129,7 @@ EXEC_START="$NODE_PATH/$NODE_BINARY"
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
 TEMP_SERVICE_FILE="/tmp/ceremonyclient_temp.service"
 
-# Updated function to add or update a line in the [Service] section while preserving order
+# Function to add or update a line in the [Service] section while preserving order
 update_service_section() {
     local key="$1"
     local value="$2"
@@ -144,20 +144,16 @@ update_service_section() {
             /^\[Install\]/i $key=$value
         }" "$file"
     fi
-    
-    echo "✅ Updated $key in the service file."
 }
 
-# Function to ensure a single empty line at the end of each section
-ensure_section_formatting() {
+# Function to ensure correct formatting with specific empty lines
+ensure_correct_formatting() {
     local file="$1"
-    sed -i '
-        /^\[.*\]/{
-            n
-            /^$/!G
-        }
-        /^\[Install\]/G
-    ' "$file"
+    # Remove all empty lines
+    sed -i '/^$/d' "$file"
+    # Add empty line before [Service] and [Install]
+    sed -i '/^\[Service\]/i\ ' "$file"
+    sed -i '/^\[Install\]/i\ ' "$file"
 }
 
 # Check if the node is running via cluster script or para.sh and skip
@@ -167,10 +163,10 @@ if [ -f "$SERVICE_FILE" ] && (grep -q "ExecStart=/root/scripts/qnode_cluster_run
     exit 0
 fi
 
-# Create a temporary service file for dry run
-if [ -f "$SERVICE_FILE" ]; then
-    cp "$SERVICE_FILE" "$TEMP_SERVICE_FILE"
-else
+# Build service file
+echo "⏳ Rebuilding Ceremonyclient Service..."
+if [ ! -f "$SERVICE_FILE" ]; then
+    echo "⏳ Creating new ceremonyclient service file..."
     cat > "$TEMP_SERVICE_FILE" <<EOF
 [Unit]
 Description=Ceremony Client Go App Service
@@ -179,38 +175,51 @@ Description=Ceremony Client Go App Service
 Type=simple
 Restart=always
 RestartSec=5s
+WorkingDirectory=$NODE_PATH
+ExecStart=$EXEC_START
+ExecStop=/bin/kill -s SIGINT $MAINPID
+ExecReload=/bin/kill -s SIGINT $MAINPID && $EXEC_START
+KillSignal=SIGINT
+RestartKillSignal=SIGINT
+FinalKillSignal=SIGKILL
+TimeoutStopSec=30s
 
 [Install]
 WantedBy=multi-user.target
 EOF
+    echo "New service file will be created with the following content:"
+    cat "$TEMP_SERVICE_FILE"
+else
+    echo "⏳ Checking existing ceremonyclient service file..."
+    cp "$SERVICE_FILE" "$TEMP_SERVICE_FILE"
+
+    # Update all required lines in the [Service] section
+    update_service_section "WorkingDirectory" "$NODE_PATH" "$TEMP_SERVICE_FILE"
+    update_service_section "ExecStart" "$EXEC_START" "$TEMP_SERVICE_FILE"
+    update_service_section "ExecStop" "/bin/kill -s SIGINT \$MAINPID" "$TEMP_SERVICE_FILE"
+    update_service_section "ExecReload" "/bin/kill -s SIGINT \$MAINPID && $EXEC_START" "$TEMP_SERVICE_FILE"
+    update_service_section "KillSignal" "SIGINT" "$TEMP_SERVICE_FILE"
+    update_service_section "RestartKillSignal" "SIGINT" "$TEMP_SERVICE_FILE"
+    update_service_section "FinalKillSignal" "SIGKILL" "$TEMP_SERVICE_FILE"
+    update_service_section "TimeoutStopSec" "30s" "$TEMP_SERVICE_FILE"
+
+    # Ensure proper formatting
+    ensure_correct_formatting "$TEMP_SERVICE_FILE"
+
+    # Show the difference between the current and proposed service file
+    echo
+    echo "Proposed changes to the service file:"
+    echo "====================================="
+    diff -u "$SERVICE_FILE" "$TEMP_SERVICE_FILE" || true
+    echo "====================================="
+    echo
 fi
-
-# Update all required lines in the [Service] section
-update_service_section "WorkingDirectory" "$NODE_PATH" "$TEMP_SERVICE_FILE"
-update_service_section "ExecStart" "$EXEC_START" "$TEMP_SERVICE_FILE"
-update_service_section "ExecStop" "/bin/kill -s SIGINT \$MAINPID" "$TEMP_SERVICE_FILE"
-update_service_section "ExecReload" "/bin/kill -s SIGINT \$MAINPID && $EXEC_START" "$TEMP_SERVICE_FILE"
-update_service_section "KillSignal" "SIGINT" "$TEMP_SERVICE_FILE"
-update_service_section "RestartKillSignal" "SIGINT" "$TEMP_SERVICE_FILE"
-update_service_section "FinalKillSignal" "SIGKILL" "$TEMP_SERVICE_FILE"
-update_service_section "TimeoutStopSec" "30s" "$TEMP_SERVICE_FILE"
-
-# Ensure proper formatting with a single empty line at the end of each section
-ensure_section_formatting "$TEMP_SERVICE_FILE"
-
-# Show the proposed service file
-echo
-echo "Proposed changes to the service file:"
-echo "====================================="
-cat "$TEMP_SERVICE_FILE"
-echo "====================================="
-echo
 
 # Ask for user confirmation
 read -p "Do you want to apply these changes? (Y/N): " confirm
 
 if [[ $confirm == [Yy]* ]]; then
-    echo "⏳ Applying changes to the actual service file..."
+    echo "⏳ Applying changes to the service file..."
     sudo cp "$TEMP_SERVICE_FILE" "$SERVICE_FILE"
     echo "⏳ Reloading daemon and restarting the node to apply the new settings..."
     sudo systemctl daemon-reload
