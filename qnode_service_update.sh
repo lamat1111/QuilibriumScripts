@@ -6,6 +6,8 @@
 #Comment out for automatic creation of the qclient version
 #QCLIENT_VERSION=1.4.19.1
 
+GO_VERSION=1.23.2
+
 cat << "EOF"
 
                     QQQQQQQQQ       1111111   
@@ -130,21 +132,21 @@ echo
 if [ "$ARCH" = "x86_64" ]; then
     if [ "$OS" = "Linux" ]; then
         NODE_BINARY="node-$NODE_VERSION-linux-amd64"
-        GO_BINARY="go1.22.4.linux-amd64.tar.gz"
+        GO_BINARY="go$GO_VERSION.linux-amd64.tar.gz"
         [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-amd64"
     elif [ "$OS" = "Darwin" ]; then
         NODE_BINARY="node-$NODE_VERSION-darwin-amd64"
-        GO_BINARY="go1.22.4.darwin-amd64.tar.gz"
+        GO_BINARY="go$GO_VERSION.darwin-amd64.tar.gz"
         [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-amd64"
     fi
 elif [ "$ARCH" = "aarch64" ]; then
     if [ "$OS" = "Linux" ]; then
         NODE_BINARY="node-$NODE_VERSION-linux-arm64"
-        GO_BINARY="go1.22.4.linux-arm64.tar.gz"
+        GO_BINARY="go$GO_VERSION.linux-arm64.tar.gz"
         [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-arm64"
     elif [ "$OS" = "Darwin" ]; then
         NODE_BINARY="node-$NODE_VERSION-darwin-arm64"
-        GO_BINARY="go1.22.4.darwin-arm64.tar.gz"
+        GO_BINARY="go$GO_VERSION.darwin-arm64.tar.gz"
         [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-arm64"
     fi
 else
@@ -163,9 +165,9 @@ else
     INSTALLED_VERSION="none"
 fi
 
-# If the installed version is not 1.22.4, proceed with the installation
-if [ "$INSTALLED_VERSION" != "1.22.4" ]; then
-    echo "⏳ Current Go version is $INSTALLED_VERSION. Proceeding with installation of Go 1.22.4..."
+# If the installed version is not $GO_VERSION, proceed with the installation
+if [ "$INSTALLED_VERSION" != "$GO_VERSION" ]; then
+    echo "⏳ Current Go version is $INSTALLED_VERSION. Proceeding with installation of Go $GO_VERSION..."
 
     # Download and install Go
     wget https://go.dev/dl/$GO_BINARY > /dev/null 2>&1 || echo "Failed to download Go!"
@@ -174,9 +176,9 @@ if [ "$INSTALLED_VERSION" != "1.22.4" ]; then
     sudo mv go /usr/local || echo "Failed to move Go!"
     sudo rm $GO_BINARY || echo "Failed to remove downloaded archive!"
     
-    echo "✅ Go 1.22.4 has been installed successfully."
+    echo "✅ Go $GO_VERSION has been installed successfully."
 else
-    echo "✅ Go version 1.22.4 is already installed. No action needed."
+    echo "✅ Go version $GO_VERSION is already installed. No action needed."
 fi
 echo
 

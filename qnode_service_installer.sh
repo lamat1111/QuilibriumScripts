@@ -144,21 +144,21 @@ echo
 if [ "$ARCH" = "x86_64" ]; then
     if [ "$OS" = "Linux" ]; then
         NODE_BINARY="node-$NODE_VERSION-linux-amd64"
-        GO_BINARY="go1.22.4.linux-amd64.tar.gz"
+        #GO_BINARY="go1.22.4.linux-amd64.tar.gz"
         [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-amd64"
     elif [ "$OS" = "Darwin" ]; then
         NODE_BINARY="node-$NODE_VERSION-darwin-amd64"
-        GO_BINARY="go1.22.4.darwin-amd64.tar.gz"
+        #GO_BINARY="go1.22.4.darwin-amd64.tar.gz"
         [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-amd64"
     fi
 elif [ "$ARCH" = "aarch64" ]; then
     if [ "$OS" = "Linux" ]; then
         NODE_BINARY="node-$NODE_VERSION-linux-arm64"
-        GO_BINARY="go1.22.4.linux-arm64.tar.gz"
+        #GO_BINARY="go1.22.4.linux-arm64.tar.gz"
         [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-arm64"
     elif [ "$OS" = "Darwin" ]; then
         NODE_BINARY="node-$NODE_VERSION-darwin-arm64"
-        GO_BINARY="go1.22.4.darwin-arm64.tar.gz"
+        #GO_BINARY="go1.22.4.darwin-arm64.tar.gz"
         [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-arm64"
     fi
 else

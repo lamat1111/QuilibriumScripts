@@ -1,5 +1,7 @@
 #!/bin/bash -i
 
+GO_VERSION=1.23.2
+
 cat << "EOF"             
                             QQQQQQQQQ       1111111   
                           QQ:::::::::QQ    1::::::1   
@@ -49,15 +51,15 @@ OS=$(uname -s)
 # Determine the node binary name based on the architecture and OS
 if [ "$ARCH" = "x86_64" ]; then
     if [ "$OS" = "Linux" ]; then
-        GO_BINARY="go1.22.4.linux-amd64.tar.gz"
+        GO_BINARY="go$GO_VERSION.linux-amd64.tar.gz"
     elif [ "$OS" = "Darwin" ]; then
-        GO_BINARY="go1.22.4.linux-amd64.tar.gz"
+        GO_BINARY="go$GO_VERSION.darwin-amd64.tar.gz"
     fi
 elif [ "$ARCH" = "aarch64" ]; then
     if [ "$OS" = "Linux" ]; then
-        GO_BINARY="go1.22.4.linux-arm64.tar.gz"
+        GO_BINARY="go$GO_VERSION.linux-arm64.tar.gz"
     elif [ "$OS" = "Darwin" ]; then
-        GO_BINARY="go1.22.4.linux-arm64.tar.gz"
+        GO_BINARY="go$GO_VERSION.darwin-arm64.tar.gz"
     fi
 fi
 
@@ -156,27 +158,33 @@ done
 echo "✅ Packages installed successfully or already present."
 echo
 
-#################################
-# GO
-#################################
+#==========================
+# GO UPGRADE
+#==========================
 
-# Installing Go
-echo "⏳ Downloading and installing GO..."
-if wget https://go.dev/dl/$GO_BINARY > /dev/null 2>&1; then
-    if sudo tar -xvf $GO_BINARY > /dev/null 2>&1; then
-        sudo rm -rf /usr/local/go || log_error "Failed to remove existing GO!"
-        if sudo mv go /usr/local; then
-            sudo rm $GO_BINARY || log_error "Failed to remove downloaded archive!"
-            echo "✅ GO has been successfully downloaded and installed."
-        else
-            log_error "Failed to move GO!"
-        fi
-    else
-        log_error "Failed to extract GO!"
-    fi
+# Check the currently installed Go version
+if go version &>/dev/null; then
+    INSTALLED_VERSION=$(go version | awk '{print $3}' | sed 's/go//')
 else
-    log_error "Failed to download GO!"
+    INSTALLED_VERSION="none"
 fi
+
+# If the installed version is not $GO_VERSION, proceed with the installation
+if [ "$INSTALLED_VERSION" != "$GO_VERSION" ]; then
+    echo "⏳ Current Go version is $INSTALLED_VERSION. Proceeding with installation of Go $GO_VERSION..."
+
+    # Download and install Go
+    wget https://go.dev/dl/$GO_BINARY > /dev/null 2>&1 || echo "Failed to download Go!"
+    sudo tar -xvf $GO_BINARY > /dev/null 2>&1 || echo "Failed to extract Go!"
+    sudo rm -rf /usr/local/go || echo "Failed to remove existing Go!"
+    sudo mv go /usr/local || echo "Failed to move Go!"
+    sudo rm $GO_BINARY || echo "Failed to remove downloaded archive!"
+    
+    echo "✅ Go $GO_VERSION has been installed successfully."
+else
+    echo "✅ Go version $GO_VERSION is already installed. No action needed."
+fi
+echo
 
 # Set Go environment variables
 echo "⏳ Setting Go environment variables..."
