@@ -328,7 +328,7 @@ HOME=$(eval echo ~$USER)
 
 # Use the home directory in the path
 NODE_PATH="$HOME/ceremonyclient/node"
-EXEC_START="$NODE_PATH/release_autorun.sh"
+EXEC_START="$NODE_PATH/$NODE_BINARY"
 
 # Step 6: Create Ceremonyclient Service
 echo "⏳ Creating Ceremonyclient Service"
