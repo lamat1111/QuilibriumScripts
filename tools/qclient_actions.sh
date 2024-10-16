@@ -13,7 +13,7 @@ display_menu() {
 
 ========================================
          ✨ QCLIENT ACTIONS ✨
-              v $SCRIPT_VERSION
+               v $SCRIPT_VERSION
 ----------------------------------------
 1) Check total balance / see address 
 2) Check individual coins
