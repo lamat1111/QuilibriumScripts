@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.0.2"
+SCRIPT_VERSION="1.0.3"
 
 #=====================
 # Menu interface
@@ -45,11 +45,20 @@ add_alias_if_needed() {
             echo "" >> "$HOME/.bashrc"  # Add a blank line for better readability
             echo "$comment_line" >> "$HOME/.bashrc"
             echo "$alias_line" >> "$HOME/.bashrc"
-            echo "Alias added to .bashrc. Please restart your terminal or run 'source ~/.bashrc' to use the 'qclient' command."
+            echo "Alias added to .bashrc."
+            
+            # Source .bashrc to make the alias immediately available
+            if [ -n "$BASH_VERSION" ]; then
+                source "$HOME/.bashrc"
+                echo "Alias 'qclient' is now active."
+            else
+                echo "Please run 'source ~/.bashrc' or restart your terminal to use the 'qclient' command."
+            fi
         fi
         touch "$ALIAS_MARKER_FILE"
     fi
 }
+
 
 #=====================
 # Check for updates
