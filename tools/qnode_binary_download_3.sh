@@ -35,7 +35,7 @@ echo "File download process completed."
 
 # Make the new node executable
 echo "Making the new node executable..."
-chmod +x $HOME/ceremonyclient/node-$VERSION-linux-amd64 || { echo "Failed to make node executable. Exiting."; exit 1; }
+chmod +x $HOME/ceremonyclient/node/node-$VERSION-linux-amd64 || { echo "Failed to make node executable. Exiting."; exit 1; }
 
 # Stop the ceremonyclient service
 echo "Stopping ceremonyclient service..."
