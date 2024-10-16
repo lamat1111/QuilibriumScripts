@@ -372,6 +372,8 @@ fi
 # Prepare the service file content
 SERVICE_CONTENT="[Unit]
 Description=Ceremony Client Go App Service
+StartLimitIntervalSec=0
+StartLimitBurst=0
 
 [Service]
 Type=simple
@@ -381,6 +383,7 @@ WorkingDirectory=$NODE_PATH
 ExecStart=$EXEC_START
 ExecStop=/bin/kill -s SIGINT \$MAINPID
 KillSignal=SIGINT
+RestartKillSignal=SIGINT
 FinalKillSignal=SIGKILL
 TimeoutStopSec=30s"
 

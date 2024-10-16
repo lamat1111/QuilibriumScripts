@@ -459,6 +459,8 @@ if [ ! -f "$SERVICE_FILE" ]; then
     sudo tee "$SERVICE_FILE" > /dev/null <<EOF
 [Unit]
 Description=Ceremony Client Go App Service
+StartLimitIntervalSec=0
+StartLimitBurst=0
 
 [Service]
 Type=simple
