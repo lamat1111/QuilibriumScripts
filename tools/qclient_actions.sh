@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.0.1"
+SCRIPT_VERSION="1.0.2"
 
 #=====================
 # Menu interface
@@ -79,17 +79,11 @@ check_for_updates() {
             echo "✅ New version ($LATEST_VERSION) installed. Restarting script..."
             exec "$HOME/qclient_actions.sh"
         else
-            show_temp_message "❌ Error: Failed to download the new version. Update aborted." &
-            return 1
+            echo "❌ Failed to download the new version. Update aborted."
         fi
     else
-        show_temp_message "✅ Current version is up to date." &
+        echo "✅ Current version is up to date."
     fi
-}
-
-show_temp_message() {
-    echo "$1"
-    (sleep 3; echo -ne "\033[1A\033[2K") &  # Run in background
 }
 
 
