@@ -57,7 +57,6 @@ add_alias_if_needed() {
 
 check_for_updates() {
     if ! command -v curl &> /dev/null; then
-        echo "❌ curl is required but not installed. Skipping update check."
         return 1
     fi
 
@@ -67,22 +66,18 @@ check_for_updates() {
     LATEST_VERSION=$(curl -sS "$GITHUB_RAW_URL" | sed -n 's/^SCRIPT_VERSION="\(.*\)"$/\1/p')
     
     if [ $? -ne 0 ] || [ -z "$LATEST_VERSION" ]; then
-        echo "❌ Failed to check for updates. Continuing with current version."
         return 1
     fi
     
-    if [ "$SCRIPT_VERSION" != "$LATEST_VERSION" ]; then
-        echo "🔄 New version available. Attempting update..."
-        if curl -sS -o "$HOME/qclient_actions_new.sh" "$GITHUB_RAW_URL"; then
-            chmod +x "$HOME/qclient_actions_new.sh"
-            mv "$HOME/qclient_actions_new.sh" "$HOME/qclient_actions.sh"
-            echo "✅ New version ($LATEST_VERSION) installed. Restarting script..."
-            exec "$HOME/qclient_actions.sh"
-        else
-            echo "❌ Failed to download the new version. Update aborted."
+    # Version comparison function
+    version_gt() { test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1"; }
+    
+    if version_gt "$LATEST_VERSION" "$SCRIPT_VERSION"; then
+        if curl -sS -o "$HOME/scripts/qclient_actions_new.sh" "$GITHUB_RAW_URL"; then
+            chmod +x "$HOME/scripts/qclient_actions_new.sh"
+            mv "$HOME/scripts/qclient_actions_new.sh" "$HOME/scripts/qclient_actions.sh"
+            exec "$HOME/scripts/qclient_actions.sh"
         fi
-    else
-        echo "✅ Current version is up to date."
     fi
 }
 
