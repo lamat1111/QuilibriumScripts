@@ -412,7 +412,7 @@ ensure_correct_formatting() {
     echo "[Service]" >> "$temp_file"
     
     # Standard keys we want to ensure are in a specific order
-    standard_keys="Type Restart RestartSec WorkingDirectory ExecStart ExecStop ExecReload KillSignal RestartKillSignal FinalKillSignal TimeoutStopSec"
+    standard_keys="Type Restart RestartSec WorkingDirectory ExecStart ExecStop KillSignal RestartKillSignal FinalKillSignal TimeoutStopSec"
     
     # Add standard keys if they exist
     for key in $standard_keys; do
@@ -477,7 +477,6 @@ else
     update_service_section "WorkingDirectory" "$NODE_PATH" "$SERVICE_FILE"
     update_service_section "ExecStart" "$EXEC_START" "$SERVICE_FILE"
     update_service_section "ExecStop" "/bin/kill -s SIGINT \$MAINPID" "$SERVICE_FILE"
-    update_service_section "ExecReload" "/bin/kill -s SIGINT \$MAINPID && $EXEC_START" "$SERVICE_FILE"
     update_service_section "KillSignal" "SIGINT" "$SERVICE_FILE"
     update_service_section "RestartKillSignal" "SIGINT" "$SERVICE_FILE"
     update_service_section "FinalKillSignal" "SIGKILL" "$SERVICE_FILE"
