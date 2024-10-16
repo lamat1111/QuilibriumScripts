@@ -11,20 +11,27 @@ cd $HOME/ceremonyclient/node || { echo "Failed to change directory. Exiting."; e
 
 # Download files
 echo "Downloading new node files..."
-files=(
+main_files=(
     "node-$VERSION-linux-amd64"
     "node-$VERSION-linux-amd64.dgst"
 )
 
-for i in {1..17}; do
-    files+=("node-$VERSION-linux-amd64.dgst.sig.$i")
-done
-
-for file in "${files[@]}"; do
+# Download main files
+for file in "${main_files[@]}"; do
     wget "https://releases.quilibrium.com/$file" -O "$file" || { echo "Failed to download $file. Exiting."; exit 1; }
 done
 
-echo "All files downloaded successfully."
+# Download signature files
+for i in {1..17}; do
+    sig_file="node-$VERSION-linux-amd64.dgst.sig.$i"
+    if wget "https://releases.quilibrium.com/$sig_file" -O "$sig_file"; then
+        echo "Successfully downloaded $sig_file"
+    else
+        echo "Failed to download $sig_file. Skipping..."
+    fi
+done
+
+echo "File download process completed."
 
 # Make the new node executable
 echo "Making the new node executable..."
