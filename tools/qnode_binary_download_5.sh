@@ -13,7 +13,7 @@ cd $HOME/ceremonyclient/node || { echo "Failed to change directory. Exiting."; e
 echo "Downloading new node files..."
 main_files=(
     "node-$VERSION-linux-amd64"
-    "node-$VERSION-linux-amd64.dgst"
+    #"node-$VERSION-linux-amd64.dgst"
 )
 
 # Download main files
@@ -22,14 +22,14 @@ for file in "${main_files[@]}"; do
 done
 
 # Download signature files
-for i in {1..17}; do
-    sig_file="node-$VERSION-linux-amd64.dgst.sig.$i"
-    if wget "https://releases.quilibrium.com/$sig_file" -O "$sig_file"; then
-        echo "Successfully downloaded $sig_file"
-    else
-        echo "Failed to download $sig_file. Skipping..."
-    fi
-done
+# for i in {1..17}; do
+#     sig_file="node-$VERSION-linux-amd64.dgst.sig.$i"
+#     if wget "https://releases.quilibrium.com/$sig_file" -O "$sig_file"; then
+#         echo "Successfully downloaded $sig_file"
+#     else
+#         echo "Failed to download $sig_file. Skipping..."
+#     fi
+# done
 
 echo "File download process completed."
 
