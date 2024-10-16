@@ -112,8 +112,14 @@ if [ -z "$NODE_VERSION" ]; then
     NODE_VERSION=$(curl -s https://releases.quilibrium.com/release | grep -E "^node-[0-9]+(\.[0-9]+)*" | grep -v "dgst" | sed 's/^node-//' | cut -d '-' -f 1 | head -n 1)
     if [ -z "$NODE_VERSION" ]; then
         echo "❌ Error: Unable to determine NODE_VERSION automatically."
-        echo "The script cannot proceed without a correct node version number." 
-        echo "Please try the manual step by step installation instead:"
+        echo "The script cannot proceed without a correct node version number."
+        echo
+        echo "This could be caused by your provider blocking access to quilibrium.com"
+        echo "A solution could be to change your machine DNS and try again the update script."
+        echo "You can change your machine DNS with the command below:"
+        echo "sudo sh -c 'echo "nameserver 8.8.8.8" | tee /etc/systemd/resolved.conf.d/dns_servers.conf > /dev/null && systemctl restart systemd-resolved'"
+        echo
+        echo "Or, you can try the manual step by step installation instead:"
         echo "https://docs.quilibrium.one/start/tutorials/node-step-by-step-installation"
         echo
         exit 1
