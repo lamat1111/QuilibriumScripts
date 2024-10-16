@@ -332,23 +332,33 @@ EXEC_START="$NODE_PATH/$NODE_BINARY"
 
 # Step 6: Create Ceremonyclient Service
 echo "⏳ Creating Ceremonyclient Service"
-sleep 1  # Add a 2-second delay
+sleep 1
 
-# Calculate GOMAXPROCS based on the system's RAM
+# Calculate GOMAXPROCS based on the system's RAM and CPU cores
 calculate_gomaxprocs() {
     local ram_gb=$(free -g | awk '/^Mem:/{print $2}')
     local cpu_cores=$(nproc)
-    local gomaxprocs=$((ram_gb / 2))
-    if [ $gomaxprocs -gt $cpu_cores ]; then
-        gomaxprocs=$cpu_cores
+    
+    # Check if RAM is at least double the number of CPU cores
+    if [ $ram_gb -ge $((cpu_cores * 2)) ]; then
+        echo "0"  # GOMAXPROCS not needed
+    else
+        local gomaxprocs=$((ram_gb / 2))
+        if [ $gomaxprocs -gt $cpu_cores ]; then
+            gomaxprocs=$cpu_cores
+        fi
+        gomaxprocs=$((gomaxprocs + 1))
+        echo $gomaxprocs
     fi
-    gomaxprocs=$((gomaxprocs + 1))
-    echo $gomaxprocs
 }
 
 GOMAXPROCS=$(calculate_gomaxprocs)
 
-echo "✅ GOMAXPROCS has been set to $GOMAXPROCS based on your server's resources."
+if [ "$GOMAXPROCS" -eq "0" ]; then
+    echo "✅ RAM is sufficient (at least double the CPU cores). GOMAXPROCS setting is not needed."
+else
+    echo "✅ GOMAXPROCS has been set to $GOMAXPROCS based on your server's resources."
+fi
 echo
 
 # Check if the file exists before attempting to remove it
@@ -359,8 +369,8 @@ else
     echo "ceremonyclient.service file does not exist. No action taken."
 fi
 
-sudo tee /lib/systemd/system/ceremonyclient.service > /dev/null <<EOF
-[Unit]
+# Prepare the service file content
+SERVICE_CONTENT="[Unit]
 Description=Ceremony Client Go App Service
 
 [Service]
@@ -372,12 +382,21 @@ ExecStart=$EXEC_START
 ExecStop=/bin/kill -s SIGINT \$MAINPID
 KillSignal=SIGINT
 FinalKillSignal=SIGKILL
-TimeoutStopSec=30s
-Environment="GOMAXPROCS=$GOMAXPROCS"
+TimeoutStopSec=30s"
+
+# Add GOMAXPROCS to the service file only if needed
+if [ "$GOMAXPROCS" -ne "0" ]; then
+    SERVICE_CONTENT+="
+Environment=\"GOMAXPROCS=$GOMAXPROCS\""
+fi
+
+SERVICE_CONTENT+="
 
 [Install]
-WantedBy=multi-user.target
-EOF
+WantedBy=multi-user.target"
+
+# Write the service file
+echo "$SERVICE_CONTENT" | sudo tee /lib/systemd/system/ceremonyclient.service > /dev/null
 
 echo
 echo "This is your current updated service file."
