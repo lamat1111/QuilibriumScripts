@@ -4,7 +4,7 @@
 # 0 - Run normally with prompts
 # 1 - Run option 1 (deactivate) directly
 # 2 - Run option 2 (activate) directly
-EXECUTION_MODE=2
+EXECUTION_MODE=1
 
 # Function to display current crontab
 show_crontab() {
