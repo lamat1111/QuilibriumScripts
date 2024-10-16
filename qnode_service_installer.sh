@@ -374,6 +374,14 @@ Environment="GOMAXPROCS=$GOMAXPROCS"
 WantedBy=multi-user.target
 EOF
 
+echo
+echo "This is your current updated service file."
+echo "If you notice errors please correct them manually and restart your node."
+echo "------------------------------------------------"
+cat /lib/systemd/system/ceremonyclient.service
+echo "------------------------------------------------"
+sleep 1
+
 #==========================
 # START NODE VIA SERVICE
 #==========================
