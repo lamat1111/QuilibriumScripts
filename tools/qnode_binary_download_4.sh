@@ -43,7 +43,7 @@ sudo service ceremonyclient stop || { echo "Failed to stop ceremonyclient servic
 
 # Update the service file
 echo "Updating ceremonyclient service file..."
-sudo sed -i "s|^ExecStart=.*|ExecStart=/root/ceremonyclient/node/node-$VERSION-linux-amd64|" /lib/systemd/system/ceremonyclient.service || { echo "Failed to update service file. Exiting."; exit 1; }
+sudo sed -i "s|^ExecStart=.*|ExecStart=/root/ceremonyclient/node/node-$VERSION-linux-amd64 --signature-check=false|" /lib/systemd/system/ceremonyclient.service || { echo "Failed to update service file. Exiting."; exit 1; }
 
 # Reload systemd
 echo "Reloading systemd..."
