@@ -87,7 +87,7 @@ check_and_install curl
 # CREATE PATH VARIABLES
 #==========================
 
-display_header "CREATING PATH VARIABLES"
+display_header "CHECK NEEDED UPDATES"
 
 # Determine the ExecStart line based on the architecture
 ARCH=$(uname -m)
@@ -180,10 +180,10 @@ QCLIENT_NEEDS_UPDATE=true
 
 # Check node binary
 if check_executable "$NODE_BINARY_PATH"; then
-    echo "Latest node binary ($NODE_BINARY) is already present."
+    echo "🟢 Node is already updated to $NODE_VERSION"
     NODE_NEEDS_UPDATE=false
 else
-    echo "Node binary needs to be updated to $NODE_BINARY."
+    echo "🟡 Node needs to be updated to $NODE_VERSION"
 fi
 
 # Check qclient binary
@@ -191,7 +191,7 @@ if check_executable "$QCLIENT_BINARY_PATH"; then
     echo "Latest Qclient binary ($QCLIENT_BINARY) is already present."
     QCLIENT_NEEDS_UPDATE=false
 else
-    echo "Qclient binary needs to be updated to $QCLIENT_BINARY."
+    echo "🟡 Qclient needs to be updated to $QCLIENT_BINARY."
 fi
 
 # Determine which parts of the script to run
