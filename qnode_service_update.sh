@@ -26,14 +26,15 @@ cat << "EOF"
 This script will update your Quilibrium node when running it as a service.
 It will run your node from the binary file, and you will have to
 update manually.
-
 Follow the guide at https://docs.quilibrium.one
 
 Made with 🔥 by LaMat - https://quilibrium.one
 ===========================================================================
 
-⚠️ THIS SCRIPT DOES NOT SUPPORT CLUSTERS! ⚠️
-IF YOU ARE RUNNING A NODE CLUSTER PRESS 'CTRL+C' IMMEDIATELY
+              ⚠️ THIS SCRIPT DOES NOT SUPPORT CLUSTERS! ⚠️
+        if you are running a node cluster press 'CTRL+C' immediately
+
+---------------------------------------------------------------------------
 
 Processing... ⏳
 
@@ -110,10 +111,10 @@ if [ -z "$NODE_VERSION" ]; then
         echo
         exit 1
     else
-        echo "✅ Automatically determined NODE_VERSION: $NODE_VERSION"
+        echo "✅ Latest Node release: $NODE_VERSION"
     fi
 else
-    echo "✅ Using specified NODE_VERSION: $NODE_VERSION"
+    echo "✅ Using specified Node version: $NODE_VERSION"
 fi
 
 # Determine qclient latest version
@@ -122,15 +123,15 @@ if [ -z "$QCLIENT_VERSION" ]; then
     QCLIENT_VERSION=$(curl -s https://releases.quilibrium.com/qclient-release | grep -E "^qclient-[0-9]+(\.[0-9]+)*" | sed 's/^qclient-//' | cut -d '-' -f 1 |  head -n 1)
     if [ -z "$QCLIENT_VERSION" ]; then
         echo "⚠️ Warning: Unable to determine QCLIENT_VERSION automatically. Continuing without it."
-        echo "The script won't be able to install the qclient, but it will still install your node."
-        echo "You can install the qclient later manually if you need to."
+        echo "The script won't be able to install the Qclient, but it will still install your node."
+        echo "You can install the Qclient later manually if you need to."
         echo
         sleep 1
     else
-        echo "✅ Automatically determined QCLIENT_VERSION: $QCLIENT_VERSION"
+        echo "✅ Latest Qclient release: $QCLIENT_VERSION"
     fi
 else
-    echo "✅ Using specified QCLIENT_VERSION: $QCLIENT_VERSION"
+    echo "✅ Using specified Qclient version: $QCLIENT_VERSION"
 fi
 
 # Determine the node binary name based on the architecture and OS
