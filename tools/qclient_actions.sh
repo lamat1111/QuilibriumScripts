@@ -10,7 +10,7 @@ SCRIPT_VERSION="1.0.5"
 display_menu() {
     cat << EOF
          
-                QCLIENT ACTIONS  v $SCRIPT_VERSION
+                    QCLIENT ACTIONS  v $SCRIPT_VERSION
 -----------------------------------------------------------------
 1) Check total balance / see address 
 2) Check individual coins
