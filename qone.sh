@@ -664,7 +664,7 @@ Let your node run for 30 minutes, then choose option 3. Done!
 8) Node version               16) System cleaner               
 9) Node info                                      
 -----------------------------------------------------------------
-B) ⭐️ Best server providers
+B) ⭐ Best server providers
 D) 💜 Donations
 -----------------------------------------------------------------    
 X) Disclaimer                 E) Exit   
