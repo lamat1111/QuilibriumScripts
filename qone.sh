@@ -612,7 +612,7 @@ To remove the script fomr your system, run: rm ~/qone.sh
     You need a Storj account https://www.storj.io/ and a Public/Secret access key.
 
 14) Qclient install:
-    Install or update the qClient, to manage your QUIL tokens via CLI.
+    Install or update the Qclient, to manage your QUIL tokens via CLI.
 
 15) Qclient actions:
     Open a submenu with serveral actions for the Qclient, like check balance,
