@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.0.5"
+SCRIPT_VERSION="2.0.6"
 
 #==========================
 # INSTALL APPS
@@ -143,6 +143,7 @@ BACKUP_STORJ_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/
 BACKUP_RESTORE_STORJ_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_backup_restore_storj.sh"
 BALANCE_LOG_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_balance_checker_installer.sh"
 TEST_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/test/test_script.sh"
+QCLIENT_ACTIONS_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/tools/qclient_actions.sh"
 
 #=====================
 # Function Definitions
@@ -205,6 +206,20 @@ qclient_install() {
     
     prompt_return_to_menu
     return $?
+}
+
+qclient_actions() {
+
+    if [ -f ~/scripts/qclient_actions.sh ]; then
+        #echo "Script already exists. Executing..."
+    else
+        #echo "Script not found. Downloading..."
+        mkdir -p ~/scripts
+        curl -sSL "$QCLIENT_ACTIONS_URL" -o ~/scripts/qclient_actions.sh
+        chmod +x ~/scripts/qclient_actions.sh
+    fi
+    ~/scripts/qclient_actions.sh
+
 }
 
 system_cleaner() {
@@ -646,8 +661,8 @@ Let your node run for 30 minutes, then choose option 3. Done!
 3) Set up gRPCurl             12) Backup your node
                               13) Restore backup                
 4) Node Log                                    
-5) Update node                14) qclient install      
-6) Stop node                  15) qclient actions (coming soon...)                                            
+5) Update node                14) Qclient install      
+6) Stop node                                                             
 7) Start node                               
 8) Node version               16) System cleaner               
 9) Node info                                      
@@ -688,7 +703,7 @@ while true; do
         12) confirm_action "$(wrap_text "$backup_storj_message" "")" "Backup your node on StorJ" backup_storj && continue ;;
         13) confirm_action "$(wrap_text "$backup_restore_storj_message" "")" "Restore a node backup from StorJ" backup_restore_storj && continue ;;
         14) confirm_action "$(wrap_text "$qclient_install_message" "")" "qClient install" qclient_install && continue ;;
-        #15) check_visibility && continue ;;
+        15) qclient_actions;;
         16) system_cleaner && continue ;;
         20) confirm_action "$(wrap_text "$test_script_message" "")" "Test Script" test_script && continue ;;
         [bB]) best_providers ;;
