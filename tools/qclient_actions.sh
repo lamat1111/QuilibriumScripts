@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.0.5"
+SCRIPT_VERSION="1.0.6"
 
 #=====================
 # Menu interface
