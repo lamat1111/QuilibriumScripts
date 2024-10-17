@@ -521,7 +521,7 @@ update_config_file() {
         echo "Config file not found: $config_file"
         echo "This is not a problem (it's not related to your node)."
         return
-    }
+    fi  # Changed from } to fi
     
     # Get the current NODE_BINARY from the config file
     config_node_binary=$(grep "^NODE_BINARY=" "$config_file" | cut -d '=' -f 2 | tr -d '"' | tr -d "'")
@@ -529,7 +529,7 @@ update_config_file() {
     if [ -z "$config_node_binary" ]; then
         echo "❌ Could not find NODE_BINARY in config file"
         return
-    }
+    fi  # Changed from } to fi
     
     # Compare NODE_BINARY values
     if [ "$config_node_binary" = "$NODE_BINARY" ]; then
