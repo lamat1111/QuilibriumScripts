@@ -172,7 +172,7 @@ check_executable() {
 
 # Set the full paths for the binary files
 NODE_BINARY_PATH="$HOME/ceremonyclient/node/$NODE_BINARY"
-QCLIENT_BINARY_PATH="$HOME/ceremonyclient/node/$QCLIENT_BINARY"
+QCLIENT_BINARY_PATH="$HOME/ceremonyclient/client/$QCLIENT_BINARY"
 
 # Initialize flags
 NODE_NEEDS_UPDATE=true
@@ -194,15 +194,20 @@ else
     echo "🟡 Qclient needs to be updated to $QCLIENT_VERSION"
 fi
 
+echo
+
 # Determine which parts of the script to run
 if [ "$NODE_NEEDS_UPDATE" = false ] && [ "$QCLIENT_NEEDS_UPDATE" = false ]; then
     echo "✅ Both node and Qclient are already up to date!"
     exit 0
 elif [ "$NODE_NEEDS_UPDATE" = false ]; then
+    echo
     echo "🟡 Only the Qclient needs to be updated. Skipping node update..."
 elif [ "$QCLIENT_NEEDS_UPDATE" = false ]; then
+    echo
     echo "🟡 Only the node needs to be updated. Skipping Qclient update..."
 else
+    echo
     echo "✅ Both node and Qclient need to be updated. Proceeding..."
 fi
 
