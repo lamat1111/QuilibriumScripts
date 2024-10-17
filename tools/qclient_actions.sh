@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.0.4"
+SCRIPT_VERSION="1.0.5"
 
 #=====================
 # Menu interface
@@ -9,7 +9,6 @@ SCRIPT_VERSION="1.0.4"
 
 display_menu() {
     cat << EOF
-
          
                 QCLIENT ACTIONS  v $SCRIPT_VERSION
 -----------------------------------------------------------------
