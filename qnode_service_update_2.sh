@@ -401,44 +401,53 @@ else
 fi
 
 
-#==========================
-# DELETE OLD RELEASES
-#==========================
+if [ "$NODE_NEEDS_UPDATE" = true ] && [ "$QCLIENT_NEEDS_UPDATE" = true ]; then
 
-display_header "DELETING OLD RELEASES"
+    #==========================
+    # DELETE OLD RELEASES
+    #==========================
 
-# Function to clean up old releases
-cleanup_old_releases() {
-    local directory=$1
-    local current_binary=$2
-    local prefix=$3
+    display_header "DELETING OLD RELEASES"
 
-    echo "⏳ Cleaning up old $prefix releases in $directory..."
+    # Function to clean up old releases
+    cleanup_old_releases() {
+        local directory=$1
+        local current_binary=$2
+        local prefix=$3
 
-    # Delete old binary files, .dgst files, and signature files in one go
-    if find "$directory" -type f \( \
-        -name "${prefix}-*-${OS_ARCH}" -o \
-        -name "${prefix}-*-${OS_ARCH}.dgst" -o \
-        -name "${prefix}-*-${OS_ARCH}.dgst.sig.*" \
-    \) ! -name "${current_binary}*" -delete; then
-        echo "✅ Removed old $prefix files (binary, .dgst, and signatures)."
-    else
-        echo "ℹ️ No old $prefix files to remove."
-    fi
+        echo "⏳ Cleaning up old $prefix releases in $directory..."
 
-    echo "✅ Cleanup of old $prefix releases completed."
-    echo
-}
+        # Delete old binary files, .dgst files, and signature files in one go
+        if find "$directory" -type f \( \
+            -name "${prefix}-*-${OS_ARCH}" -o \
+            -name "${prefix}-*-${OS_ARCH}.dgst" -o \
+            -name "${prefix}-*-${OS_ARCH}.dgst.sig.*" \
+        \) ! -name "${current_binary}*" -delete; then
+            echo "✅ Removed old $prefix files (binary, .dgst, and signatures)."
+        else
+            echo "ℹ️ No old $prefix files to remove."
+        fi
 
-# After node binary download and verification
-echo "⏳ Starting cleanup of old node releases..."
-sleep 1
-cleanup_old_releases "$HOME/ceremonyclient/node" "$NODE_BINARY" "node"
+        echo "✅ Cleanup of old $prefix releases completed."
+        echo
+    }
 
-# After qclient binary download and verification
-echo "⏳ Starting cleanup of old qclient releases..."
-sleep 1
-cleanup_old_releases "$HOME/ceremonyclient/client" "$QCLIENT_BINARY" "qclient"
+    # After node binary download and verification
+    echo "⏳ Starting cleanup of old node releases..."
+    sleep 1
+    cleanup_old_releases "$HOME/ceremonyclient/node" "$NODE_BINARY" "node"
+
+    # After qclient binary download and verification
+    echo "⏳ Starting cleanup of old qclient releases..."
+    sleep 1
+    cleanup_old_releases "$HOME/ceremonyclient/client" "$QCLIENT_BINARY" "qclient"
+
+else
+    echo "✅ Skipping deletion of old releases to preserve current installations."
+fi
+
+
+if [ "$NODE_NEEDS_UPDATE" = true ]; then
 
 #==========================
 # SERVICE UPDATE
@@ -562,6 +571,7 @@ sudo systemctl daemon-reload
 sudo systemctl restart ceremonyclient
 echo "✅ Service file update completed and applied."
 
+
 #==========================
 # CONFIG FILE UPDATE for "REWARDS TO GOOGLE SHEET SCRIPT"
 #==========================
@@ -633,3 +643,7 @@ echo
 echo
 sleep 2
 sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
+
+else
+    echo "✅ Skipping all operations as node was already updated."
+fi
