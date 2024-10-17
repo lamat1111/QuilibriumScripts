@@ -336,7 +336,7 @@ if [ "$NODE_NEEDS_UPDATE" = true ]; then
     echo "✅ Node binary download completed."
 
 else
-    echo "✅ Skipping node update."
+    : # Do nothing
 fi
 
 
@@ -396,7 +396,7 @@ if [ "$QCLIENT_NEEDS_UPDATE" = true ]; then
     echo "✅ Qclient download completed."
 
 else
-    echo "✅ Skipping Qclient update."
+    : # Do nothing
 fi
 
 
@@ -644,5 +644,5 @@ sleep 2
 sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
 
 else
-    echo "✅ Skipping all operations as node was already updated."
+    echo "✅ Update finished!"
 fi
