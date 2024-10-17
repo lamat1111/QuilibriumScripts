@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.0.6"
+SCRIPT_VERSION="2.0.7"
 
 #==========================
 # INSTALL APPS
@@ -209,17 +209,12 @@ qclient_install() {
 }
 
 qclient_actions() {
-
-    if [ -f ~/scripts/qclient_actions.sh ]; then
-        #echo "Script already exists. Executing..."
-    else
-        #echo "Script not found. Downloading..."
+    if [ ! -f ~/scripts/qclient_actions.sh ]; then
         mkdir -p ~/scripts
         curl -sSL "$QCLIENT_ACTIONS_URL" -o ~/scripts/qclient_actions.sh
         chmod +x ~/scripts/qclient_actions.sh
     fi
     ~/scripts/qclient_actions.sh
-
 }
 
 system_cleaner() {
