@@ -36,7 +36,7 @@ Made with 🔥 by LaMat - https://quilibrium.one
 
 ---------------------------------------------------------------------------
 
-Processing... ⏳
+⏳ Processing... 
 
 EOF
 
@@ -98,7 +98,7 @@ OS=$(uname -s)
 if [ -z "$NODE_VERSION" ]; then
     NODE_VERSION=$(curl -s https://releases.quilibrium.com/release | grep -E "^node-[0-9]+(\.[0-9]+)*" | grep -v "dgst" | sed 's/^node-//' | cut -d '-' -f 1 | head -n 1)
     if [ -z "$NODE_VERSION" ]; then
-        echo "❌ Error: Unable to determine NODE_VERSION automatically."
+        echo "❌ Error: Unable to determine th latest node release automatically."
         echo "The script cannot proceed without a correct node version number."
         echo
         echo "This could be caused by your provider blocking access to quilibrium.com"
@@ -122,7 +122,7 @@ fi
 if [ -z "$QCLIENT_VERSION" ]; then
     QCLIENT_VERSION=$(curl -s https://releases.quilibrium.com/qclient-release | grep -E "^qclient-[0-9]+(\.[0-9]+)*" | sed 's/^qclient-//' | cut -d '-' -f 1 |  head -n 1)
     if [ -z "$QCLIENT_VERSION" ]; then
-        echo "⚠️ Warning: Unable to determine QCLIENT_VERSION automatically. Continuing without it."
+        echo "⚠️ Warning: Unable to determinethe latest Qclient release automatically. Continuing without it."
         echo "The script won't be able to install the Qclient, but it will still install your node."
         echo "You can install the Qclient later manually if you need to."
         echo
@@ -139,21 +139,21 @@ if [ "$ARCH" = "x86_64" ]; then
     if [ "$OS" = "Linux" ]; then
         NODE_BINARY="node-$NODE_VERSION-linux-amd64"
         GO_BINARY="go$GO_VERSION.linux-amd64.tar.gz"
-        [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-amd64"
+        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-amd64"
     elif [ "$OS" = "Darwin" ]; then
         NODE_BINARY="node-$NODE_VERSION-darwin-amd64"
         GO_BINARY="go$GO_VERSION.darwin-amd64.tar.gz"
-        [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-amd64"
+       QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-amd64"
     fi
 elif [ "$ARCH" = "aarch64" ]; then
     if [ "$OS" = "Linux" ]; then
         NODE_BINARY="node-$NODE_VERSION-linux-arm64"
         GO_BINARY="go$GO_VERSION.linux-arm64.tar.gz"
-        [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-arm64"
+        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-arm64"
     elif [ "$OS" = "Darwin" ]; then
         NODE_BINARY="node-$NODE_VERSION-darwin-arm64"
         GO_BINARY="go$GO_VERSION.darwin-arm64.tar.gz"
-        [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-arm64"
+        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-arm64"
     fi
 else
     echo "❌ Error: Unsupported system architecture ($ARCH) or operating system ($OS)."
@@ -199,10 +199,9 @@ if [ "$NODE_NEEDS_UPDATE" = false ] && [ "$QCLIENT_NEEDS_UPDATE" = false ]; then
     echo "✅ Both node and Qclient are already up to date!"
     exit 0
 elif [ "$NODE_NEEDS_UPDATE" = false ]; then
-    echo "✅ Only Qclient needs to be updated. Skipping node update sections."
-    # Here you would add logic to skip to the QCLIENT UPDATE section
+    echo "✅ Only Qclient needs to be updated. Skipping node updates."
 elif [ "$QCLIENT_NEEDS_UPDATE" = false ]; then
-    echo "✅ Only node needs to be updated. Will skip Qclient update section."
+    echo "✅ Only the node needs to be updated. Skipping Qclient update."
 else
     echo "✅ Both node and Qclient need to be updated. Proceeding..."
 fi
