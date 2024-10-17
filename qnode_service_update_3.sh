@@ -188,10 +188,10 @@ fi
 
 # Check qclient binary
 if check_executable "$QCLIENT_BINARY_PATH"; then
-    echo "Latest Qclient binary ($QCLIENT_BINARY) is already present."
+    echo "🟢 Qclient is already updated to $QCLIENT_VERSION"
     QCLIENT_NEEDS_UPDATE=false
 else
-    echo "🟡 Qclient needs to be updated to $QCLIENT_BINARY."
+    echo "🟡 Qclient needs to be updated to $QCLIENT_VERSION"
 fi
 
 # Determine which parts of the script to run
@@ -199,9 +199,9 @@ if [ "$NODE_NEEDS_UPDATE" = false ] && [ "$QCLIENT_NEEDS_UPDATE" = false ]; then
     echo "✅ Both node and Qclient are already up to date!"
     exit 0
 elif [ "$NODE_NEEDS_UPDATE" = false ]; then
-    echo "✅ Only Qclient needs to be updated. Skipping node updates."
+    echo "🟡 Only the Qclient needs to be updated. Skipping node update..."
 elif [ "$QCLIENT_NEEDS_UPDATE" = false ]; then
-    echo "✅ Only the node needs to be updated. Skipping Qclient update."
+    echo "🟡 Only the node needs to be updated. Skipping Qclient update..."
 else
     echo "✅ Both node and Qclient need to be updated. Proceeding..."
 fi
