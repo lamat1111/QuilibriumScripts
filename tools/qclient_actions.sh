@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.0.3"
+SCRIPT_VERSION="1.0.4"
 
 #=====================
 # Menu interface
@@ -10,21 +10,20 @@ SCRIPT_VERSION="1.0.3"
 display_menu() {
     cat << EOF
 
-
-========================================
-         ✨ QCLIENT ACTIONS ✨
-               v $SCRIPT_VERSION
-----------------------------------------
+         
+                QCLIENT ACTIONS  v $SCRIPT_VERSION
+-----------------------------------------------------------------
 1) Check total balance / see address 
 2) Check individual coins
-3) Create transaction
 
+3) Create transaction
 4) Accept transaction
-5) Reject transaction                        
+5) Reject transaction
+
 6) Perform mutual transfer
 
 E) Exit              
-========================================
+==================================================================
 
 EOF
 }
