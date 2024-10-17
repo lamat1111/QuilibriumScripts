@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.0.7"
+SCRIPT_VERSION="2.0.8"
 
 #==========================
 # INSTALL APPS
@@ -452,21 +452,22 @@ to follow the online guide instead at: https://docs.quilibrium.one/
 '
 
 install_node_message='
-This action will install the node on your server. 
+This action will install the Qnode & Qclient. 
 If this is the first time you install a Quilibrium node I suggest you 
-to follow the online guide instead at: https://docs.quilibrium.one/ 
+to follow the online guide instead at: https://docs.quilibrium.one/
+
 Ensure that your server meets all the requirements and that you have 
 already prepared you server via Step 1.
 '
 
 update_node_message='
-This action will update your node. 
+This action will update your Qnode & Qclient.
 Only use this if you have installed the node via the guide at 
 https://docs.quilibrium.one/
 '
 
 qclient_install_message='
-This action will install or update the qClient.
+This action will install or update the Qclient.
 '
 
 setup_grpcurl_message='
@@ -501,7 +502,7 @@ in the Q.One Quickstart menu.
 
 best_providers_message='
 Check out the best server providers for your node
-at ⭐️ https://iri.quest/q-best-providers ⭐️
+at ★ https://iri.quest/q-best-providers ★
 
 Avoid using providers that specifically ban crypto and mining.
 '
@@ -560,7 +561,7 @@ To remove the script fomr your system, run: rm ~/qone.sh
     to follow the online guide at: https://docs.quilibrium.one/
 
  2) Install node:
-    This action will install the node on your server. 
+    This action will install the Qnode & Qclient on your server. 
     If this is the first time you install a Quilibrium node, it is recommended
     to follow the online guide at: https://docs.quilibrium.one/ 
     Ensure that your server meets all the requirements and that you have 
@@ -574,7 +575,7 @@ To remove the script fomr your system, run: rm ~/qone.sh
     Display the log of the node.
 
  5) Update node:
-    This action will update your node. 
+    This action will update your Qnode & Qclient. 
     Only use this if you have installed the node via the guide at 
     https://docs.quilibrium.one/
 
