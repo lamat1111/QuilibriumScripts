@@ -160,6 +160,7 @@ else
     exit 1
 fi
 
+echo
 
 #==========================
 # CHECK IF UPDATE IS NEEDED
@@ -198,17 +199,17 @@ echo
 
 # Determine which parts of the script to run
 if [ "$NODE_NEEDS_UPDATE" = false ] && [ "$QCLIENT_NEEDS_UPDATE" = false ]; then
-    echo "✅ Both node and Qclient are already up to date!"
+    echo "✅ Both Node and Qclient are already up to date!"
     exit 0
 elif [ "$NODE_NEEDS_UPDATE" = false ]; then
     echo
     echo "🟡 Only the Qclient needs to be updated. Skipping node update..."
 elif [ "$QCLIENT_NEEDS_UPDATE" = false ]; then
     echo
-    echo "🟡 Only the node needs to be updated. Skipping Qclient update..."
+    echo "🟡 Only the Node needs to be updated. Skipping Qclient update..."
 else
     echo
-    echo "✅ Both node and Qclient need to be updated. Proceeding..."
+    echo "✅ Both Node and Qclient need to be updated. Proceeding..."
 fi
 
 
@@ -588,42 +589,60 @@ echo
 
 # Function to update config file
 update_config_file() {
-    local config_file=$1
+    local config_file="$1"
+    # Expand the path properly
+    config_file="${config_file/#\~/$HOME}"
+    
     echo "✅ Checking node version in config file '$(basename "$config_file")'."
-    sleep 1
+    
+    if [ ! -f "$config_file" ]; then
+        echo "Config file not found: $config_file"
+        echo "This is not a problem (it's not related to your node)."
+        return
+    }
+    
     # Get the current NODE_BINARY from the config file
-    config_node_binary=$(grep "NODE_BINARY=" "$config_file" | cut -d '=' -f 2)
+    config_node_binary=$(grep "^NODE_BINARY=" "$config_file" | cut -d '=' -f 2 | tr -d '"' | tr -d "'")
+    
+    if [ -z "$config_node_binary" ]; then
+        echo "❌ Could not find NODE_BINARY in config file"
+        return
+    }
+    
     # Compare NODE_BINARY values
     if [ "$config_node_binary" = "$NODE_BINARY" ]; then
         echo "NODE_BINARY values match. No update needed."
     else
         echo "⏳ NODE_BINARY values differ. Updating config file..."
+        echo "Current value: $config_node_binary"
+        echo "New value: $NODE_BINARY"
         
-        # Update the config file
-        sed -i "s|NODE_BINARY=.*|NODE_BINARY=$NODE_BINARY|" "$config_file"
+        # Create a backup of the config file
+        cp "$config_file" "${config_file}.backup"
+        
+        # Update the config file using a temporary file to handle special characters
+        sed "s|^NODE_BINARY=.*|NODE_BINARY=$NODE_BINARY|" "$config_file" > "${config_file}.tmp"
+        mv "${config_file}.tmp" "$config_file"
         
         if [ $? -eq 0 ]; then
             echo "✅ Config file updated successfully."
         else
-            echo "❌ Failed to update config file. Continuing to next step..."
+            echo "❌ Failed to update config file. Restoring backup..."
+            mv "${config_file}.backup" "$config_file"
         fi
     fi
 }
 
-# Array of config files
+# Array of config files with proper path expansion
 config_files=(
-    "~/scripts/qnode_rewards_to_gsheet.config"
-    "~/scripts/qnode_rewards_to_gsheet_2.config"
+    "$HOME/scripts/qnode_rewards_to_gsheet.config"
+    "$HOME/scripts/qnode_rewards_to_gsheet_2.config"
 )
 
 # Loop through config files
 for config_file in "${config_files[@]}"; do
-    if [ -f "$config_file" ]; then
-        update_config_file "$config_file"
-    else
-        echo "Config file not found: $config_file"
-        echo "This is not a problem (it's not related to your node). Continuing to next file..."
-    fi
+    update_config_file "$config_file"
+    echo "-------------------"
 done
 
 echo "All config files processed."
