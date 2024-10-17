@@ -611,10 +611,12 @@ To remove the script fomr your system, run: rm ~/qone.sh
     This script will restore your node backup from StorJ.
     You need a Storj account https://www.storj.io/ and a Public/Secret access key.
 
-14) qClient install:
+14) Qclient install:
     Install or update the qClient, to manage your QUIL tokens via CLI.
 
-15) qclient actions (coming soon...)    
+15) Qclient actions:
+    Open a submenu with serveral actions for the Qclient, like check balance,
+    create transaction, accept transaction etc.  
 
 16) System cleaner:
     Perform system cleanup tasks. It will not affect your node.
