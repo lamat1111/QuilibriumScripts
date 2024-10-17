@@ -581,71 +581,74 @@ echo "✅ Service file update completed and applied."
 # CONFIG FILE UPDATE for "REWARDS TO GOOGLE SHEET SCRIPT"
 #==========================
 
-display_header "UPDATING EXTRA CONFIG FILES (OPTIONAL)"
+# Define the config files
+CONFIG_FILE1="$HOME/scripts/qnode_rewards_to_gsheet.config"
+CONFIG_FILE2="$HOME/scripts/qnode_rewards_to_gsheet_2.config"
 
-echo "This is an optional section that almost nobody needs."
-echo "Don't worry if you receive errors."
-echo
+# Check if either of the config files exist
+if [ -f "$CONFIG_FILE1" ] || [ -f "$CONFIG_FILE2" ]; then
 
-# Function to update config file
-update_config_file() {
-    local config_file="$1"
-    # Expand the path properly
-    config_file="${config_file/#\~/$HOME}"
-    
-    echo "✅ Checking node version in config file '$(basename "$config_file")'."
-    
-    if [ ! -f "$config_file" ]; then
-        echo "Config file not found: $config_file"
-        echo "This is not a problem (it's not related to your node)."
-        return
-    }
-    
-    # Get the current NODE_BINARY from the config file
-    config_node_binary=$(grep "^NODE_BINARY=" "$config_file" | cut -d '=' -f 2 | tr -d '"' | tr -d "'")
-    
-    if [ -z "$config_node_binary" ]; then
-        echo "❌ Could not find NODE_BINARY in config file"
-        return
-    }
-    
-    # Compare NODE_BINARY values
-    if [ "$config_node_binary" = "$NODE_BINARY" ]; then
-        echo "NODE_BINARY values match. No update needed."
-    else
-        echo "⏳ NODE_BINARY values differ. Updating config file..."
-        echo "Current value: $config_node_binary"
-        echo "New value: $NODE_BINARY"
+    display_header "UPDATING EXTRA CONFIG FILES (OPTIONAL)"
+
+    echo "This is an optional section that almost nobody needs."
+    echo "Don't worry if you receive errors."
+    echo
+
+    # Function to update config file
+    update_config_file() {
+        local config_file="$1"
         
-        # Create a backup of the config file
-        cp "$config_file" "${config_file}.backup"
+        echo "✅ Checking node version in config file '$(basename "$config_file")'."
         
-        # Update the config file using a temporary file to handle special characters
-        sed "s|^NODE_BINARY=.*|NODE_BINARY=$NODE_BINARY|" "$config_file" > "${config_file}.tmp"
-        mv "${config_file}.tmp" "$config_file"
+        # Get the current NODE_BINARY from the config file
+        config_node_binary=$(grep "^NODE_BINARY=" "$config_file" | cut -d '=' -f 2 | tr -d '"' | tr -d "'")
         
-        if [ $? -eq 0 ]; then
-            echo "✅ Config file updated successfully."
-        else
-            echo "❌ Failed to update config file. Restoring backup..."
-            mv "${config_file}.backup" "$config_file"
+        if [ -z "$config_node_binary" ]; then
+            echo "❌ Could not find NODE_BINARY in config file"
+            return
         fi
-    fi
-}
+        
+        # Compare NODE_BINARY values
+        if [ "$config_node_binary" = "$NODE_BINARY" ]; then
+            echo "NODE_BINARY values match. No update needed."
+        else
+            echo "⏳ NODE_BINARY values differ. Updating config file..."
+            echo "Current value: $config_node_binary"
+            echo "New value: $NODE_BINARY"
+            
+            # Create a backup of the config file
+            cp "$config_file" "${config_file}.backup"
+            
+            # Update the config file using a temporary file to handle special characters
+            sed "s|^NODE_BINARY=.*|NODE_BINARY=$NODE_BINARY|" "$config_file" > "${config_file}.tmp"
+            mv "${config_file}.tmp" "$config_file"
+            
+            if [ $? -eq 0 ]; then
+                echo "✅ Config file updated successfully."
+            else
+                echo "❌ Failed to update config file. Restoring backup..."
+                mv "${config_file}.backup" "$config_file"
+            fi
+        fi
+    }
 
-# Array of config files with proper path expansion
-config_files=(
-    "$HOME/scripts/qnode_rewards_to_gsheet.config"
-    "$HOME/scripts/qnode_rewards_to_gsheet_2.config"
-)
+    # Array of config files
+    config_files=("$CONFIG_FILE1" "$CONFIG_FILE2")
 
-# Loop through config files
-for config_file in "${config_files[@]}"; do
-    update_config_file "$config_file"
-    echo "-------------------"
-done
+    # Loop through config files
+    for config_file in "${config_files[@]}"; do
+        if [ -f "$config_file" ]; then
+            update_config_file "$config_file"
+            echo "-------------------"
+        else
+            echo "Config file not found: $config_file"
+        fi
+    done
 
-echo "All config files processed."
+    echo "All config files processed."
+else
+    : #do nothing
+fi
 
 #==========================
 # START NODE VIA SERVICE
