@@ -13,16 +13,23 @@ BASE_URL="https://releases.quilibrium.com"
 if [ -z "$QCLIENT_VERSION" ]; then
     QCLIENT_VERSION=$(curl -s https://releases.quilibrium.com/qclient-release | grep -E "^qclient-[0-9]+(\.[0-9]+)*" | sed 's/^qclient-//' | cut -d '-' -f 1 |  head -n 1)
     if [ -z "$QCLIENT_VERSION" ]; then
-        echo "⚠️ Warning: Unable to determine QCLIENT_VERSION automatically. Continuing without it."
-        echo "The script won't be able to install the qclient, but it will still install your node."
-        echo "You can install the qclient later manually if you need to."
+        echo "⚠️ Warning: Unable to determine the Qclient version automatically. Continuing without it."
+        echo "The script cannot proceed without a correct qclientversion number."
         echo
-        sleep 1
+        echo "This could be caused by your provider blocking access to quilibrium.com"
+        echo "A solution could be to change your machine DNS and try again the update script."
+        echo "You can change your machine DNS with the command below:"
+        echo "sudo sh -c 'echo "nameserver 8.8.8.8" | tee /etc/systemd/resolved.conf.d/dns_servers.conf > /dev/null && systemctl restart systemd-resolved'"
+        echo
+        echo "Or, you can try the manual step by step installation instead:"
+        echo "https://docs.quilibrium.one/start/tutorials/node-step-by-step-installation"
+        echo
+        exit 1
     else
-        echo "✅ Automatically determined QCLIENT_VERSION: $QCLIENT_VERSION"
+        echo "✅ Latest Qclient release: $QCLIENT_VERSION"
     fi
 else
-    echo "✅ Using specified QCLIENT_VERSION: $QCLIENT_VERSION"
+    echo "✅ Using specified Qclient version: $QCLIENT_VERSION"
 fi
 
 echo
@@ -47,6 +54,12 @@ fi
 
 
 echo "QCLIENT_BINARY set to: $QCLIENT_BINARY"
+
+# Create directories if they don't exist
+mkdir -p "$HOME/ceremonyclient"
+mkdir -p "$HOME/ceremonyclient/client"
+
+echo "Directories created successfully."
 
 # Change to the download directory
 if ! cd ~/ceremonyclient/client; then
@@ -76,7 +89,7 @@ if download_and_overwrite "$BASE_URL/$QCLIENT_BINARY" "$QCLIENT_BINARY"; then
     #chmod +x qclient
     #echo "✅ Renamed to qclient and made executable"
 else
-    echo "Manual installation may be required."
+    echo "❌ Error during download: manual installation may be required."
     exit 1
 fi
 
