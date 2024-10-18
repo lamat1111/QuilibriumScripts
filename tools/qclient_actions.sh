@@ -1,7 +1,10 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.0.6"
+SCRIPT_VERSION="1.0.7"
+
+# Define the script path
+SCRIPT_PATH="${BASH_SOURCE[0]}"
 
 #=====================
 # Menu interface
@@ -12,17 +15,16 @@ display_menu() {
          
                     QCLIENT ACTIONS  v $SCRIPT_VERSION
 -----------------------------------------------------------------
-1) Check total balance / see address 
+1) Check total balance / address
 2) Check individual coins
 
 3) Create transaction
 4) Accept transaction
 5) Reject transaction
 
-6) Perform mutual transfer
-
-E) Exit              
+6) Perform mutual transfer     
 ==================================================================
+E) Exit                                       S) Security settings
 
 EOF
 }
@@ -249,6 +251,29 @@ mutual_transfer() {
     esac
 }
 
+
+security_settings() {
+    echo
+    echo "Security settings"
+    echo "==============================="
+    
+    cat << EOF
+
+This script performs QUIL transactions. You can inspect the source code by running:
+cat "$SCRIPT_PATH"
+
+The script also auto-updates to the latest version automatically.
+If you want to disable auto-updates, comment out the line "check_for_updates"
+in the script itself.
+
+DISCLAIMER:
+The author assumes no responsibility for any QUIL loss due to misuse of this script.
+Use this script at your own risk and always verify transactions before confirming them.
+
+EOF
+}
+
+
 #=====================
 # Initial Setup
 #=====================
@@ -286,6 +311,7 @@ while true; do
         4) accept_transaction; prompt_return_to_menu || break ;;
         5) reject_transaction; prompt_return_to_menu || break ;;
         6) mutual_transfer; prompt_return_to_menu || break ;;
+        sS) security_settings; prompt_return_to_menu || break ;;
         [eE]) echo ; break ;;
         *) echo "Invalid option, please try again."; prompt_return_to_menu || break ;;
     esac
