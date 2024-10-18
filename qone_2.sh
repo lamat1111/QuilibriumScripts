@@ -596,27 +596,28 @@ To remove the script fomr your system, run: rm ~/qone.sh
     Avoid using providers that specifically ban crypto and mining.
 
  1) Prepare your server:
-    This action will install the necessary prerequisites for your server. 
+    Installs the necessary prerequisites for your server. 
     If this is the first time you install a Quilibrium node, it is recommended
     to follow the online guide at: https://docs.quilibrium.one/
 
  2) Install node:
-    This action will install the Qnode & Qclient on your server. 
+    Installs the Qnode & Qclient on your server. 
     If this is the first time you install a Quilibrium node, it is recommended
     to follow the online guide at: https://docs.quilibrium.one/ 
     Ensure that your server meets all the requirements and that you have 
     already prepared your server via Step 1.
 
  3) Set up gRPCurl:
-    This action will make some edits to your config.yml to enable communication with the network. 
+    Edits your config.yml to enable communication with the network. 
     If this is a fresh node installation, let the node run for 30 minutes before doing this.
+    You can run the action multiple times and it wiill not cause issues.
 
  4) Node Log:
-    Display the log of the node.
+    Displays the log of the node.
 
  5) Update node:
-    This action will update your Qnode & Qclient. 
-    Only use this if you have installed the node via the guide at 
+    Updates your Qnode & Qclient, if necessary.
+    Only use this if you have installed the Q1 menu node or the guide at 
     https://docs.quilibrium.one/
 
  6) Stop node:
@@ -625,37 +626,37 @@ To remove the script fomr your system, run: rm ~/qone.sh
  7) Start node:
     Starts the node.
 
- 8) Node version:
-    Display the version of the node.
+ 8) Restart node:
+    Stop and then starts the node again.
 
  9) Node info (peerID & balance):
-    Display information about your node peerID and balance.
+    Displays information about your node peerID and balance.
 
-10) Check balance:
-    Display the balance of QUIL tokens.
+10) Node status:
+    Shows the status of your node service.
 
 11) Balance log:
-    Log your balance every 1 hour on a CSV file.
+    Logs your balance every 1 hour on a CSV file.
     For more info on how to see/download your balance CSV log, please visit:
     https://docs.quilibrium.one/start/tutorials/log-your-node-balance-every-1-hour
 
 12) Backup your node:
-    Backup of your node .config folder and other data on StorJ.
+    Backups your node .config folder and other data on StorJ.
     You need a Storj account https://www.storj.io/ and a Public/Secret access key.
 
 13) Restore backup:
-    This script will restore your node backup from StorJ.
+    Restores your node backup from StorJ.
     You need a Storj account https://www.storj.io/ and a Public/Secret access key.
 
-14) Qclient install:
-    Install or update the Qclient, to manage your QUIL tokens via CLI.
+14) System cleaner:
+    Performs system cleanup tasks. It will not affect your node.
 
-15) Qclient actions:
-    Open a submenu with serveral actions for the Qclient, like check balance,
+15) Qclient install:
+    Installs or update the Qclient, to manage your QUIL tokens via CLI.
+
+16) Qclient actions:
+    Opens a submenu with serveral actions for the Qclient, like: check balance,
     create transaction, accept transaction etc.  
-
-16) System cleaner:
-    Perform system cleanup tasks. It will not affect your node.
 
 '
 
@@ -844,7 +845,7 @@ while true; do
         8) node_version; press_any_key ;;
         9) node_info; press_any_key ;;
         10) node_status; press_any_key ;;
-        11) quil_balance; press_any_key ;;
+        11) confirm_action "$(wrap_text "$balance_log_message" "")" "alance log" balance_log && prompt_return_to_menu "skip_check" ;;
         12) confirm_action "$(wrap_text "$backup_storj_message" "")" "Backup your node on StorJ" backup_storj && prompt_return_to_menu "skip_check" ;;
         13) confirm_action "$(wrap_text "$backup_restore_storj_message" "")" "Restore a node backup from StorJ" backup_restore_storj && prompt_return_to_menu "skip_check" ;;
         14) system_cleaner && prompt_return_to_menu "skip_check" ;;
