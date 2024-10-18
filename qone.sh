@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.0.8"
+SCRIPT_VERSION="2.0.9"
 
 #==========================
 # INSTALL APPS
@@ -97,33 +97,20 @@ SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
 # Common message for missing service file
 MISSING_SERVICE_MSG="⚠️ Your service file does not exist. Looks like you do not have a node running as a service yet!"
 
-# Node version
-#NODE_VERSION="1.4.20.1"
-
 #=============================
 # DETERMINE NODE BINARY PATH
 #=============================
 
-# Determine the ExecStart line based on the architecture
-ARCH=$(uname -m)
-OS=$(uname -s)
+# Set the node directory
+NODE_DIR="$HOME/ceremonyclient/node"
 
-# Determine the node version
-NODE_VERSION=$(curl -s https://releases.quilibrium.com/release | grep -E "^node-[0-9]+(\.[0-9]+)*" | grep -v "dgst" | sed 's/^node-//' | cut -d '-' -f 1 | head -n 1)
+# Find the latest node binary
+NODE_BINARY=$(find "$NODE_DIR" -name "node-*" -type f -executable | sort -V | tail -n 1 | xargs basename)
 
-# Determine the node binary name based on the architecture and OS
-if [ "$ARCH" = "x86_64" ]; then
-    if [ "$OS" = "Linux" ]; then
-        NODE_BINARY="node-$NODE_VERSION-linux-amd64"
-    elif [ "$OS" = "Darwin" ]; then
-        NODE_BINARY="node-$NODE_VERSION-darwin-amd64"
-    fi
-elif [ "$ARCH" = "aarch64" ]; then
-    if [ "$OS" = "Linux" ]; then
-        NODE_BINARY="node-$NODE_VERSION-linux-arm64"
-    elif [ "$OS" = "Darwin" ]; then
-        NODE_BINARY="node-$NODE_VERSION-darwin-arm64"
-    fi
+# If no binary found, print an error message
+if [ -z "$NODE_BINARY" ]; then
+    echo "Error: No node binary found in $NODE_DIR"
+    exit 1
 fi
 
 #=====================
