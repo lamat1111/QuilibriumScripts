@@ -1,5 +1,13 @@
 #!/bin/bash
 
+#Comment out for automatic creation of the node version
+#NODE_VERSION=2.0
+
+#Comment out for automatic creation of the qclient version
+#QCLIENT_VERSION=1.4.19.1
+
+GO_VERSION=1.23.2
+
 cat << "EOF"
 
                     Q1Q1Q1\    Q1\   
@@ -28,29 +36,17 @@ Made with 🔥 by LaMat - https://quilibrium.one
 
 ---------------------------------------------------------------------------
 
-⏳ Processing... 
+Processing... ⏳
 
 EOF
 
 sleep 7  
 
-#Comment out for automatic creation of the node version
-#NODE_VERSION=2.0
-
-#Comment out for automatic creation of the qclient version
-#QCLIENT_VERSION=1.4.19.1
-
-#GO installation yes or no?
-INSTALL_GO=false
-GO_VERSION=1.23.2
-#GIT PULL yes or no?
-GIT_PULL=false
-
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
 
 # Check if the service file exists
 if [ ! -f "$SERVICE_FILE" ]; then
-    echo "❌ Error: you are not running your node via service file:  $SERVICE_FILE"
+    echo "❌ Error: you are not runnign your node via service file:  $SERVICE_FILE"
     echo "This update script won't work for you. Exiting."
     exit 1
 fi
@@ -91,7 +87,7 @@ check_and_install curl
 # CREATE PATH VARIABLES
 #==========================
 
-display_header "CHECK NEEDED UPDATES"
+display_header "CREATING PATH VARIABLES"
 
 # Determine the ExecStart line based on the architecture
 ARCH=$(uname -m)
@@ -102,7 +98,7 @@ OS=$(uname -s)
 if [ -z "$NODE_VERSION" ]; then
     NODE_VERSION=$(curl -s https://releases.quilibrium.com/release | grep -E "^node-[0-9]+(\.[0-9]+)*" | grep -v "dgst" | sed 's/^node-//' | cut -d '-' -f 1 | head -n 1)
     if [ -z "$NODE_VERSION" ]; then
-        echo "❌ Error: Unable to determine the latest node release automatically."
+        echo "❌ Error: Unable to determine NODE_VERSION automatically."
         echo "The script cannot proceed without a correct node version number."
         echo
         echo "This could be caused by your provider blocking access to quilibrium.com"
@@ -126,7 +122,7 @@ fi
 if [ -z "$QCLIENT_VERSION" ]; then
     QCLIENT_VERSION=$(curl -s https://releases.quilibrium.com/qclient-release | grep -E "^qclient-[0-9]+(\.[0-9]+)*" | sed 's/^qclient-//' | cut -d '-' -f 1 |  head -n 1)
     if [ -z "$QCLIENT_VERSION" ]; then
-        echo "⚠️ Warning: Unable to determinethe latest Qclient release automatically. Continuing without it."
+        echo "⚠️ Warning: Unable to determine QCLIENT_VERSION automatically. Continuing without it."
         echo "The script won't be able to install the Qclient, but it will still install your node."
         echo "You can install the Qclient later manually if you need to."
         echo
@@ -143,26 +139,99 @@ if [ "$ARCH" = "x86_64" ]; then
     if [ "$OS" = "Linux" ]; then
         NODE_BINARY="node-$NODE_VERSION-linux-amd64"
         GO_BINARY="go$GO_VERSION.linux-amd64.tar.gz"
-        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-amd64"
+        [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-amd64"
     elif [ "$OS" = "Darwin" ]; then
         NODE_BINARY="node-$NODE_VERSION-darwin-amd64"
         GO_BINARY="go$GO_VERSION.darwin-amd64.tar.gz"
-       QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-amd64"
+        [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-amd64"
     fi
 elif [ "$ARCH" = "aarch64" ]; then
     if [ "$OS" = "Linux" ]; then
         NODE_BINARY="node-$NODE_VERSION-linux-arm64"
         GO_BINARY="go$GO_VERSION.linux-arm64.tar.gz"
-        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-arm64"
+        [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-arm64"
     elif [ "$OS" = "Darwin" ]; then
         NODE_BINARY="node-$NODE_VERSION-darwin-arm64"
         GO_BINARY="go$GO_VERSION.darwin-arm64.tar.gz"
-        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-arm64"
+        [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-arm64"
     fi
 else
     echo "❌ Error: Unsupported system architecture ($ARCH) or operating system ($OS)."
     exit 1
 fi
+
+#==========================
+# GO UPGRADE
+#==========================
+
+display_header "UPGRADING GO"
+
+# Check the currently installed Go version
+if go version &>/dev/null; then
+    INSTALLED_VERSION=$(go version | awk '{print $3}' | sed 's/go//')
+else
+    INSTALLED_VERSION="none"
+fi
+
+# If the installed version is not $GO_VERSION, proceed with the installation
+if [ "$INSTALLED_VERSION" != "$GO_VERSION" ]; then
+    echo "⏳ Current Go version is $INSTALLED_VERSION. Proceeding with installation of Go $GO_VERSION..."
+
+    # Download and install Go
+    wget https://go.dev/dl/$GO_BINARY > /dev/null 2>&1 || echo "Failed to download Go!"
+    sudo tar -xvf $GO_BINARY > /dev/null 2>&1 || echo "Failed to extract Go!"
+    sudo rm -rf /usr/local/go || echo "Failed to remove existing Go!"
+    sudo mv go /usr/local || echo "Failed to move Go!"
+    sudo rm $GO_BINARY || echo "Failed to remove downloaded archive!"
+    
+    echo "✅ Go $GO_VERSION has been installed successfully."
+else
+    echo "✅ Go version $GO_VERSION is already installed. No action needed."
+fi
+
+#==========================
+# STOP SERVICE
+#==========================
+
+display_header "STOPPING SERVICE"
+
+# Stop the ceremonyclient service if it exists
+echo "⏳ Stopping the ceremonyclient service if it exists..."
+if systemctl is-active --quiet ceremonyclient; then
+    if sudo systemctl stop ceremonyclient; then
+        echo "🔴 Service stopped successfully."
+        echo
+    else
+        echo "❌ Failed to stop the ceremonyclient service." >&2
+        echo
+    fi
+else
+    echo "ℹ️ Ceremonyclient service is not active or does not exist."
+    echo
+fi
+sleep 1
+
+#==========================
+# CEREMONYCLIENT REPO UPDATE
+#==========================
+
+display_header "UPDATING CEREMONYCLIENT REPO"
+
+# Set the remote URL and download
+echo "⏳ Updating ceremonyclient repo for node v$NODE_VERSION"
+cd  ~/ceremonyclient
+git remote set-url origin https://github.com/QuilibriumNetwork/ceremonyclient.git
+git checkout main
+git branch -D release
+git pull
+git checkout release
+echo "✅ Downloaded the latest changes successfully."
+
+#==========================
+# NODE BINARY DOWNLOAD
+#==========================
+
+display_header "DOWNLOADING NODE BINARY"
 
 get_os_arch() {
     local os=$(uname -s | tr '[:upper:]' '[:lower:]')
@@ -185,296 +254,137 @@ get_os_arch() {
 # Get the current OS and architecture
 OS_ARCH=$(get_os_arch)
 
-echo
+# Base URL for the Quilibrium releases
+RELEASE_FILES_URL="https://releases.quilibrium.com/release"
+
+# Fetch the list of files from the release page
+# Updated regex to allow for an optional fourth version number
+RELEASE_FILES=$(curl -s $RELEASE_FILES_URL | grep -oE "node-[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?-${OS_ARCH}(\.dgst)?(\.sig\.[0-9]+)?")
+
+# Change to the download directory
+cd ~/ceremonyclient/node
+
+# Download each file
+for file in $RELEASE_FILES; do
+    echo "Downloading $file..."
+    if curl -L -o "$file" "https://releases.quilibrium.com/$file" --fail --silent; then
+        echo "✅ Successfully downloaded $file"
+        # Check if the file is the base binary (without .dgst or .sig suffix)
+        if [[ $file =~ ^node-[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?-${OS_ARCH}$ ]]; then
+            if chmod +x "$file"; then
+                echo "✅ Made $file executable"
+            else
+                echo "❌ Failed to make $file executable"
+            fi
+        fi
+    else
+        echo "❌ Failed to download $file"
+    fi
+    echo "------------------------"
+done
+
+echo "✅ Node binary download completed."
 
 #==========================
-# CHECK IF UPDATE IS NEEDED
+# QCLIENT UPDATE
 #==========================
 
-# Function to check if a file exists and is executable
-check_executable() {
-    [ -x "$1" ]
+display_header "UPDATING QCLIENT"
+
+# Base URL for the Quilibrium releases
+BASE_URL="https://releases.quilibrium.com"
+
+# Change to the download directory
+if ! cd ~/ceremonyclient/client; then
+    echo "❌ Error: Unable to change to the download directory"
+    exit 1
+fi
+
+# Function to download file and overwrite if it exists
+download_and_overwrite() {
+    local url="$1"
+    local filename="$2"
+    if curl -L -o "$filename" "$url" --fail --silent; then
+        echo "✅ Successfully downloaded $filename"
+        return 0
+    else
+        return 1
+    fi
 }
 
-# Set the full paths for the binary files
-NODE_BINARY_PATH="$HOME/ceremonyclient/node/$NODE_BINARY"
-QCLIENT_BINARY_PATH="$HOME/ceremonyclient/client/$QCLIENT_BINARY"
-
-# Initialize flags
-NODE_NEEDS_UPDATE=true
-QCLIENT_NEEDS_UPDATE=true
-
-# Check node binary
-if check_executable "$NODE_BINARY_PATH"; then
-    echo "🟢 Node is already updated to $NODE_VERSION"
-    NODE_NEEDS_UPDATE=false
+# Download the main binary
+echo "Downloading $QCLIENT_BINARY..."
+if download_and_overwrite "$BASE_URL/$QCLIENT_BINARY" "$QCLIENT_BINARY"; then
+    chmod +x $QCLIENT_BINARY
 else
-    echo "🟠 Node needs to be updated to $NODE_VERSION"
+    echo "❌ Failed to download qclient binary. Manual installation may be required."
+    exit 1
 fi
 
-# Check qclient binary
-if check_executable "$QCLIENT_BINARY_PATH"; then
-    echo "🟢 Qclient is already updated to $QCLIENT_VERSION"
-    QCLIENT_NEEDS_UPDATE=false
-else
-    echo "🟠 Qclient needs to be updated to $QCLIENT_VERSION"
+# Download the .dgst file
+echo "Downloading ${QCLIENT_BINARY}.dgst..."
+if ! download_and_overwrite "$BASE_URL/${QCLIENT_BINARY}.dgst" "${QCLIENT_BINARY}.dgst"; then
+    echo "❌ Failed to download .dgst file. Continuing without it."
 fi
 
-echo
+# Download signature files
+echo "Downloading signature files..."
+for i in {1..20}; do
+    sig_file="${QCLIENT_BINARY}.dgst.sig.${i}"
+    if download_and_overwrite "$BASE_URL/$sig_file" "$sig_file"; then
+        echo "Downloaded $sig_file"
+    fi
+done
 
-# Determine which parts of the script to run
-if [ "$NODE_NEEDS_UPDATE" = false ] && [ "$QCLIENT_NEEDS_UPDATE" = false ]; then
-    echo "✅ Both Node and Qclient are already up to date!"
-    exit 0
-elif [ "$NODE_NEEDS_UPDATE" = false ]; then
+echo "✅ Qclient download completed."
+
+#==========================
+# DELETE OLD RELEASES
+#==========================
+
+display_header "DELETING OLD RELEASES"
+
+# Function to clean up old releases
+cleanup_old_releases() {
+    local directory=$1
+    local current_binary=$2
+    local prefix=$3
+
+    echo "⏳ Cleaning up old $prefix releases in $directory..."
+
+    # Delete old binary files, .dgst files, and signature files in one go
+    if find "$directory" -type f \( \
+        -name "${prefix}-*-${OS_ARCH}" -o \
+        -name "${prefix}-*-${OS_ARCH}.dgst" -o \
+        -name "${prefix}-*-${OS_ARCH}.dgst.sig.*" \
+    \) ! -name "${current_binary}*" -delete; then
+        echo "✅ Removed old $prefix files (binary, .dgst, and signatures)."
+    else
+        echo "ℹ️ No old $prefix files to remove."
+    fi
+
+    echo "✅ Cleanup of old $prefix releases completed."
     echo
-    echo "🟠 Only the Qclient needs to be updated. Skipping node update..."
-elif [ "$QCLIENT_NEEDS_UPDATE" = false ]; then
-    echo
-    echo "🟠 Only the Node needs to be updated. Skipping Qclient update..."
-else
-    echo
-    echo "✅ Both Node and Qclient need to be updated. Proceeding..."
-fi
+}
 
+# After node binary download and verification
+echo "⏳ Starting cleanup of old node releases..."
+sleep 1
+cleanup_old_releases "$HOME/ceremonyclient/node" "$NODE_BINARY" "node"
 
-
-if [ "$NODE_NEEDS_UPDATE" = true ]; then
-
-    #==========================
-    # GO UPGRADE
-    #==========================
-
-    if [ "$INSTALL_GO" = true ]; then
-        display_header "UPGRADING GO"
-
-        # Check the currently installed Go version
-        if go version &>/dev/null; then
-            INSTALLED_VERSION=$(go version | awk '{print $3}' | sed 's/go//')
-        else
-            INSTALLED_VERSION="none"
-        fi
-
-        # If the installed version is not $GO_VERSION, proceed with the installation
-        if [ "$INSTALLED_VERSION" != "$GO_VERSION" ]; then
-            echo "⏳ Current Go version is $INSTALLED_VERSION. Proceeding with installation of Go $GO_VERSION..."
-
-            # Download and install Go
-            wget https://go.dev/dl/$GO_BINARY > /dev/null 2>&1 || echo "Failed to download Go!"
-            sudo tar -xvf $GO_BINARY > /dev/null 2>&1 || echo "Failed to extract Go!"
-            sudo rm -rf /usr/local/go || echo "Failed to remove existing Go!"
-            sudo mv go /usr/local || echo "Failed to move Go!"
-            sudo rm $GO_BINARY || echo "Failed to remove downloaded archive!"
-            
-            echo "✅ Go $GO_VERSION has been installed successfully."
-        else
-            echo "✅ Go version $GO_VERSION is already installed. No action needed."
-        fi
-    else
-        : # do nothing
-    fi
-
-
-    #==========================
-    # STOP SERVICE
-    #==========================
-
-    display_header "STOPPING SERVICE"
-
-    # Stop the ceremonyclient service if it exists
-    echo "⏳ Stopping the ceremonyclient service if it exists..."
-    if systemctl is-active --quiet ceremonyclient; then
-        if sudo systemctl stop ceremonyclient; then
-            echo "✅ Service stopped successfully."
-            echo
-        else
-            echo "❌ Failed to stop the ceremonyclient service." >&2
-            echo
-        fi
-    else
-        echo "⚠️ Ceremonyclient service is not active or does not exist."
-        echo
-    fi
-    sleep 1
-
-    #==========================
-    # CEREMONYCLIENT REPO UPDATE
-    #==========================
-
-    display_header "UPDATING CEREMONYCLIENT REPO"
-
-    if [ "$GIT_PULL" = true ]; then
-
-        # Set the remote URL and download
-        echo "⏳ Updating ceremonyclient repo for node v$NODE_VERSION"
-        cd  ~/ceremonyclient
-        git remote set-url origin https://github.com/QuilibriumNetwork/ceremonyclient.git
-        git checkout main
-        git branch -D release
-        git pull
-        git checkout release
-        echo "✅ Downloaded the latest changes successfully."
-
-    else
-        echo "⚠️ Repo not updated since you are running the node and qclient directly via binary files."
-        echo " If you want to clone or update the repo you can do it manually later."
-    fi
-
-    #==========================
-    # NODE BINARY DOWNLOAD
-    #==========================
-
-    display_header "DOWNLOADING NODE BINARY"
-
-    # Base URL for the Quilibrium releases
-    RELEASE_FILES_URL="https://releases.quilibrium.com/release"
-
-    # Fetch the list of files from the release page
-    # Updated regex to allow for an optional fourth version number
-    RELEASE_FILES=$(curl -s $RELEASE_FILES_URL | grep -oE "node-[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?-${OS_ARCH}(\.dgst)?(\.sig\.[0-9]+)?")
-
-    # Change to the download directory
-    cd ~/ceremonyclient/node
-
-    # Download each file
-    for file in $RELEASE_FILES; do
-        echo "Downloading $file..."
-        if curl -L -o "$file" "https://releases.quilibrium.com/$file" --fail --silent; then
-            echo "Successfully downloaded $file"
-            # Check if the file is the base binary (without .dgst or .sig suffix)
-            if [[ $file =~ ^node-[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?-${OS_ARCH}$ ]]; then
-                if chmod +x "$file"; then
-                    echo "Made $file executable"
-                else
-                    echo "❌ Failed to make $file executable"
-                fi
-            fi
-        else
-            echo "❌ Failed to download $file"
-        fi
-        echo "------------------------"
-    done
-
-    echo "✅ Node binary download completed."
-
-else
-    : # Do nothing
-fi
-
-
-if [ "$QCLIENT_NEEDS_UPDATE" = true ]; then
-
-    #==========================
-    # QCLIENT UPDATE
-    #==========================
-
-    display_header "UPDATING QCLIENT"
-
-    # Base URL for the Quilibrium releases
-    BASE_URL="https://releases.quilibrium.com"
-
-    # Change to the download directory
-    if ! cd ~/ceremonyclient/client; then
-        echo "❌ Error: Unable to change to the download directory"
-        exit 1
-    fi
-
-    # Function to download file and overwrite if it exists
-    download_and_overwrite() {
-        local url="$1"
-        local filename="$2"
-        if curl -L -o "$filename" "$url" --fail --silent; then
-            echo "Successfully downloaded $filename"
-            return 0
-        else
-            return 1
-        fi
-    }
-
-    # Download the main binary
-    echo "Downloading $QCLIENT_BINARY..."
-    if download_and_overwrite "$BASE_URL/$QCLIENT_BINARY" "$QCLIENT_BINARY"; then
-        chmod +x $QCLIENT_BINARY
-    else
-        echo "❌ Failed to download qclient binary. Manual installation may be required."
-        exit 1
-    fi
-
-    # Download the .dgst file
-    echo "Downloading ${QCLIENT_BINARY}.dgst..."
-    if ! download_and_overwrite "$BASE_URL/${QCLIENT_BINARY}.dgst" "${QCLIENT_BINARY}.dgst"; then
-        echo "❌ Failed to download .dgst file. Continuing without it."
-    fi
-
-    # Download signature files
-    echo "Downloading signature files..."
-    for i in {1..20}; do
-        sig_file="${QCLIENT_BINARY}.dgst.sig.${i}"
-        if download_and_overwrite "$BASE_URL/$sig_file" "$sig_file"; then
-            echo "Downloaded $sig_file"
-        fi
-    done
-
-    echo "✅ Qclient download completed."
-
-else
-    : # Do nothing
-fi
-
-
-if [ "$NODE_NEEDS_UPDATE" = true ] && [ "$QCLIENT_NEEDS_UPDATE" = true ]; then
-
-    #==========================
-    # DELETE OLD RELEASES
-    #==========================
-
-    display_header "DELETING OLD RELEASES"
-
-    # Function to clean up old releases
-    cleanup_old_releases() {
-        local directory=$1
-        local current_binary=$2
-        local prefix=$3
-
-        echo "⏳ Cleaning up old $prefix releases in $directory..."
-
-        # Delete old binary files, .dgst files, and signature files in one go
-        if find "$directory" -type f \( \
-            -name "${prefix}-*-${OS_ARCH}" -o \
-            -name "${prefix}-*-${OS_ARCH}.dgst" -o \
-            -name "${prefix}-*-${OS_ARCH}.dgst.sig.*" \
-        \) ! -name "${current_binary}*" -delete; then
-            echo "✅ Removed old $prefix files (binary, .dgst, and signatures)."
-        else
-            echo "ℹ️ No old $prefix files to remove."
-        fi
-
-        echo "✅ Cleanup of old $prefix releases completed."
-        echo
-    }
-
-    # After node binary download and verification
-    echo "⏳ Starting cleanup of old node releases..."
-    sleep 1
-    cleanup_old_releases "$HOME/ceremonyclient/node" "$NODE_BINARY" "node"
-
-    # After qclient binary download and verification
-    echo "⏳ Starting cleanup of old qclient releases..."
-    sleep 1
-    cleanup_old_releases "$HOME/ceremonyclient/client" "$QCLIENT_BINARY" "qclient"
-
-else
-    echo "✅ Skipping deletion of old releases to preserve current installations."
-fi
-
-
-if [ "$NODE_NEEDS_UPDATE" = true ]; then
+# After qclient binary download and verification
+echo "⏳ Starting cleanup of old qclient releases..."
+sleep 1
+cleanup_old_releases "$HOME/ceremonyclient/client" "$QCLIENT_BINARY" "qclient"
 
 #==========================
 # SERVICE UPDATE
 #==========================
 
-display_header "UPDATING SERVICE" 
+display_header "UPDATING SERVICE"
+
+#Set variables
+HOME=$(eval echo ~$HOME_DIR)
 
 NODE_PATH="$HOME/ceremonyclient/node"
 EXEC_START="$NODE_PATH/$NODE_BINARY"
@@ -589,7 +499,6 @@ sudo systemctl daemon-reload
 sudo systemctl restart ceremonyclient
 echo "✅ Service file update completed and applied."
 
-
 #==========================
 # CONFIG FILE UPDATE for "REWARDS TO GOOGLE SHEET SCRIPT"
 #==========================
@@ -682,7 +591,3 @@ echo
 echo
 sleep 2
 sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
-
-else
-    echo "✅ Update finished!"
-fi
