@@ -38,14 +38,10 @@ upgrade_qone() {
             echo "❌ Error: Failed to download and execute qone-setup.sh"
             return 1
         else
-            echo "✅ qone.sh upgraded!"
+            echo "qone.sh upgraded!"
             echo
             echo "🟢 To launch the QONE Quickstart Menu."
-            echo "You can simply type 'q1', or run './qone.sh'"
-            sleep 1
-            echo "The menu will also load automatically every time you log in."
-            echo "You can disable this feature by running:"
-            echo "sed -i 's|^~/qone.sh|#&|' ~/.bashrc && source ~/.bashrc" 
+            echo "You can simply type 'q1','qone' or run './qone.sh'"
             echo
             sleep 3
         fi

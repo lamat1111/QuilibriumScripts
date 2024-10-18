@@ -51,6 +51,7 @@ else
 # === qone.sh setup ===
 # The following lines are added to create aliases for qone.sh
 alias q1='~/qone.sh'
+alias qone='~/qone.sh'
 # === end qone.sh setup ===
 EOF
 )
@@ -61,6 +62,7 @@ EOF
 # === qone.sh setup ===
 #this allows you to call the qone menu with "q1"
 alias q1='~/qone.sh'
+alias qone='~/qone.sh'
 # === end qone.sh setup ===
 EOF
 )
