@@ -67,23 +67,23 @@ fi
 sleep 1
 
 # Step 3: Check and modify listenMultiaddr
-echo "🔍 Checking listenMultiaddr..."
-if grep -qF "  listenMultiaddr: /ip4/0.0.0.0/udp/8336/quic" .config/config.yml; then
-    echo "🛠️ Modifying listenMultiaddr..."
-    sudo sed -i -E 's|^ *  listenMultiaddr: /ip4/0.0.0.0/udp/8336/quic *$|  listenMultiaddr: /ip4/0.0.0.0/tcp/8336|' .config/config.yml
-    if [ $? -eq 0 ]; then
-        echo "✅ listenMultiaddr modified to use TCP protocol."
-    else
-        echo "❌ Failed to modify listenMultiaddr! Please check manually your config.yml file"
-    fi
-else
-    # Check if the new listenMultiaddr exists
-    if grep -qF "  listenMultiaddr: /ip4/0.0.0.0/tcp/8336" .config/config.yml; then
-        echo "✅ New listenMultiaddr line found."
-    else
-        echo "❌ Neither old nor new listenMultiaddr found. This could cause issues. Please check manually your config.yml file"
-    fi
-fi
+# echo "🔍 Checking listenMultiaddr..."
+# if grep -qF "  listenMultiaddr: /ip4/0.0.0.0/udp/8336/quic" .config/config.yml; then
+#     echo "🛠️ Modifying listenMultiaddr..."
+#     sudo sed -i -E 's|^ *  listenMultiaddr: /ip4/0.0.0.0/udp/8336/quic *$|  listenMultiaddr: /ip4/0.0.0.0/tcp/8336|' .config/config.yml
+#     if [ $? -eq 0 ]; then
+#         echo "✅ listenMultiaddr modified to use TCP protocol."
+#     else
+#         echo "❌ Failed to modify listenMultiaddr! Please check manually your config.yml file"
+#     fi
+# else
+#     # Check if the new listenMultiaddr exists
+#     if grep -qF "  listenMultiaddr: /ip4/0.0.0.0/tcp/8336" .config/config.yml; then
+#         echo "✅ New listenMultiaddr line found."
+#     else
+#         echo "❌ Neither old nor new listenMultiaddr found. This could cause issues. Please check manually your config.yml file"
+#     fi
+# fi
 
 
 sleep 1
