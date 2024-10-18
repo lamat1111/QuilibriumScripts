@@ -206,6 +206,7 @@ qclient_actions() {
         chmod +x ~/scripts/qclient_actions.sh
     fi
     ~/scripts/qclient_actions.sh
+    return $?
 }
 
 system_cleaner() {
