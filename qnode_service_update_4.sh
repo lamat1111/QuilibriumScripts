@@ -474,7 +474,7 @@ if [ "$NODE_NEEDS_UPDATE" = true ]; then
 # SERVICE UPDATE
 #==========================
 
-display_header "UPDATING SERVICE"
+display_header "UPDATING SERVICE" 
 
 NODE_PATH="$HOME/ceremonyclient/node"
 EXEC_START="$NODE_PATH/$NODE_BINARY"
