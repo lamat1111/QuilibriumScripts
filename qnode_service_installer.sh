@@ -119,7 +119,7 @@ OS=$(uname -s)
 if [ -z "$NODE_VERSION" ]; then
     NODE_VERSION=$(curl -s https://releases.quilibrium.com/release | grep -E "^node-[0-9]+(\.[0-9]+)*" | grep -v "dgst" | sed 's/^node-//' | cut -d '-' -f 1 | head -n 1)
     if [ -z "$NODE_VERSION" ]; then
-        echo "❌ Error: Unable to determine NODE_VERSION automatically."
+        echo "❌ Error: Unable to determine the latest node release automatically."
         echo "The script cannot proceed without a correct node version number."
         echo
         echo "This could be caused by your provider blocking access to quilibrium.com"
@@ -132,10 +132,10 @@ if [ -z "$NODE_VERSION" ]; then
         echo
         exit 1
     else
-        echo "✅ Automatically determined NODE_VERSION: $NODE_VERSION"
+        echo "✅ Latest Node release: $NODE_VERSION"
     fi
 else
-    echo "✅ Using specified NODE_VERSION: $NODE_VERSION"
+    echo "✅ Using specified Node version: $NODE_VERSION"
 fi
 
 # Determine qclient latest version
@@ -149,10 +149,10 @@ if [ -z "$QCLIENT_VERSION" ]; then
         echo
         sleep 1
     else
-        echo "✅ Automatically determined QCLIENT_VERSION: $QCLIENT_VERSION"
+        echo "✅ Latest Qclient release: $QCLIENT_VERSION"
     fi
 else
-    echo "✅ Using specified QCLIENT_VERSION: $QCLIENT_VERSION"
+    echo "✅ Using specified Qclient version: $QCLIENT_VERSION"
 fi
 
 # Determine the node binary name based on the architecture and OS
