@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.0.9"
+SCRIPT_VERSION="2.1.0"
 
 #==========================
 # INSTALL APPS
@@ -104,14 +104,17 @@ MISSING_SERVICE_MSG="⚠️ Your service file does not exist. Looks like you do 
 # Set the node directory
 NODE_DIR="$HOME/ceremonyclient/node"
 
-# Find the latest node binary
-NODE_BINARY=$(find "$NODE_DIR" -name "node-*" -type f -executable | sort -V | tail -n 1 | xargs basename)
+# Function to find the latest node binary
+find_node_binary() {
+    if [ -d "$NODE_DIR" ]; then
+        find "$NODE_DIR" -name "node-*" -type f -executable 2>/dev/null | sort -V | tail -n 1 | xargs -r basename
+    else
+        echo ""
+    fi
+}
 
-# If no binary found, print an error message
-if [ -z "$NODE_BINARY" ]; then
-    echo "Error: No node binary found in $NODE_DIR"
-    exit 1
-fi
+# Find the latest node binary
+NODE_BINARY=$(find_node_binary)
 
 #=====================
 # URLs for scripts
@@ -261,12 +264,18 @@ backup_restore_storj() {
 node_info() {
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
+    elif [ -z "$NODE_BINARY" ]; then
+        echo "Error: No node binary found. Is the node installed correctly?"
     else
         echo
         echo "⌛️  Displaying node info..."
         echo "If this doesn't work you can try the direct commands: https://iri.quest/q-node-info"
         echo
-        cd ~/ceremonyclient/node && ./"$NODE_BINARY" -node-info
+        if [ -d "$NODE_DIR" ]; then
+            cd "$NODE_DIR" && ./"$NODE_BINARY" -node-info
+        else
+            echo "Error: Node directory not found. Is the node installed correctly?"
+        fi
         echo
     fi
 }
@@ -276,13 +285,20 @@ quil_balance() {
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
         return 1
+    elif [ -z "$NODE_BINARY" ]; then
+        echo "Error: No node binary found. Is the node installed correctly?"
+        return 1
     else
         echo
         echo "⌛️  Displaying your QUIL balance..."
         echo "The node has to be running for at least 10 minutes for this command to work."
-        echo "If is still doesn't work you can try the direct commands: https://iri.quest/q-node-info"
+        echo "If it still doesn't work you can try the direct commands: https://iri.quest/q-node-info"
         echo
-        cd ~/ceremonyclient/node && ./"$NODE_BINARY" -balance
+        if [ -d "$NODE_DIR" ]; then
+            cd "$NODE_DIR" && ./"$NODE_BINARY" -balance
+        else
+            echo "Error: Node directory not found. Is the node installed correctly?"
+        fi
         echo
         return 0
     fi
