@@ -1,13 +1,5 @@
 #!/bin/bash
 
-#Comment out for automatic creation of the node version
-#NODE_VERSION=2.0
-
-#Comment out for automatic creation of the qclient version
-#QCLIENT_VERSION=1.4.19.1
-
-GO_VERSION=1.23.2
-
 cat << "EOF"
 
                     Q1Q1Q1\    Q1\   
@@ -41,6 +33,16 @@ Made with 🔥 by LaMat - https://quilibrium.one
 EOF
 
 sleep 7  
+
+#Comment out for automatic creation of the node version
+#NODE_VERSION=2.0
+
+#Comment out for automatic creation of the qclient version
+#QCLIENT_VERSION=1.4.19.1
+
+#Set to false to skip GO installation
+INSTALL_GO=false
+GO_VERSION=1.23.2
 
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
 
@@ -160,6 +162,27 @@ else
     exit 1
 fi
 
+get_os_arch() {
+    local os=$(uname -s | tr '[:upper:]' '[:lower:]')
+    local arch=$(uname -m)
+
+    case "$os" in
+        linux|darwin) ;;
+        *) echo "Unsupported operating system: $os" >&2; return 1 ;;
+    esac
+
+    case "$arch" in
+        x86_64|amd64) arch="amd64" ;;
+        arm64|aarch64) arch="arm64" ;;
+        *) echo "Unsupported architecture: $arch" >&2; return 1 ;;
+    esac
+
+    echo "${os}-${arch}"
+}
+
+# Get the current OS and architecture
+OS_ARCH=$(get_os_arch)
+
 echo
 
 #==========================
@@ -220,30 +243,35 @@ if [ "$NODE_NEEDS_UPDATE" = true ]; then
     # GO UPGRADE
     #==========================
 
-    display_header "UPGRADING GO"
+    if [ "$INSTALL_GO" = true ]; then
+        display_header "UPGRADING GO"
 
-    # Check the currently installed Go version
-    if go version &>/dev/null; then
-        INSTALLED_VERSION=$(go version | awk '{print $3}' | sed 's/go//')
+        # Check the currently installed Go version
+        if go version &>/dev/null; then
+            INSTALLED_VERSION=$(go version | awk '{print $3}' | sed 's/go//')
+        else
+            INSTALLED_VERSION="none"
+        fi
+
+        # If the installed version is not $GO_VERSION, proceed with the installation
+        if [ "$INSTALLED_VERSION" != "$GO_VERSION" ]; then
+            echo "⏳ Current Go version is $INSTALLED_VERSION. Proceeding with installation of Go $GO_VERSION..."
+
+            # Download and install Go
+            wget https://go.dev/dl/$GO_BINARY > /dev/null 2>&1 || echo "Failed to download Go!"
+            sudo tar -xvf $GO_BINARY > /dev/null 2>&1 || echo "Failed to extract Go!"
+            sudo rm -rf /usr/local/go || echo "Failed to remove existing Go!"
+            sudo mv go /usr/local || echo "Failed to move Go!"
+            sudo rm $GO_BINARY || echo "Failed to remove downloaded archive!"
+            
+            echo "✅ Go $GO_VERSION has been installed successfully."
+        else
+            echo "✅ Go version $GO_VERSION is already installed. No action needed."
+        fi
     else
-        INSTALLED_VERSION="none"
+        : # do nothing
     fi
 
-    # If the installed version is not $GO_VERSION, proceed with the installation
-    if [ "$INSTALLED_VERSION" != "$GO_VERSION" ]; then
-        echo "⏳ Current Go version is $INSTALLED_VERSION. Proceeding with installation of Go $GO_VERSION..."
-
-        # Download and install Go
-        wget https://go.dev/dl/$GO_BINARY > /dev/null 2>&1 || echo "Failed to download Go!"
-        sudo tar -xvf $GO_BINARY > /dev/null 2>&1 || echo "Failed to extract Go!"
-        sudo rm -rf /usr/local/go || echo "Failed to remove existing Go!"
-        sudo mv go /usr/local || echo "Failed to move Go!"
-        sudo rm $GO_BINARY || echo "Failed to remove downloaded archive!"
-        
-        echo "✅ Go $GO_VERSION has been installed successfully."
-    else
-        echo "✅ Go version $GO_VERSION is already installed. No action needed."
-    fi
 
     #==========================
     # STOP SERVICE
@@ -289,27 +317,6 @@ if [ "$NODE_NEEDS_UPDATE" = true ]; then
 
     display_header "DOWNLOADING NODE BINARY"
 
-    get_os_arch() {
-        local os=$(uname -s | tr '[:upper:]' '[:lower:]')
-        local arch=$(uname -m)
-
-        case "$os" in
-            linux|darwin) ;;
-            *) echo "Unsupported operating system: $os" >&2; return 1 ;;
-        esac
-
-        case "$arch" in
-            x86_64|amd64) arch="amd64" ;;
-            arm64|aarch64) arch="arm64" ;;
-            *) echo "Unsupported architecture: $arch" >&2; return 1 ;;
-        esac
-
-        echo "${os}-${arch}"
-    }
-
-    # Get the current OS and architecture
-    OS_ARCH=$(get_os_arch)
-
     # Base URL for the Quilibrium releases
     RELEASE_FILES_URL="https://releases.quilibrium.com/release"
 
@@ -324,11 +331,11 @@ if [ "$NODE_NEEDS_UPDATE" = true ]; then
     for file in $RELEASE_FILES; do
         echo "Downloading $file..."
         if curl -L -o "$file" "https://releases.quilibrium.com/$file" --fail --silent; then
-            echo "✅ Successfully downloaded $file"
+            echo "Successfully downloaded $file"
             # Check if the file is the base binary (without .dgst or .sig suffix)
             if [[ $file =~ ^node-[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?-${OS_ARCH}$ ]]; then
                 if chmod +x "$file"; then
-                    echo "✅ Made $file executable"
+                    echo "Made $file executable"
                 else
                     echo "❌ Failed to make $file executable"
                 fi
@@ -368,7 +375,7 @@ if [ "$QCLIENT_NEEDS_UPDATE" = true ]; then
         local url="$1"
         local filename="$2"
         if curl -L -o "$filename" "$url" --fail --silent; then
-            echo "✅ Successfully downloaded $filename"
+            echo "Successfully downloaded $filename"
             return 0
         else
             return 1
