@@ -255,7 +255,7 @@ mutual_transfer() {
 security_settings() {
     echo
     echo "Security settings"
-    echo "==============================="
+    echo "================="
     
     cat << EOF
 
