@@ -50,7 +50,7 @@ SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
 
 # Check if the service file exists
 if [ ! -f "$SERVICE_FILE" ]; then
-    echo "❌ Error: you are not runnign your node via service file:  $SERVICE_FILE"
+    echo "❌ Error: you are not running your node via service file:  $SERVICE_FILE"
     echo "This update script won't work for you. Exiting."
     exit 1
 fi
@@ -102,7 +102,7 @@ OS=$(uname -s)
 if [ -z "$NODE_VERSION" ]; then
     NODE_VERSION=$(curl -s https://releases.quilibrium.com/release | grep -E "^node-[0-9]+(\.[0-9]+)*" | grep -v "dgst" | sed 's/^node-//' | cut -d '-' -f 1 | head -n 1)
     if [ -z "$NODE_VERSION" ]; then
-        echo "❌ Error: Unable to determine th latest node release automatically."
+        echo "❌ Error: Unable to determine the latest node release automatically."
         echo "The script cannot proceed without a correct node version number."
         echo
         echo "This could be caused by your provider blocking access to quilibrium.com"
