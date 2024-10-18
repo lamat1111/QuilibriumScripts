@@ -207,7 +207,7 @@ if check_executable "$NODE_BINARY_PATH"; then
     echo "🟢 Node is already updated to $NODE_VERSION"
     NODE_NEEDS_UPDATE=false
 else
-    echo "🟡 Node needs to be updated to $NODE_VERSION"
+    echo "🟠 Node needs to be updated to $NODE_VERSION"
 fi
 
 # Check qclient binary
@@ -215,7 +215,7 @@ if check_executable "$QCLIENT_BINARY_PATH"; then
     echo "🟢 Qclient is already updated to $QCLIENT_VERSION"
     QCLIENT_NEEDS_UPDATE=false
 else
-    echo "🟡 Qclient needs to be updated to $QCLIENT_VERSION"
+    echo "🟠 Qclient needs to be updated to $QCLIENT_VERSION"
 fi
 
 echo
@@ -226,10 +226,10 @@ if [ "$NODE_NEEDS_UPDATE" = false ] && [ "$QCLIENT_NEEDS_UPDATE" = false ]; then
     exit 0
 elif [ "$NODE_NEEDS_UPDATE" = false ]; then
     echo
-    echo "🟡 Only the Qclient needs to be updated. Skipping node update..."
+    echo "🟠 Only the Qclient needs to be updated. Skipping node update..."
 elif [ "$QCLIENT_NEEDS_UPDATE" = false ]; then
     echo
-    echo "🟡 Only the Node needs to be updated. Skipping Qclient update..."
+    echo "🟠 Only the Node needs to be updated. Skipping Qclient update..."
 else
     echo
     echo "✅ Both Node and Qclient need to be updated. Proceeding..."
@@ -283,14 +283,14 @@ if [ "$NODE_NEEDS_UPDATE" = true ]; then
     echo "⏳ Stopping the ceremonyclient service if it exists..."
     if systemctl is-active --quiet ceremonyclient; then
         if sudo systemctl stop ceremonyclient; then
-            echo "🔴 Service stopped successfully."
+            echo "✅ Service stopped successfully."
             echo
         else
             echo "❌ Failed to stop the ceremonyclient service." >&2
             echo
         fi
     else
-        echo "ℹ️ Ceremonyclient service is not active or does not exist."
+        echo "⚠️ Ceremonyclient service is not active or does not exist."
         echo
     fi
     sleep 1
