@@ -40,9 +40,11 @@ sleep 7
 #Comment out for automatic creation of the qclient version
 #QCLIENT_VERSION=1.4.19.1
 
-#Set to false to skip GO installation
+#GO installation yes or no?
 INSTALL_GO=false
 GO_VERSION=1.23.2
+#GIT PULL yes or no?
+GIT_PULL=false
 
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
 
@@ -301,15 +303,22 @@ if [ "$NODE_NEEDS_UPDATE" = true ]; then
 
     display_header "UPDATING CEREMONYCLIENT REPO"
 
-    # Set the remote URL and download
-    echo "⏳ Updating ceremonyclient repo for node v$NODE_VERSION"
-    cd  ~/ceremonyclient
-    git remote set-url origin https://github.com/QuilibriumNetwork/ceremonyclient.git
-    git checkout main
-    git branch -D release
-    git pull
-    git checkout release
-    echo "✅ Downloaded the latest changes successfully."
+    if [ "$GIT_PULL" = true ]; then
+
+        # Set the remote URL and download
+        echo "⏳ Updating ceremonyclient repo for node v$NODE_VERSION"
+        cd  ~/ceremonyclient
+        git remote set-url origin https://github.com/QuilibriumNetwork/ceremonyclient.git
+        git checkout main
+        git branch -D release
+        git pull
+        git checkout release
+        echo "✅ Downloaded the latest changes successfully."
+
+    else
+        echo "⚠️ Repo not updated since you are running the node and qclient directly via binary files."
+        echo " If you want to clone or update the repo you can do it manually later."
+    fi
 
     #==========================
     # NODE BINARY DOWNLOAD
