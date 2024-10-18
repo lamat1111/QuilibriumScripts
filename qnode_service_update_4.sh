@@ -476,9 +476,6 @@ if [ "$NODE_NEEDS_UPDATE" = true ]; then
 
 display_header "UPDATING SERVICE"
 
-#Set variables
-HOME=$(eval echo ~$HOME_DIR)
-
 NODE_PATH="$HOME/ceremonyclient/node"
 EXEC_START="$NODE_PATH/$NODE_BINARY"
 
