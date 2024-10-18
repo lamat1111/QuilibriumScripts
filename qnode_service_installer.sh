@@ -49,6 +49,9 @@ display_header() {
     echo
 }
 
+
+GIT_CLONE=false
+
 #==========================
 # MANAGE ERRORS
 #==========================
@@ -68,6 +71,11 @@ exit_message() {
 # Set a trap to call exit_message on any error
 trap exit_message ERR
 
+if [[ $EUID -ne 0 ]]; then
+   echo "❌ This script must be run as root or with sudo privileges"
+   exit 1
+fi
+
 #==========================
 # INSTALL APPS
 #==========================
@@ -80,7 +88,7 @@ check_and_install() {
     then
         echo "$1 could not be found"
         echo "⏳ Installing $1..."
-        su -c "apt install $1 -y"
+        sudo apt install $1 -y
         echo
     else
         echo "✅ $1 is installed"
@@ -174,37 +182,52 @@ else
 fi
 
 #==========================
-# CEREMONYCLIENT REPO UPDATE
+# GIT CLONE
 #==========================
 
-display_header "UPDATING CEREMONYCLIENT REPO"
+if [ "$GIT_CLONE" = true ]; then
 
-# Download Ceremonyclient
-echo "⏳ Downloading Ceremonyclient..."
-sleep 1  # Add a 1-second delay
-cd ~
-if [ -d "ceremonyclient" ]; then
-  echo "⚠️ Looks like you already have a node installed!"
-  echo "The directory 'ceremonyclient' already exists. Skipping git clone..."
-  echo
+    display_header "UPDATING CEREMONYCLIENT REPO"
+
+    # Download Ceremonyclient
+    echo "⏳ Downloading Ceremonyclient..."
+    sleep 1  # Add a 1-second delay
+    cd $HOME
+    if [ -d "ceremonyclient" ]; then
+    echo "⚠️ Looks like you already have a node installed!"
+    echo "The directory 'ceremonyclient' already exists. Skipping git clone..."
+    echo
+    else
+    until git clone --depth 1 --branch release https://github.com/QuilibriumNetwork/ceremonyclient.git || git clone https://source.quilibrium.com/quilibrium/ceremonyclient.git; do
+        echo "Git clone failed, retrying..."
+        sleep 2
+    done
+    fi
+    echo
+
 else
-  until git clone --depth 1 --branch release https://github.com/QuilibriumNetwork/ceremonyclient.git || git clone https://source.quilibrium.com/quilibrium/ceremonyclient.git; do
-    echo "Git clone failed, retrying..."
-    sleep 2
-  done
+        : # do nothing
 fi
-echo
-
-# Set up environment variables (redundant but solves the command go not found error)
-export GOROOT=/usr/local/go
-export GOPATH=$HOME/go
-export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
 
 #==========================
 # NODE BINARY DOWNLOAD
 #==========================
 
 display_header "DOWNLOADING NODE BINARY"
+
+if [ "$GIT_CLONE" = false ]; then
+
+    # Create directories if they don't exist
+    mkdir -p "$HOME/ceremonyclient"
+    mkdir -p "$HOME/ceremonyclient/node"
+    mkdir -p "$HOME/ceremonyclient/client"
+
+    echo "Directories created successfully."
+
+else
+        : # do nothing
+fi
+
 
 get_os_arch() {
     local os=$(uname -s | tr '[:upper:]' '[:lower:]')
@@ -235,7 +258,7 @@ RELEASE_FILES_URL="https://releases.quilibrium.com/release"
 RELEASE_FILES=$(curl -s $RELEASE_FILES_URL | grep -oE "node-[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?-${OS_ARCH}(\.dgst)?(\.sig\.[0-9]+)?")
 
 # Change to the download directory
-cd ~/ceremonyclient/node
+cd $HOME/ceremonyclient/node
 
 # Download each file
 for file in $RELEASE_FILES; do
@@ -269,7 +292,7 @@ BASE_URL="https://releases.quilibrium.com"
 
 
 # Change to the download directory
-if ! cd ~/ceremonyclient/client; then
+if ! cd $HOME/ceremonyclient/client; then
     echo "❌ Error: Unable to change to the download directory"
     exit 1
 fi
@@ -295,14 +318,13 @@ if download_and_overwrite "$BASE_URL/$QCLIENT_BINARY" "$QCLIENT_BINARY"; then
     #chmod +x qclient
     #echo "✅ Renamed to qclient and made executable"
 else
-    echo "❌ Failed to download qclient binary. Manual installation may be required."
-    exit 1
+    echo "❌ Failed to download qclient binary. Manual installation is required."
 fi
 
 # Download the .dgst file
 echo "Downloading ${QCLIENT_BINARY}.dgst..."
 if ! download_and_overwrite "$BASE_URL/${QCLIENT_BINARY}.dgst" "${QCLIENT_BINARY}.dgst"; then
-    echo "❌ Failed to download .dgst file. Continuing without it."
+    echo "❌ Failed to download .dgst file. Manual installation is required."
 fi
 
 # Download signature files
@@ -322,9 +344,6 @@ echo "✅ Qclient download completed."
 #==========================
 
 display_header "CREATING SERVICE FILE"
-
-# Get the current user's home directory
-HOME=$(eval echo ~$USER)
 
 # Use the home directory in the path
 NODE_PATH="$HOME/ceremonyclient/node"
