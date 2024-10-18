@@ -2,26 +2,16 @@
 
 cat << "EOF"
 
-                  QQQQQQQQQ       1111111   
-                QQ:::::::::QQ    1::::::1   
-              QQ:::::::::::::QQ 1:::::::1   
-             Q:::::::QQQ:::::::Q111:::::1   
-             Q::::::O   Q::::::Q   1::::1   
-             Q:::::O     Q:::::Q   1::::1   
-             Q:::::O     Q:::::Q   1::::1   
-             Q:::::O     Q:::::Q   1::::l   
-             Q:::::O     Q:::::Q   1::::l   
-             Q:::::O     Q:::::Q   1::::l   
-             Q:::::O  QQQQ:::::Q   1::::l   
-             Q::::::O Q::::::::Q   1::::l   
-             Q:::::::QQ::::::::Q111::::::111
-              QQ::::::::::::::Q 1::::::::::1
-                QQ:::::::::::Q  1::::::::::1
-                  QQQQQQQQ::::QQ111111111111
-                          Q:::::Q           
-                           QQQQQQ  QUILIBRIUM.ONE                                                                                                                                  
-
-
+                    Q1Q1Q1\    Q1\   
+                   Q1  __Q1\ Q1Q1 |  
+                   Q1 |  Q1 |\_Q1 |  
+                   Q1 |  Q1 |  Q1 |  
+                   Q1 |  Q1 |  Q1 |  
+                   Q1  Q1Q1 |  Q1 |  
+                   \Q1Q1Q1 / Q1Q1Q1\ 
+                    \___Q1Q\ \______|  QUILIBRIUM.ONE
+                        \___|        
+                              
 ===================================================================
              ✨ OOM Monitoring Script Installer ✨
 ===================================================================
@@ -48,7 +38,7 @@ if [ ! -f "$SERVICE_FILE" ]; then
 fi
 
 # Define variables
-SCRIPT_DIR=~/scripts
+SCRIPT_DIR=$HOME/scripts
 SCRIPT_FILE=$SCRIPT_DIR/qnode_oom_sys_restart.sh
 
 # Function to check if a command succeeded
@@ -131,3 +121,5 @@ echo "You can find the monitoring script at: $SCRIPT_FILE"
 sleep 1
 echo "Logs will be written to: ~/scripts/log/"
 sleep 1
+echo "To disable the script simply run 'crontab -e' and comment out the line:"
+echo "*/10 * * * * $SCRIPT_FILE"
