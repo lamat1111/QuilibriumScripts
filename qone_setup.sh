@@ -49,7 +49,7 @@ else
         bashrc_section=$(cat << 'EOF'
         
 # === qone.sh setup ===
-# The following lines are added to create aliases for qone.sh
+# this allows you to call the qone menu with "q1" or "qone"
 alias q1='~/qone.sh'
 alias qone='~/qone.sh'
 # === end qone.sh setup ===
@@ -60,7 +60,7 @@ EOF
         bashrc_section=$(cat << 'EOF'
         
 # === qone.sh setup ===
-#this allows you to call the qone menu with "q1"
+# this allows you to call the qone menu with "q1" or "qone"
 alias q1='~/qone.sh'
 alias qone='~/qone.sh'
 # === end qone.sh setup ===
