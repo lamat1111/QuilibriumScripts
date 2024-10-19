@@ -9,7 +9,7 @@ check_sudo() {
 }
 
 # Function to download and execute the latest script
-download_and_execute_script() {
+download_update_script() {
     mkdir -p ~/scripts && \
     curl -sSL "https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/qnode_service_update.sh" -o ~/scripts/qnode_service_update.sh && \
     chmod +x ~/scripts/qnode_service_update.sh
@@ -61,7 +61,7 @@ activate_service_and_timer() {
 # Main script logic
 main() {
     check_sudo
-    download_and_execute_script
+    download_update_script
 
     if systemctl list-unit-files | grep -q qnode-autoupdate.service; then
         if systemctl is-active --quiet qnode-autoupdate.timer; then
