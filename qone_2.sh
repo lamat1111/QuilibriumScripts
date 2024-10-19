@@ -868,16 +868,22 @@ fresh_check() {
 #=====================
 
 # Function to edit .bashrc
+# Function to edit .bashrc
 edit_bashrc() {
     local action=$1
     local bashrc_file="$HOME/.bashrc"
     local start_marker="# === qone.sh autoload ==="
     local end_marker="# === end qone.sh autoload ==="
-    local autoload_script=$(cat << 'EOF'
-if [ -n "$SSH_CONNECTION" ] && [ -t 0 ] && [ "$TERM" != "dumb" ] && [ -z "$TMUX" ] && \
-   [ -z "$EMACS" ] && [ -z "$VIM" ] && [ -z "$INSIDE_EMACS" ]; then
+    
+    # Get the script filename dynamically
+    local script_name=$(basename "${BASH_SOURCE[0]}")
+    local script_path="$HOME/$script_name"  # Construct the full path to the script
+
+    local autoload_script=$(cat << EOF
+if [ -n "\$SSH_CONNECTION" ] && [ -t 0 ] && [ "\$TERM" != "dumb" ] && [ -z "\$TMUX" ] && \
+   [ -z "\$EMACS" ] && [ -z "\$VIM" ] && [ -z "\$INSIDE_EMACS" ]; then
     export Q1_MENU_SHOWN=1
-    ~/qone.sh
+    $script_path
 fi
 EOF
 )
@@ -893,6 +899,7 @@ EOF
     # Source .bashrc
     source "$bashrc_file"
 }
+
 
 # Function to set up autoload
 setup_autoload() {
