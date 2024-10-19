@@ -953,6 +953,9 @@ E) Exit
 EOF
 }
 
+sleep 1  # Add a short delay
+read -t 0.1 -n 1000 discard  # Clear any pending input
+
 # main menu loop
 while true; do
     if $REDRAW_MENU; then

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.1.0"
+SCRIPT_VERSION="2.1.1"
 
 #==========================
 # INSTALL APPS
@@ -679,6 +679,9 @@ EOF
 #=====================
 # Main Menu Loop
 #=====================
+
+sleep 1  # Add a short delay
+read -t 0.1 -n 1000 discard  # Clear any pending input
 
 while true; do
     display_menu
