@@ -23,14 +23,12 @@ check_and_install() {
         echo "⏳ Installing $1..."
         su -c "apt install $1 -y"
     else
-        echo "✅ $1 is installed"
+        :
     fi
 }
 
 # For DEBIAN OS - Check if sudo, git, and curl are installed
 check_and_install sudo
-check_and_install git
-check_and_install wget
 check_and_install curl
 
 echo
@@ -39,10 +37,8 @@ upgrade_qone() {
     # Function to check if the qone.sh setup section is present in .bashrc
     if ! grep -Fxq "# === qone.sh setup ===" ~/.bashrc; then
         # Run the setup script
-        # echo "⌛️ Upgrading the qone.sh script... just one minute!"
         sleep 3
-        # echo "ℹ️ Downloading qone_setup.sh..."
-        if ! wget -qO- https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/qone_setup.sh | bash; then
+        if ! curl -sSL https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/qone_setup.sh | bash; then
             echo "❌ Error: Failed to download and execute qone-setup.sh"
             return 1
         else
@@ -51,9 +47,6 @@ upgrade_qone() {
             echo "✅ To launch the Q1 Quickstart Menu."
             echo "You can simply type 'q1','qone' or run './qone.sh'"
             sleep 1
-            # echo "The menu will also load automatically every time you log in."
-            # echo "You can disable this feature by running:"
-            # echo "sed -i 's|^~/qone.sh|#&|' ~/.bashrc && source ~/.bashrc" 
             echo
             sleep 3
         fi
