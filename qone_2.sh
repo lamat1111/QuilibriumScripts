@@ -387,7 +387,19 @@ node_status() {
     else
         echo
         echo "Quilibrium Node Service Status:"
-        systemctl status ceremonyclient.service | grep -E "Active|Main PID|Tasks|Memory|CPU"
+        echo
+
+        # Get the status output, excluding log entries
+        status_output=$(systemctl status ceremonyclient.service --no-pager)
+
+        # Display relevant parts of the status, excluding logs
+        echo "$status_output" | sed -n '1,/CGroup:/p' | sed '/CGroup:/d'
+
+        # If the service is active, show the CGroup information
+        if echo "$status_output" | grep -q "Active: active"; then
+            echo "$status_output" | sed -n '/CGroup:/,/^$/p' | sed 's/^[[:space:]]*//'
+        fi
+
         echo
     fi
 }
