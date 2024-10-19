@@ -390,19 +390,19 @@ node_status() {
         echo
 
         # Get the status output, excluding log entries
-        status_output=$(systemctl status ceremonyclient.service --no-pager)
-
-        # Display relevant parts of the status, excluding logs
-        echo "$status_output" | sed -n '1,/CGroup:/p' | sed '/CGroup:/d'
-
-        # If the service is active, show the CGroup information
-        if echo "$status_output" | grep -q "Active: active"; then
-            echo "$status_output" | sed -n '/CGroup:/,/^$/p' | sed 's/^[[:space:]]*//'
-        fi
+        systemctl status ceremonyclient.service --no-pager | 
+        awk '
+        /^[●○]/ { print; in_cgroup = 0; next }
+        /^ *(Loaded|Active|Process|Main PID|Tasks|Memory|CPU):/ { print; in_cgroup = 0; next }
+        /^     CGroup:/ { print; in_cgroup = 1; next }
+        in_cgroup == 1 && /^[[:space:]]/ { print; next }
+        in_cgroup == 1 && $0 == "" { exit }
+        '
 
         echo
     fi
 }
+
 
 # peer_manifest() {
 #     echo "⌛️  Checking peer manifest (Difficulty metric)..."
