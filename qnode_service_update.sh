@@ -563,7 +563,7 @@ ExecStop=/bin/kill -s SIGINT \$MAINPID
 KillSignal=SIGINT
 RestartKillSignal=SIGINT
 FinalKillSignal=SIGKILL
-TimeoutStopSec=30s
+TimeoutStopSec=60s
 
 [Install]
 WantedBy=multi-user.target

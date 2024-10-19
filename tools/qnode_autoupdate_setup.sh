@@ -52,7 +52,7 @@ EOF
 
 # Function to activate service and timer
 activate_service_and_timer() {
-    systemctl reload qnode-autoupdate.service qnode-autoupdate.timer
+    systemctl daemon-reload
     systemctl enable qnode-autoupdate.timer
     systemctl start qnode-autoupdate.timer
     echo "✅ Auto updates are ON."
@@ -67,18 +67,15 @@ main() {
         if systemctl is-active --quiet qnode-autoupdate.timer; then
             echo "QNode auto-update service and timer are already active."
             echo "✅ Auto updates are ON."
-            exit 0
         else
             echo "QNode auto-update service and timer exist but are not active. Activating..."
             activate_service_and_timer
-            exit 0
         fi
     else
         echo "Setting up QNode auto-update service and timer..."
         create_service_file
         create_timer_file
         activate_service_and_timer
-        echo "✅ Auto updates are ON."
     fi
 }
 
