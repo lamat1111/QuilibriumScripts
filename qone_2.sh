@@ -33,6 +33,10 @@ check_and_install curl
 
 echo
 
+#==========================
+# UPDATES & UPGRADE
+#==========================
+
 upgrade_qone() {
     # Function to check if the qone.sh setup section is present in .bashrc
     if ! grep -Fxq "# === qone.sh setup ===" ~/.bashrc; then
