@@ -345,10 +345,10 @@ start_node() {
         echo "$MISSING_SERVICE_MSG"
     else
         echo
-        echo "⌛️   Starting node service..."
+        echo "⌛️ Starting node service..."
         echo
         service ceremonyclient start
-        echo "✅   Node started"
+        echo "✅ Node started"
         echo
     fi
 }
@@ -358,13 +358,27 @@ stop_node() {
         echo "$MISSING_SERVICE_MSG"
     else
         echo
-        echo "⌛️  Stopping node service..."
+        echo "⌛️ Stopping node service..."
         echo
         service ceremonyclient stop
-        echo "✅   Node stopped"
+        echo "🔴 Node stopped"
         echo
     fi
 }
+
+restart_node() {
+    if [ ! -f "$SERVICE_FILE" ]; then
+        echo "$MISSING_SERVICE_MSG"
+    else
+        echo
+        echo "⌛️ Restarting node service..."
+        echo
+        service ceremonyclient restart
+        echo "✅ Node restarted"
+        echo
+    fi
+}
+
 
 node_status() {
     if [ ! -f "$SERVICE_FILE" ]; then
@@ -952,7 +966,7 @@ while true; do
             ;;
         6) stop_node; press_any_key ;;  
         7) start_node; press_any_key ;;
-        8) node_version; press_any_key ;;
+        8) restart_node; press_any_key ;;
         9) node_info; press_any_key ;;
         10) node_status; press_any_key ;;
         11) confirm_action "$(wrap_text "$balance_log_message" "")" "alance log" balance_log && prompt_return_to_menu "skip_check" ;;
