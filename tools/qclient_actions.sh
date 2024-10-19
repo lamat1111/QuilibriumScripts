@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.0.7"
+SCRIPT_VERSION="1.0.8"
 
 # Define the script path
 SCRIPT_PATH="${BASH_SOURCE[0]}"
@@ -22,8 +22,8 @@ display_menu() {
 4) Accept transaction
 5) Reject transaction
 
-6) Perform mutual transfer     
-==================================================================
+6) Perform mutual transfer 
+-----------------------------------------------------------------    
 E) Exit                                       S) Security settings
 
 EOF
