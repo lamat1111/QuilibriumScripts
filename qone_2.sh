@@ -961,7 +961,7 @@ handle_menu_autoload() {
 }
 
 #=====================
-# Main Menu Function
+# Menu interface
 #=====================
 
 display_menu() {
