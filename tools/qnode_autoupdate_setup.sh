@@ -12,8 +12,7 @@ check_sudo() {
 download_and_execute_script() {
     mkdir -p ~/scripts && \
     curl -sSL "https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/qnode_service_update.sh" -o ~/scripts/qnode_service_update.sh && \
-    chmod +x ~/scripts/qnode_service_update.sh && \
-    ~/scripts/qnode_service_update.sh
+    chmod +x ~/scripts/qnode_service_update.sh
 }
 
 # Function to create service file
@@ -79,7 +78,6 @@ main() {
         create_service_file
         create_timer_file
         activate_service_and_timer
-        echo "Setup completed successfully."
         echo "✅ Auto updates are ON."
     fi
 }
