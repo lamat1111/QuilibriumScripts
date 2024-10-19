@@ -188,6 +188,17 @@ update_node() {
     return $?
 }
 
+autoupdate_setup() {
+    echo
+    echo "⌛️  Updating node..."
+    mkdir -p ~/scripts
+    rm -f ~/scripts/qnode_service_update.sh
+    curl -sSL "$NODE_UPDATE_URL" -o ~/scripts/qnode_service_update.sh
+    chmod +x ~/scripts/qnode_service_update.sh
+    ~/scripts/qnode_service_update.sh
+    return $?
+}
+
 qclient_install() {
     echo
     echo "⌛️  Installing qClient..."
