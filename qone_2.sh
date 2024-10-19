@@ -308,7 +308,6 @@ check_for_updates() {
     fi
 }
 
-
 #==========================
 # ADD ALIASES
 #==========================
@@ -322,28 +321,27 @@ setup_aliases() {
 
     if [ ! -f "$ALIAS_MARKER_FILE" ]; then
         echo "⌛️ Setting up aliases..."
-        
-        # Check if the setup already exists
-        if grep -q "=== qone.sh setup ===" "$HOME/.bashrc"; then
-            echo "Existing Q1 setup found in .bashrc. Updating if necessary..."
-            # Remove existing setup
-            sed -i '/=== qone.sh setup ===/,/=== end qone.sh setup ===/d' "$HOME/.bashrc"
-        fi
 
-        # Add the new setup
+        # Remove old alias block (from old script versions)
+        sed -i '/=== qone.sh setup ===/,/=== end qone.sh setup ===/d' "$HOME/.bashrc"
+
+        # Remove new alias block (from newer script versions)
+        sed -i '/=== qone.sh aliases ===/,/=== end qone.sh aliases ===/d' "$HOME/.bashrc"
+
+        # Add the new alias setup
         cat << 'EOF' >> "$HOME/.bashrc"
 
-# === qone.sh setup ===
+# === qone.sh aliases ===
 # The following lines are added to create aliases for qone.sh
 alias qone='~/qone.sh'
 alias q1='~/qone.sh'
-# === end qone.sh setup ===
+# === end qone.sh aliases ===
 EOF
 
-        # Create marker file
+        # Create marker file to prevent redundant setup
         touch "$ALIAS_MARKER_FILE"
         
-        # Source .bashrc to make sure aliases are available
+        # Source .bashrc to make sure aliases are available immediately
         if [ -n "$BASH_VERSION" ]; then
             source "$HOME/.bashrc"
             echo "Aliases 'q1' and 'qone' are now active."
@@ -354,6 +352,7 @@ EOF
         echo "Aliases are already set up."
     fi
 }
+
 
 #=============================
 # VARIABLES
@@ -865,6 +864,96 @@ fresh_check() {
 }
 
 #=====================
+# Menu autoload setup
+#=====================
+
+# Function to edit .bashrc
+edit_bashrc() {
+    local action=$1
+    local bashrc_file="$HOME/.bashrc"
+    local start_marker="# === qone.sh autoload ==="
+    local end_marker="# === end qone.sh autoload ==="
+    local autoload_script=$(cat << 'EOF'
+if [ -n "$SSH_CONNECTION" ] && [ -t 0 ] && [ "$TERM" != "dumb" ] && [ -z "$TMUX" ] && \
+   [ -z "$EMACS" ] && [ -z "$VIM" ] && [ -z "$INSIDE_EMACS" ]; then
+    export Q1_MENU_SHOWN=1
+    ~/qone.sh
+fi
+EOF
+)
+
+    if [ "$action" = "add" ]; then
+        if ! grep -q "$start_marker" "$bashrc_file"; then
+            echo -e "\n$start_marker\n$autoload_script\n$end_marker" >> "$bashrc_file"
+        fi
+    elif [ "$action" = "remove" ]; then
+        sed -i "/$start_marker/,/$end_marker/d" "$bashrc_file"
+    fi
+
+    # Source .bashrc
+    source "$bashrc_file"
+}
+
+# Function to set up autoload
+setup_autoload() {
+    edit_bashrc "add"
+}
+
+# Function to disable autoload
+disable_autoload() {
+    edit_bashrc "remove"
+}
+
+# Function to check autoload status
+check_autoload_status() {
+    if grep -q "# === qone.sh autoload ===" "$HOME/.bashrc"; then
+        echo "ON"
+    else
+        echo "OFF"
+    fi
+}
+
+# Main function to handle menu autoload
+handle_menu_autoload() {
+    local current_status=$(check_autoload_status)
+    
+    echo
+    echo "Q1 menu autoload on login"
+    echo "--------------------------"
+    echo -n "Current status: "
+    if [ "$current_status" = "ON" ]; then
+        echo "🟢 Enabled"
+        read -p "Do you want to disable autoload? (y/n): " choice
+        if [[ "$choice" =~ ^[Yy]$ ]]; then
+            disable_autoload
+            echo "✅ Menu autoload has been disabled."
+            current_status="OFF"
+        else
+            echo "No changes made. Menu autoload remains enabled."
+        fi
+    else
+        echo "🔴 Disabled"
+        read -p "Do you want to enable autoload? (y/n): " choice
+        if [[ "$choice" =~ ^[Yy]$ ]]; then
+            setup_autoload
+            echo "✅ Menu autoload has been enabled."
+            current_status="ON"
+        else
+            echo "No changes made. Menu autoload remains disabled."
+        fi
+    fi
+    
+    echo
+    echo "Final status:"
+    echo -n "Menu autoload is now "
+    if [ "$current_status" = "ON" ]; then
+        echo "🟢 Enabled"
+    else
+        echo "🔴 Disabled"
+    fi
+}
+
+#=====================
 # Main Menu Function
 #=====================
 
@@ -951,10 +1040,10 @@ EOF
 9)  Node info & balance         
 10) Node status                 16) Auto-update ON/OFF                              
 -----------------------------------------------------------------
-B) ⭐ Best server providers     X) Disclaimer   
-D) 💜 Donations                 H) Help 
+B) ⭐ Best server providers     A) Menu autoload on login                            
+D) 💜 Donations                 H) Help
 -----------------------------------------------------------------    
-E) Exit   
+E) Exit                         X) Disclaimer
  
                         
 EOF
@@ -1024,6 +1113,7 @@ main() {
             [bB]) best_providers; press_any_key ;;
             [dD]) donations; press_any_key ;;
             [eE]) exit ;;
+            [aA]) handle_menu_autoload; press_any_key ;;
             [xX]) disclaimer; press_any_key ;;
             [hH]) help_message; press_any_key ;;
             *) echo "Invalid option, please try again."; press_any_key ;;
