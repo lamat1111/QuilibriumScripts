@@ -142,6 +142,7 @@ BACKUP_RESTORE_STORJ_URL="https://raw.githubusercontent.com/lamat1111/Quilibrium
 BALANCE_LOG_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_balance_checker_installer.sh"
 TEST_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/test/test_script.sh"
 QCLIENT_ACTIONS_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/tools/qclient_actions.sh"
+AUTOUPDATE_SETUP_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_autoupdate_setup.sh"
 
 #=====================
 # Function Definitions
@@ -595,10 +596,10 @@ Please find here: https://docs.quilibrium.one/start/node-quickstart
 the command to do this
 
 >> UNINSTALL Q1
-To remove the script fomr your system, run: rm ~/qone.sh
+To remove the script, run: rm ~/qone.sh
 
-
->> Q:ONE MENU OPTIONS DETAILS
+------------------------------------------------------
+>> Q1 MENU OPTIONS DETAILS
 ------------------------------------------------------
 
  B) Best server providers:
@@ -669,7 +670,103 @@ To remove the script fomr your system, run: rm ~/qone.sh
     Opens a submenu with serveral actions for the Qclient, like: check balance,
     create transaction, accept transaction etc.  
 
+17) Auto-update ON/OFF:
+    Sets up auto-updates for Node and Qclient via service file and timer.
+    If they are already set up, it will activate or deactivate them on user choice.
+    The timer checks for updates every 1 hour at a random minute.
+
 '
+
+#=====================
+# Autoupdate Toggle 
+#=====================
+
+# Function to check if auto-update service files exist
+check_autoupdate_files() {
+    if [ -f "/etc/systemd/system/qnode-autoupdate.service" ] && [ -f "/etc/systemd/system/qnode-autoupdate.timer" ]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+# Function to check the status of the auto-update service
+check_autoupdate_status() {
+    if check_autoupdate_files; then
+        if systemctl is-active --quiet qnode-autoupdate.timer; then
+            echo "ON"
+        else
+            echo "OFF"
+        fi
+    else
+        echo "OFF"
+    fi
+}
+
+# Function to set up auto-update
+setup_autoupdate() {
+    echo "⌛️ Setting up auto-update..."
+    mkdir -p ~/scripts && \
+    curl -sSL "https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_autoupdate_setup.sh" -o ~/scripts/qnode_autoupdate_setup.sh && \
+    chmod +x ~/scripts/qnode_autoupdate_setup.sh && \
+    sudo ~/scripts/qnode_autoupdate_setup.sh
+    if [ $? -eq 0 ]; then
+        echo "✅ Auto-update setup completed successfully."
+        return 0
+    else
+        echo "❌ Failed to set up auto-update."
+        return 1
+    fi
+}
+
+# Function to enable auto-update
+enable_autoupdate() {
+    echo
+    echo "⌛️ Enabling auto-update..."
+    if sudo systemctl enable qnode-autoupdate.timer && sudo systemctl start qnode-autoupdate.timer; then
+        echo "✅ Auto-update enabled."
+        return 0
+    else
+        echo "❌ Failed to enable auto-update."
+        return 1
+    fi
+}
+
+# Function to disable auto-update
+disable_autoupdate() {
+    echo
+    echo "⌛️ Disabling auto-update..."
+    if sudo systemctl stop qnode-autoupdate.timer && sudo systemctl disable qnode-autoupdate.timer; then
+        echo "✅ Auto-update disabled."
+        return 0
+    else
+        echo "❌ Failed to disable auto-update."
+        return 1
+    fi
+}
+
+# Main toggle function
+toggle_autoupdate() {
+    local current_status=$(check_autoupdate_status)
+    
+    if [ "$current_status" = "OFF" ]; then
+        if ! check_autoupdate_files; then
+            echo "⌛️ Auto-update is not set up. Setting up now..."
+            if ! setup_autoupdate; then
+                echo "❌ Failed to set up auto-update. Please check your permissions and try again."
+                return 1
+            fi
+        else
+            enable_autoupdate
+        fi
+    else
+        disable_autoupdate
+    fi
+    
+    # Refresh status after changes
+    current_status=$(check_autoupdate_status)
+    echo "Auto-update is now $current_status."
+}
 
 #=====================
 # Check node and qclient installations
@@ -691,11 +788,11 @@ display_version_status() {
     local component=$3
 
     if [ -z "$current_version" ]; then
-        echo -e "🔴 ${RED}$component version: Not installed${NC}"
+        echo -e "🔴 ${RED}$component: Not installed${NC}"
     elif version_gt "$latest_version" "$current_version"; then
-        echo -e "🟠 ${RED}$component version: $current_version - update needed${NC}"
+        echo -e "🟠 ${RED}$component: $current_version - update needed${NC}"
     else
-        echo -e "🟢 $component version: $current_version - up to date"
+        echo -e "🟢 $component: $current_version - up to date"
     fi
 }
 
@@ -756,8 +853,7 @@ display_menu() {
 ==================================================================
 ////////////////// Q1 QUICKSTART MENU - $SCRIPT_VERSION ////////////////////
 ==================================================================
-        Follow the guide at https://docs.quilibrium.one
-                    Made with 🔥 by LaMat
+             Node guide: https://docs.quilibrium.one
 ------------------------------------------------------------------
 
 EOF
@@ -792,6 +888,9 @@ EOF
     else
         echo -e "🔴 ${RED}Qclient not installed${NC}"
     fi
+    # Autoudpate Toggle
+    echo
+    echo -e "Auto-update: $([ "$(check_autoupdate_status)" = "ON" ] && echo "🟢" || echo "🔴") $(check_autoupdate_status)"
 
     # Display installation instructions only if node is not installed
     if [ "$NODE_INSTALLED" != "Yes" ]; then
@@ -813,14 +912,14 @@ EOF
 3)  Set up gRPCurl              11) Balance log
 4)  Node Log                    12) Backup your node
 5)  Update node                 13) Restore backup
-6)  Stop node                   14) System cleaner              
-7)  Start node                  
-8)  Restart node                15) Qclient install/update         
-9)  Node info & balance
-10) Node status                                                         
+6)  Stop node                                
+7)  Start node                  14) Qclient install/update   
+8)  Restart node                15) Qclient actions (BETA)
+9)  Node info & balance         
+10) Node status                 16) Auto-update ON/OFF                              
 -----------------------------------------------------------------
-B) ⭐ Best server providers    X) Disclaimer   
-D) 💜 Donations                H) Help 
+B) ⭐ Best server providers     X) Disclaimer   
+D) 💜 Donations                 H) Help 
 -----------------------------------------------------------------    
 E) Exit   
  
@@ -859,13 +958,14 @@ while true; do
         11) confirm_action "$(wrap_text "$balance_log_message" "")" "alance log" balance_log && prompt_return_to_menu "skip_check" ;;
         12) confirm_action "$(wrap_text "$backup_storj_message" "")" "Backup your node on StorJ" backup_storj && prompt_return_to_menu "skip_check" ;;
         13) confirm_action "$(wrap_text "$backup_restore_storj_message" "")" "Restore a node backup from StorJ" backup_restore_storj && prompt_return_to_menu "skip_check" ;;
-        14) system_cleaner && prompt_return_to_menu "skip_check" ;;
-        15) 
+        #14) system_cleaner && prompt_return_to_menu "skip_check" ;;
+        14) 
             if confirm_action "$(wrap_text "$qclient_install_message" "")" "qClient install" qclient_install; then
                 prompt_return_to_menu
             fi
             ;;
-        16) qclient_actions;;
+        15) qclient_actions; press_any_key ;;
+        16) toggle_autoupdate; press_any_key ;;
         [bB]) best_providers; press_any_key ;;
         [dD]) donations; press_any_key ;;
         [eE]) exit ;;
