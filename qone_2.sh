@@ -109,13 +109,19 @@ If something does not work in Q1 please try to update to the
 latest version manually by running the code that you find here:
 https://docs.quilibrium.one/quilibrium-node-setup-guide/node-quickstart
 
+>> FOLDERS!
+The menu will work correctly only if your node istallation follows the default folder structure.
+> Node: "$HOME/ceremonyclient/node"
+> Qclient: "$HOME/ceremonyclient/client"
+> .config folder: "$HOME/ceremonyclient/node/"
+> Service name: "ceremonyclient"
 
->> STOP Q1 FROM LOADING ON LOGIN
-Please find here: https://docs.quilibrium.one/start/node-quickstart
-the command to do this
+>> NODE/QCLIENT is installed, but menu says not installed
+In some rare cases the menu may not telling the truth...
+But you can always check by looking at your Node log or by trying to use the Qclient
 
->> UNINSTALL Q1
-To remove the script, run: rm ~/qone.sh
+>> UNINSTALL Q1 MENU
+To remove the script completely, run: rm ~/qone.sh
 
 ------------------------------------------------------
 >> Q1 MENU OPTIONS DETAILS
