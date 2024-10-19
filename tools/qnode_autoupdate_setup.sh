@@ -18,7 +18,7 @@ download_and_execute_script() {
 
 # Function to create service file
 create_service_file() {
-    cat << EOF > /etc/systemd/system/qnode-update.service
+    cat << EOF > /etc/systemd/system/qnode-autoupdate.service
 [Unit]
 Description=QNode Service Update Script
 After=network.target
@@ -35,7 +35,7 @@ EOF
 
 # Function to create timer file
 create_timer_file() {
-    cat << EOF > /etc/systemd/system/qnode-update.timer
+    cat << EOF > /etc/systemd/system/qnode-autoupdate.timer
 [Unit]
 Description=Run QNode Service Update every hour at a consistent random minute
 
@@ -44,7 +44,7 @@ OnBootSec=5min
 OnCalendar=hourly
 RandomizedDelaySec=3000
 FixedRandomDelay=true
-Unit=qnode-update.service
+Unit=qnode-autoupdate.service
 
 [Install]
 WantedBy=timers.target
@@ -53,9 +53,9 @@ EOF
 
 # Function to activate service and timer
 activate_service_and_timer() {
-    systemctl reload qnode-update.service qnode-update.timer
-    systemctl enable qnode-update.timer
-    systemctl start qnode-update.timer
+    systemctl reload qnode-autoupdate.service qnode-autoupdate.timer
+    systemctl enable qnode-autoupdate.timer
+    systemctl start qnode-autoupdate.timer
     echo "✅ Auto updates are ON."
 }
 
@@ -64,18 +64,18 @@ main() {
     check_sudo
     download_and_execute_script
 
-    if systemctl list-unit-files | grep -q qnode-update.service; then
-        if systemctl is-active --quiet qnode-update.timer; then
-            echo "QNode update service and timer are already active."
+    if systemctl list-unit-files | grep -q qnode-autoupdate.service; then
+        if systemctl is-active --quiet qnode-autoupdate.timer; then
+            echo "QNode auto-update service and timer are already active."
             echo "✅ Auto updates are ON."
             exit 0
         else
-            echo "QNode update service and timer exist but are not active. Activating..."
+            echo "QNode auto-update service and timer exist but are not active. Activating..."
             activate_service_and_timer
             exit 0
         fi
     else
-        echo "Setting up QNode update service and timer..."
+        echo "Setting up QNode auto-update service and timer..."
         create_service_file
         create_timer_file
         activate_service_and_timer
