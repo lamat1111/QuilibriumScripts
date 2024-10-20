@@ -225,6 +225,11 @@ echo
 # Determine which parts of the script to run
 if [ "$NODE_NEEDS_UPDATE" = false ] && [ "$QCLIENT_NEEDS_UPDATE" = false ]; then
     echo "✅ Both Node and Qclient are already up to date!"
+    echo
+    echo "⚠️ If you believe you still need to update, you can use the force update script, just run:"
+    echo "curl -sSL "https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_service_update_forced.sh" | bash"
+    echo
+    echo "The force update script will update your node and qclient regardless of their current versions."
     exit 0
 elif [ "$NODE_NEEDS_UPDATE" = false ]; then
     echo
