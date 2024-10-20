@@ -373,7 +373,7 @@ SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
 # Common message for missing service file
 MISSING_SERVICE_MSG="⚠️ Your service file does not exist. Looks like you do not have a node running as a service yet!"
 
-INSTALLATION_DIR="/root/ceremonyclient"  # Default installation directory
+INSTALLATION_DIR="$HOME/ceremonyclient"  # Default installation directory
 NODE_DIR="${INSTALLATION_DIR}/node"
 CLIENT_DIR="${INSTALLATION_DIR}/client"
 
