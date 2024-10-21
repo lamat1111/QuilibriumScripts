@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.1.2"
+SCRIPT_VERSION="1.1.3"
 
 # Define the script path
 SCRIPT_PATH="${BASH_SOURCE[0]}"
