@@ -29,67 +29,33 @@ E) Exit                                       S) Security settings
 EOF
 }
 
-
 #=====================
-# One-time alias setup
+# Main Menu Loop
 #=====================
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ALIAS_MARKER_FILE="$SCRIPT_DIR/.qclient_actions_alias_added"
+main() {
 
-add_alias_if_needed() {
-    if [ ! -f "$ALIAS_MARKER_FILE" ]; then
-        local comment_line="# This alias calls the \"qclient actions\" menu by typing \"qclient\""
-        local alias_line="alias qclient='$SCRIPT_DIR/$(basename "${BASH_SOURCE[0]}")'"
-        if ! grep -q "$alias_line" "$HOME/.bashrc"; then
-            echo "" >> "$HOME/.bashrc"  # Add a blank line for better readability
-            echo "$comment_line" >> "$HOME/.bashrc"
-            echo "$alias_line" >> "$HOME/.bashrc"
-            echo "Alias added to .bashrc."
-            
-            # Source .bashrc to make the alias immediately available
-            if [ -n "$BASH_VERSION" ]; then
-                source "$HOME/.bashrc"
-                echo "Alias 'qclient' is now active."
-            else
-                echo "Please run 'source ~/.bashrc' or restart your terminal to use the 'qclient' command."
-            fi
-        fi
-        touch "$ALIAS_MARKER_FILE"
-    fi
+    while true; do
+        display_menu
+        
+        read -rp "Enter your choice: " choice
+        
+        case $choice in
+            1) check_balance; prompt_return_to_menu || break ;;
+            2) check_coins; prompt_return_to_menu || break ;;
+            3) create_transaction; prompt_return_to_menu || break ;;
+            4) accept_transaction; prompt_return_to_menu || break ;;
+            5) reject_transaction; prompt_return_to_menu || break ;;
+            6) mutual_transfer; prompt_return_to_menu || break ;;
+            sS) security_settings; prompt_return_to_menu || break ;;
+            [eE]) echo ; break ;;
+            *) echo "Invalid option, please try again."; prompt_return_to_menu || break ;;
+        esac
+    done
+
+    echo
+
 }
-
-
-#=====================
-# Check for updates
-#=====================
-
-check_for_updates() {
-    if ! command -v curl &> /dev/null; then
-        return 1
-    fi
-
-    local GITHUB_RAW_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qclient_actions.sh"
-    local LATEST_VERSION
-
-    LATEST_VERSION=$(curl -sS "$GITHUB_RAW_URL" | sed -n 's/^SCRIPT_VERSION="\(.*\)"$/\1/p')
-    
-    if [ $? -ne 0 ] || [ -z "$LATEST_VERSION" ]; then
-        return 1
-    fi
-    
-    # Version comparison function
-    version_gt() { test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1"; }
-    
-    if version_gt "$LATEST_VERSION" "$SCRIPT_VERSION"; then
-        if curl -sS -o "$HOME/scripts/qclient_actions_new.sh" "$GITHUB_RAW_URL"; then
-            chmod +x "$HOME/scripts/qclient_actions_new.sh"
-            mv "$HOME/scripts/qclient_actions_new.sh" "$HOME/scripts/qclient_actions.sh"
-            exec "$HOME/scripts/qclient_actions.sh"
-        fi
-    fi
-}
-
 
 #=====================
 # Menu functions
@@ -275,13 +241,6 @@ EOF
 
 
 #=====================
-# Initial Setup
-#=====================
-
-check_for_updates
-add_alias_if_needed
-
-#=====================
 # Qclient binary determination
 #=====================
 
@@ -295,26 +254,73 @@ if [ -z "$QCLIENT_EXEC" ]; then
     exit 1
 fi
 
+
 #=====================
-# Main Menu Loop
+# One-time alias setup
 #=====================
 
-while true; do
-    display_menu
-    
-    read -rp "Enter your choice: " choice
-    
-    case $choice in
-        1) check_balance; prompt_return_to_menu || break ;;
-        2) check_coins; prompt_return_to_menu || break ;;
-        3) create_transaction; prompt_return_to_menu || break ;;
-        4) accept_transaction; prompt_return_to_menu || break ;;
-        5) reject_transaction; prompt_return_to_menu || break ;;
-        6) mutual_transfer; prompt_return_to_menu || break ;;
-        sS) security_settings; prompt_return_to_menu || break ;;
-        [eE]) echo ; break ;;
-        *) echo "Invalid option, please try again."; prompt_return_to_menu || break ;;
-    esac
-done
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ALIAS_MARKER_FILE="$SCRIPT_DIR/.qclient_actions_alias_added"
 
-echo
+add_alias_if_needed() {
+    if [ ! -f "$ALIAS_MARKER_FILE" ]; then
+        local comment_line="# This alias calls the \"qclient actions\" menu by typing \"qclient\""
+        local alias_line="alias qclient='$SCRIPT_DIR/$(basename "${BASH_SOURCE[0]}")'"
+        if ! grep -q "$alias_line" "$HOME/.bashrc"; then
+            echo "" >> "$HOME/.bashrc"  # Add a blank line for better readability
+            echo "$comment_line" >> "$HOME/.bashrc"
+            echo "$alias_line" >> "$HOME/.bashrc"
+            echo "Alias added to .bashrc."
+            
+            # Source .bashrc to make the alias immediately available
+            if [ -n "$BASH_VERSION" ]; then
+                source "$HOME/.bashrc"
+                echo "Alias 'qclient' is now active."
+            else
+                echo "Please run 'source ~/.bashrc' or restart your terminal to use the 'qclient' command."
+            fi
+        fi
+        touch "$ALIAS_MARKER_FILE"
+    fi
+}
+
+
+#=====================
+# Check for updates
+#=====================
+
+check_for_updates() {
+    if ! command -v curl &> /dev/null; then
+        return 1
+    fi
+
+    local GITHUB_RAW_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qclient_actions.sh"
+    local LATEST_VERSION
+
+    LATEST_VERSION=$(curl -sS "$GITHUB_RAW_URL" | sed -n 's/^SCRIPT_VERSION="\(.*\)"$/\1/p')
+    
+    if [ $? -ne 0 ] || [ -z "$LATEST_VERSION" ]; then
+        return 1
+    fi
+    
+    # Version comparison function
+    version_gt() { test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1"; }
+    
+    if version_gt "$LATEST_VERSION" "$SCRIPT_VERSION"; then
+        if curl -sS -o "$HOME/scripts/qclient_actions_new.sh" "$GITHUB_RAW_URL"; then
+            chmod +x "$HOME/scripts/qclient_actions_new.sh"
+            mv "$HOME/scripts/qclient_actions_new.sh" "$HOME/scripts/qclient_actions.sh"
+            exec "$HOME/scripts/qclient_actions.sh"
+        fi
+    fi
+}
+
+
+#=====================
+# Initial Setup
+#=====================
+
+check_for_updates
+add_alias_if_needed
+
+main
