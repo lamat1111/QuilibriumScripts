@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.1.0"
+SCRIPT_VERSION="1.1.1"
 
 # Define the script path
 SCRIPT_PATH="${BASH_SOURCE[0]}"
@@ -317,7 +317,7 @@ check_for_updates() {
 
 
 #=====================
-# Initial Setup
+# Run
 #=====================
 
 check_for_updates
