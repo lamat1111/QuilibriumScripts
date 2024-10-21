@@ -69,7 +69,7 @@ main() {
     done
 
     if [ "$RUNNING_FROM_QONE" = "true" ]; then
-        exit 10
+        return 0
     else
         exit 0
     fi
