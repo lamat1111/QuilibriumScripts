@@ -10,7 +10,21 @@ SCRIPT_PATH="${BASH_SOURCE[0]}"
 # Menu interface
 #=====================
 
+clear_menu() {
+    if [ "$RUNNING_FROM_QONE" = "true" ]; then
+        # Clear only the lines used by this script
+        lines_to_clear=$(tput lines)
+        for ((i=1; i<=lines_to_clear; i++)); do
+            tput cuu1 # Move cursor up by one line
+            tput el # Clear the line
+        done
+    else
+        clear
+    fi
+}
+
 display_menu() {
+    clear_menu
     cat << EOF
          
                     QCLIENT ACTIONS  v $SCRIPT_VERSION
@@ -34,7 +48,6 @@ EOF
 #=====================
 
 main() {
-
     while true; do
         display_menu
         
@@ -49,12 +62,15 @@ main() {
             6) mutual_transfer; prompt_return_to_menu || break ;;
             [sS]) security_settings; prompt_return_to_menu || break ;;
             [eE]) echo ; break ;;
-            *) echo "Invalid option, please try again."; prompt_return_to_menu || break ;;
+            *) echo "Invalid option, please try again." ;;
         esac
     done
 
-    echo
-
+    if [ "$RUNNING_FROM_QONE" = "true" ]; then
+        exit 10
+    else
+        exit 0
+    fi
 }
 
 #=====================
@@ -64,12 +80,12 @@ main() {
 prompt_return_to_menu() {
     echo
     while true; do
-    echo
-    echo "--------------------------------"
+        echo
+        echo "--------------------------------"
         read -rp "Go back to the menu? (Y/N): " choice
         case $choice in
-            [Yy]* ) return 0 ;;  # Return true (0) to continue the loop
-            [Nn]* ) return 1 ;;  # Return false (1) to break the loop
+            [Yy]* ) return 0 ;;  # Return to menu
+            [Nn]* ) return 1 ;;  # Exit
             * ) echo "Please answer Y or N." ;;
         esac
     done
