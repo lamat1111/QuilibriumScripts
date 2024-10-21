@@ -15,7 +15,6 @@ echo "Downloading new node files..."
 # Main files to download
 main_files=(
     "node-$VERSION-linux-amd64"
-    "node-$VERSION-linux-amd64.dgst"
 )
 
 # Download main files
@@ -25,17 +24,6 @@ for file in "${main_files[@]}"; do
     else
         echo "Failed to download $file. Exiting."
         exit 1
-    fi
-done
-
-# Download signature files
-echo "Downloading signature files..."
-for i in {1..20}; do
-    sig_file="node-$VERSION-linux-amd64.dgst.sig.$i"
-    if wget "https://releases.quilibrium.com/$sig_file" -O "$sig_file"; then
-        echo "Successfully downloaded $sig_file"
-    else
-        echo "Signature file $sig_file not found or failed to download. Skipping..."
     fi
 done
 
@@ -51,7 +39,7 @@ sudo service ceremonyclient stop || { echo "Failed to stop ceremonyclient servic
 
 # Update the service file
 echo "Updating ceremonyclient service file..."
-sudo sed -i "s|^ExecStart=.*|ExecStart=/root/ceremonyclient/node/node-$VERSION-linux-amd64|" /lib/systemd/system/ceremonyclient.service || { echo "Failed to update service file. Exiting."; exit 1; }
+sudo sed -i "s|^ExecStart=.*|ExecStart=/root/ceremonyclient/node/node-$VERSION-linux-amd64 --signature-check=false|" /lib/systemd/system/ceremonyclient.service || { echo "Failed to update service file. Exiting."; exit 1; }
 
 # Reload systemd
 echo "Reloading systemd..."
