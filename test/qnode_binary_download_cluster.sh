@@ -5,10 +5,6 @@
 # Set the version number as a variable
 VERSION="1.4.21.1"
 
-# Stop the ceremonyclient service
-echo "Stopping ceremonyclient service..."
-sudo service ceremonyclient stop || { echo "Failed to stop ceremonyclient service. Exiting."; exit 1; }
-
 # Change to the specified directory
 echo "Changing to the ceremonyclient/node directory..."
 cd $HOME/ceremonyclient/node || { echo "Failed to change directory. Exiting."; exit 1; }
@@ -20,6 +16,18 @@ echo "Downloading new node files..."
 main_files=(
     "node-$VERSION-linux-amd64"
     "node-$VERSION-linux-amd64.dgst"
+)
+
+# Signature files to download
+sig_files=(
+    "node-$VERSION-linux-amd64.dgst.sig.3"
+    "node-$VERSION-linux-amd64.dgst.sig.4"
+    "node-$VERSION-linux-amd64.dgst.sig.5"
+    "node-$VERSION-linux-amd64.dgst.sig.9"
+    "node-$VERSION-linux-amd64.dgst.sig.12"
+    "node-$VERSION-linux-amd64.dgst.sig.13"
+    "node-$VERSION-linux-amd64.dgst.sig.15"
+    "node-$VERSION-linux-amd64.dgst.sig.16"
 )
 
 # Download main files
@@ -34,12 +42,11 @@ done
 
 # Download signature files
 echo "Downloading signature files..."
-for i in {1..20}; do
-    sig_file="node-$VERSION-linux-amd64.dgst.sig.$i"
-    if wget "https://releases.quilibrium.com/$sig_file" -O "$sig_file"; then
-        echo "Successfully downloaded $sig_file"
+for file in "${sig_files[@]}"; do
+    if wget "https://releases.quilibrium.com/$file" -O "$file"; then
+        echo "Successfully downloaded $file"
     else
-        echo "Signature file $sig_file not found or failed to download. Skipping..."
+        echo "Failed to download $file. Skipping..."
     fi
 done
 
