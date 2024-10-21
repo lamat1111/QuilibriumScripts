@@ -100,7 +100,7 @@ EOF
 }
 
 #=====================
-# Main Script Execution
+# Main Menu loop
 #=====================
 
 
