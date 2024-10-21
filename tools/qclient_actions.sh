@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.1.6"
+SCRIPT_VERSION="1.1.7"
 
 # Define the script path
 SCRIPT_PATH="${BASH_SOURCE[0]}"
@@ -22,7 +22,6 @@ clear_menu() {
 }
 
 display_menu() {
-    clear_menu
     cat << EOF
          
                     QCLIENT ACTIONS  v $SCRIPT_VERSION
@@ -46,9 +45,8 @@ EOF
 #=====================
 
 main() {
+    display_menu
     while true; do
-        display_menu
-        
         read -rp "Enter your choice: " choice
         
         case $choice in
@@ -78,7 +76,10 @@ prompt_return_to_menu() {
         echo "--------------------------------"
         read -rp "Go back to the menu? (Y/N): " choice
         case $choice in
-            [Yy]* ) return 0 ;;  # Return to menu
+            [Yy]* ) 
+                clear_menu
+                display_menu
+                return 0 ;;  # Return to menu
             [Nn]* ) return 1 ;;  # Exit
             * ) echo "Please answer Y or N." ;;
         esac
