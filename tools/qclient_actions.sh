@@ -65,8 +65,8 @@ prompt_return_to_menu() {
     echo
     while true; do
     echo
-    echo "--------------------------------"
-        read -rp "Go back to the menu? (Y/N): " choice
+    echo "--------------------------------------"
+        read -rp "Go back to Qclient Actions menu? (Y/N): " choice
         case $choice in
             [Yy]* ) return 0 ;;  # Return true (0) to continue the loop
             [Nn]* ) return 1 ;;  # Return false (1) to break the loop
