@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.1.3"
+SCRIPT_VERSION="1.1.4"
 
 # Define the script path
 SCRIPT_PATH="${BASH_SOURCE[0]}"
@@ -47,7 +47,7 @@ main() {
             4) accept_transaction; prompt_return_to_menu || break ;;
             5) reject_transaction; prompt_return_to_menu || break ;;
             6) mutual_transfer; prompt_return_to_menu || break ;;
-            sS) security_settings; prompt_return_to_menu || break ;;
+            [sS]) security_settings; prompt_return_to_menu || break ;;
             [eE]) echo ; break ;;
             *) echo "Invalid option, please try again."; prompt_return_to_menu || break ;;
         esac
