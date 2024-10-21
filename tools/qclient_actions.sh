@@ -10,29 +10,6 @@ SCRIPT_PATH="${BASH_SOURCE[0]}"
 # Menu interface
 #=====================
 
-# This solution should work for both qlcient_actions as standalone or as submenu of Q1 main menu
-clear_menu() {
-    # Save cursor position
-    tput sc
-
-    # Move cursor up until we find the line containing "QCLIENT ACTIONS"
-    while true; do
-        current_line=$(tput cuu1 && tput el && tput sc && sed -n '1p' && tput rc)
-        if [[ $current_line == *"QCLIENT ACTIONS"* ]]; then
-            # Clear the "QCLIENT ACTIONS" line itself
-            tput el
-            break
-        fi
-        # If we've reached the top of the screen without finding "QCLIENT ACTIONS", stop
-        if [[ $(tput cuu1; echo $?) -ne 0 ]]; then
-            break
-        fi
-    done
-
-    # Restore cursor to saved position
-    tput rc
-}
-
 display_menu() {
     cat << EOF
          
@@ -57,8 +34,10 @@ EOF
 #=====================
 
 main() {
-    display_menu
+
     while true; do
+        display_menu
+        
         read -rp "Enter your choice: " choice
         
         case $choice in
@@ -70,11 +49,12 @@ main() {
             6) mutual_transfer; prompt_return_to_menu || break ;;
             [sS]) security_settings; prompt_return_to_menu || break ;;
             [eE]) echo ; break ;;
-            *) echo "Invalid option, please try again." ;;
+            *) echo "Invalid option, please try again."; prompt_return_to_menu || break ;;
         esac
     done
 
-    exit 0
+    echo
+
 }
 
 #=====================
@@ -84,15 +64,12 @@ main() {
 prompt_return_to_menu() {
     echo
     while true; do
-        echo
-        echo "--------------------------------"
+    echo
+    echo "--------------------------------"
         read -rp "Go back to the menu? (Y/N): " choice
         case $choice in
-            [Yy]* ) 
-                clear_menu
-                display_menu
-                return 0 ;;  # Return to menu
-            [Nn]* ) return 1 ;;  # Exit
+            [Yy]* ) return 0 ;;  # Return true (0) to continue the loop
+            [Nn]* ) return 1 ;;  # Return false (1) to break the loop
             * ) echo "Please answer Y or N." ;;
         esac
     done
