@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.1.5"
+SCRIPT_VERSION="1.1.6"
 
 # Define the script path
 SCRIPT_PATH="${BASH_SOURCE[0]}"
@@ -11,18 +11,14 @@ SCRIPT_PATH="${BASH_SOURCE[0]}"
 #=====================
 
 clear_menu() {
-    if [ "$RUNNING_FROM_QONE" = "true" ]; then
-        # Find the line containing "QCLIENT ACTIONS" and clear up to it
-        tput cuu1  # Move up one line to start search from current position
-        while IFS= read -r line && [[ $line != *"QCLIENT ACTIONS"* ]]; do
-            tput cuu1  # Move cursor up
-            tput el    # Clear the line
-        done
-        tput cuu1  # Move up one more line to clear the "QCLIENT ACTIONS" line itself
+    # Find the line containing "QCLIENT ACTIONS" and clear up to it
+    tput cuu1  # Move up one line to start search from current position
+    while IFS= read -r line && [[ $line != *"QCLIENT ACTIONS"* ]]; do
+        tput cuu1  # Move cursor up
         tput el    # Clear the line
-    else
-        clear
-    fi
+    done
+    tput cuu1  # Move up one more line to clear the "QCLIENT ACTIONS" line itself
+    tput el    # Clear the line
 }
 
 display_menu() {
@@ -68,11 +64,7 @@ main() {
         esac
     done
 
-    if [ "$RUNNING_FROM_QONE" = "true" ]; then
-        return 0
-    else
-        exit 0
-    fi
+    exit 0
 }
 
 #=====================
