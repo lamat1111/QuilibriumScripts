@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.0.8"
+SCRIPT_VERSION="1.0.9"
 
 # Define the script path
 SCRIPT_PATH="${BASH_SOURCE[0]}"
@@ -15,8 +15,8 @@ display_menu() {
          
                     QCLIENT ACTIONS  v $SCRIPT_VERSION
 -----------------------------------------------------------------
-1) Check total balance / address
-2) Check individual coins
+1) Check balance / address
+2) Check coins
 
 3) Create transaction
 4) Accept transaction
