@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script version
-SCRIPT_VERSION="1.0"
+SCRIPT_VERSION="1.2"
 
 # Function to check for newer script version
 check_for_updates() {
@@ -64,7 +64,7 @@ if command -v ufw > /dev/null 2>&1; then
   if $SUDO ufw status | grep -q "Status: active"; then
     # Check if the port is allowed
     if ! $SUDO ufw status | grep -q "$PORT/tcp"; then
-      echo "Opening port $PORT in the firewall..."
+      #cho "Opening port $PORT in the firewall..."
       $SUDO ufw allow $PORT/tcp > /dev/null 2>&1
       UFW_OPENED=true
     fi
@@ -74,7 +74,7 @@ elif command -v firewall-cmd > /dev/null 2>&1; then
   if $SUDO firewall-cmd --state | grep -q "running"; then
     # Check if the port is allowed
     if ! $SUDO firewall-cmd --list-ports | grep -q "$PORT/tcp"; then
-      echo "Opening port $PORT in the firewall..."
+      #echo "Opening port $PORT in the firewall..."
       $SUDO firewall-cmd --add-port=$PORT/tcp --permanent > /dev/null 2>&1
       $SUDO firewall-cmd --reload > /dev/null 2>&1
       FIREWALL_CMD_OPENED=true
@@ -106,7 +106,7 @@ cleanup() {
 trap "echo 'Then press ENTER to stop the web server.'; trap - SIGINT" SIGINT
 
 # Start a temporary web server
-echo "Starting temporary web server on port $PORT..."
+#echo "Starting temporary web server on port $PORT..."
 cd $HOME/scripts
 python3 -m http.server $PORT > /dev/null 2>&1 &
 SERVER_PID=$!
