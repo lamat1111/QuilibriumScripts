@@ -16,7 +16,7 @@ display_menu() {
                     QCLIENT ACTIONS  v $SCRIPT_VERSION
 -----------------------------------------------------------------
 1) Check balance / address
-2) Check coins
+2) Check individual coins
 
 3) Create transaction
 4) Accept transaction
@@ -24,7 +24,7 @@ display_menu() {
 
 6) Perform mutual transfer 
 -----------------------------------------------------------------    
-E) Exit                                       S) Security settings
+E) Exit                                      S) Security settings
 
 EOF
 }
