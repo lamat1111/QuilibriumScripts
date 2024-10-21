@@ -5,7 +5,7 @@ SCRIPT_VERSION="1.2"
 
 # Function to check for newer script version
 check_for_updates() {
-    echo "⚙️ Checking for script updates..."
+    #echo "⚙️ Checking for script updates..."
     LATEST_VERSION=$(wget -qO- "https://github.com/lamat1111/QuilibriumScripts/raw/main/tools/qnode_balance_log_download.sh" | grep 'SCRIPT_VERSION="' | head -1 | cut -d'"' -f2)
     if [ "$SCRIPT_VERSION" != "$LATEST_VERSION" ]; then
         wget -O ~/scripts/qnode_balance_log_download.sh "https://github.com/lamat1111/QuilibriumScripts/raw/main/tools/qnode_balance_log_download.sh"
