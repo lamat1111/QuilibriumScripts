@@ -1,4 +1,5 @@
 # Set the version number as a variable
+#
 VERSION="1.4.21.1"
 
 # Change to the specified directory
