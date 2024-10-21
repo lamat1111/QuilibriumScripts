@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.1.7"
+SCRIPT_VERSION="1.1.8"
 
 # Define the script path
 SCRIPT_PATH="${BASH_SOURCE[0]}"
@@ -12,14 +12,25 @@ SCRIPT_PATH="${BASH_SOURCE[0]}"
 
 # This solution should work for both qlcient_actions as standalone or as submenu of Q1 main menu
 clear_menu() {
-    # Find the line containing "QCLIENT ACTIONS" and clear up to it
-    tput cuu1  # Move up one line to start search from current position
-    while IFS= read -r line && [[ $line != *"QCLIENT ACTIONS"* ]]; do
-        tput cuu1  # Move cursor up
-        tput el    # Clear the line
+    # Save cursor position
+    tput sc
+
+    # Move cursor up until we find the line containing "QCLIENT ACTIONS"
+    while true; do
+        current_line=$(tput cuu1 && tput el && tput sc && sed -n '1p' && tput rc)
+        if [[ $current_line == *"QCLIENT ACTIONS"* ]]; then
+            # Clear the "QCLIENT ACTIONS" line itself
+            tput el
+            break
+        fi
+        # If we've reached the top of the screen without finding "QCLIENT ACTIONS", stop
+        if [[ $(tput cuu1; echo $?) -ne 0 ]]; then
+            break
+        fi
     done
-    tput cuu1  # Move up one more line to clear the "QCLIENT ACTIONS" line itself
-    tput el    # Clear the line
+
+    # Restore cursor to saved position
+    tput rc
 }
 
 display_menu() {
