@@ -1,30 +1,16 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.2.0"
+SCRIPT_VERSION="1.2.1"
 
 # Define the script path
 SCRIPT_PATH="${BASH_SOURCE[0]}"
-
-# Variable to store the number of lines in the menu
-MENU_LINES=0
 
 #=====================
 # Menu interface
 #=====================
 
 display_menu() {
-    # Clear the previous menu
-    if [ $MENU_LINES -gt 0 ]; then
-        tput cuu $MENU_LINES && tput ed
-    fi
-    
-    # Store the current cursor position
-    local start_row
-    IFS='[;' read -p $'\e[6n' -d R -a pos
-    start_row=$((${pos[1]} - 1))
-    
-    # Display the menu
     cat << EOF
          
                     QCLIENT ACTIONS  v $SCRIPT_VERSION
@@ -41,12 +27,6 @@ display_menu() {
 E) Exit                                      S) Security settings
 
 EOF
-
-    # Calculate the number of lines in the menu
-    local end_row
-    IFS='[;' read -p $'\e[6n' -d R -a pos
-    end_row=$((${pos[1]} - 1))
-    MENU_LINES=$((end_row - start_row))
 }
 
 #=====================
