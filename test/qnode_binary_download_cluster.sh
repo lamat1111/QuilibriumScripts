@@ -15,20 +15,20 @@ echo "Downloading new node files..."
 # Main files to download
 main_files=(
     "node-$VERSION-linux-amd64"
-    "node-$VERSION-linux-amd64.dgst"
+    #"node-$VERSION-linux-amd64.dgst"
 )
 
-# Signature files to download
-sig_files=(
-    "node-$VERSION-linux-amd64.dgst.sig.3"
-    "node-$VERSION-linux-amd64.dgst.sig.4"
-    "node-$VERSION-linux-amd64.dgst.sig.5"
-    "node-$VERSION-linux-amd64.dgst.sig.9"
-    "node-$VERSION-linux-amd64.dgst.sig.12"
-    "node-$VERSION-linux-amd64.dgst.sig.13"
-    "node-$VERSION-linux-amd64.dgst.sig.15"
-    "node-$VERSION-linux-amd64.dgst.sig.16"
-)
+# # Signature files to download
+# sig_files=(
+#     "node-$VERSION-linux-amd64.dgst.sig.3"
+#     "node-$VERSION-linux-amd64.dgst.sig.4"
+#     "node-$VERSION-linux-amd64.dgst.sig.5"
+#     "node-$VERSION-linux-amd64.dgst.sig.9"
+#     "node-$VERSION-linux-amd64.dgst.sig.12"
+#     "node-$VERSION-linux-amd64.dgst.sig.13"
+#     "node-$VERSION-linux-amd64.dgst.sig.15"
+#     "node-$VERSION-linux-amd64.dgst.sig.16"
+# )
 
 # Download main files
 for file in "${main_files[@]}"; do
@@ -40,15 +40,15 @@ for file in "${main_files[@]}"; do
     fi
 done
 
-# Download signature files
-echo "Downloading signature files..."
-for file in "${sig_files[@]}"; do
-    if wget "https://releases.quilibrium.com/$file" -O "$file"; then
-        echo "Successfully downloaded $file"
-    else
-        echo "Failed to download $file. Skipping..."
-    fi
-done
+# # Download signature files
+# echo "Downloading signature files..."
+# for file in "${sig_files[@]}"; do
+#     if wget "https://releases.quilibrium.com/$file" -O "$file"; then
+#         echo "Successfully downloaded $file"
+#     else
+#         echo "Failed to download $file. Skipping..."
+#     fi
+# done
 
 echo "File download process completed."
 
