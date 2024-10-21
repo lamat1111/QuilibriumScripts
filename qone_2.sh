@@ -132,7 +132,7 @@ main() {
             8) restart_node; press_any_key ;;
             9) node_info; press_any_key ;;
             10) node_status; press_any_key ;;
-            11) confirm_action "$(wrap_text "$balance_log_message" "")" "alance log" balance_log && prompt_return_to_menu "skip_check" ;;
+            11) balance_log && prompt_return_to_menu "skip_check" ;;
             12) confirm_action "$(wrap_text "$backup_storj_message" "")" "Backup your node on StorJ" backup_storj && prompt_return_to_menu "skip_check" ;;
             13) confirm_action "$(wrap_text "$backup_restore_storj_message" "")" "Restore a node backup from StorJ" backup_restore_storj && prompt_return_to_menu "skip_check" ;;
             #14) system_cleaner && prompt_return_to_menu "skip_check" ;;
@@ -441,8 +441,55 @@ system_cleaner() {
 
 balance_log() {
     echo
-    echo "⌛️  Installing the balance log script..."
-    curl -sSL "$BALANCE_LOG_URL" | bash
+    if [ -f "$HOME/scripts/qnode_balance_checker.sh" ] && crontab -l | grep -q "qnode_balance_checker.sh"; then
+        echo "Balance log is already set up. What would you like to do?"
+        echo
+        echo "1 - Download balance log"
+        echo "2 - See balance log"
+        echo "3 - Clean balance log"
+        echo
+        read -p "Enter your choice (1, 2 or 3): " choice
+
+        case $choice in
+            1)
+                echo
+                mkdir -p ~/scripts && \
+                curl -sSL "https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_balance_log_download.sh" -o ~/scripts/qnode_balance_log_download.sh && \
+                chmod +x ~/scripts/qnode_balance_log_download.sh && \
+                ~/scripts/qnode_balance_log_download.sh
+                ;;
+            2)
+                if [ -f "$HOME/scripts/balance_log.csv" ]; then
+                    echo
+                    echo "Balance Log"
+                    echo "================="
+                    echo
+                    cat "$HOME/scripts/balance_log.csv"
+                else
+                    echo "Balance log file not found."
+                fi
+                ;;
+            3)
+                echo "This option will completely delete your balance log. Proceed? (y/n)"
+                read -p "> " confirm
+                if [[ "$confirm" =~ ^[Yy]$ ]]; then
+                    if rm "$HOME/scripts/balance_log.csv"; then
+                        echo "Balance log has been deleted."
+                    else
+                        echo "Error: Failed to delete balance log or file doesn't exist."
+                    fi
+                else
+                    echo "Operation cancelled."
+                fi
+                ;;
+            *)
+                echo "Invalid choice. Please run the balance log option again."
+                ;;
+        esac
+    else
+        echo "⌛️  Installing the balance log script..."
+        curl -sSL "$BALANCE_LOG_URL" | bash
+    fi
     return $?
 }
 
@@ -783,9 +830,10 @@ SYSTEM_CLEANER_URL="https://raw.githubusercontent.com/lamat1111/quilibrium-node-
 BACKUP_STORJ_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_backup_storj.sh"
 BACKUP_RESTORE_STORJ_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_backup_restore_storj.sh"
 BALANCE_LOG_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_balance_checker_installer.sh"
-TEST_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/test/test_script.sh"
 QCLIENT_ACTIONS_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/tools/qclient_actions.sh"
 AUTOUPDATE_SETUP_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_autoupdate_setup.sh"
+
+TEST_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/test/test_script.sh"
 
 #=====================
 # Autoupdate Toggle 
