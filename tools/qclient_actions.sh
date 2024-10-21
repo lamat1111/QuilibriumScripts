@@ -10,6 +10,7 @@ SCRIPT_PATH="${BASH_SOURCE[0]}"
 # Menu interface
 #=====================
 
+# This solution should work for both qlcient_actions as standalone or as submenu of Q1 main menu
 clear_menu() {
     # Find the line containing "QCLIENT ACTIONS" and clear up to it
     tput cuu1  # Move up one line to start search from current position
