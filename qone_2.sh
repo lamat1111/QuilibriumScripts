@@ -4,6 +4,157 @@
 SCRIPT_VERSION="2.5.0"
 
 #=====================
+# Menu interface
+#=====================
+
+display_menu() {
+    clear
+    source ~/.bashrc
+    cat << EOF
+
+                    Q1Q1Q1\    Q1\   
+                   Q1  __Q1\ Q1Q1 |  
+                   Q1 |  Q1 |\_Q1 |  
+                   Q1 |  Q1 |  Q1 |  
+                   Q1 |  Q1 |  Q1 |  
+                   Q1  Q1Q1 |  Q1 |  
+                   \Q1Q1Q1 / Q1Q1Q1\ 
+                    \___Q1Q\ \______|  QUILIBRIUM.ONE
+                        \___|        
+                              
+==================================================================
+////////////////// Q1 QUICKSTART MENU - $SCRIPT_VERSION ////////////////////
+==================================================================
+             Node guide: https://docs.quilibrium.one
+------------------------------------------------------------------
+
+EOF
+
+    # Perform a fresh check only if the parameter is not "skip_check"
+    if [ "$1" != "skip_check" ]; then
+        while IFS= read -r line; do
+            if [[ $line == *"Node installed:"* ]]; then
+                NODE_INSTALLED=${line#*: }
+            elif [[ $line == *"Current Node version:"* ]]; then
+                CURRENT_NODE_VERSION=${line#*: }
+            elif [[ $line == *"Latest Node version:"* ]]; then
+                LATEST_NODE_VERSION=${line#*: }
+            elif [[ $line == *"Qclient installed:"* ]]; then
+                QCLIENT_INSTALLED=${line#*: }
+            elif [[ $line == *"Current Qclient version:"* ]]; then
+                CURRENT_QCLIENT_VERSION=${line#*: }
+            elif [[ $line == *"Latest Qclient version:"* ]]; then
+                LATEST_QCLIENT_VERSION=${line#*: }
+            fi
+        done < <(fresh_check)
+    fi
+
+    if [ "$NODE_INSTALLED" = "Yes" ]; then
+        display_version_status "$CURRENT_NODE_VERSION" "$LATEST_NODE_VERSION" "Node"
+    else
+        echo -e "🔴 ${RED}Node not installed${NC}"
+    fi
+
+    if [ "$QCLIENT_INSTALLED" = "Yes" ]; then
+        display_version_status "$CURRENT_QCLIENT_VERSION" "$LATEST_QCLIENT_VERSION" "Qclient"
+    else
+        echo -e "🔴 ${RED}Qclient not installed${NC}"
+    fi
+    # Autoudpate Toggle
+    echo
+    echo -e "Auto-update: $([ "$(check_autoupdate_status)" = "ON" ] && echo "🟢" || echo "🔴") $(check_autoupdate_status)"
+
+    # Display installation instructions only if node is not installed
+    if [ "$NODE_INSTALLED" != "Yes" ]; then
+        cat << EOF
+
+HOW TO INSTALL A NEW NODE?
+Choose option 1, reboot and then choose 2.
+Let your node run for 30 minutes, then choose option 3. Done!
+
+1) Prepare your server  
+2) Install node
+3) Set up gRPCurl   
+
+EOF
+    fi
+
+    cat << EOF
+-----------------------------------------------------------------
+3)  Set up gRPCurl              11) Balance log
+4)  Node Log                    12) Backup your node
+5)  Update node                 13) Restore backup
+6)  Stop node                                
+7)  Start node                  14) Qclient install/update   
+8)  Restart node                15) Qclient actions (BETA)
+9)  Node info & balance         
+10) Node status                 16) Auto-update ON/OFF                              
+-----------------------------------------------------------------
+B) ⭐ Best server providers     A) Menu autoload on login                            
+D) 💜 Donations                 H) Help
+-----------------------------------------------------------------    
+E) Exit                         X) Disclaimer
+ 
+                        
+EOF
+}
+
+#=====================
+# Main Script Execution
+#=====================
+
+
+main() {
+    while true; do
+        if $REDRAW_MENU; then
+            display_menu
+            REDRAW_MENU=false
+        fi
+
+        read -rp "Enter your choice: " choice
+        
+        case $choice in
+            1) confirm_action "$(wrap_text "$prepare_server_message" "")" "Prepare your server" install_prerequisites && prompt_return_to_menu "skip_check" ;;
+            2) 
+                if confirm_action "$(wrap_text "$install_node_message" "")" "Install node" install_node; then
+                    prompt_return_to_menu
+                fi
+                ;;
+            3) confirm_action "$(wrap_text "$setup_grpcurl_message" "")" "Set up gRPCurl" configure_grpcurl && prompt_return_to_menu "skip_check" ;;
+            4) node_logs; press_any_key ;;
+            5) 
+                if confirm_action "$(wrap_text "$update_node_message" "")" "Update node" update_node; then
+                    prompt_return_to_menu
+                fi
+                ;;
+            6) stop_node; press_any_key ;;  
+            7) start_node; press_any_key ;;
+            8) restart_node; press_any_key ;;
+            9) node_info; press_any_key ;;
+            10) node_status; press_any_key ;;
+            11) confirm_action "$(wrap_text "$balance_log_message" "")" "alance log" balance_log && prompt_return_to_menu "skip_check" ;;
+            12) confirm_action "$(wrap_text "$backup_storj_message" "")" "Backup your node on StorJ" backup_storj && prompt_return_to_menu "skip_check" ;;
+            13) confirm_action "$(wrap_text "$backup_restore_storj_message" "")" "Restore a node backup from StorJ" backup_restore_storj && prompt_return_to_menu "skip_check" ;;
+            #14) system_cleaner && prompt_return_to_menu "skip_check" ;;
+            14) 
+                if confirm_action "$(wrap_text "$qclient_install_message" "")" "qClient install" qclient_install; then
+                    prompt_return_to_menu
+                fi
+                ;;
+            15) qclient_actions; press_any_key ;;
+            16) toggle_autoupdate; press_any_key ;;
+            [bB]) best_providers; press_any_key ;;
+            [dD]) donations; press_any_key ;;
+            [eE]) exit ;;
+            [aA]) handle_menu_autoload; press_any_key ;;
+            [xX]) disclaimer; press_any_key ;;
+            [hH]) help_message; press_any_key ;;
+            *) echo "Invalid option, please try again."; press_any_key ;;
+        esac
+    done
+}
+
+#=====================
 # Message Definitions
 #=====================
 
@@ -46,7 +197,9 @@ balance_log_message='
 This installer sets up a script to check your node balance
 and then sets up a cronjob to log your balance every hour in a CSV file.
 
-For more info on how to see/download your balance CSV log, please visit:
+To see your existing balance log run "cat ~/scripts/balance_log.csv"
+
+To download the balance log directly run visit:
 https://docs.quilibrium.one/start/tutorials/log-your-node-balance-every-1-hour
 '
 
@@ -201,213 +354,6 @@ To remove the script completely, run: rm ~/qone.sh
     The timer checks for updates every 1 hour at a random minute.
 
 '
-
-#==========================
-# Utility functions
-#==========================
-
-# Modify this function to handle "press any key" prompts
-press_any_key() {
-    echo
-    read -n 1 -s -r -p "Press any key to continue..."
-    echo
-    # Instead of setting REDRAW_MENU, we'll call display_menu directly
-    display_menu "skip_check"
-}
-
-prompt_return_to_menu() {
-    echo -e "\n\n"  # Add two empty lines for readability
-    echo "-------------------------------------"
-    read -rp "Go back to the main menu? (y/n): " return_to_menu
-    case $return_to_menu in
-        [Yy]) 
-            if [ "$1" != "skip_check" ]; then
-                REDRAW_MENU=true
-            fi
-            display_menu "$1"
-            ;;
-        *) 
-            echo "Exiting the script..."
-            exit 0
-            ;;
-    esac
-}
-
-
-confirm_action() {
-    cat << EOF
-
-$1
-
-✅ Do you want to proceed? (y/n):
-EOF
-    read -p "> " confirm
-    if [[ "$confirm" =~ ^[Yy]$ ]]; then
-        $3
-        return 0
-    else
-        return 1
-    fi
-}
-
-# Function to wrap and indent text
-wrap_text() {
-    local text="$1"
-    local indent="$2"
-    echo "$text" | fold -s -w 80 | awk -v indent="$indent" '{printf "%s%s\n", indent, $0}'
-}
-
-wrap_text_2() {
-    local text="$1"
-    echo "$text" | fold -s -w 100
-}
-
-return_to_menu() {
-    clear
-    display_menu
-}
-
-#==========================
-# INSTALL APPS
-#==========================
-
-# Function to check and install a package
-check_and_install() {
-    if ! command -v $1 &> /dev/null
-    then
-        echo "$1 could not be found"
-        echo "⏳ Installing $1..."
-        su -c "apt install $1 -y"
-    else
-        :
-    fi
-}
-
-#==========================
-# CHECK UPDATES
-#==========================
-
-# Function to check for newer script version
-check_for_updates() {
-    local GITHUB_RAW_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/qone.sh"
-    local LATEST_VERSION
-    LATEST_VERSION=$(curl -sS "$GITHUB_RAW_URL" | grep 'SCRIPT_VERSION=' | head -1 | cut -d'"' -f2)
-    
-    if [ $? -ne 0 ] || [ -z "$LATEST_VERSION" ]; then
-        echo "Failed to check for updates. Continuing with current version."
-        return 1
-    fi
-    
-    if [ "$SCRIPT_VERSION" != "$LATEST_VERSION" ]; then
-        echo "New version available. Attempting update..."
-        if curl -sS -o ~/qone_new.sh "$GITHUB_RAW_URL"; then
-            chmod +x ~/qone_new.sh
-            mv ~/qone_new.sh ~/qone.sh
-            echo "✅ New version ($LATEST_VERSION) installed. Restarting script..."
-            exec ~/qone.sh
-        else
-            echo "Error: Failed to download the new version. Update aborted."
-            return 1
-        fi
-    else
-        echo "Current version is up to date."
-    fi
-}
-
-#==========================
-# ADD ALIASES
-#==========================
-
-setup_aliases() {
-    SCRIPTS_DIR="$HOME/scripts"
-    ALIAS_MARKER_FILE="$SCRIPTS_DIR/.q1_alias_added"
-
-    # Ensure the scripts directory exists
-    mkdir -p "$SCRIPTS_DIR"
-
-    if [ ! -f "$ALIAS_MARKER_FILE" ]; then
-        echo "⌛️ Setting up aliases..."
-
-        # Remove old alias block (from old script versions)
-        sed -i '/=== qone.sh setup ===/,/=== end qone.sh setup ===/d' "$HOME/.bashrc"
-
-        # Remove new alias block (from newer script versions)
-        sed -i '/=== qone.sh aliases ===/,/=== end qone.sh aliases ===/d' "$HOME/.bashrc"
-
-        # Add the new alias setup
-        cat << 'EOF' >> "$HOME/.bashrc"
-
-# === qone.sh aliases ===
-# The following lines are added to create aliases for qone.sh
-alias qone='~/qone.sh'
-alias q1='~/qone.sh'
-# === end qone.sh aliases ===
-EOF
-
-        # Create marker file to prevent redundant setup
-        touch "$ALIAS_MARKER_FILE"
-        
-        # Source .bashrc to make sure aliases are available immediately
-        if [ -n "$BASH_VERSION" ]; then
-            source "$HOME/.bashrc"
-            echo "Aliases 'q1' and 'qone' are now active."
-        else
-            echo "Please run 'source ~/.bashrc' or restart your terminal to use the 'q1' and 'qone' commands."
-        fi
-    else
-        echo "Aliases are already set up."
-    fi
-}
-
-
-#=============================
-# VARIABLES
-#=============================
-
-#Reload menu
-REDRAW_MENU=true
-
-# Service file path
-SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
-
-# Common message for missing service file
-MISSING_SERVICE_MSG="⚠️ Your service file does not exist. Looks like you do not have a node running as a service yet!"
-
-INSTALLATION_DIR="$HOME/ceremonyclient"  # Default installation directory
-NODE_DIR="${INSTALLATION_DIR}/node"
-CLIENT_DIR="${INSTALLATION_DIR}/client"
-
-
-# Set the node directory
-NODE_DIR="$HOME/ceremonyclient/node"
-
-# Function to find the latest node binary
-find_node_binary() {
-    if [ -d "$NODE_DIR" ]; then
-        find "$NODE_DIR" -name "node-*" -type f -executable 2>/dev/null | sort -V | tail -n 1 | xargs -r basename
-    else
-        echo ""
-    fi
-}
-
-# Find the latest node binary
-NODE_BINARY=$(find_node_binary)
-
-# URLs for scripts
-PREREQUISITES_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/server_setup.sh"
-NODE_INSTALL_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/master/qnode_service_installer.sh"
-QCLIENT_INSTALL_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qclient_install.sh"
-GRPCURL_CONFIG_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/tools/qnode_gRPC_calls_setup.sh"
-NODE_UPDATE_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/master/qnode_service_update.sh"
-#PEER_MANIFEST_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/tools/qnode_peermanifest_checker.sh"
-#CHECK_VISIBILITY_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/master/tools/qnode_visibility_check.sh"
-SYSTEM_CLEANER_URL="https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/tools/qnode_system_cleanup.sh"
-BACKUP_STORJ_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_backup_storj.sh"
-BACKUP_RESTORE_STORJ_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_backup_restore_storj.sh"
-BALANCE_LOG_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_balance_checker_installer.sh"
-TEST_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/test/test_script.sh"
-QCLIENT_ACTIONS_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/tools/qclient_actions.sh"
-AUTOUPDATE_SETUP_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_autoupdate_setup.sh"
 
 #=====================
 # MENU options functions
@@ -664,7 +610,6 @@ node_status() {
     fi
 }
 
-
 # peer_manifest() {
 #     echo "⌛️  Checking peer manifest (Difficulty metric)..."
 #     curl -sSL "$PEER_MANIFEST_URL" | bash
@@ -683,6 +628,7 @@ node_status() {
 #         echo
 #     fi
 # }
+
 
 best_providers() {
     wrap_text "$best_providers_message"
@@ -714,6 +660,132 @@ echo "⌛️   Running test script..."
     wget --no-cache -O - "$TEST_URL" | bash
 }
 
+
+#==========================
+# CHECK UPDATES
+#==========================
+
+# Function to check for newer script version
+check_for_updates() {
+    local GITHUB_RAW_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/qone.sh"
+    local LATEST_VERSION
+    LATEST_VERSION=$(curl -sS "$GITHUB_RAW_URL" | grep 'SCRIPT_VERSION=' | head -1 | cut -d'"' -f2)
+    
+    if [ $? -ne 0 ] || [ -z "$LATEST_VERSION" ]; then
+        echo "Failed to check for updates. Continuing with current version."
+        return 1
+    fi
+    
+    if [ "$SCRIPT_VERSION" != "$LATEST_VERSION" ]; then
+        echo "New version available. Attempting update..."
+        if curl -sS -o ~/qone_new.sh "$GITHUB_RAW_URL"; then
+            chmod +x ~/qone_new.sh
+            mv ~/qone_new.sh ~/qone.sh
+            echo "✅ New version ($LATEST_VERSION) installed. Restarting script..."
+            exec ~/qone.sh
+        else
+            echo "Error: Failed to download the new version. Update aborted."
+            return 1
+        fi
+    else
+        echo "Current version is up to date."
+    fi
+}
+
+#==========================
+# ADD ALIASES
+#==========================
+
+setup_aliases() {
+    SCRIPTS_DIR="$HOME/scripts"
+    ALIAS_MARKER_FILE="$SCRIPTS_DIR/.q1_alias_added"
+
+    # Ensure the scripts directory exists
+    mkdir -p "$SCRIPTS_DIR"
+
+    if [ ! -f "$ALIAS_MARKER_FILE" ]; then
+        echo "⌛️ Setting up aliases..."
+
+        # Remove old alias block (from old script versions)
+        sed -i '/=== qone.sh setup ===/,/=== end qone.sh setup ===/d' "$HOME/.bashrc"
+
+        # Remove new alias block (from newer script versions)
+        sed -i '/=== qone.sh aliases ===/,/=== end qone.sh aliases ===/d' "$HOME/.bashrc"
+
+        # Add the new alias setup
+        cat << 'EOF' >> "$HOME/.bashrc"
+
+# === qone.sh aliases ===
+# The following lines are added to create aliases for qone.sh
+alias qone='~/qone.sh'
+alias q1='~/qone.sh'
+# === end qone.sh aliases ===
+EOF
+
+        # Create marker file to prevent redundant setup
+        touch "$ALIAS_MARKER_FILE"
+        
+        # Source .bashrc to make sure aliases are available immediately
+        if [ -n "$BASH_VERSION" ]; then
+            source "$HOME/.bashrc"
+            echo "Aliases 'q1' and 'qone' are now active."
+        else
+            echo "Please run 'source ~/.bashrc' or restart your terminal to use the 'q1' and 'qone' commands."
+        fi
+    else
+        echo "Aliases are already set up."
+    fi
+}
+
+
+#=============================
+# VARIABLES
+#=============================
+
+#Reload menu
+REDRAW_MENU=true
+
+# Service file path
+SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
+
+# Common message for missing service file
+MISSING_SERVICE_MSG="⚠️ Your service file does not exist. Looks like you do not have a node running as a service yet!"
+
+INSTALLATION_DIR="$HOME/ceremonyclient"  # Default installation directory
+NODE_DIR="${INSTALLATION_DIR}/node"
+CLIENT_DIR="${INSTALLATION_DIR}/client"
+
+
+# Set the node directory
+NODE_DIR="$HOME/ceremonyclient/node"
+
+# Function to find the latest node binary
+find_node_binary() {
+    if [ -d "$NODE_DIR" ]; then
+        find "$NODE_DIR" -name "node-*" -type f -executable 2>/dev/null | sort -V | tail -n 1 | xargs -r basename
+    else
+        echo ""
+    fi
+}
+
+# Find the latest node binary
+NODE_BINARY=$(find_node_binary)
+
+# URLs for scripts
+PREREQUISITES_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/server_setup.sh"
+NODE_INSTALL_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/master/qnode_service_installer.sh"
+QCLIENT_INSTALL_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qclient_install.sh"
+GRPCURL_CONFIG_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/tools/qnode_gRPC_calls_setup.sh"
+NODE_UPDATE_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/master/qnode_service_update.sh"
+#PEER_MANIFEST_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/tools/qnode_peermanifest_checker.sh"
+#CHECK_VISIBILITY_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/master/tools/qnode_visibility_check.sh"
+SYSTEM_CLEANER_URL="https://raw.githubusercontent.com/lamat1111/quilibrium-node-auto-installer/master/tools/qnode_system_cleanup.sh"
+BACKUP_STORJ_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_backup_storj.sh"
+BACKUP_RESTORE_STORJ_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_backup_restore_storj.sh"
+BALANCE_LOG_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_balance_checker_installer.sh"
+TEST_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/test/test_script.sh"
+QCLIENT_ACTIONS_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/tools/qclient_actions.sh"
+AUTOUPDATE_SETUP_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_autoupdate_setup.sh"
 
 #=====================
 # Autoupdate Toggle 
@@ -874,7 +946,6 @@ fresh_check() {
 #=====================
 
 # Function to edit .bashrc
-# Function to edit .bashrc
 edit_bashrc() {
     local action=$1
     local bashrc_file="$HOME/.bashrc"
@@ -966,173 +1037,85 @@ handle_menu_autoload() {
     fi
 }
 
-#=====================
-# Menu interface
-#=====================
+#==========================
+# Utility functions
+#==========================
 
-display_menu() {
-    clear
-    source ~/.bashrc
-    cat << EOF
-
-                    Q1Q1Q1\    Q1\   
-                   Q1  __Q1\ Q1Q1 |  
-                   Q1 |  Q1 |\_Q1 |  
-                   Q1 |  Q1 |  Q1 |  
-                   Q1 |  Q1 |  Q1 |  
-                   Q1  Q1Q1 |  Q1 |  
-                   \Q1Q1Q1 / Q1Q1Q1\ 
-                    \___Q1Q\ \______|  QUILIBRIUM.ONE
-                        \___|        
-                              
-==================================================================
-////////////////// Q1 QUICKSTART MENU - $SCRIPT_VERSION ////////////////////
-==================================================================
-             Node guide: https://docs.quilibrium.one
-------------------------------------------------------------------
-
-EOF
-
-    # Perform a fresh check only if the parameter is not "skip_check"
-    if [ "$1" != "skip_check" ]; then
-        while IFS= read -r line; do
-            if [[ $line == *"Node installed:"* ]]; then
-                NODE_INSTALLED=${line#*: }
-            elif [[ $line == *"Current Node version:"* ]]; then
-                CURRENT_NODE_VERSION=${line#*: }
-            elif [[ $line == *"Latest Node version:"* ]]; then
-                LATEST_NODE_VERSION=${line#*: }
-            elif [[ $line == *"Qclient installed:"* ]]; then
-                QCLIENT_INSTALLED=${line#*: }
-            elif [[ $line == *"Current Qclient version:"* ]]; then
-                CURRENT_QCLIENT_VERSION=${line#*: }
-            elif [[ $line == *"Latest Qclient version:"* ]]; then
-                LATEST_QCLIENT_VERSION=${line#*: }
-            fi
-        done < <(fresh_check)
-    fi
-
-    if [ "$NODE_INSTALLED" = "Yes" ]; then
-        display_version_status "$CURRENT_NODE_VERSION" "$LATEST_NODE_VERSION" "Node"
+# Function to check and install a package
+check_and_install() {
+    if ! command -v $1 &> /dev/null
+    then
+        echo "$1 could not be found"
+        echo "⏳ Installing $1..."
+        su -c "apt install $1 -y"
     else
-        echo -e "🔴 ${RED}Node not installed${NC}"
+        :
     fi
+}
 
-    if [ "$QCLIENT_INSTALLED" = "Yes" ]; then
-        display_version_status "$CURRENT_QCLIENT_VERSION" "$LATEST_QCLIENT_VERSION" "Qclient"
-    else
-        echo -e "🔴 ${RED}Qclient not installed${NC}"
-    fi
-    # Autoudpate Toggle
+# Handle "press any key" prompts
+press_any_key() {
     echo
-    echo -e "Auto-update: $([ "$(check_autoupdate_status)" = "ON" ] && echo "🟢" || echo "🔴") $(check_autoupdate_status)"
+    read -n 1 -s -r -p "Press any key to continue..."
+    echo
+    # Instead of setting REDRAW_MENU, we'll call display_menu directly
+    display_menu "skip_check"
+}
 
-    # Display installation instructions only if node is not installed
-    if [ "$NODE_INSTALLED" != "Yes" ]; then
-        cat << EOF
+prompt_return_to_menu() {
+    echo -e "\n\n"  # Add two empty lines for readability
+    echo "-------------------------------------"
+    read -rp "Go back to the main menu? (y/n): " return_to_menu
+    case $return_to_menu in
+        [Yy]) 
+            if [ "$1" != "skip_check" ]; then
+                REDRAW_MENU=true
+            fi
+            display_menu "$1"
+            ;;
+        *) 
+            echo "Exiting the script..."
+            exit 0
+            ;;
+    esac
+}
 
-HOW TO INSTALL A NEW NODE?
-Choose option 1, reboot and then choose 2.
-Let your node run for 30 minutes, then choose option 3. Done!
 
-1) Prepare your server  
-2) Install node
-3) Set up gRPCurl   
-
-EOF
-    fi
-
+confirm_action() {
     cat << EOF
------------------------------------------------------------------
-3)  Set up gRPCurl              11) Balance log
-4)  Node Log                    12) Backup your node
-5)  Update node                 13) Restore backup
-6)  Stop node                                
-7)  Start node                  14) Qclient install/update   
-8)  Restart node                15) Qclient actions (BETA)
-9)  Node info & balance         
-10) Node status                 16) Auto-update ON/OFF                              
------------------------------------------------------------------
-B) ⭐ Best server providers     A) Menu autoload on login                            
-D) 💜 Donations                 H) Help
------------------------------------------------------------------    
-E) Exit                         X) Disclaimer
- 
-                        
+
+$1
+
+✅ Do you want to proceed? (y/n):
 EOF
+    read -p "> " confirm
+    if [[ "$confirm" =~ ^[Yy]$ ]]; then
+        $3
+        return 0
+    else
+        return 1
+    fi
+}
+
+# Function to wrap and indent text
+wrap_text() {
+    local text="$1"
+    local indent="$2"
+    echo "$text" | fold -s -w 80 | awk -v indent="$indent" '{printf "%s%s\n", indent, $0}'
 }
 
 
 #=====================
-# Initial Setup and Checks
+# Run everything
 #=====================
 
-# Initial setup function
-perform_initial_setup() {
-    check_and_install sudo
-    check_and_install curl
-    #check_for_updates
-    setup_aliases
-}
-
-#=====================
-# Main Script Execution
-#=====================
+# Initial setup
+check_and_install sudo
+check_and_install curl
+#check_for_updates
+setup_aliases
 
 read -t 0.1 -n 1000 discard  # Clear any pending input
-
-# main menu loop
-
-main() {
-    perform_initial_setup
-    while true; do
-        if $REDRAW_MENU; then
-            display_menu
-            REDRAW_MENU=false
-        fi
-
-        read -rp "Enter your choice: " choice
-        
-        case $choice in
-            1) confirm_action "$(wrap_text "$prepare_server_message" "")" "Prepare your server" install_prerequisites && prompt_return_to_menu "skip_check" ;;
-            2) 
-                if confirm_action "$(wrap_text "$install_node_message" "")" "Install node" install_node; then
-                    prompt_return_to_menu
-                fi
-                ;;
-            3) confirm_action "$(wrap_text "$setup_grpcurl_message" "")" "Set up gRPCurl" configure_grpcurl && prompt_return_to_menu "skip_check" ;;
-            4) node_logs; press_any_key ;;
-            5) 
-                if confirm_action "$(wrap_text "$update_node_message" "")" "Update node" update_node; then
-                    prompt_return_to_menu
-                fi
-                ;;
-            6) stop_node; press_any_key ;;  
-            7) start_node; press_any_key ;;
-            8) restart_node; press_any_key ;;
-            9) node_info; press_any_key ;;
-            10) node_status; press_any_key ;;
-            11) confirm_action "$(wrap_text "$balance_log_message" "")" "alance log" balance_log && prompt_return_to_menu "skip_check" ;;
-            12) confirm_action "$(wrap_text "$backup_storj_message" "")" "Backup your node on StorJ" backup_storj && prompt_return_to_menu "skip_check" ;;
-            13) confirm_action "$(wrap_text "$backup_restore_storj_message" "")" "Restore a node backup from StorJ" backup_restore_storj && prompt_return_to_menu "skip_check" ;;
-            #14) system_cleaner && prompt_return_to_menu "skip_check" ;;
-            14) 
-                if confirm_action "$(wrap_text "$qclient_install_message" "")" "qClient install" qclient_install; then
-                    prompt_return_to_menu
-                fi
-                ;;
-            15) qclient_actions; press_any_key ;;
-            16) toggle_autoupdate; press_any_key ;;
-            [bB]) best_providers; press_any_key ;;
-            [dD]) donations; press_any_key ;;
-            [eE]) exit ;;
-            [aA]) handle_menu_autoload; press_any_key ;;
-            [xX]) disclaimer; press_any_key ;;
-            [hH]) help_message; press_any_key ;;
-            *) echo "Invalid option, please try again."; press_any_key ;;
-        esac
-    done
-}
 
 main
 
