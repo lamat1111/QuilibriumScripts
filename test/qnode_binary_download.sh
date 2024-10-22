@@ -59,10 +59,37 @@ fi
 echo "Stopping ceremonyclient service..."
 systemctl stop ceremonyclient || error_exit "Failed to stop ceremonyclient service"
 
-# Backup .config directory
-echo "Backing up your node/.config directory..."
+# Backup .config directory with progress and error checking
+echo "Starting backup of .config directory..."
 if [ -d "$NODE_DIR/.config" ]; then
-    cp -rp "$NODE_DIR/.config" "$NODE_DIR/.config.bak" || error_exit "Backup failed"
+    # Create a temporary backup first
+    echo "Creating temporary backup..."
+    rsync -av --progress "$NODE_DIR/.config/" "$NODE_DIR/.config.bak.tmp/" || {
+        echo "Error: Temporary backup failed"
+        rm -rf "$NODE_DIR/.config.bak.tmp"  # Clean up failed backup
+        exit 1
+    }
+    
+    # If temporary backup succeeded, remove old backup and move new one into place
+    echo "Finalizing backup..."
+    if [ -d "$NODE_DIR/.config.bak" ]; then
+        rm -rf "$NODE_DIR/.config.bak" || {
+            echo "Error: Could not remove old backup"
+            rm -rf "$NODE_DIR/.config.bak.tmp"
+            exit 1
+        }
+    fi
+    
+    mv "$NODE_DIR/.config.bak.tmp" "$NODE_DIR/.config.bak" || {
+        echo "Error: Could not finalize backup"
+        rm -rf "$NODE_DIR/.config.bak.tmp"
+        exit 1
+    }
+    
+    echo "Backup completed successfully"
+else
+    echo "Error: .config directory not found at $NODE_DIR/.config"
+    exit 1
 fi
 
 # Change to the specified directory
