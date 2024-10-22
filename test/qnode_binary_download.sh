@@ -32,8 +32,10 @@ echo "The update will be performed in: $NODE_DIR"
 echo "New binary will be: $NODE_BINARY"
 echo
 echo "==============================================="
-echo "ONLY COMPATIBLE WITH: OS:LINUX ARCH:AMD64 / UBUNTU 22.x or 24.x"
-echo "NOT COMPATIBLE WITH NODE CLUSTERS"
+echo "Compatibility:"
+echo "only compatible with nodes that are running via service file"
+echo "only compatible with: os:linux arch:amd64 / ubuntu 22.x or 24.x"
+echo "not compatible with node clusters"
 
 # Ask for confirmation
 read -p "Do you want to proceed with the update? (y/n) " -n 1 -r
@@ -42,8 +44,20 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     echo "Update cancelled."
     exit 1
 fi
+
 # Verify directory exists
 [ -d "$NODE_DIR" ] || error_exit "Directory $NODE_DIR does not exist"
+
+# Check if service file exists
+if [ ! -f "/lib/systemd/system/ceremonyclient.service" ]; then
+    echo "Error: ceremonyclient service file not found."
+    echo "This script is only compatible with nodes running via service file."
+    exit 1
+fi
+
+# Stop the ceremonyclient service
+echo "Stopping ceremonyclient service..."
+systemctl stop ceremonyclient || error_exit "Failed to stop ceremonyclient service"
 
 # Backup .config directory
 echo "Backing up your node/.config directory..."
@@ -88,10 +102,6 @@ echo "File download process completed."
 # Make the new node executable
 echo "Making the new node executable..."
 chmod +x "$NODE_BINARY" || error_exit "Failed to make node executable"
-
-# Stop the ceremonyclient service
-echo "Stopping ceremonyclient service..."
-systemctl stop ceremonyclient || error_exit "Failed to stop ceremonyclient service"
 
 # Update the service file
 echo "Updating ceremonyclient service file..."
