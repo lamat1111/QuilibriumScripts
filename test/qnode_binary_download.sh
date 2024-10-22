@@ -5,6 +5,9 @@
 # Set the version number as a variable
 VERSION="1.4.21.1"
 
+echo "BAcking up your node/.config directory..."
+mv -rp $HOME/ceremonyclient/node/.config $HOME/ceremonyclient/node/.config.bak
+
 # Change to the specified directory
 echo "Changing to the ceremonyclient/node directory..."
 cd $HOME/ceremonyclient/node || { echo "Failed to change directory. Exiting."; exit 1; }
@@ -15,6 +18,20 @@ echo "Downloading new node files..."
 # Main files to download
 main_files=(
     "node-$VERSION-linux-amd64"
+    "node-$VERSION-linux-amd64.dgst"
+)
+
+# Signature files to download
+sig_files=(
+    "node-$VERSION-linux-amd64.dgst.sig.1"
+    "node-$VERSION-linux-amd64.dgst.sig.2"
+    "node-$VERSION-linux-amd64.dgst.sig.3"
+    "node-$VERSION-linux-amd64.dgst.sig.8"
+    "node-$VERSION-linux-amd64.dgst.sig.9"
+    "node-$VERSION-linux-amd64.dgst.sig.13"
+    "node-$VERSION-linux-amd64.dgst.sig.15"
+    "node-$VERSION-linux-amd64.dgst.sig.16"
+    "node-$VERSION-linux-amd64.dgst.sig.17"
 )
 
 # Download main files
@@ -39,7 +56,7 @@ sudo service ceremonyclient stop || { echo "Failed to stop ceremonyclient servic
 
 # Update the service file
 echo "Updating ceremonyclient service file..."
-sudo sed -i "s|^ExecStart=.*|ExecStart=/root/ceremonyclient/node/node-$VERSION-linux-amd64 --signature-check=false|" /lib/systemd/system/ceremonyclient.service || { echo "Failed to update service file. Exiting."; exit 1; }
+sudo sed -i "s|^ExecStart=.*|ExecStart=/root/ceremonyclient/node/node-$VERSION-linux-amd64|" /lib/systemd/system/ceremonyclient.service || { echo "Failed to update service file. Exiting."; exit 1; }
 
 # Reload systemd
 echo "Reloading systemd..."
