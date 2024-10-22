@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.2.3"
+SCRIPT_VERSION="1.2.4"
 
 # Define the script path
 SCRIPT_PATH="${BASH_SOURCE[0]}"
@@ -34,9 +34,12 @@ display_menu() {
 4) Accept transaction
 5) Reject transaction
 
-6) Perform mutual transfer 
+6) Perform mutual transfer
+-----------------------------------------------------------------
+B) ⭐ Best server providers     X) Disclaimer                           
+D) 💜 Donations                 S) Security settings
 -----------------------------------------------------------------    
-E) Exit                                      S) Security settings
+E) Exit
 
 EOF
 }
@@ -60,6 +63,9 @@ main() {
             5) reject_transaction; prompt_return_to_menu || break ;;
             6) mutual_transfer; prompt_return_to_menu || break ;;
             [sS]) security_settings; prompt_return_to_menu || break ;;
+            [bB]) best_providers; prompt_return_to_menu || break ;;
+            [dD]) donations; prompt_return_to_menu || break ;;
+            [xX]) disclaimer; prompt_return_to_menu || break ;;
             [eE]) echo ; break ;;
             *) echo "Invalid option, please try again."; prompt_return_to_menu || break ;;
         esac
@@ -229,16 +235,57 @@ mutual_transfer() {
     esac
 }
 
+donations() {
+    echo '
+
+Donations
+=========
+
+Quilbrium.one is a one-man volunteer effort.
+If you would like to chip in some financial help, thank you!
+
+You can send ERC-20 tokens at this address:
+0x0fd383A1cfbcf4d1F493Dd71b798ebca89e8a013
+
+Or visit this page: https://iri.quest/q-donations
+'
+}
+
+disclaimer() {
+    echo '
+
+Disclaimer
+==========
+
+This tool and all related scripts are unofficial and are being shared as-is.
+I take no responsibility for potential bugs or any misuse of the available options. 
+
+All scripts are open source; feel free to inspect them before use.
+Repo: https://github.com/lamat1111/QuilibriumScripts
+'
+}
+
+best_providers() {
+    echo '
+
+Best Server Providers
+====================
+
+Check out the best server providers for your node
+at ★ https://iri.quest/q-best-providers ★
+
+Avoid using providers that specifically ban crypto and mining.
+'
+}
 
 security_settings() {
-    echo
-    echo "Security settings"
-    echo "================="
-    
-    cat << EOF
+    echo '
+
+Security Settings
+================
 
 This script performs QUIL transactions. You can inspect the source code by running:
-cat "$SCRIPT_PATH"
+cat "'$SCRIPT_PATH'"
 
 The script also auto-updates to the latest version automatically.
 If you want to disable auto-updates, comment out the line "check_for_updates"
@@ -247,10 +294,8 @@ in the script itself.
 DISCLAIMER:
 The author assumes no responsibility for any QUIL loss due to misuse of this script.
 Use this script at your own risk and always verify transactions before confirming them.
-
-EOF
+'
 }
-
 
 #=====================
 # Qclient binary determination
