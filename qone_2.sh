@@ -174,7 +174,9 @@ already prepared you server via Step 1.
 '
 
 update_node_message='
-This action will update your Qnode & Qclient.
+⚠️ It is strongly advised to backup your "node/.config" folder before updating the node
+
+This action will update your Node & Qclient.
 Only use this if you have installed the node via the guide at 
 https://docs.quilibrium.one/
 '
