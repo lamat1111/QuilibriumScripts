@@ -423,12 +423,15 @@ qclient_install() {
 }
 
 qclient_actions() {
+    clear  # This clears everything, including the main menu
+    
     if [ ! -f ~/scripts/qclient_actions.sh ]; then
         mkdir -p ~/scripts
         curl -sSL "$QCLIENT_ACTIONS_URL" -o ~/scripts/qclient_actions.sh
         chmod +x ~/scripts/qclient_actions.sh
     fi
-    ~/scripts/qclient_actions.sh
+    
+    ~/scripts/qclient_actions.sh # This runs in the cleared screen
     return $?
 }
 
