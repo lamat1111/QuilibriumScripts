@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.1.2"
+SCRIPT_VERSION="2.1.3"
 
 #==========================
 # INSTALL APPS
@@ -15,7 +15,7 @@ check_and_install() {
         echo "⏳ Installing $1..."
         su -c "apt install $1 -y"
     else
-        # echo "✅ $1 is installed"
+       : # echo "✅ $1 is installed"
     fi
 }
 
