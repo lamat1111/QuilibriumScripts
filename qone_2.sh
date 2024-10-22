@@ -818,17 +818,8 @@ CLIENT_DIR="${INSTALLATION_DIR}/client"
 # Set the node directory
 NODE_DIR="$HOME/ceremonyclient/node"
 
-# Function to find the latest node binary
-find_node_binary() {
-    if [ -d "$NODE_DIR" ]; then
-        find "$NODE_DIR" -name "node-*" -type f -executable 2>/dev/null | sort -V | tail -n 1 | xargs -r basename
-    else
-        echo ""
-    fi
-}
-
-# Find the latest node binary
-NODE_BINARY=$(find_node_binary)
+# Find the latest local node binary
+NODE_BINARY=$(find "${NODE_DIR}" -name "node-*" ! -name "*.dgst" ! -name "*.sig*" -type f -executable 2>/dev/null | sort -V | tail -n 1)
 
 # URLs for scripts
 PREREQUISITES_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/server_setup.sh"
