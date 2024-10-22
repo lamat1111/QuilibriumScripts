@@ -15,7 +15,7 @@ check_and_install() {
         echo "⏳ Installing $1..."
         su -c "apt install $1 -y"
     else
-        echo "✅ $1 is installed"
+        # echo "✅ $1 is installed"
     fi
 }
 
@@ -32,7 +32,6 @@ upgrade_qone() {
     if ! grep -Fxq "# === qone.sh setup ===" ~/.bashrc; then
         # Run the setup script
         echo "⌛️ Upgrading the qone.sh script... just one minute!"
-        sleep 3
         echo "ℹ️ Downloading qone_setup.sh..."
         if ! wget -qO- https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/qone_setup.sh | bash; then
             echo "❌ Error: Failed to download and execute qone-setup.sh"
@@ -46,7 +45,7 @@ upgrade_qone() {
             sleep 3
         fi
     else
-        echo "✅ qone.sh is already upgraded."
+        # echo "✅ qone.sh is already upgraded."
     fi
 }
 
@@ -62,18 +61,18 @@ check_for_updates() {
     fi
     
     if [ "$SCRIPT_VERSION" != "$LATEST_VERSION" ]; then
-        echo "New version available. Attempting update..."
+        # echo "New version available. Attempting update..."
         if curl -sS -o ~/qone_new.sh "$GITHUB_RAW_URL"; then
             chmod +x ~/qone_new.sh
             mv ~/qone_new.sh ~/qone.sh
-            echo "✅ New version ($LATEST_VERSION) installed. Restarting script..."
+            # echo "✅ New version ($LATEST_VERSION) installed. Restarting script..."
             exec ~/qone.sh
         else
             echo "Error: Failed to download the new version. Update aborted."
             return 1
         fi
     else
-        echo "Current version is up to date."
+        : # echo "Current version is up to date."
     fi
 }
 
