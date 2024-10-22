@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.2.6"
+SCRIPT_VERSION="1.2.7"
 
 # Define the script path
 SCRIPT_PATH=$HOME/scripts
@@ -84,14 +84,12 @@ main() {
 QCLIENT_DIR="$HOME/ceremonyclient/client"
 CONFIG_FLAG="--config $HOME/ceremonyclient/node/.config"
 
-QCLIENT_EXEC=$(find "$QCLIENT_DIR" -name "qclient-*-$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')" -type f -executable | sort -V | tail -n1)
+QCLIENT_EXEC=$(find "$QCLIENT_DIR" -name "qclient-*" ! -name "*.dgst" ! -name "*.sig*" -type f -executable 2>/dev/null | sort -V | tail -n 1)
 
 if [ -z "$QCLIENT_EXEC" ]; then
     echo "❌ No matching qclient binary found in $QCLIENT_DIR"
     exit 1
 fi
-
-
 
 #=====================
 # Menu functions
