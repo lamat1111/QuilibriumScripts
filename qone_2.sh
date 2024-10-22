@@ -541,30 +541,11 @@ backup_restore_storj() {
     return $?
 }
 
-node_info() {
-    if [ ! -f "$SERVICE_FILE" ]; then
-        echo "$MISSING_SERVICE_MSG"
-    elif [ -z "$NODE_BINARY" ]; then
-        echo "Error: No node binary found. Is the node installed correctly?"
-    else
-        echo
-        echo "⌛️  Displaying node info..."
-        echo "If this doesn't work you can try the direct commands: https://iri.quest/q-node-info"
-        echo
-        if [ -d "$NODE_DIR" ]; then
-            cd "$NODE_DIR" && ./"$NODE_BINARY" -node-info
-        else
-            echo "Error: Node directory not found. Is the node installed correctly?"
-        fi
-        echo
-    fi
-}
-
 quil_balance() {
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
         return 1
-    elif [ -z "$NODE_BINARY" ]; then
+    elif [ -z "$NODE_EXEC" ]; then
         echo "Error: No node binary found. Is the node installed correctly?"
         return 1
     else
@@ -574,12 +555,31 @@ quil_balance() {
         echo "If it still doesn't work you can try the direct commands: https://iri.quest/q-node-info"
         echo
         if [ -d "$NODE_DIR" ]; then
-            cd "$NODE_DIR" && ./"$NODE_BINARY" -balance
+            "$NODE_EXEC" -balance
         else
             echo "Error: Node directory not found. Is the node installed correctly?"
         fi
         echo
         return 0
+    fi
+}
+
+node_info() {
+    if [ ! -f "$SERVICE_FILE" ]; then
+        echo "$MISSING_SERVICE_MSG"
+    elif [ -z "$NODE_EXEC" ]; then
+        echo "Error: No node binary found. Is the node installed correctly?"
+    else
+        echo
+        echo "⌛️  Displaying node info..."
+        echo "If this doesn't work you can try the direct commands: https://iri.quest/q-node-info"
+        echo
+        if [ -d "$NODE_DIR" ]; then
+            "$NODE_EXEC" -node-info
+        else
+            echo "Error: Node directory not found. Is the node installed correctly?"
+        fi
+        echo
     fi
 }
 
@@ -814,12 +814,9 @@ INSTALLATION_DIR="$HOME/ceremonyclient"  # Default installation directory
 NODE_DIR="${INSTALLATION_DIR}/node"
 CLIENT_DIR="${INSTALLATION_DIR}/client"
 
-
-# Set the node directory
-NODE_DIR="$HOME/ceremonyclient/node"
-
-# Find the latest local node binary
-NODE_BINARY=$(find "${NODE_DIR}" -name "node-*" ! -name "*.dgst" ! -name "*.sig*" -type f -executable 2>/dev/null | sort -V | tail -n 1)
+# Find the latest executables
+NODE_EXEC=$(find "${NODE_DIR}" -name "node-*" ! -name "*.dgst" ! -name "*.sig*" -type f -executable 2>/dev/null | sort -V | tail -n 1)
+QCLIENT_EXEC=$(find "${CLIENT_DIR}" -name "qclient-*" -type f -executable 2>/dev/null | sort -V | tail -n 1)
 
 # URLs for scripts
 PREREQUISITES_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/server_setup.sh"
@@ -957,17 +954,40 @@ display_version_status() {
     fi
 }
 
+# Put these at the top with other functions
+get_latest_node_version() {
+    curl -s https://releases.quilibrium.com/release | grep -oP 'node-\K[0-9]+(\.[0-9]+){2,3}' | sort -V | tail -n 1
+}
+
+get_current_node_version() {
+    basename "$NODE_EXEC" | grep -oP 'node-\K[0-9]+(\.[0-9]+){2,3}'
+}
+
+# Same for qclient
+get_latest_qclient_version() {
+    curl -s https://releases.quilibrium.com/qclient-release | grep -oP 'qclient-\K[0-9]+(\.[0-9]+){2,3}' | sort -V | tail -n 1
+}
+
+get_current_qclient_version() {
+    basename "$QCLIENT_EXEC" | grep -oP 'qclient-\K[0-9]+(\.[0-9]+){2,3}'
+}
+
 # Function to perform a fresh check of installations and versions
 fresh_check() {
     # Check node installation and version
     if [ -d "${NODE_DIR}" ]; then
-        NODE_BINARY=$(find "${NODE_DIR}" -name "node-*" -type f -executable 2>/dev/null | sort -V | tail -n 1)
-        if [ -n "$NODE_BINARY" ]; then
-            CURRENT_NODE_VERSION=$(basename "$NODE_BINARY" | grep -oP 'node-\K[0-9]+(\.[0-9]+){2,3}')
-            LATEST_NODE_VERSION=$(curl -s https://releases.quilibrium.com/release | grep -oP 'node-\K[0-9]+(\.[0-9]+){2,3}' | sort -V | tail -n 1)
-            echo "Node installed: Yes"
-            echo "Current Node version: $CURRENT_NODE_VERSION"
-            echo "Latest Node version: $LATEST_NODE_VERSION"
+        if [ -n "$NODE_EXEC" ]; then
+            local current_version="$(get_current_node_version)"
+            local latest_version="$(get_latest_node_version)"
+            if [ $? -eq 0 ] && [ -n "$latest_version" ]; then
+                echo "Node installed: Yes"
+                echo "Current Node version: $current_version"
+                echo "Latest Node version: $latest_version"
+            else
+                echo "Node installed: Yes"
+                echo "Current Node version: $current_version"
+                echo "Latest Node version: Error fetching"
+            fi
         else
             echo "Node installed: Yes, but no executable found"
         fi
@@ -977,13 +997,18 @@ fresh_check() {
 
     # Check qclient installation and version
     if [ -d "${CLIENT_DIR}" ]; then
-        QCLIENT_BINARY=$(find "${CLIENT_DIR}" -name "qclient-*" -type f -executable 2>/dev/null | sort -V | tail -n 1)
-        if [ -n "$QCLIENT_BINARY" ]; then
-            CURRENT_QCLIENT_VERSION=$(basename "$QCLIENT_BINARY" | grep -oP 'qclient-\K[0-9]+(\.[0-9]+){2,3}')
-            LATEST_QCLIENT_VERSION=$(curl -s https://releases.quilibrium.com/qclient-release | grep -oP 'qclient-\K[0-9]+(\.[0-9]+){2,3}' | sort -V | tail -n 1)
-            echo "Qclient installed: Yes"
-            echo "Current Qclient version: $CURRENT_QCLIENT_VERSION"
-            echo "Latest Qclient version: $LATEST_QCLIENT_VERSION"
+        if [ -n "$QCLIENT_EXEC" ]; then
+            local current_qclient="$(get_current_qclient_version)"
+            local latest_qclient="$(get_latest_qclient_version)"
+            if [ $? -eq 0 ] && [ -n "$latest_qclient" ]; then
+                echo "Qclient installed: Yes"
+                echo "Current Qclient version: $current_qclient"
+                echo "Latest Qclient version: $latest_qclient"
+            else
+                echo "Qclient installed: Yes"
+                echo "Current Qclient version: $current_qclient"
+                echo "Latest Qclient version: Error fetching"
+            fi
         else
             echo "Qclient installed: Yes, but no executable found"
         fi
