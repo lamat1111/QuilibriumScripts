@@ -1,10 +1,12 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.2.5"
+SCRIPT_VERSION="1.2.6"
 
 # Define the script path
-SCRIPT_PATH="${BASH_SOURCE[0]}"
+SCRIPT_PATH=$HOME/scripts
+# Or define the absolute script path by following symlinks
+# SCRIPT_PATH="$(readlink -f "${BASH_SOURCE[0]}")"
 
 #=====================
 # Menu interface
@@ -324,13 +326,17 @@ fi
 # One-time alias setup
 #=====================
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Replace the current SCRIPT_DIR definition with:
+SCRIPT_DIR="$HOME/scripts"  # Hardcoded path
+# Or use this more dynamic approach that follows symlinks:
+#SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
+
 ALIAS_MARKER_FILE="$SCRIPT_DIR/.qclient_actions_alias_added"
 
 add_alias_if_needed() {
     if [ ! -f "$ALIAS_MARKER_FILE" ]; then
         local comment_line="# This alias calls the \"qclient actions\" menu by typing \"qclient\""
-        local alias_line="alias qclient='$SCRIPT_DIR/$(basename "${BASH_SOURCE[0]}")'"
+        local alias_line="alias qclient='/root/scripts/$(basename "${BASH_SOURCE[0]}")'"  # Hardcoded path
         if ! grep -q "$alias_line" "$HOME/.bashrc"; then
             echo "" >> "$HOME/.bashrc"  # Add a blank line for better readability
             echo "$comment_line" >> "$HOME/.bashrc"
@@ -348,7 +354,6 @@ add_alias_if_needed() {
         touch "$ALIAS_MARKER_FILE"
     fi
 }
-
 
 #=====================
 # Check for updates
