@@ -141,7 +141,7 @@ main() {
                     prompt_return_to_menu
                 fi
                 ;;
-            15) qclient_actions; press_any_key ;;
+            15) qclient_actions; clear; display_menu "skip_check" ;;
             16) toggle_autoupdate; press_any_key ;;
             [bB]) best_providers; press_any_key ;;
             [dD]) donations; press_any_key ;;
@@ -432,7 +432,14 @@ qclient_actions() {
     fi
     
     ~/scripts/qclient_actions.sh # This runs in the cleared screen
-    return $?
+    local exit_status=$?
+
+    # Only redraw menu if we didn't exit the qclient actions menu
+    if [ $exit_status -eq 0 ]; then
+        clear
+        display_menu "skip_check"
+    fi
+    return $exit_status
 }
 
 system_cleaner() {
