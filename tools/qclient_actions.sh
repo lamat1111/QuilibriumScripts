@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.2.4"
+SCRIPT_VERSION="1.2.5"
 
 # Define the script path
 SCRIPT_PATH="${BASH_SOURCE[0]}"
@@ -62,10 +62,10 @@ main() {
             4) accept_transaction; prompt_return_to_menu || break ;;
             5) reject_transaction; prompt_return_to_menu || break ;;
             6) mutual_transfer; prompt_return_to_menu || break ;;
-            [sS]) security_settings; prompt_return_to_menu || break ;;
-            [bB]) best_providers; prompt_return_to_menu || break ;;
-            [dD]) donations; prompt_return_to_menu || break ;;
-            [xX]) disclaimer; prompt_return_to_menu || break ;;
+            [sS]) security_settings; press_any_key || break ;;
+            [bB]) best_providers; press_any_key || break ;;
+            [dD]) donations; press_any_key || break ;;
+            [xX]) disclaimer; press_any_key || break ;;
             [eE]) echo ; break ;;
             *) echo "Invalid option, please try again."; prompt_return_to_menu || break ;;
         esac
@@ -91,6 +91,14 @@ prompt_return_to_menu() {
             * ) echo "Please answer Y or N." ;;
         esac
     done
+}
+
+# Handle "press any key" prompts
+press_any_key() {
+    echo
+    read -n 1 -s -r -p "Press any key to continue..."
+    echo
+    display_menu
 }
 
 check_balance() {
