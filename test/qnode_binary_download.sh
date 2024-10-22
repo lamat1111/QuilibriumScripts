@@ -91,10 +91,10 @@ sig_files=(
     "$NODE_BINARY.dgst.sig.17"
 )
 
-# Download all files
+# Download all files using curl
 for file in "${main_files[@]}" "${sig_files[@]}"; do
     echo "Downloading $file..."
-    wget -q --show-progress "https://releases.quilibrium.com/$file" || error_exit "Failed to download $file"
+    curl -# -L -o "$file" "https://releases.quilibrium.com/$file" || error_exit "Failed to download $file"
 done
 
 echo "File download process completed."
