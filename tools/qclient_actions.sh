@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.2.2"
+SCRIPT_VERSION="1.2.3"
 
 # Define the script path
 SCRIPT_PATH="${BASH_SOURCE[0]}"
@@ -13,9 +13,20 @@ SCRIPT_PATH="${BASH_SOURCE[0]}"
 display_menu() {
     clear
     cat << EOF
-         
-                    QCLIENT ACTIONS  v $SCRIPT_VERSION
------------------------------------------------------------------
+
+                    Q1Q1Q1\    Q1\   
+                   Q1  __Q1\ Q1Q1 |  
+                   Q1 |  Q1 |\_Q1 |  
+                   Q1 |  Q1 |  Q1 |  
+                   Q1 |  Q1 |  Q1 |  
+                   Q1  Q1Q1 |  Q1 |  
+                   \Q1Q1Q1 / Q1Q1Q1\ 
+                    \___Q1Q\ \______|  QUILIBRIUM.ONE
+                        \___|                        
+
+=================================================================
+////////////////// QCLIENT ACTIONS - $SCRIPT_VERSION /////////////////////
+=================================================================
 1) Check balance / address
 2) Check individual coins
 
