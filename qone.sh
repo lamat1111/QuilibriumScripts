@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.1.1"
+SCRIPT_VERSION="2.1.2"
 
 #==========================
 # INSTALL APPS
@@ -460,6 +460,8 @@ already prepared you server via Step 1.
 '
 
 update_node_message='
+⚠️ It is strongly advised to backup your "node/.config" folder before updating the node
+
 This action will update your Qnode & Qclient.
 Only use this if you have installed the node via the guide at 
 https://docs.quilibrium.one/
