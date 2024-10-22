@@ -78,6 +78,22 @@ main() {
 }
 
 #=====================
+# Qclient binary determination
+#=====================
+
+QCLIENT_DIR="$HOME/ceremonyclient/client"
+CONFIG_FLAG="--config $HOME/ceremonyclient/node/.config"
+
+QCLIENT_EXEC=$(find "$QCLIENT_DIR" -name "qclient-*-$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')" -type f -executable | sort -V | tail -n1)
+
+if [ -z "$QCLIENT_EXEC" ]; then
+    echo "❌ No matching qclient binary found in $QCLIENT_DIR"
+    exit 1
+fi
+
+
+
+#=====================
 # Menu functions
 #=====================
 
@@ -306,20 +322,6 @@ The author assumes no responsibility for any QUIL loss due to misuse of this scr
 Use this script at your own risk and always verify transactions before confirming them.
 '
 }
-
-#=====================
-# Qclient binary determination
-#=====================
-
-QCLIENT_DIR="$HOME/ceremonyclient/client"
-CONFIG_FLAG="--config $HOME/ceremonyclient/node/.config"
-
-QCLIENT_EXEC=$(find "$QCLIENT_DIR" -name "qclient-*-$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')" -type f -executable | sort -V | tail -n1)
-
-if [ -z "$QCLIENT_EXEC" ]; then
-    echo "❌ No matching qclient binary found in $QCLIENT_DIR"
-    exit 1
-fi
 
 
 #=====================
