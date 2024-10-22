@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.2.1"
+SCRIPT_VERSION="1.2.2"
 
 # Define the script path
 SCRIPT_PATH="${BASH_SOURCE[0]}"
@@ -11,6 +11,7 @@ SCRIPT_PATH="${BASH_SOURCE[0]}"
 #=====================
 
 display_menu() {
+    clear
     cat << EOF
          
                     QCLIENT ACTIONS  v $SCRIPT_VERSION
