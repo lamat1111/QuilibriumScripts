@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.1.3"
+SCRIPT_VERSION="2.1.4"
 
 #==========================
 # INSTALL APPS
@@ -45,7 +45,7 @@ upgrade_qone() {
             sleep 3
         fi
     else
-        # echo "✅ qone.sh is already upgraded."
+        : # echo "✅ qone.sh is already upgraded."
     fi
 }
 
