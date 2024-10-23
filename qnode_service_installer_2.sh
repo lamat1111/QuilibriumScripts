@@ -143,7 +143,7 @@ fi
 if [ -z "$QCLIENT_VERSION" ]; then
     QCLIENT_VERSION=$(curl -s "$QCLIENT_RELEASE_URL" | grep -E "^qclient-[0-9]+(\.[0-9]+)*" | sed 's/^qclient-//' | cut -d '-' -f 1 |  head -n 1)
     if [ -z "$QCLIENT_VERSION" ]; then
-        echo "⚠️ Warning: Unable to determinethe latest Qclient release automatically. Continuing without it."
+        echo "⚠️ Warning: Unable to determine the latest Qclient release automatically. Continuing without it."
         echo "The script won't be able to install the Qclient, but it will still install your node."
         echo "You can install the Qclient later manually if you need to."
         echo
