@@ -370,8 +370,7 @@ install_prerequisites() {
     echo
     echo "⌛️ Preparing server with necessary apps and settings..."
     mkdir -p ~/scripts
-    rm -f ~/scripts/server_setup.sh
-    curl -sSL "$PREREQUISITES_URL" -o ~/scripts/server_setup.sh
+    curl -sSL -o ~/scripts/server_setup.sh "$PREREQUISITES_URL"
     chmod +x ~/scripts/server_setup.sh
     ~/scripts/server_setup.sh
     return $?
@@ -381,8 +380,7 @@ install_node() {
     echo
     echo "⌛️ Installing node..."
     mkdir -p ~/scripts
-    rm -f ~/scripts/qnode_service_installer.sh
-    curl -sSL "$NODE_INSTALL_URL" -o ~/scripts/qnode_service_installer.sh
+    curl -sSL -o ~/scripts/qnode_service_installer.sh "$NODE_INSTALL_URL"
     chmod +x ~/scripts/qnode_service_installer.sh
     ~/scripts/qnode_service_installer.sh
     return $?
@@ -390,8 +388,12 @@ install_node() {
 
 configure_grpcurl() {
     echo
-    echo "⌛️ Setting up gRPCurl..."
-    curl -sSL "$GRPCURL_CONFIG_URL" | bash
+    echo "⌛️  Setting up gRPCurl..."
+    mkdir -p ~/scripts
+    curl -sSL -o ~/scripts/qnode_gRPC_calls_setup.sh "$GRPCURL_CONFIG_URL"
+    chmod +x ~/scripts/qnode_gRPC_calls_setup.sh
+    ~/scripts/qnode_gRPC_calls_setup.sh
+    prompt_return_to_menu
     return $?
 }
 
@@ -399,8 +401,7 @@ update_node() {
     echo
     echo "⌛️ Updating node..."
     mkdir -p ~/scripts
-    rm -f ~/scripts/qnode_service_update.sh
-    curl -sSL "$NODE_UPDATE_URL" -o ~/scripts/qnode_service_update.sh
+    curl -sSL -o ~/scripts/qnode_service_update.sh "$NODE_UPDATE_URL"
     chmod +x ~/scripts/qnode_service_update.sh
     ~/scripts/qnode_service_update.sh
     return $?
@@ -410,10 +411,9 @@ autoupdate_setup() {
     echo
     echo "⌛️ Setting up auto-update..."
     mkdir -p ~/scripts
-    rm -f ~/scripts//qnode_autoupdate_setup.sh
-    curl -sSL "$AUTOUPDATE_SETUP_URL" -o ~/scripts//qnode_autoupdate_setup.sh
-    chmod +x ~/scripts//qnode_autoupdate_setup.sh
-    ~/scripts//qnode_autoupdate_setup.sh
+    curl -sSL -o ~/scripts/qnode_autoupdate_setup.sh "$AUTOUPDATE_SETUP_URL"
+    chmod +x ~/scripts/qnode_autoupdate_setup.sh
+    ~/scripts/qnode_autoupdate_setup.sh
     return $?
 }
 
@@ -421,8 +421,7 @@ qclient_install() {
     echo
     echo "⌛️ Installing qClient..."
     mkdir -p ~/scripts
-    rm -f ~/scripts/qclient_install.sh
-    curl -sSL "$QCLIENT_INSTALL_URL" -o ~/scripts/qclient_install.sh
+    curl -sSL -o ~/scripts/qclient_install.sh "$QCLIENT_INSTALL_URL"
     chmod +x ~/scripts/qclient_install.sh
     ~/scripts/qclient_install.sh
     return $?
@@ -433,7 +432,7 @@ qclient_actions() {
     
     if [ ! -f ~/scripts/qclient_actions.sh ]; then
         mkdir -p ~/scripts
-        curl -sSL "$QCLIENT_ACTIONS_URL" -o ~/scripts/qclient_actions.sh
+        curl -sSL -o ~/scripts/qclient_actions.sh "$QCLIENT_ACTIONS_URL"
         chmod +x ~/scripts/qclient_actions.sh
     fi
     
@@ -470,7 +469,7 @@ balance_log() {
             1)
                 echo
                 mkdir -p ~/scripts && \
-                curl -sSL "https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_balance_log_download.sh" -o ~/scripts/qnode_balance_log_download.sh && \
+                curl -sSL -o ~/scripts/qnode_balance_log_download.sh "https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_balance_log_download.sh" && \
                 chmod +x ~/scripts/qnode_balance_log_download.sh && \
                 ~/scripts/qnode_balance_log_download.sh
                 ;;
@@ -513,8 +512,7 @@ backup_storj() {
     echo
     echo "⌛️  Downloading Storj backup script..."
     mkdir -p ~/scripts
-    rm -f ~/scripts/qnode_backup_storj.sh
-    if curl -sSL "$BACKUP_STORJ_URL" -o ~/scripts/qnode_backup_storj.sh; then
+    if curl -sSL -o ~/scripts/qnode_backup_storj.sh "$BACKUP_STORJ_URL"; then
         chmod +x ~/scripts/qnode_backup_storj.sh
         if ~/scripts/qnode_backup_storj.sh; then
             echo "✅ Storj backup completed successfully."
@@ -531,8 +529,7 @@ backup_restore_storj() {
     echo
     echo "⌛️  Downloading Storj backup restore script..."
     mkdir -p ~/scripts
-    rm -f ~/scripts/qnode_backup_restore_storj.sh
-    if curl -sSL "$BACKUP_RESTORE_STORJ_URL" -o ~/scripts/qnode_backup_restore_storj.sh; then
+    if curl -sSL -o ~/scripts/qnode_backup_restore_storj.sh "$BACKUP_RESTORE_STORJ_URL"; then
         chmod +x ~/scripts/qnode_backup_restore_storj.sh
         if ~/scripts/qnode_backup_restore_storj.sh; then
             echo "✅ Storj backup restore completed successfully."
