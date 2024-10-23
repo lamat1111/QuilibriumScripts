@@ -106,11 +106,13 @@ setup_stats_collection() {
 while true; do
     echo -e "\nPlease select a setup option:"
     echo "1) Setup local gRPC endpoint"
-    echo "   ↳ Working in most cases"
-    echo ""
+    echo "   Working in most cases"
+    echo 
     echo "2) Setup public gRPC"
-    echo "   ↳ Use this option if you run into issues with the other setup"
+    echo "   Use this option if you run into issues with the other setup"
+    echo
     read -p "Enter your choice (1-2): " choice
+    echo
 
     case $choice in
         1)
