@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.1.5"
+SCRIPT_VERSION="2.1.6"
 
 #==========================
 # INSTALL APPS
