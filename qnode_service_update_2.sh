@@ -46,7 +46,11 @@ GO_VERSION=1.23.2
 #GIT PULL yes or no?
 GIT_PULL=false
 
+#useful variables
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
+QUILIBRIUM_RELEASES="https://releases.quilibrium.com"
+NODE_RELEASE_URL="https://releases.quilibrium.com/release"
+QCLIENT_RELEASE_URL="https://releases.quilibrium.com/qclient-release"
 
 # Check if the service file exists
 if [ ! -f "$SERVICE_FILE" ]; then
@@ -96,7 +100,7 @@ display_header "CHECK NEEDED UPDATES"
 # Determine node latest version
 # Check if NODE_VERSION is empty
 if [ -z "$NODE_VERSION" ]; then
-    NODE_VERSION=$(curl -s https://releases.quilibrium.com/release | grep -E "^node-[0-9]+(\.[0-9]+)*" | grep -v "dgst" | sed 's/^node-//' | cut -d '-' -f 1 | head -n 1)
+    NODE_VERSION=$(curl -s "$NODE_RELEASE_URL" | grep -E "^node-[0-9]+(\.[0-9]+)*" | grep -v "dgst" | sed 's/^node-//' | cut -d '-' -f 1 | head -n 1)
     if [ -z "$NODE_VERSION" ]; then
         echo "❌ Error: Unable to determine the latest node release automatically."
         echo "The script cannot proceed without a correct node version number."
@@ -120,7 +124,7 @@ fi
 # Determine qclient latest version
 # Check if QCLIENT_VERSION is empty
 if [ -z "$QCLIENT_VERSION" ]; then
-    QCLIENT_VERSION=$(curl -s https://releases.quilibrium.com/qclient-release | grep -E "^qclient-[0-9]+(\.[0-9]+)*" | sed 's/^qclient-//' | cut -d '-' -f 1 |  head -n 1)
+    QCLIENT_VERSION=$(curl -s "$QCLIENT_RELEASE_URL" | grep -E "^qclient-[0-9]+(\.[0-9]+)*" | sed 's/^qclient-//' | cut -d '-' -f 1 |  head -n 1)
     if [ -z "$QCLIENT_VERSION" ]; then
         echo "⚠️ Warning: Unable to determinethe latest Qclient release automatically. Continuing without it."
         echo "The script won't be able to install the Qclient, but it will still install your node."
@@ -311,8 +315,8 @@ if [ "$NODE_NEEDS_UPDATE" = true ]; then
     fi
 
     # Fetch the file list with error handling
-    if ! files=$(curl -s -f https://releases.quilibrium.com/release); then
-        echo "❌ Error: Failed to connect to releases.quilibrium.com"
+    if ! files=$(curl -s -f --connect-timeout 10 --max-time 30 "$NODE_RELEASE_URL"); then
+        echo "❌ Error: Failed to connect to $NODE_RELEASE_URL"
         echo "Please check your internet connection and try again."
         exit 1
     fi
@@ -331,7 +335,7 @@ if [ "$NODE_NEEDS_UPDATE" = true ]; then
         version=$(echo "$file" | cut -d '-' -f 2)
         if ! test -f "./$file"; then
             echo "⏳ Downloading $file..."
-            if ! curl -s -f "https://releases.quilibrium.com/$file" > "$file"; then
+            if ! curl -s -f --connect-timeout 10 --max-time 300 "$QUILIBRIUM_RELEASES/$file" > "$file"; then
                 echo "❌ Failed to download $file"
                 rm -f "$file" # Cleanup failed download
                 continue
@@ -366,8 +370,8 @@ if [ "$QCLIENT_NEEDS_UPDATE" = true ]; then
     fi
 
     # Fetch the file list with error handling
-    if ! files=$(curl -s -f https://releases.quilibrium.com/qclient-release); then
-        echo "❌ Error: Failed to connect to releases.quilibrium.com"
+    if ! files=$(curl -s -f --connect-timeout 10 --max-time 30 "$QCLIENT_RELEASE_URL"); then
+        echo "❌ Error: Failed to connect to $QCLIENT_RELEASE_URL"
         echo "Please check your internet connection and try again."
         exit 1
     fi
@@ -386,7 +390,7 @@ if [ "$QCLIENT_NEEDS_UPDATE" = true ]; then
         version=$(echo "$file" | cut -d '-' -f 2)
         if ! test -f "./$file"; then
             echo "⏳ Downloading $file..."
-            if ! curl -s -f "https://releases.quilibrium.com/$file" > "$file"; then
+            if ! curl -s -f --connect-timeout 10 --max-time 300 "$QUILIBRIUM_RELEASES/$file" > "$file"; then
                 echo "❌ Failed to download $file"
                 rm -f "$file" # Cleanup failed download
                 continue
