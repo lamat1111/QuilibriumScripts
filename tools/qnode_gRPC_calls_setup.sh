@@ -22,11 +22,7 @@ Follow the Quilibrium Node guide at https://docs.quilibrium.one
 Made with 🔥 by LaMat - https://quilibrium.one
 ============================================================================
 
-Processing... ⏳
-
 EOF
-
-sleep 5  # Add a 7-second delay
 
 # Function to check if a line exists in a file
 line_exists() {
@@ -38,58 +34,106 @@ add_line_after_pattern() {
     sudo sed -i "/^ *$1:/a\  $2" "$3" || { echo "❌ Failed to add line after '$1'! Exiting..."; exit 1; }
 }
 
-# Step 1: Enable gRPC and REST
-echo "🚀 Enabling gRPC and REST..."
-sleep 1
-cd "$HOME/ceremonyclient/node" || { echo "❌ Failed to change directory to ~/ceremonyclient/node! Exiting..."; exit 1; }
+# Function to check and modify listenMultiaddr
+check_modify_listen_multiaddr() {
+    echo "🔍 Checking listenMultiaddr..."
+    if grep -qF "  listenMultiaddr: /ip4/0.0.0.0/udp/8336/quic" .config/config.yml; then
+        echo "🛠️ Modifying listenMultiaddr..."
+        sudo sed -i -E 's|^ *  listenMultiaddr: /ip4/0.0.0.0/udp/8336/quic *$|  listenMultiaddr: /ip4/0.0.0.0/tcp/8336|' .config/config.yml
+        if [ $? -eq 0 ]; then
+            echo "✅ listenMultiaddr modified to use TCP protocol."
+        else
+            echo "❌ Failed to modify listenMultiaddr! Please check manually your config.yml file"
+        fi
+    else
+        # Check if the new listenMultiaddr exists
+        if grep -qF "  listenMultiaddr: /ip4/0.0.0.0/tcp/8336" .config/config.yml; then
+            echo "✅ New listenMultiaddr line found."
+        else
+            echo "❌ Neither old nor new listenMultiaddr found. This could cause issues. Please check manually your config.yml file"
+        fi
+    fi
+}
 
-# Delete existing lines for listenGrpcMultiaddr and listenRESTMultiaddr if they exist
-sudo sed -i '/^ *listenGrpcMultiaddr:/d' .config/config.yml
-sudo sed -i '/^ *listenRESTMultiaddr:/d' .config/config.yml
+# Function to set up local gRPC
+setup_local_grpc() {
+    echo "🚀 Enabling local gRPC and REST..."
+    sleep 1
+    cd "$HOME/ceremonyclient/node" || { echo "❌ Failed to change directory to ~/ceremonyclient/node! Exiting..."; exit 1; }
 
-# Add listenGrpcMultiaddr: "/ip4/127.0.0.1/tcp/8337"
-echo "listenGrpcMultiaddr: \"/ip4/127.0.0.1/tcp/8337\"" | sudo tee -a .config/config.yml > /dev/null || { echo "❌ Failed to enable gRPC! Exiting..."; exit 1; }
+    # Delete existing lines for listenGrpcMultiaddr and listenRESTMultiaddr if they exist
+    sudo sed -i '/^ *listenGrpcMultiaddr:/d' .config/config.yml
+    sudo sed -i '/^ *listenRESTMultiaddr:/d' .config/config.yml
 
-# Add listenRESTMultiaddr: "/ip4/127.0.0.1/tcp/8338"
-echo "listenRESTMultiaddr: \"/ip4/127.0.0.1/tcp/8338\"" | sudo tee -a .config/config.yml > /dev/null || { echo "❌ Failed to enable REST! Exiting..."; exit 1; }
+    # Add listenGrpcMultiaddr: "/ip4/127.0.0.1/tcp/8337"
+    echo "listenGrpcMultiaddr: \"/ip4/127.0.0.1/tcp/8337\"" | sudo tee -a .config/config.yml > /dev/null || { echo "❌ Failed to enable gRPC! Exiting..."; exit 1; }
 
-sleep 1
+    # Add listenRESTMultiaddr: "/ip4/127.0.0.1/tcp/8338"
+    echo "listenRESTMultiaddr: \"/ip4/127.0.0.1/tcp/8338\"" | sudo tee -a .config/config.yml > /dev/null || { echo "❌ Failed to enable REST! Exiting..."; exit 1; }
 
-# Step 2: Enable Stats Collection
-echo "📊 Enabling Stats Collection..."
-if ! line_exists "statsMultiaddr: \"/dns/stats.quilibrium.com/tcp/443\"" .config/config.yml; then
-    add_line_after_pattern "engine" "statsMultiaddr: \"/dns/stats.quilibrium.com/tcp/443\"" .config/config.yml
-    echo "✅ Stats Collection enabled."
-else
-    echo "✅ Stats Collection already enabled."
-fi
+    echo "✅ Local gRPC and REST setup completed."
+}
 
-sleep 1
+# Function to set up alternative gRPC (blank gRPC, local REST)
+setup_public_grpc() {
+    echo "🚀 Setting up alternative gRPC configuration..."
+    sleep 1
+    cd "$HOME/ceremonyclient/node" || { echo "❌ Failed to change directory to ~/ceremonyclient/node! Exiting..."; exit 1; }
 
-# Step 3: Check and modify listenMultiaddr
-# echo "🔍 Checking listenMultiaddr..."
-# if grep -qF "  listenMultiaddr: /ip4/0.0.0.0/udp/8336/quic" .config/config.yml; then
-#     echo "🛠️ Modifying listenMultiaddr..."
-#     sudo sed -i -E 's|^ *  listenMultiaddr: /ip4/0.0.0.0/udp/8336/quic *$|  listenMultiaddr: /ip4/0.0.0.0/tcp/8336|' .config/config.yml
-#     if [ $? -eq 0 ]; then
-#         echo "✅ listenMultiaddr modified to use TCP protocol."
-#     else
-#         echo "❌ Failed to modify listenMultiaddr! Please check manually your config.yml file"
-#     fi
-# else
-#     # Check if the new listenMultiaddr exists
-#     if grep -qF "  listenMultiaddr: /ip4/0.0.0.0/tcp/8336" .config/config.yml; then
-#         echo "✅ New listenMultiaddr line found."
-#     else
-#         echo "❌ Neither old nor new listenMultiaddr found. This could cause issues. Please check manually your config.yml file"
-#     fi
-# fi
+    # Delete existing lines for listenGrpcMultiaddr and listenRESTMultiaddr if they exist
+    sudo sed -i '/^ *listenGrpcMultiaddr:/d' .config/config.yml
+    sudo sed -i '/^ *listenRESTMultiaddr:/d' .config/config.yml
 
+    # Add blank gRPC and local REST settings
+    echo "listenGrpcMultiaddr: \"\"" | sudo tee -a .config/config.yml > /dev/null || { echo "❌ Failed to set blank gRPC! Exiting..."; exit 1; }
+    echo "listenRESTMultiaddr: \"/ip4/127.0.0.1/tcp/8338\"" | sudo tee -a .config/config.yml > /dev/null || { echo "❌ Failed to set REST! Exiting..."; exit 1; }
 
-sleep 1
+    echo "✅ Alternative gRPC setup completed (blank gRPC, local REST)."
+}
 
-echo""
-echo "✅ gRPC, REST, and Stats Collection setup was successful."
-echo""
-echo "✅ If you want to check manually just run: cd /root/ceremonyclient/node/.config/ && cat config.yml"
-sleep 5
+# Function to setup stats collection
+setup_stats_collection() {
+    echo "📊 Enabling Stats Collection..."
+    if ! line_exists "statsMultiaddr: \"/dns/stats.quilibrium.com/tcp/443\"" .config/config.yml; then
+        add_line_after_pattern "engine" "statsMultiaddr: \"/dns/stats.quilibrium.com/tcp/443\"" .config/config.yml
+        echo "✅ Stats Collection enabled."
+    else
+        echo "✅ Stats Collection already enabled."
+    fi
+}
+
+# Main menu
+while true; do
+    echo -e "\nPlease select a setup option:"
+    echo
+    echo "1) Setup local gRPC endpoint"
+    echo "   Working in most cases"
+    echo 
+    echo "2) Setup public gRPC"
+    echo "   Use this option if you run into issues with the other setup"
+    echo
+    read -p "Enter your choice (1-2): " choice
+    echo
+
+    case $choice in
+        1)
+            setup_local_grpc
+            setup_stats_collection
+            #check_modify_listen_multiaddr
+            echo -e "\n✅ Configuration complete! You can check your settings with:"
+            echo "cd $HOME/ceremonyclient/node/.config/ && cat config.yml"
+            break
+            ;;
+        2)
+            setup_public_grpc
+            setup_stats_collection
+            #check_modify_listen_multiaddr
+            echo -e "\n✅ Configuration complete! You can check your settings with:"
+            echo "cd $HOME/ceremonyclient/node/.config/ && cat config.yml"
+            break
+            ;;
+        *)
+            echo "❌ Invalid option. Please select 1 or 2."
+            ;;
+    esac
+done

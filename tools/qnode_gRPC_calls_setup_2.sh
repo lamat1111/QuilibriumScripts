@@ -105,6 +105,7 @@ setup_stats_collection() {
 # Main menu
 while true; do
     echo -e "\nPlease select a setup option:"
+    echo
     echo "1) Setup local gRPC endpoint"
     echo "   Working in most cases"
     echo 
