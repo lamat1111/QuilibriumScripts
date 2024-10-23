@@ -176,7 +176,6 @@ esac
 
 # Set binary names based on detected OS and architecture
 NODE_BINARY="node-$NODE_VERSION-$release_os-$release_arch"
-GO_BINARY="go$GO_VERSION.$release_os-$release_arch.tar.gz"
 QCLIENT_BINARY="qclient-$QCLIENT_VERSION-$release_os-$release_arch"
 
 echo
