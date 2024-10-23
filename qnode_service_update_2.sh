@@ -310,27 +310,46 @@ if [ "$NODE_NEEDS_UPDATE" = true ]; then
         exit 1
     fi
 
+    # Fetch the file list with error handling
+    if ! files=$(curl -s -f https://releases.quilibrium.com/release); then
+        echo "❌ Error: Failed to connect to releases.quilibrium.com"
+        echo "Please check your internet connection and try again."
+        exit 1
+    fi
 
-    files=$(curl -s https://releases.quilibrium.com/release | grep $release_os-$release_arch)
-    
+    # Filter files for current architecture
+    files=$(echo "$files" | grep "$release_os-$release_arch" || true)
+
+    if [ -z "$files" ]; then
+        echo "❌ Error: No node files found for $release_os-$release_arch"
+        echo "This could be due to network issues or no releases for your architecture."
+        exit 1
+    fi
+
+    # Download files
     for file in $files; do
         version=$(echo "$file" | cut -d '-' -f 2)
         if ! test -f "./$file"; then
-            if curl -s "https://releases.quilibrium.com/$file" > "$file"; then
-                echo "✅ Successfully downloaded $file"
-                # Make binary executable if it's not a signature or digest file
-                if [[ ! $file =~ \.(dgst|sig) ]]; then
-                    chmod +x "$file"
-                    echo "✅ Made $file executable"
-                fi
-            else
+            echo "⏳ Downloading $file..."
+            if ! curl -s -f "https://releases.quilibrium.com/$file" > "$file"; then
                 echo "❌ Failed to download $file"
+                rm -f "$file" # Cleanup failed download
+                continue
+            fi
+            echo "✅ Successfully downloaded $file"
+            
+            # Make binary executable if it's not a signature or digest file
+            if [[ ! $file =~ \.(dgst|sig)$ ]]; then
+                if ! chmod +x "$file"; then
+                    echo "❌ Failed to make $file executable"
+                    continue
+                fi
+                echo "✅ Made $file executable"
             fi
         else
-            echo "File $file already exists, skipping"
+            echo "ℹ️ File $file already exists, skipping"
         fi
     done
-
 
 if [ "$QCLIENT_NEEDS_UPDATE" = true ]; then
 
@@ -346,25 +365,47 @@ if [ "$QCLIENT_NEEDS_UPDATE" = true ]; then
         exit 1
     fi
 
-    files=$(curl -s https://releases.quilibrium.com/qclient-release | grep $release_os-$release_arch)
-    
+    # Fetch the file list with error handling
+    if ! files=$(curl -s -f https://releases.quilibrium.com/qclient-release); then
+        echo "❌ Error: Failed to connect to releases.quilibrium.com"
+        echo "Please check your internet connection and try again."
+        exit 1
+    fi
+
+    # Filter files for current architecture
+    files=$(echo "$files" | grep "$release_os-$release_arch" || true)
+
+    if [ -z "$files" ]; then
+        echo "❌ Error: No qclient files found for $release_os-$release_arch"
+        echo "This could be due to network issues or no releases for your architecture."
+        exit 1
+    fi
+
+    # Download files
     for file in $files; do
         version=$(echo "$file" | cut -d '-' -f 2)
         if ! test -f "./$file"; then
-            if curl -s "https://releases.quilibrium.com/$file" > "$file"; then
-                echo "✅ Successfully downloaded $file"
-                # Make binary executable if it's not a signature or digest file
-                if [[ ! $file =~ \.(dgst|sig) ]]; then
-                    chmod +x "$file"
-                    echo "✅ Made $file executable"
-                fi
-            else
+            echo "⏳ Downloading $file..."
+            if ! curl -s -f "https://releases.quilibrium.com/$file" > "$file"; then
                 echo "❌ Failed to download $file"
+                rm -f "$file" # Cleanup failed download
+                continue
+            fi
+            echo "✅ Successfully downloaded $file"
+            
+            # Make binary executable if it's not a signature or digest file
+            if [[ ! $file =~ \.(dgst|sig)$ ]]; then
+                if ! chmod +x "$file"; then
+                    echo "❌ Failed to make $file executable"
+                    continue
+                fi
+                echo "✅ Made $file executable"
             fi
         else
-            echo "File $file already exists, skipping"
+            echo "ℹ️ File $file already exists, skipping"
         fi
     done
+fi
 
 
 if [ "$NODE_NEEDS_UPDATE" = true ] && [ "$QCLIENT_NEEDS_UPDATE" = true ]; then
@@ -380,22 +421,20 @@ if [ "$NODE_NEEDS_UPDATE" = true ] && [ "$QCLIENT_NEEDS_UPDATE" = true ]; then
         local directory=$1
         local current_binary=$2
         local prefix=$3
+        local arch_pattern="$release_os-$release_arch"
 
         echo "⏳ Cleaning up old $prefix releases in $directory..."
 
         # Delete old binary files, .dgst files, and signature files in one go
         if find "$directory" -type f \( \
-            -name "${prefix}-*-${OS_ARCH}" -o \
-            -name "${prefix}-*-${OS_ARCH}.dgst" -o \
-            -name "${prefix}-*-${OS_ARCH}.dgst.sig.*" \
+            -name "${prefix}-*-${arch_pattern}" -o \
+            -name "${prefix}-*-${arch_pattern}.dgst" -o \
+            -name "${prefix}-*-${arch_pattern}.dgst.sig.*" \
         \) ! -name "${current_binary}*" -delete; then
             echo "✅ Removed old $prefix files (binary, .dgst, and signatures)."
         else
-            echo "ℹ️ No old $prefix files to remove."
+            echo "No old $prefix files to remove."
         fi
-
-        echo "✅ Cleanup of old $prefix releases completed."
-        echo
     }
 
     # After node binary download and verification
