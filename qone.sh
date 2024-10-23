@@ -165,7 +165,7 @@ configure_grpcurl() {
     mkdir -p ~/scripts
     rm -f ~/scripts/qnode_gRPC_calls_setup.sh
     curl -sSL "$GRPCURL_CONFIG_URL" -o ~/scripts/qnode_gRPC_calls_setup.sh
-    chmod +x ~/scripts/qqnode_gRPC_calls_setup.sh
+    chmod +x ~/scripts/qnode_gRPC_calls_setup.sh
     ~/scripts/qnode_gRPC_calls_setup.sh
     prompt_return_to_menu
     return $?
