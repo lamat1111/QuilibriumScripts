@@ -114,7 +114,11 @@ main() {
         read -rp "Enter your choice: " choice
         
         case $choice in
-            1) confirm_action "$(wrap_text "$prepare_server_message" "")" "Prepare your server" install_prerequisites && prompt_return_to_menu "skip_check" ;;
+            1) 
+                if confirm_action "$(wrap_text "$prepare_server_message" "")" "Prepare your server" install_prerequisites; then
+                    prompt_return_to_menu "skip_check"
+                fi
+                ;;
             2) 
                 if confirm_action "$(wrap_text "$install_node_message" "")" "Install node" install_node; then
                     prompt_return_to_menu
@@ -1169,9 +1173,12 @@ EOF
         $3
         return 0
     else
+        # Show "press any key" message when user chooses not to proceed
+        press_any_key
         return 1
     fi
 }
+
 
 # Function to wrap and indent text
 wrap_text() {
@@ -1188,7 +1195,7 @@ wrap_text() {
 # Initial setup
 check_and_install sudo
 check_and_install curl
-#check_for_updates
+check_for_updates
 setup_aliases
 
 read -t 0.1 -n 1000 discard  # Clear any pending input
