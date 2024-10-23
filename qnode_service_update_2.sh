@@ -93,10 +93,6 @@ check_and_install curl
 
 display_header "CHECK NEEDED UPDATES"
 
-# Determine the ExecStart line based on the architecture
-ARCH=$(uname -m)
-OS=$(uname -s)
-
 # Determine node latest version
 # Check if NODE_VERSION is empty
 if [ -z "$NODE_VERSION" ]; then
@@ -138,43 +134,29 @@ else
     echo "✅ Using specified Qclient version: $QCLIENT_VERSION"
 fi
 
-# Determine the node binary name based on the architecture and OS
-if [ "$ARCH" = "x86_64" ]; then
-    if [ "$OS" = "Linux" ]; then
-        NODE_BINARY="node-$NODE_VERSION-linux-amd64"
-        GO_BINARY="go$GO_VERSION.linux-amd64.tar.gz"
-        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-amd64"
-    elif [ "$OS" = "Darwin" ]; then
-        NODE_BINARY="node-$NODE_VERSION-darwin-amd64"
-        GO_BINARY="go$GO_VERSION.darwin-amd64.tar.gz"
-       QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-amd64"
-    fi
-elif [ "$ARCH" = "aarch64" ]; then
-    if [ "$OS" = "Linux" ]; then
-        NODE_BINARY="node-$NODE_VERSION-linux-arm64"
-        GO_BINARY="go$GO_VERSION.linux-arm64.tar.gz"
-        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-arm64"
-    elif [ "$OS" = "Darwin" ]; then
-        NODE_BINARY="node-$NODE_VERSION-darwin-arm64"
-        GO_BINARY="go$GO_VERSION.darwin-arm64.tar.gz"
-        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-arm64"
-    fi
-else
-    echo "❌ Error: Unsupported system architecture ($ARCH) or operating system ($OS)."
-    exit 1
-fi
+# Detect OS and architecture in a unified way
+case "$OSTYPE" in
+    "linux-gnu"*)
+        release_os="linux"
+        case "$(uname -m)" in
+            "x86_64") release_arch="amd64" ;;
+            "aarch64") release_arch="arm64" ;;
+            *) echo "❌ Error: Unsupported system architecture ($(uname -m))"; exit 1 ;;
+        esac ;;
+    "darwin"*)
+        release_os="darwin"
+        case "$(uname -m)" in
+            "x86_64") release_arch="amd64" ;;
+            "arm64") release_arch="arm64" ;;
+            *) echo "❌ Error: Unsupported system architecture ($(uname -m))"; exit 1 ;;
+        esac ;;
+    *) echo "❌ Error: Unsupported operating system ($OSTYPE)"; exit 1 ;;
+esac
 
-if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    release_os="linux"
-    if [[ $(uname -m) == "aarch64"* ]]; then
-        release_arch="arm64"
-    else
-        release_arch="amd64"
-    fi
-else
-    release_os="darwin"
-    release_arch="arm64"
-fi
+# Set binary names based on detected OS and architecture
+NODE_BINARY="node-$NODE_VERSION-$release_os-$release_arch"
+GO_BINARY="go$GO_VERSION.$release_os-$release_arch.tar.gz"
+QCLIENT_BINARY="qclient-$QCLIENT_VERSION-$release_os-$release_arch"
 
 echo
 
