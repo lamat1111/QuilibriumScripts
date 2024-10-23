@@ -75,7 +75,7 @@ setup_local_grpc() {
 }
 
 # Function to set up alternative gRPC (blank gRPC, local REST)
-setup_alternative_grpc() {
+setup_public_grpc() {
     echo "🚀 Setting up alternative gRPC configuration..."
     sleep 1
     cd "$HOME/ceremonyclient/node" || { echo "❌ Failed to change directory to ~/ceremonyclient/node! Exiting..."; exit 1; }
@@ -124,7 +124,7 @@ while true; do
             break
             ;;
         2)
-            setup_alternative_grpc
+            setup_public_grpc
             setup_stats_collection
             #check_modify_listen_multiaddr
             echo -e "\n✅ Configuration complete! You can check your settings with:"
@@ -136,5 +136,3 @@ while true; do
             ;;
     esac
 done
-
-sleep 2
