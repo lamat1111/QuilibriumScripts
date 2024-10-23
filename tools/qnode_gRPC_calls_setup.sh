@@ -72,6 +72,7 @@ setup_local_grpc() {
     echo "listenRESTMultiaddr: \"/ip4/127.0.0.1/tcp/8338\"" | sudo tee -a .config/config.yml > /dev/null || { echo "❌ Failed to enable REST! Exiting..."; exit 1; }
 
     echo "✅ Local gRPC and REST setup completed."
+    return 0  # Explicitly return success
 }
 
 # Function to set up alternative gRPC (blank gRPC, local REST)
@@ -89,6 +90,7 @@ setup_public_grpc() {
     echo "listenRESTMultiaddr: \"/ip4/127.0.0.1/tcp/8338\"" | sudo tee -a .config/config.yml > /dev/null || { echo "❌ Failed to set REST! Exiting..."; exit 1; }
 
     echo "✅ Alternative gRPC setup completed (blank gRPC, local REST)."
+    return 0  # Explicitly return success
 }
 
 # Function to setup stats collection
@@ -102,7 +104,7 @@ setup_stats_collection() {
     fi
 }
 
-# Main menu
+# Main menu with proper input handling
 while true; do
     echo -e "\nPlease select a setup option:"
     echo
@@ -112,7 +114,7 @@ while true; do
     echo "2) Setup public gRPC"
     echo "   Use this option if you run into issues with the other setup"
     echo
-    read -p "Enter your choice (1-2): " choice
+    read -r choice
     echo
 
     case $choice in
@@ -122,7 +124,7 @@ while true; do
             #check_modify_listen_multiaddr
             echo -e "\n✅ Configuration complete! You can check your settings with:"
             echo "cd $HOME/ceremonyclient/node/.config/ && cat config.yml"
-            break
+            exit 0  # Exit with success
             ;;
         2)
             setup_public_grpc
@@ -130,10 +132,11 @@ while true; do
             #check_modify_listen_multiaddr
             echo -e "\n✅ Configuration complete! You can check your settings with:"
             echo "cd $HOME/ceremonyclient/node/.config/ && cat config.yml"
-            break
+            exit 0  # Exit with success
             ;;
         *)
             echo "❌ Invalid option. Please select 1 or 2."
+            continue  # Continue the loop for invalid input
             ;;
     esac
 done
