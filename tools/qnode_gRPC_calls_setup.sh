@@ -108,11 +108,11 @@ setup_stats_collection() {
 while true; do
     echo -e "\nPlease select a setup option:"
     echo
-    echo "1) Setup local gRPC endpoint"
-    echo "   Working in most cases"
+    echo "1) Setup local gRPC"
+    echo "   Choose if you are running a node"
     echo 
     echo "2) Setup public gRPC"
-    echo "   Use this option if you run into issues with the other setup"
+    echo "   Choose if you want to run the Qclient without having a working node"
     echo
     read -r choice
     echo
