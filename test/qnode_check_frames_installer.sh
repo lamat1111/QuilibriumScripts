@@ -18,28 +18,20 @@ sleep 1
 
 # Function to install required packages
 install_dependencies() {
-    local packages=("jq" "bc" "cron")    # Added cron to the array
-    local missing_packages=()
-
-    # Check which packages need to be installed
-    for pkg in "${packages[@]}"; do
-        if ! dpkg -l "$pkg" &> /dev/null; then
-            missing_packages+=("$pkg")
-        fi
-    done
-
-    # If there are missing packages, install them
-    if [ ${#missing_packages[@]} -ne 0 ]; then
-        echo -e "${YELLOW}Installing required packages: ${missing_packages[*]}${NC}"
-        apt-get update -qq
-        if ! apt-get install -y "${missing_packages[@]}"; then
-            echo -e "${RED}Failed to install required packages${NC}"
+    local pkg_name
+    echo -e "${YELLOW}Installing/checking required packages${NC}"
+    apt update -qq
+    
+    for pkg_name in "jq" "bc" "cron"; do
+        if ! apt install -y "$pkg_name"; then
+            echo -e "${RED}Failed to install $pkg_name${NC}"
             return 1
         fi
-        echo -e "${GREEN}Successfully installed required packages${NC}"
-    else
-        echo -e "${GREEN}All required packages are already installed${NC}"
-    fi
+        echo -e "${GREEN}$pkg_name installed/updated${NC}"
+    done
+    
+    echo
+    sleep 1
     return 0
 }
 
