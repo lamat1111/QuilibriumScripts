@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.1.6"
+SCRIPT_VERSION="2.1.7"
 
 #==========================
 # INSTALL APPS
@@ -327,10 +327,10 @@ start_node() {
         echo "$MISSING_SERVICE_MSG"
     else
         echo
-        echo "⌛️   Starting node service..."
+        echo "⌛️   Restarting node service..."
         echo
-        service ceremonyclient start
-        echo "✅   Node started"
+        service ceremonyclient restart
+        echo "✅   Node restarted"
         echo
     fi
 }
@@ -665,7 +665,7 @@ Let your node run for 30 minutes, then choose option 3. Done!
 4) Node Log                                    
 5) Update node                14) Qclient install      
 6) Stop node                                                             
-7) Start node                               
+7) Restart node                               
 8) Node version               16) System cleaner               
 9) Node info                                      
 -----------------------------------------------------------------
