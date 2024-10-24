@@ -94,6 +94,7 @@ if [ $time_diff -gt $DIFF ]; then
     restart_application
 else
     echo "New leading frame received within the last $DIFF seconds. No action needed."
+    echo ""
 fi
 
 #####################
