@@ -108,6 +108,17 @@ if [ -f "$HOME/check-for-frames.sh" ]; then
     fi
 fi
 
+LOG_DIR="$HOME/scripts/logs"
+
+# Create log directory if it doesn't exist
+if [ ! -d "$LOG_DIR" ]; then
+    echo "Log directory does not exist. Creating $LOG_DIR..."
+    if ! mkdir -p "$LOG_DIR" 2>/dev/null; then
+        echo "ERROR: Failed to create log directory $LOG_DIR"
+        exit 1
+    fi
+fi
+
 echo -e "${GREEN}Installation completed successfully!${NC}"
 echo "Script location: ~/scripts/qnode_check_for_frames.sh"
 echo "Cron job will run every 10 minutes"
