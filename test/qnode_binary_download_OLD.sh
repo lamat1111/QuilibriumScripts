@@ -36,6 +36,10 @@ echo "Compatibility:"
 echo "only compatible with nodes that are running via service file"
 echo "only compatible with: os:linux arch:amd64 / ubuntu 22.x or 24.x"
 echo "not compatible with node clusters"
+echo
+echo "DO NOT RUN THIS SCRIPT IF YOU ARE ALREADY ON v2.0.1"
+echo
+sleep 1
 
 # Ask for confirmation
 read -p "Do you want to proceed with the update? (y/n) " -n 1 -r
