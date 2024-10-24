@@ -670,7 +670,3 @@ echo
 echo
 sleep 2
 sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
-
-else
-    echo "✅ Update finished!"
-fi
