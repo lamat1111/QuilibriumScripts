@@ -37,12 +37,8 @@ install_dependencies() {
             return 1
         fi
         echo -e "${GREEN}Successfully installed required packages${NC}"
-        echo
-        sleep 1
     else
         echo -e "${GREEN}All required packages are already installed${NC}"
-        echo
-        sleep 1
     fi
     return 0
 }
@@ -90,8 +86,6 @@ if grep -q "check-for-frames.sh\|qnode_check_for_frames.sh" "$TEMP_CRON"; then
     grep -v "check-for-frames.sh\|qnode_check_for_frames.sh" "$TEMP_CRON" > "$TEMP_CRON_NEW"
     mv "$TEMP_CRON_NEW" "$TEMP_CRON"
     echo -e "${GREEN}Old cron jobs removed successfully${NC}"
-    echo
-    sleep 1
 fi
 
 # Add new cron job
@@ -104,8 +98,6 @@ if ! crontab "$TEMP_CRON"; then
     exit 1
 fi
 echo -e "${GREEN}Cron job installed successfully${NC}"
-echo
-sleep 1
 
 # Clean up temporary files
 rm "$TEMP_CRON" "$TEMP_CRON_NEW" 2>/dev/null
@@ -113,13 +105,6 @@ rm "$TEMP_CRON" "$TEMP_CRON_NEW" 2>/dev/null
 echo -e "${GREEN}Installation completed successfully!${NC}"
 echo "Script location: ~/scripts/qnode_check_for_frames.sh"
 echo "Cron job will run every 10 minutes"
-echo
-sleep 1
-
-# Verify everything is installed
-echo -e "${YELLOW}Verifying installation:${NC}"
-echo -n "jq version: " && jq --version
-echo -n "bc version: " && bc --version | head -n 1
 echo
 sleep 1
 
