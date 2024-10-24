@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.2.7"
+SCRIPT_VERSION="1.2.8"
 
 # Define the script path
 SCRIPT_PATH=$HOME/scripts
@@ -29,7 +29,7 @@ display_menu() {
 =================================================================
 /////////////////// QCLIENT ACTIONS - $SCRIPT_VERSION /////////////////////
 =================================================================
-1) Check balance / address
+1) Check balance / address       7) Mint all rewards
 2) Check individual coins
 
 3) Create transaction
@@ -42,6 +42,8 @@ B) ⭐ Best server providers     X) Disclaimer
 D) 💜 Donations                 S) Security settings
 -----------------------------------------------------------------    
 E) Exit
+
+⚠️ Most Qclient commands won't work until the network si synced and stable.
 
 EOF
 }
@@ -64,6 +66,7 @@ main() {
             4) accept_transaction; prompt_return_to_menu || break ;;
             5) reject_transaction; prompt_return_to_menu || break ;;
             6) mutual_transfer; prompt_return_to_menu || break ;;
+            7) mint_all; prompt_return_to_menu || break ;;
             [sS]) security_settings; press_any_key || break ;;
             [bB]) best_providers; press_any_key || break ;;
             [dD]) donations; press_any_key || break ;;
@@ -132,6 +135,16 @@ check_coins() {
     $QCLIENT_EXEC token coins $CONFIG_FLAG
     echo
 }
+
+mint_all() {
+    echo
+    echo "Mint all rewards:"
+    echo "This command will only work when the network is synced and stable"
+    echo
+    $QCLIENT_EXEC token mint all $CONFIG_FLAG
+    echo
+}
+
 
 create_transaction() {
     echo
