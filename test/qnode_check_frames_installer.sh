@@ -18,7 +18,7 @@ sleep 1
 
 # Function to install required packages
 install_dependencies() {
-    local packages=("jq" "bc")
+    local packages=("jq" "bc" "cron")    # Added cron to the array
     local missing_packages=()
 
     # Check which packages need to be installed
