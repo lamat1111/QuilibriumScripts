@@ -33,7 +33,7 @@ get_latest_timestamp() {
 
 restart_application() {
     echo "Restarting the node..."
-    service ceremonyclient restart
+    service $QUIL_SERVICE_NAME restart
 }
 
 # Get the initial timestamp
