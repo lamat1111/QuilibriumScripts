@@ -793,7 +793,7 @@ EOF
             echo "Please run 'source ~/.bashrc' or restart your terminal to use the 'q1' and 'qone' commands."
         fi
     else
-        echo "Aliases are already set up."
+        : #echo "Aliases are already set up."
     fi
 }
 
@@ -1125,8 +1125,6 @@ check_and_install() {
         echo "$1 could not be found"
         echo "⏳ Installing $1..."
         su -c "apt install $1 -y"
-    else
-        :
     fi
 }
 
