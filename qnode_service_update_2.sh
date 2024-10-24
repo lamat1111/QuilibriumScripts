@@ -562,7 +562,7 @@ else
     # Update all required lines in the [Service] section
     update_service_section "WorkingDirectory" "$NODE_PATH" "$SERVICE_FILE"
     update_service_section "ExecStart" "$EXEC_START" "$SERVICE_FILE"
-    update_service_section "ExecStop" "/bin/kill -s SIGINT \$MAINPID" "$SERVICE_FILE"
+    update_service_section "ExecStop" "/bin/kill -s SIGINT \\$MAINPID" "$SERVICE_FILE"
     update_service_section "KillSignal" "SIGINT" "$SERVICE_FILE"
     update_service_section "RestartKillSignal" "SIGINT" "$SERVICE_FILE"
     update_service_section "FinalKillSignal" "SIGKILL" "$SERVICE_FILE"
