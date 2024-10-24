@@ -1192,7 +1192,7 @@ wrap_text() {
 # Initial setup
 check_and_install sudo
 check_and_install curl
-check_for_updates
+#check_for_updates
 setup_aliases
 
 read -t 0.1 -n 1000 discard  # Clear any pending input
