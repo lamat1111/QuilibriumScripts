@@ -1,121 +1,65 @@
 #!/bin/bash
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+# Parse command line arguments
+DIFF=600  # Default value for diff
 
-# Check if running as root or with sudo
-if [ "$EUID" -ne 0 ]; then 
-    echo -e "${RED}Please run with sudo privileges to install required packages${NC}"
-    exit 1
+if [ -z "$QUIL_SERVICE_NAME" ]; then
+    QUIL_SERVICE_NAME="ceremonyclient"
 fi
 
-echo -e "${YELLOW}Starting installation of QNode frame checker...${NC}"
-echo
-sleep 1
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --diff)
+            DIFF="$2"
+            shift 2
+            ;;
+        *)
+            echo "Unknown option: $1"
+            exit 1
+            ;;
+    esac
+done
 
-# Function to install required packages
-install_dependencies() {
-    local packages=("jq" "bc")
-    local missing_packages=()
+echo "Using diff: $DIFF seconds"
 
-    # Check which packages need to be installed
-    for pkg in "${packages[@]}"; do
-        if ! dpkg -l "$pkg" &> /dev/null; then
-            missing_packages+=("$pkg")
-        fi
-    done
-
-    # If there are missing packages, install them
-    if [ ${#missing_packages[@]} -ne 0 ]; then
-        echo -e "${YELLOW}Installing required packages: ${missing_packages[*]}${NC}"
-        apt-get update -qq
-        if ! apt-get install -y "${missing_packages[@]}"; then
-            echo -e "${RED}Failed to install required packages${NC}"
-            return 1
-        fi
-        echo -e "${GREEN}Successfully installed required packages${NC}"
-        echo
-        sleep 1
-    else
-        echo -e "${GREEN}All required packages are already installed${NC}"
-        echo
-        sleep 1
-    fi
-    return 0
+# Function to get the latest timestamp
+get_latest_frame_received_timestamp() {
+    journalctl -u $QUIL_SERVICE_NAME --no-hostname -g "received new leading frame" --output=cat -r -n 1 | jq -r '.ts'
 }
 
-# Install dependencies
-if ! install_dependencies; then
+get_latest_timestamp() {
+    journalctl -u $QUIL_SERVICE_NAME --no-hostname --output=cat -r -n 1 | jq -r '.ts'
+}
+
+restart_application() {
+    echo "Restarting the node..."
+    service ceremonyclient restart
+}
+
+# Get the initial timestamp
+last_timestamp=$(get_latest_frame_received_timestamp | awk '{print int($1)}')
+
+if [ -z "$last_timestamp" ]; then
+    echo "No frames received timestamp found at all in latest logs. Restarting the node..."
+    restart_application
     exit 1
 fi
 
-# Create scripts directory
-if ! mkdir -p ~/scripts; then
-    echo -e "${RED}Failed to create scripts directory${NC}"
-    exit 1
+# Get the current timestamp
+current_timestamp=$(get_latest_timestamp | awk '{print int($1)}')
+
+echo "Last timestamp: $last_timestamp"
+echo "Current timestamp: $current_timestamp"
+
+# Calculate the time difference
+time_diff=$(echo "$current_timestamp - $last_timestamp" | bc)
+
+echo "Time difference: $time_diff seconds"
+
+# If the time difference is more than $DIFF, restart the node
+if [ $time_diff -gt $DIFF ]; then
+    echo "No new leading frame received in the last $DIFF seconds. Restarting the node..."
+    restart_application
+else
+    echo "New leading frame received within the last $DIFF seconds. No action needed."
 fi
-
-# Download the script
-echo "Downloading qnode_check_for_frames.sh..."
-if ! curl -sSL "https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/test/qnode_check_for_frames.sh" -o ~/scripts/qnode_check_for_frames.sh; then
-    echo -e "${RED}Failed to download the script${NC}"
-    exit 1
-fi
-echo -e "${GREEN}Download completed successfully${NC}"
-echo
-sleep 1
-
-# Make script executable
-if ! chmod +x ~/scripts/qnode_check_for_frames.sh; then
-    echo -e "${RED}Failed to make script executable${NC}"
-    exit 1
-fi
-echo -e "${GREEN}Script permissions set successfully${NC}"
-echo
-sleep 1
-
-# Set up cron job
-TEMP_CRON=$(mktemp)
-TEMP_CRON_NEW=$(mktemp)
-
-# Export current crontab
-crontab -l > "$TEMP_CRON" 2>/dev/null
-
-# Check for existing frame checker cron entries
-if grep -q "check-for-frames.sh\|qnode_check_for_frames.sh" "$TEMP_CRON"; then
-    echo -e "${YELLOW}Found existing frame checker cron job(s). Removing...${NC}"
-    grep -v "check-for-frames.sh\|qnode_check_for_frames.sh" "$TEMP_CRON" > "$TEMP_CRON_NEW"
-    mv "$TEMP_CRON_NEW" "$TEMP_CRON"
-    echo -e "${GREEN}Old cron jobs removed successfully${NC}"
-    echo
-    sleep 1
-fi
-
-# Add new cron job
-echo "*/10 * * * * ${HOME}/scripts/qnode_check_for_frames.sh" >> "$TEMP_CRON"
-
-# Install new crontab
-if ! crontab "$TEMP_CRON"; then
-    echo -e "${RED}Failed to install cron job${NC}"
-    rm "$TEMP_CRON" "$TEMP_CRON_NEW" 2>/dev/null
-    exit 1
-fi
-echo -e "${GREEN}Cron job installed successfully${NC}"
-echo
-sleep 1
-
-# Clean up temporary files
-rm "$TEMP_CRON" "$TEMP_CRON_NEW" 2>/dev/null
-
-echo -e "${GREEN}Installation completed successfully!${NC}"
-echo "Script location: ~/scripts/qnode_check_for_frames.sh"
-echo "Cron job will run every 10 minutes"
-echo
-sleep 1
-
-echo -e "${YELLOW}Current crontab entries:${NC}"
-crontab -l
-echo
