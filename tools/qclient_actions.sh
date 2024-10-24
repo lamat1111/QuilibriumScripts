@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.2.8"
+SCRIPT_VERSION="1.2.9"
 
 # Define the script path
 SCRIPT_PATH=$HOME/scripts
@@ -43,7 +43,7 @@ D) 💜 Donations                 S) Security settings
 -----------------------------------------------------------------    
 E) Exit
 
-⚠️ Most Qclient commands won't work until the network si synced and stable.
+⚠️ Most Qclient commands won't work until the network is synced and stable.
 
 EOF
 }
