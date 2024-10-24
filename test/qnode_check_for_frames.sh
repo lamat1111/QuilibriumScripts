@@ -1,5 +1,30 @@
 #!/bin/bash
 
+#####################
+# Logs - add
+#####################
+
+# Log configuration
+LOG_DIR="$HOME/scripts/logs"
+LOG_FILE="$LOG_DIR/qnode_check_for_frames.log"
+LOG_ENTRIES=1000
+
+# Create log directory if needed
+if [ ! -d "$LOG_DIR" ]; then
+    echo "Log directory does not exist. Creating $LOG_DIR..."
+    if ! mkdir -p "$LOG_DIR" 2>/dev/null; then
+        echo "ERROR: Failed to create log directory $LOG_DIR"
+        exit 1
+    fi
+fi
+
+# Set up logging with timestamps
+exec 1> >(while read line; do echo "[$(date '+%Y-%m-%d %H:%M:%S')] $line"; done | tee -a "$LOG_FILE") 2>&1
+
+#####################
+# Script
+#####################
+
 # Parse command line arguments
 DIFF=600  # Default value for diff
 
@@ -63,3 +88,10 @@ if [ $time_diff -gt $DIFF ]; then
 else
     echo "New leading frame received within the last $DIFF seconds. No action needed."
 fi
+
+#####################
+# Logs - clean
+#####################
+
+# At the end of script, rotate logs
+tail -n $LOG_ENTRIES "$LOG_FILE" > "$LOG_FILE.tmp" && mv "$LOG_FILE.tmp" "$LOG_FILE"
