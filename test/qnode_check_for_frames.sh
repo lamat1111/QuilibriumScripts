@@ -33,7 +33,7 @@ get_latest_timestamp() {
 
 restart_application() {
     echo "Restarting the node..."
-    qtools restart
+    service ceremonyclient restart
 }
 
 # Get the initial timestamp
