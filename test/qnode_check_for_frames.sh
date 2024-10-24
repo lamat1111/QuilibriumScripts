@@ -1,6 +1,12 @@
 #!/bin/bash
 
 #####################
+# Colors
+#####################
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+#####################
 # Logs - add
 #####################
 
@@ -11,7 +17,7 @@ LOG_ENTRIES=1000
 
 # Create log directory if needed
 if [ ! -d "$LOG_DIR" ]; then
-    echo "Log directory does not exist. Creating $LOG_DIR..."
+    echo -e "${YELLOW}WARNING: Log directory does not exist. Creating $LOG_DIR...${NC}"
     if ! mkdir -p "$LOG_DIR" 2>/dev/null; then
         echo "ERROR: Failed to create log directory $LOG_DIR"
         exit 1
@@ -39,7 +45,7 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         *)
-            echo "Unknown option: $1"
+            echo -e "${YELLOW}WARNING: Unknown option: $1${NC}"
             exit 1
             ;;
     esac
@@ -57,7 +63,7 @@ get_latest_timestamp() {
 }
 
 restart_application() {
-    echo "Restarting the node..."
+    echo -e "Restarting the node..."
     service $QUIL_SERVICE_NAME restart
 }
 
@@ -65,7 +71,7 @@ restart_application() {
 last_timestamp=$(get_latest_frame_received_timestamp | awk '{print int($1)}')
 
 if [ -z "$last_timestamp" ]; then
-    echo "No frames received timestamp found at all in latest logs. Restarting the node..."
+    echo -e "${YELLOW}WARNING: No frames received timestamp found at all in latest logs. Restarting the node...${NC}"
     restart_application
     exit 1
 fi
@@ -83,7 +89,7 @@ echo "Time difference: $time_diff seconds"
 
 # If the time difference is more than $DIFF, restart the node
 if [ $time_diff -gt $DIFF ]; then
-    echo "No new leading frame received in the last $DIFF seconds. Restarting the node..."
+    echo -e "${YELLOW}WARNING: No new leading frame received in the last $DIFF seconds. Restarting the node...${NC}"
     restart_application
 else
     echo "New leading frame received within the last $DIFF seconds. No action needed."
