@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.2.9"
+SCRIPT_VERSION="1.3.0"
 
 # Define the script path
 SCRIPT_PATH=$HOME/scripts
@@ -322,7 +322,7 @@ Security Settings
 ================
 
 This script performs QUIL transactions. You can inspect the source code by running:
-cat "'$SCRIPT_PATH'"
+cat "'$SCRIPT_PATH/qclient_actions.sh'"
 
 The script also auto-updates to the latest version automatically.
 If you want to disable auto-updates, comment out the line "check_for_updates"
