@@ -63,7 +63,7 @@ get_latest_timestamp() {
 }
 
 restart_application() {
-    echo -e "${YELLOW}WARNING:Restarting the node...${NC}"
+    echo -e "${YELLOW}WARNING: Restarting the node...${NC}"
     echo ""
     service $QUIL_SERVICE_NAME restart
 }
