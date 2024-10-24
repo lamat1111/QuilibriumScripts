@@ -102,6 +102,20 @@ echo -e "${GREEN}Cron job installed successfully${NC}"
 # Clean up temporary files
 rm "$TEMP_CRON" "$TEMP_CRON_NEW" 2>/dev/null
 
+# Check and remove old script if it exists
+if [ -f "$HOME/check-for-frames.sh" ]; then
+    echo -e "${YELLOW}Found old script at $HOME/check-for-frames.sh${NC}"
+    if rm "$HOME/check-for-frames.sh"; then
+        echo -e "${GREEN}Successfully removed old script${NC}"
+        echo
+        sleep 1
+    else
+        echo -e "${RED}Failed to remove old script${NC}"
+        echo
+        sleep 1
+    fi
+fi
+
 echo -e "${GREEN}Installation completed successfully!${NC}"
 echo "Script location: ~/scripts/qnode_check_for_frames.sh"
 echo "Cron job will run every 10 minutes"
