@@ -72,8 +72,18 @@ exit_message() {
 trap exit_message ERR
 
 if [[ $EUID -ne 0 ]]; then
-   echo "❌ This script must be run as root or with sudo privileges"
-   exit 1
+    echo "⚠️ Warning: This script is recommended to run as root or with sudo privileges"
+    read -p "Do you want to continue anyway? (y/N): " choice
+    
+    case "$choice" in
+        [yY]|[yY][eE][sS])
+            echo "Continuing without root privileges..."
+            ;;
+        *)
+            echo "❌ Exiting..."
+            exit 1
+            ;;
+    esac
 fi
 
 #==========================
