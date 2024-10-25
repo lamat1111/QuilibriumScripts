@@ -71,11 +71,6 @@ exit_message() {
 # Set a trap to call exit_message on any error
 trap exit_message ERR
 
-if [[ $EUID -ne 0 ]]; then
-   echo "❌ This script must be run as root or with sudo privileges"
-   exit 1
-fi
-
 #==========================
 # INSTALL APPS
 #==========================

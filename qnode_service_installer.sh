@@ -71,21 +71,6 @@ exit_message() {
 # Set a trap to call exit_message on any error
 trap exit_message ERR
 
-if [[ $EUID -ne 0 ]]; then
-    echo "⚠️ Warning: This script is recommended to run as root or with sudo privileges"
-    read -p "Do you want to continue anyway? (y/N): " choice
-    
-    case "$choice" in
-        [yY]|[yY][eE][sS])
-            echo "Continuing without root privileges..."
-            ;;
-        *)
-            echo "❌ Exiting..."
-            exit 1
-            ;;
-    esac
-fi
-
 #==========================
 # INSTALL APPS
 #==========================
