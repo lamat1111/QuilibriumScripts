@@ -188,20 +188,49 @@ echo
 source ~/.bashrc
 sleep 1  # Add a 1-second delay
 
+
+#################################
 # Adjust network buffer sizes
+#################################
+
 echo "⏳ Adjusting network buffer sizes..."
-if grep -q "^net.core.rmem_max=600000000$" /etc/sysctl.conf; then
-  echo "✅ net.core.rmem_max=600000000 found inside /etc/sysctl.conf, skipping..."
-else
-  echo -e "\n# Change made to increase buffer sizes for better network performance for ceremonyclient\nnet.core.rmem_max=600000000" | sudo tee -a /etc/sysctl.conf > /dev/null
+
+# Detect Ubuntu version
+if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    VERSION_ID="${VERSION_ID}"
 fi
-if grep -q "^net.core.wmem_max=600000000$" /etc/sysctl.conf; then
-  echo "✅ net.core.wmem_max=600000000 found inside /etc/sysctl.conf, skipping..."
+
+# Add settings to sysctl.conf
+add_sysctl_setting() {
+    local key=$1
+    local value=$2
+    
+    if grep -q "^${key}=${value}$" /etc/sysctl.conf; then
+        echo "✅ ${key}=${value} found inside /etc/sysctl.conf, skipping..."
+    else
+        echo -e "\n# Change made to increase buffer sizes for better network performance for ceremonyclient\n${key}=${value}" | sudo tee -a /etc/sysctl.conf > /dev/null
+        echo "✅ Added ${key}=${value} to /etc/sysctl.conf"
+    fi
+}
+
+# Apply the settings
+add_sysctl_setting "net.core.rmem_max" "600000000"
+add_sysctl_setting "net.core.wmem_max" "600000000"
+
+# Apply changes based on Ubuntu version
+if [[ "${VERSION_ID}" == "24.04" ]]; then
+    echo "⏳ Applying changes (Ubuntu 24.04 method)..."
+    sudo /sbin/sysctl -p/etc/sysctl.conf
 else
-  echo -e "\n# Change made to increase buffer sizes for better network performance for ceremonyclient\nnet.core.wmem_max=600000000" | sudo tee -a /etc/sysctl.conf > /dev/null
+    echo "⏳ Applying changes (Ubuntu 22.04 and older method)..."
+    sudo sysctl -p
 fi
-sudo sysctl -p
-echo
+
+# Restart procps to ensure changes take effect
+sudo /etc/init.d/procps restart
+
+echo "✅ Network buffer sizes updated successfully"
 
 export GOROOT=/usr/local/go
 export GOPATH=$HOME/go
