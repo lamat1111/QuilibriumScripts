@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.3.0"
+SCRIPT_VERSION="1.3.1"
 
 # Define the script path
 SCRIPT_PATH=$HOME/scripts
@@ -140,11 +140,32 @@ mint_all() {
     echo
     echo "Mint all rewards:"
     echo "This command will only work when the network is synced and stable"
+    echo "Notes:"
+    echo "- Your node must be stopped."
+    echo "- You must use the public RPC. IN your config.yml the 'listenGrpcMultiaddr' field must be empty"
+    echo "- There is no confirmation. So once you hit enter, it will execute. It won't give you a preview what's going to happen. So double check everything!"
     echo
-    $QCLIENT_EXEC token mint all $CONFIG_FLAG
+
+    # Add confirmation prompt
+    while true; do
+        read -rp "Are you sure you want to proceed with minting all rewards? (Y/N): " confirm
+        case $confirm in
+            [Yy]* ) 
+                echo "Proceeding with minting..."
+                $QCLIENT_EXEC token mint all $CONFIG_FLAG
+                break
+                ;;
+            [Nn]* ) 
+                echo "Minting cancelled."
+                break
+                ;;
+            * ) 
+                echo "Please answer Y or N."
+                ;;
+        esac
+    done
     echo
 }
-
 
 create_transaction() {
     echo
