@@ -727,8 +727,11 @@ echo "⌛️   Running test script..."
 
 # Function to check for newer script version
 check_for_updates() {
+    local SCRIPT_NAME="qone"
+    local SCRIPT_VERSION="${SCRIPT_VERSION:-0.0.0}"  # Fallback if not defined
     local GITHUB_RAW_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/qone.sh"
     local LATEST_VERSION
+    
     LATEST_VERSION=$(curl -sS "$GITHUB_RAW_URL" | grep 'SCRIPT_VERSION=' | head -1 | cut -d'"' -f2)
     
     if [ $? -ne 0 ] || [ -z "$LATEST_VERSION" ]; then
@@ -738,11 +741,11 @@ check_for_updates() {
     
     if [ "$SCRIPT_VERSION" != "$LATEST_VERSION" ]; then
         echo "New version available. Attempting update..."
-        if curl -sS -o ~/qone_new.sh "$GITHUB_RAW_URL"; then
-            chmod +x ~/qone_new.sh
-            mv ~/qone_new.sh ~/qone.sh
+        if curl -sS -o "${HOME}/${SCRIPT_NAME}_new.sh" "$GITHUB_RAW_URL"; then
+            chmod +x "${HOME}/${SCRIPT_NAME}_new.sh"
+            mv "${HOME}/${SCRIPT_NAME}_new.sh" "${HOME}/${SCRIPT_NAME}.sh"
             echo "✅ New version ($LATEST_VERSION) installed. Restarting script..."
-            exec ~/qone.sh
+            exec "${HOME}/${SCRIPT_NAME}.sh"
         else
             echo "Error: Failed to download the new version. Update aborted."
             return 1
