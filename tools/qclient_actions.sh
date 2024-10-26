@@ -143,7 +143,7 @@ mint_all() {
     echo "Notes:"
     echo "- Your node must be stopped."
     echo "- You must use the public RPC. IN your config.yml the 'listenGrpcMultiaddr' field must be empty"
-    echo "- There is no confirmation. So once you hit enter, it will execute. It won't give you a preview what's going to happen. So double check everything!"
+    echo "- There is no confirmation. So once you hit enter, it will execute. It won't give you a preview of what's going to happen. So double check everything!"
     echo
 
     # Add confirmation prompt
