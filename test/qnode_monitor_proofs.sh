@@ -108,7 +108,7 @@ END {
     printf "Total decrease: %d\n", total_decrease;
     
     # Time statistics
-    if (minutes_since_last > 10) {
+    if (minutes_since_last > 30) {
         printf "%sLast proof submitted: %.1f minutes ago%s\n", yellow, minutes_since_last, nc;
     } else {
         printf "Last proof submitted: %.1f minutes ago\n", minutes_since_last;
