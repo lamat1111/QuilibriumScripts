@@ -41,13 +41,19 @@ get_proof_entries() {
 log_entries=$(get_proof_entries)
 
 # Check if we have any entries
+
+# Function to count proof entries
+count_proofs=$(echo "$log_entries" | wc -l)
+
 if [ -z "$log_entries" ]; then
     echo -e "${YELLOW}WARNING: No proof submissions found in the last $TIME_CHECK minutes!${NC}"
+    echo "This is also true if you have already minted all your rewards."
     exit 1
 fi
 
+
 # Process entries with awk
-echo -e "${BOLD}=== Increment Analysis (last 30 submissions) ===${NC}"
+echo -e "${BOLD}=== Proof submissions in last $TIME_CHECK minutes ===${NC}"
 echo "___________________________________________________________"
 
 echo "$log_entries" | awk -v current_time="$(date +%s)" \
