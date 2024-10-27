@@ -145,11 +145,12 @@ END {
     
     # Add warning if last proof is much older than the average interval
     if (minutes_since_last > (avg_interval * 10)) {
-        printf "%sWARNING: Node might be stalled\n", yellow;
-        printf "Last proof is %.1fx older than the average interval%s\n\n", 
-            minutes_since_last/avg_interval, nc;
+        printf "%sNote: Proof submission delay detected\n", yellow;
+        printf "Last proof is %.1fx older than the average interval\n", minutes_since_last/avg_interval;
+        printf "This could be normal and the node could recover on its own\n";
+        printf "If needed, wait at least 1 hour between restarts%s\n\n", nc;
     }
-    
+        
     # Processing Speed
     printf "=== Processing Speed ===\n";
     if (avg_time_per_batch > 0) {
