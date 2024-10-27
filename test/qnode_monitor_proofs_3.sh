@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Configurable time interval (default 10 minutes)
-TIME_INTERVAL=${1:-10}
-
 # Color definitions
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
@@ -32,8 +29,8 @@ ANIM_PID=$!
 # Trap to ensure we kill the animation on script exit
 trap "kill $ANIM_PID 2>/dev/null" EXIT
 
-# Calculate how many minutes of logs we need (time interval + 5 minutes buffer)
-MINUTES_TO_FETCH=$((TIME_INTERVAL + 5))
+# Always fetch at least 30 minutes of logs
+MINUTES_TO_FETCH=30  
 
 # Get recent log entries more efficiently
 log_entries=$(journalctl -u ceremonyclient.service --no-hostname --since "$MINUTES_TO_FETCH minutes ago" | grep increment)
@@ -65,7 +62,7 @@ if [ -z "$entries_window" ]; then
 fi
 
 # Process entries with awk
-echo -e "${BOLD}=== Increment Analysis for the last $TIME_INTERVAL minutes ===${NC}"
+echo -e "${BOLD}=== Increment Analysis (checking last 30 minutes) ===${NC}"
 echo "___________________________________________________________"
 
 echo "$entries_window" | awk -v current_time="$(date +%s)" \
