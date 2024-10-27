@@ -8,26 +8,8 @@ CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 BOLD='\033[1m'
 
-# Function for animated loading message
-animate_loading() {
-    local message="$1"
-    local chars="⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
-    local delay=0.1
-    
-    while true; do
-        for (( i=0; i<${#chars}; i++ )); do
-            echo -en "\r${CYAN}${chars:$i:1}${NC} ${message}"
-            sleep $delay
-        done
-    done
-}
-
 # Start animation in background
-animate_loading "Checking your increments..." &
-ANIM_PID=$!
-
-# Trap to ensure we kill the animation on script exit
-trap "kill $ANIM_PID 2>/dev/null" EXIT
+echo "Checking your increments..."
 
 # Fetch 60 minutes of logs
 MINUTES_TO_FETCH=60
