@@ -1,25 +1,45 @@
 #!/bin/bash
 
-# Color definitions - only keeping warning/error colors
+# Color definitions
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 BOLD='\033[1m'
 
-echo
 echo "Checking your increments..."
 
-# Get log entries with better filtering
-og_entries=$(journalctl -u ceremonyclient.service --no-hostname -n 20000 | grep "proof batch.*increment" | tail -n 30)
+# Function to get last N proof submissions
+get_proof_entries() {
+    local required_proofs=30
+    local found_proofs=0
+    local buffer=""
+    
+    # Read journalctl output in reverse, line by line, until we have enough proofs
+    journalctl -u ceremonyclient.service --no-hostname -r | while IFS= read -r line; do
+        if echo "$line" | grep -q "proof batch.*increment"; then
+            buffer="${buffer}${line}\n"
+            ((found_proofs++))
+            
+            if [ $found_proofs -eq $required_proofs ]; then
+                # Found enough proofs, output them in correct order (reverse again)
+                echo -e "$buffer" | tac
+                exit 0
+            fi
+        fi
+    done
+}
+
+# Get the proof entries
+log_entries=$(get_proof_entries)
 
 # Check if we have any entries
 if [ -z "$log_entries" ]; then
-    echo -e "${YELLOW}WARNING: No proof submissions found in the last 20.000 log entries!${NC}"
+    echo -e "${YELLOW}WARNING: No proof submissions found!${NC}"
     exit 1
 fi
 
 # Process entries with awk
-echo -e "${BOLD}=== Last 30 proof submissions ===${NC}"
+echo -e "${BOLD}=== Increment Analysis (last 30 submissions) ===${NC}"
 echo "___________________________________________________________"
 
 echo "$log_entries" | awk -v current_time="$(date +%s)" \
@@ -28,17 +48,19 @@ BEGIN {
     total_time=0;
     total_decrement=0;
     count=0;
+    first_time = 0;
 }
 {
     # Extract timestamp and increment from JSON format
     match($0, /"ts":([0-9]+\.[0-9]+)/, ts);
     match($0, /"increment":([0-9]+)/, inc);
     
-    entry_time = ts[1];  # Using the ts field directly
+    entry_time = ts[1];
     increment = inc[1];
     
     if (NR == 1) {
         first_increment = increment;
+        first_time = entry_time;
     }
     
     if (previous_time && previous_increment) {
@@ -72,7 +94,11 @@ END {
     last_decrement_gap = current_time - previous_time;
     minutes_since_last = last_decrement_gap / 60;
     
-    # Calculate averages
+    # Calculate time span of the 30 proofs
+    total_span = previous_time - first_time;
+    avg_time_between_proofs = total_span / (NR - 1);  # NR-1 gives intervals between N proofs
+    
+    # Calculate averages for batches
     avg_time_per_batch = (count > 0 && total_decrement > 0) ? (total_time / (total_decrement/200)) : 0;
     total_decrease = first_increment - previous_increment;
     
@@ -80,12 +106,16 @@ END {
     printf "Current increment: %d\n", previous_increment;
     printf "Total decrease: %d\n", total_decrease;
     
-    # Use yellow for warnings about timing
+    # Time statistics
     if (minutes_since_last > 10) {
-        printf "%sLast Decrease: %.1f minutes ago%s\n", yellow, minutes_since_last, nc;
+        printf "%sLast proof submitted: %.1f minutes ago%s\n", yellow, minutes_since_last, nc;
     } else {
-        printf "Last Decrease: %.1f minutes ago\n", minutes_since_last;
+        printf "Last proof submitted: %.1f minutes ago\n", minutes_since_last;
     }
+    
+    printf "Average time between proofs: %.2f seconds (%.2f minutes)\n", 
+        avg_time_between_proofs, avg_time_between_proofs/60;
+    printf "Time span of last %d proofs: %.2f minutes\n", NR, total_span/60;
     
     if (avg_time_per_batch > 0) {
         printf "Avg Time per Batch (200 increments): %.2f Seconds\n", avg_time_per_batch;
