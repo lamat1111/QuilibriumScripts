@@ -20,7 +20,7 @@ log_entries=$(journalctl -u ceremonyclient.service --no-hostname --since "$MINUT
 # Check if we have any entries
 if [ -z "$log_entries" ]; then
     echo -e "${YELLOW}WARNING: No proof submissions found in the last $MINUTES_TO_FETCH minutes!${NC}"
-    echo "${YELLOW}Can also happen if you have already minted all your rewards.${NC}"
+    echo -e "${YELLOW}Can also happen if you have already minted all your rewards.${NC}"
     exit 1
 fi
 
