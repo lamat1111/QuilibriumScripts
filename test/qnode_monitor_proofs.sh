@@ -6,7 +6,7 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 BOLD='\033[1m'
 
-echo "Checking your increments..."
+echo "Checking your log (this will take a minute)..."
 
 # Function to get last N proof submissions
 get_proof_entries() {
