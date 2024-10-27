@@ -42,7 +42,7 @@ log_entries=$(get_proof_entries)
 
 # Check if we have any entries
 if [ -z "$log_entries" ]; then
-    echo -e "${YELLOW}WARNING: No proof submissions found!${NC}"
+    echo -e "${YELLOW}WARNING: No proof submissions found in the last 60 minutes!${NC}"
     exit 1
 fi
 
