@@ -31,7 +31,7 @@ TIME_CHECK="120"
 #     done
 # }
 
-# Function to get last N proof submissions for the lat N minutes
+# Function to get last N proof submissions for the last N minutes
 get_proof_entries() {
     local required_proofs=30
     journalctl -u ceremonyclient.service --no-hostname --since "$TIME_CHECK minutes ago" -r | \
@@ -131,9 +131,9 @@ END {
     # Time statistics with improved clarity
     if (minutes_since_last > 30) {
         printf "%sWARNING: No recent proofs!\n", yellow;
-        printf "Last proof submitted: %.1f minutes ago%s\n\n", minutes_since_last, nc;
+        printf "Last proof submitted: %.2f minutes ago%s\n\n", minutes_since_last, nc;
     } else {
-        printf "Last proof submitted: %.1f minutes ago\n\n", minutes_since_last;
+        printf "Last proof submitted: %.2f minutes ago\n\n", minutes_since_last;
     }
     
     printf "When active, proofs were submitted every %.2f minutes\n", avg_interval;
@@ -153,6 +153,7 @@ END {
         
         # Completion Estimates
         printf "=== Completion Estimates ===\n";
+        days_to_complete = (previous_increment * (avg_time_per_batch/200)) / 86400;
         printf "Time to complete your %d remaining Increments: %.2f days\n\n", 
             previous_increment, days_to_complete;
     } else {
