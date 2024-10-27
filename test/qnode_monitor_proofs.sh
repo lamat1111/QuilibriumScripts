@@ -9,23 +9,32 @@ BOLD='\033[1m'
 echo "Checking your log (this will take a minute)..."
 
 # Function to get last N proof submissions
+# get_proof_entries() {
+#     local required_proofs=30
+#     local found_proofs=0
+#     local buffer=""
+    
+#     # Read journalctl output in reverse, line by line, until we have enough proofs
+#     journalctl -u ceremonyclient.service --no-hostname -r | while IFS= read -r line; do
+#         if echo "$line" | grep -q "proof batch.*increment"; then
+#             buffer="$line\n$buffer"
+#             ((found_proofs++))
+            
+#             if [ $found_proofs -eq $required_proofs ]; then
+#                 echo -e "$buffer"
+#                 exit 0
+#             fi
+#         fi
+#     done
+# }
+
+# Function to get last N proof submissions for the lat 60 minutes
 get_proof_entries() {
     local required_proofs=30
-    local found_proofs=0
-    local buffer=""
-    
-    # Read journalctl output in reverse, line by line, until we have enough proofs
-    journalctl -u ceremonyclient.service --no-hostname -r | while IFS= read -r line; do
-        if echo "$line" | grep -q "proof batch.*increment"; then
-            buffer="$line\n$buffer"
-            ((found_proofs++))
-            
-            if [ $found_proofs -eq $required_proofs ]; then
-                echo -e "$buffer"
-                exit 0
-            fi
-        fi
-    done
+    journalctl -u ceremonyclient.service --no-hostname --since "60 minutes ago" -r | \
+    grep "proof batch.*increment" | \
+    head -n 30 | \
+    tac
 }
 
 # Get the proof entries
