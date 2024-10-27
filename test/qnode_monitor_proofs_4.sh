@@ -29,35 +29,19 @@ ANIM_PID=$!
 # Trap to ensure we kill the animation on script exit
 trap "kill $ANIM_PID 2>/dev/null" EXIT
 
-# Always fetch at least 30 minutes of logs
-MINUTES_TO_FETCH=30  
+# Always fetch 30 minutes of logs
+MINUTES_TO_FETCH=30
 
 # Get recent log entries more efficiently
 log_entries=$(journalctl -u ceremonyclient.service --no-hostname --since "$MINUTES_TO_FETCH minutes ago" | grep increment)
-
-# Get the most recent timestamp
-latest_ts=$(echo "$log_entries" | tail -n 1 | grep -o '"ts":[0-9]*\.[0-9]*' | cut -d: -f2)
-
-# Calculate timestamp from X minutes ago
-minutes_ago=$(echo "$latest_ts - (60 * $TIME_INTERVAL)" | bc)
-
-# Filter entries within time window
-entries_window=$(echo "$log_entries" | awk -v cutoff="$minutes_ago" '
-    {
-        match($0, /"ts":([0-9]*\.[0-9]*)/, ts)
-        if (ts[1] >= cutoff) {
-            print $0
-        }
-    }
-')
 
 # Kill animation and clear line
 kill $ANIM_PID 2>/dev/null
 echo -en "\r\033[K"
 
 # Check if we have any entries
-if [ -z "$entries_window" ]; then
-    echo -e "${YELLOW}WARNING: No proof submissions found in the last $TIME_INTERVAL minutes!${NC}"
+if [ -z "$log_entries" ]; then
+    echo -e "${YELLOW}WARNING: No proof submissions found in the last $MINUTES_TO_FETCH minutes!${NC}"
     exit 1
 fi
 
@@ -65,7 +49,7 @@ fi
 echo -e "${BOLD}=== Increment Analysis (checking last 30 minutes) ===${NC}"
 echo "___________________________________________________________"
 
-echo "$entries_window" | awk -v current_time="$(date +%s)" \
+echo "$log_entries" | awk -v current_time="$(date +%s)" \
     -v green="${GREEN}" -v yellow="${YELLOW}" -v blue="${BLUE}" -v cyan="${CYAN}" -v nc="${NC}" '
 BEGIN {
     total_time=0;
