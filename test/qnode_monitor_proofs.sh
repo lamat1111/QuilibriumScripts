@@ -53,6 +53,7 @@ fi
 
 
 # Process entries with awk
+echo
 echo -e "${BOLD}=== Proof submissions in last $TIME_CHECK minutes ===${NC}"
 echo "___________________________________________________________"
 
@@ -166,3 +167,4 @@ END {
     printf "___________________________________________________________\n";
 }
 '
+echo
