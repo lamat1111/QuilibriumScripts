@@ -8,6 +8,9 @@ BOLD='\033[1m'
 
 echo "Checking your log (this will take a minute)..."
 
+#minutes in the past to check
+TIME_CHECK="120" 
+
 # Function to get last N proof submissions - can be very slow if there are no proofs, it scans the log until it finds them
 # get_proof_entries() {
 #     local required_proofs=30
@@ -28,10 +31,10 @@ echo "Checking your log (this will take a minute)..."
 #     done
 # }
 
-# Function to get last N proof submissions for the lat 60 minutes
+# Function to get last N proof submissions for the lat N minutes
 get_proof_entries() {
     local required_proofs=30
-    journalctl -u ceremonyclient.service --no-hostname --since "60 minutes ago" -r | \
+    journalctl -u ceremonyclient.service --no-hostname --since "$TIME_CHECK minutes ago" -r | \
     grep "proof batch.*increment" | \
     head -n 30 | \
     tac
@@ -42,7 +45,7 @@ log_entries=$(get_proof_entries)
 
 # Check if we have any entries
 if [ -z "$log_entries" ]; then
-    echo -e "${YELLOW}WARNING: No proof submissions found in the last 60 minutes!${NC}"
+    echo -e "${YELLOW}WARNING: No proof submissions found in the last $TIME_CHECK minutes!${NC}"
     exit 1
 fi
 
@@ -51,7 +54,8 @@ echo -e "${BOLD}=== Increment Analysis (last 30 submissions) ===${NC}"
 echo "___________________________________________________________"
 
 echo "$log_entries" | awk -v current_time="$(date +%s)" \
-    -v yellow="${YELLOW}" -v red="${RED}" -v nc="${NC}" -v bold="${BOLD}" '
+    -v yellow="${YELLOW}" -v red="${RED}" -v nc="${NC}" -v bold="${BOLD}" \
+    -v time_check="$TIME_CHECK" '
 BEGIN {
     total_time=0;
     total_decrement=0;
