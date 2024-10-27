@@ -1,120 +1,99 @@
 #!/bin/bash
 
-# CPU limit checks snippet - to be added to node update script
+# Color definitions - only keeping warning/error colors
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+BOLD='\033[1m'
 
-#===========================
-# Set variables
-#===========================
-# Set service file path
-SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
-# User working folder
-HOME=$(eval echo ~$USER)
-# Node path
-NODE_PATH="$HOME/ceremonyclient/node"
+echo "Checking your increments..."
 
-#===========================
-# Check if ceremonyclient directory exists
-#===========================
-HOME=$(eval echo ~$USER)
-CEREMONYCLIENT_DIR="$HOME/ceremonyclient"
+# Get more log entries initially to ensure we catch enough proofs
+log_entries=$(journalctl -u ceremonyclient.service -o short-iso -n 2000 | grep 'publishing' | tail -n 30)
 
-if [ ! -d "$CEREMONYCLIENT_DIR" ]; then
-    echo "❌ Error: You don't have a node installed yet. Nothing to update. Exiting..."
+# Check if we have any entries
+if [ -z "$log_entries" ]; then
+    echo -e "${YELLOW}WARNING: No proof submissions found!${NC}"
     exit 1
 fi
 
-#===========================
-# CPU limit cheks
-#===========================
-# Calculate the number of vCores
-vCORES=$(nproc)
+# Process entries with awk
+echo -e "${BOLD}=== Increment Analysis (last 30 submissions) ===${NC}"
+echo "___________________________________________________________"
 
-# Check if CPUQuota exists
-if grep -q "CPUQuota=" "$SERVICE_FILE"; then
-    # Extract the current CPU limit percentage
-    CURRENT_CPU_LIMIT=$(grep -oP '(?<=CPUQuota=)\d+' "$SERVICE_FILE")
+echo "$log_entries" | awk -v current_time="$(date +%s)" \
+    -v yellow="${YELLOW}" -v red="${RED}" -v nc="${NC}" -v bold="${BOLD}" '
+BEGIN {
+    total_time=0;
+    total_decrement=0;
+    count=0;
+}
+{
+    timestamp=$1;
+    increment=gensub(/.*"increment":([0-9]+).*/, "\\1", "g", $0);
+    cmd="date -d \"" timestamp "\" +%s";
+    cmd | getline entry_time;
+    close(cmd);
     
-    # Calculate the current CPUQuota value
-    CURRENT_CPU_QUOTA=$(( $CURRENT_CPU_LIMIT / $vCORES ))
+    if (NR == 1) {
+        first_increment = increment;
+    }
     
-    # Ask the user if they want to change the current CPU limit
-    read -p "Your CPU is already limited to $CURRENT_CPU_QUOTA%. Do you want to change this? (Y/N): " CHANGE_CPU_LIMIT
+    if (previous_time && previous_increment) {
+        time_gap=entry_time-previous_time;
+        decrement=previous_increment-increment;
+        if (decrement > 0) {
+            total_time+=time_gap;
+            total_decrement+=decrement;
+            count++;
+        }
+    }
     
-    if [[ "$CHANGE_CPU_LIMIT" =~ ^[Yy]$ ]]; then
-        while true; do
-            read -p "Enter the new CPU limit percentage (0-100) - enter 0 for no limit: " CPU_LIMIT_PERCENT
-            
-            # Validate the input
-            if [[ "$CPU_LIMIT_PERCENT" =~ ^[0-9]+$ ]] && [ "$CPU_LIMIT_PERCENT" -ge 0 ] && [ "$CPU_LIMIT_PERCENT" -le 100 ]; then
-                break  # Break out of the loop if the input is valid
-            else
-                echo "❌ Invalid input. Please enter a number between 0 and 100."
-            fi
-        done
-
-        if [ "$CPU_LIMIT_PERCENT" -eq 0 ]; then
-            echo "⚠️ No CPUQuota will be set."
-        else
-            echo "✅ CPU limit percentage set to: $CPU_LIMIT_PERCENT%"
-            sleep 1
-
-            # Calculate the new CPUQuota value
-            CPU_QUOTA=$(( ($CPU_LIMIT_PERCENT * $vCORES) / 100 ))
-            echo "☑️ Your CPUQuota value will be $CPU_LIMIT_PERCENT% of $vCORES vCores = $CPU_QUOTA%"
-            sleep 1
-
-            # Add CPUQuota to the service file
-            echo "➕ Adding CPUQuota to ceremonyclient service file..."
-            if ! sudo sed -i "/\[Service\]/a CPUQuota=${CPU_QUOTA}%" "$SERVICE_FILE"; then
-                echo "❌ Error: Failed to add CPUQuota to ceremonyclient service file." >&2
-                exit 1
-            else
-                echo "✅ A CPU limit of $CPU_LIMIT_PERCENT% has been applied"
-                echo "You can change this manually later in your service file if you need"
-            fi
-            sleep 1  # Add a 1-second delay
-        fi
-    elif [[ "$CHANGE_CPU_LIMIT" =~ ^[Nn]$ ]]; then
-        echo "🔄 CPUQuota will not be changed. Moving on..."
-    else
-        echo "❌ Invalid input. CPUQuota will not be changed. Moving on..."
-    fi
-else
-    # CPUQuota does not exist, proceed with setting a new CPU limit
-    while true; do
-        read -p "Enter the CPU limit percentage (0-100) - enter 0 for no limit: " CPU_LIMIT_PERCENT
-
-        # Validate the input
-        if [[ "$CPU_LIMIT_PERCENT" =~ ^[0-9]+$ ]] && [ "$CPU_LIMIT_PERCENT" -ge 0 ] && [ "$CPU_LIMIT_PERCENT" -le 100 ]; then
-            break  # Break out of the loop if the input is valid
-        else
-            echo "❌ Invalid input. Please enter a number between 0 and 100."
-        fi
-    done
-
-    if [ "$CPU_LIMIT_PERCENT" -eq 0 ]; then
-        echo "⚠️ No CPUQuota will be set."
-    else
-        echo "✅ CPU limit percentage set to: $CPU_LIMIT_PERCENT%"
-        sleep 1
-
-        # Calculate the CPUQuota value
-        CPU_QUOTA=$(( $CPU_LIMIT_PERCENT * $vCORES ))
-        echo "☑️ Your CPUQuota value will be $CPU_LIMIT_PERCENT% of $vCORES vCores = $CPU_QUOTA%"
-        sleep 1
-
-        # Add CPUQuota to the service file
-        echo "➕ Adding CPUQuota to ceremonyclient service file..."
-        if ! sudo sed -i "/\[Service\]/a CPUQuota=${CPU_QUOTA}%" "$SERVICE_FILE"; then
-            echo "❌ Error: Failed to add CPUQuota to ceremonyclient service file." >&2
-            exit 1
-        else
-            echo "✅ A CPU limit of $CPU_LIMIT_PERCENT% has been applied"
-            echo "You can change this manually later in your service file if you need"
-        fi
-        sleep 1  # Add a 1-second delay
-    fi
-fi
-
-
-
+    previous_time=entry_time;
+    previous_increment=increment;
+}
+END {
+    if (count == 0) {
+        printf "%sNo increment changes detected%s\n", yellow, nc;
+        exit 1;
+    }
+    
+    # Check if increment has reached 0
+    if (previous_increment == 0) {
+        printf "\n🎉 Congratulations! 🎉\n";
+        printf "%sYou have already minted all your rewards!%s\n", bold, nc;
+        printf "___________________________________________________________\n";
+        exit 0;
+    }
+    
+    # Calculate time since last proof
+    last_decrement_gap = current_time - previous_time;
+    minutes_since_last = last_decrement_gap / 60;
+    
+    # Calculate averages
+    avg_time_per_batch = (count > 0 && total_decrement > 0) ? (total_time / (total_decrement/200)) : 0;
+    total_decrease = first_increment - previous_increment;
+    
+    printf "Starting increment: %d\n", first_increment;
+    printf "Current increment: %d\n", previous_increment;
+    printf "Total decrease: %d\n", total_decrease;
+    
+    # Use yellow for warnings about timing
+    if (minutes_since_last > 10) {
+        printf "%sLast Decrease: %.1f minutes ago%s\n", yellow, minutes_since_last, nc;
+    } else {
+        printf "Last Decrease: %.1f minutes ago\n", minutes_since_last;
+    }
+    
+    if (avg_time_per_batch > 0) {
+        printf "Avg Time per Batch (200 increments): %.2f Seconds\n", avg_time_per_batch;
+        printf "\n=== Completion Estimates ===\n";
+        days_to_complete = (previous_increment * (avg_time_per_batch/200)) / 86400;
+        printf "Time to complete your %d remaining Increments: %.2f days\n", 
+            previous_increment, days_to_complete;
+    } else {
+        printf "%sWARNING: Could not calculate average batch time%s\n", yellow, nc;
+    }
+    printf "___________________________________________________________\n";
+}
+'
