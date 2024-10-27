@@ -8,7 +8,7 @@ BOLD='\033[1m'
 
 echo "Checking your log (this will take a minute)..."
 
-# Function to get last N proof submissions
+# Function to get last N proof submissions - can be very slow if there are no proofs, it scans the log until it finds them
 # get_proof_entries() {
 #     local required_proofs=30
 #     local found_proofs=0
