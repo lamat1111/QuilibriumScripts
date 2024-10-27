@@ -17,12 +17,12 @@ get_proof_entries() {
     # Read journalctl output in reverse, line by line, until we have enough proofs
     journalctl -u ceremonyclient.service --no-hostname -r | while IFS= read -r line; do
         if echo "$line" | grep -q "proof batch.*increment"; then
-            buffer="${buffer}${line}\n"
+            buffer="$line\n$buffer"  # Changed order of concatenation
             ((found_proofs++))
             
             if [ $found_proofs -eq $required_proofs ]; then
-                # Found enough proofs, output them in correct order (reverse again)
-                echo -e "$buffer" | tac
+                # Output without needing tac (already in correct order)
+                echo -e "$buffer"
                 exit 0
             fi
         fi
@@ -48,7 +48,7 @@ BEGIN {
     total_time=0;
     total_decrement=0;
     count=0;
-    first_time = 0;
+    first_entry = 1;
 }
 {
     # Extract timestamp and increment from JSON format
@@ -58,12 +58,13 @@ BEGIN {
     entry_time = ts[1];
     increment = inc[1];
     
-    if (NR == 1) {
-        first_increment = increment;
+    if (first_entry) {
         first_time = entry_time;
+        first_increment = increment;
+        first_entry = 0;
     }
     
-    if (previous_time && previous_increment) {
+    if (previous_time) {
         time_gap = entry_time - previous_time;
         decrement = previous_increment - increment;
         if (decrement > 0) {
@@ -94,11 +95,11 @@ END {
     last_decrement_gap = current_time - previous_time;
     minutes_since_last = last_decrement_gap / 60;
     
-    # Calculate time span of the 30 proofs
-    total_span = previous_time - first_time;
-    avg_time_between_proofs = total_span / (NR - 1);  # NR-1 gives intervals between N proofs
+    # Calculate time span of the proofs (only valid intervals)
+    span_minutes = (previous_time - first_time) / 60;  # Convert to minutes
+    avg_interval = count > 0 ? span_minutes / count : 0;
     
-    # Calculate averages for batches
+    # Calculate batch statistics
     avg_time_per_batch = (count > 0 && total_decrement > 0) ? (total_time / (total_decrement/200)) : 0;
     total_decrease = first_increment - previous_increment;
     
@@ -113,9 +114,9 @@ END {
         printf "Last proof submitted: %.1f minutes ago\n", minutes_since_last;
     }
     
-    printf "Average time between proofs: %.2f seconds (%.2f minutes)\n", 
-        avg_time_between_proofs, avg_time_between_proofs/60;
-    printf "Time span of last %d proofs: %.2f minutes\n", NR, total_span/60;
+    printf "Average time between proofs: %.2f minutes\n", avg_interval;
+    printf "Time span analyzed: %.2f minutes\n", span_minutes;
+    printf "Number of proof submissions analyzed: %d\n", count + 1;
     
     if (avg_time_per_batch > 0) {
         printf "Avg Time per Batch (200 increments): %.2f Seconds\n", avg_time_per_batch;
