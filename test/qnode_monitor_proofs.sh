@@ -6,10 +6,10 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 BOLD='\033[1m'
 
-echo "Checking your log for proofs submission.."
+echo "Checking your increments..."
 
-# Get more log entries initially to ensure we catch enough proofs
-log_entries=$(journalctl -u ceremonyclient.service -o short-iso -n 2000 | grep 'publishing' | tail -n 30)
+# Get log entries with better filtering
+log_entries=$(journalctl -u ceremonyclient.service --no-hostname -n 2000 | grep "proof batch.*increment" | tail -n 30)
 
 # Check if we have any entries
 if [ -z "$log_entries" ]; then
@@ -29,28 +29,29 @@ BEGIN {
     count=0;
 }
 {
-    timestamp=$1;
-    increment=gensub(/.*"increment":([0-9]+).*/, "\\1", "g", $0);
-    cmd="date -d \"" timestamp "\" +%s";
-    cmd | getline entry_time;
-    close(cmd);
+    # Extract timestamp and increment from JSON format
+    match($0, /"ts":([0-9]+\.[0-9]+)/, ts);
+    match($0, /"increment":([0-9]+)/, inc);
+    
+    entry_time = ts[1];  # Using the ts field directly
+    increment = inc[1];
     
     if (NR == 1) {
         first_increment = increment;
     }
     
     if (previous_time && previous_increment) {
-        time_gap=entry_time-previous_time;
-        decrement=previous_increment-increment;
+        time_gap = entry_time - previous_time;
+        decrement = previous_increment - increment;
         if (decrement > 0) {
-            total_time+=time_gap;
-            total_decrement+=decrement;
+            total_time += time_gap;
+            total_decrement += decrement;
             count++;
         }
     }
     
-    previous_time=entry_time;
-    previous_increment=increment;
+    previous_time = entry_time;
+    previous_increment = increment;
 }
 END {
     if (count == 0) {
