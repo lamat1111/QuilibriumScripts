@@ -134,13 +134,13 @@ END {
     # Time statistics with improved clarity
     if (minutes_since_last > 30) {
         printf "%sWARNING: No recent proofs!\n", yellow;
-        printf "Last proof submitted: %.2f minutes ago%s\n\n", minutes_since_last, nc;
+        printf "Last batch submitted: %.2f minutes ago%s\n\n", minutes_since_last, nc;
     } else {
-        printf "Last proof submitted: %.2f minutes ago\n\n", minutes_since_last;
+        printf "Last batch submitted: %.2f minutes ago\n\n", minutes_since_last;
     }
     
-    printf "When active, proofs were submitted every %.2f minutes\n", avg_interval;
-    printf "The analyzed %d proofs were submitted within %.2f minutes\n\n", total_entries, span_minutes;
+    printf "When active, batches were submitted every %.2f minutes\n", avg_interval;
+    printf "The analyzed %d batches were submitted within %.2f minutes\n\n", total_entries, span_minutes;
     
     # Add warning if last proof is much older than the average interval
     if (minutes_since_last > (avg_interval * 10)) {
