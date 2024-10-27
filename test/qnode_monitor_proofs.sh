@@ -6,7 +6,7 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 BOLD='\033[1m'
 
-echo "Checking your increments (this will take a minute)..."
+echo "Checking your log for proofs submission (this will take a minute)..."
 
 # Get current Unix timestamp (with nanoseconds for precision)
 current_timestamp=$(date +%s)
