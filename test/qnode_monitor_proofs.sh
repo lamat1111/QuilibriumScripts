@@ -17,11 +17,10 @@ get_proof_entries() {
     # Read journalctl output in reverse, line by line, until we have enough proofs
     journalctl -u ceremonyclient.service --no-hostname -r | while IFS= read -r line; do
         if echo "$line" | grep -q "proof batch.*increment"; then
-            buffer="$line\n$buffer"  # Changed order of concatenation
+            buffer="$line\n$buffer"
             ((found_proofs++))
             
             if [ $found_proofs -eq $required_proofs ]; then
-                # Output without needing tac (already in correct order)
                 echo -e "$buffer"
                 exit 0
             fi
@@ -41,6 +40,7 @@ fi
 # Process entries with awk
 echo -e "${BOLD}=== Increment Analysis (last 30 submissions) ===${NC}"
 echo "___________________________________________________________"
+echo ""
 
 echo "$log_entries" | awk -v current_time="$(date +%s)" \
     -v yellow="${YELLOW}" -v red="${RED}" -v nc="${NC}" -v bold="${BOLD}" '
@@ -86,7 +86,7 @@ END {
     # Check if increment has reached 0
     if (previous_increment == 0) {
         printf "\n🎉 Congratulations! 🎉\n";
-        printf "%sYou have already minted all your rewards!%s\n", bold, nc;
+        printf "%sYou have already minted all your rewards!%s\n\n", bold, nc;
         printf "___________________________________________________________\n";
         exit 0;
     }
@@ -96,37 +96,54 @@ END {
     minutes_since_last = last_decrement_gap / 60;
     
     # Calculate time span of the proofs (only valid intervals)
-    span_minutes = (previous_time - first_time) / 60;  # Convert to minutes
+    span_minutes = (previous_time - first_time) / 60;
     avg_interval = count > 0 ? span_minutes / count : 0;
     
     # Calculate batch statistics
     avg_time_per_batch = (count > 0 && total_decrement > 0) ? (total_time / (total_decrement/200)) : 0;
     total_decrease = first_increment - previous_increment;
     
+    # Increment Information
+    printf "=== Current State ===\n";
     printf "Starting increment: %d\n", first_increment;
     printf "Current increment: %d\n", previous_increment;
-    printf "Total decrease: %d\n", total_decrease;
+    printf "Total decrease: %d\n\n", total_decrease;
     
-    # Time statistics
+    # Time Analysis
+    printf "=== Time Analysis ===\n";
+    
+    # Time statistics with improved clarity
     if (minutes_since_last > 30) {
-        printf "%sLast proof submitted: %.1f minutes ago%s\n", yellow, minutes_since_last, nc;
+        printf "%sWARNING: No recent proofs!\n", yellow;
+        printf "Last proof submitted: %.1f minutes ago%s\n\n", minutes_since_last, nc;
     } else {
-        printf "Last proof submitted: %.1f minutes ago\n", minutes_since_last;
+        printf "Last proof submitted: %.1f minutes ago\n\n", minutes_since_last;
     }
     
-    printf "Average time between proofs: %.2f minutes\n", avg_interval;
-    printf "Time span analyzed: %.2f minutes\n", span_minutes;
-    printf "Number of proof submissions analyzed: %d\n", count + 1;
+    printf "When active, proofs were submitted every %.2f minutes\n", avg_interval;
+    printf "The analyzed %d proofs were submitted within %.2f minutes\n\n", count + 1, span_minutes;
     
+    # Add warning if last proof is much older than the average interval
+    if (minutes_since_last > (avg_interval * 10)) {
+        printf "%sWARNING: Node might be stalled\n", yellow;
+        printf "Last proof is %.1fx older than the average interval%s\n\n", 
+            minutes_since_last/avg_interval, nc;
+    }
+    
+    # Processing Speed
+    printf "=== Processing Speed ===\n";
     if (avg_time_per_batch > 0) {
-        printf "Avg Time per Batch (200 increments): %.2f Seconds\n", avg_time_per_batch;
-        printf "\n=== Completion Estimates ===\n";
+        printf "Avg Time per Batch (200 increments): %.2f Seconds\n\n", avg_time_per_batch;
+        
+        # Completion Estimates
+        printf "=== Completion Estimates ===\n";
         days_to_complete = (previous_increment * (avg_time_per_batch/200)) / 86400;
-        printf "Time to complete your %d remaining Increments: %.2f days\n", 
+        printf "Time to complete your %d remaining Increments: %.2f days\n\n", 
             previous_increment, days_to_complete;
     } else {
-        printf "%sWARNING: Could not calculate average batch time%s\n", yellow, nc;
+        printf "%sWARNING: Could not calculate average batch time%s\n\n", yellow, nc;
     }
+    
     printf "___________________________________________________________\n";
 }
 '
