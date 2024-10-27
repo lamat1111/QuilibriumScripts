@@ -3,6 +3,14 @@
 # Configurable time interval (default 10 minutes)
 TIME_INTERVAL=${1:-10}
 
+# Color definitions
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
+BOLD='\033[1m'
+
 # Function for animated loading message
 animate_loading() {
     local message="$1"
@@ -11,7 +19,7 @@ animate_loading() {
     
     while true; do
         for (( i=0; i<${#chars}; i++ )); do
-            echo -en "\r${chars:$i:1} ${message}"
+            echo -en "\r${CYAN}${chars:$i:1}${NC} ${message}"
             sleep $delay
         done
     done
@@ -49,15 +57,16 @@ echo -en "\r\033[K"
 
 # Check if we have any entries
 if [ -z "$entries_window" ]; then
-    echo "WARNING: No proof submissions found in the last $TIME_INTERVAL minutes!"
+    echo -e "${YELLOW}WARNING: No proof submissions found in the last $TIME_INTERVAL minutes!${NC}"
     exit 1
 fi
 
 # Process entries with awk
-echo "=== Increment Analysis for the last $TIME_INTERVAL minutes ==="
+echo -e "${BOLD}=== Increment Analysis for the last $TIME_INTERVAL minutes ===${NC}"
 echo "___________________________________________________________"
 
-echo "$entries_window" | awk -v current_time="$(date +%s)" '
+echo "$entries_window" | awk -v current_time="$(date +%s)" \
+    -v green="${GREEN}" -v yellow="${YELLOW}" -v blue="${BLUE}" -v cyan="${CYAN}" -v nc="${NC}" '
 BEGIN {
     total_time=0;
     total_decrement=0;
@@ -90,21 +99,22 @@ BEGIN {
 }
 END {
     if (count == 0) {
-        printf "No increment changes detected in the time window\n";
+        printf "%sNo increment changes detected in the time window%s\n", yellow, nc;
         exit 1;
     }
     
     last_decrement_gap = int(current_time - previous_time);
-    avg_time_per_decrement = (count > 0 && total_decrement > 0) ? total_time / total_decrement : 0;
+    avg_time_per_batch = (count > 0 && total_decrement > 0) ? (total_time / (total_decrement/200)) : 0;
     total_decrease = first_increment - increment;
     
-    printf "Starting increment: %d\n", first_increment;
-    printf "Current increment: %d\n", increment;
-    printf "Total decrease: %d\n", total_decrease;
-    printf "Last Decrease: %d Seconds ago\n", last_decrement_gap;
-    printf "Avg Time per Increment: %f Seconds\n", avg_time_per_decrement;
-    printf "\n=== Completion Estimates ===\n";
-    printf "Time to complete your %d remaining Increments: %.2f days\n", increment, (increment * avg_time_per_decrement) / 86400;
+    printf "%sStarting increment:%s %d\n", blue, nc, first_increment;
+    printf "%sCurrent increment:%s %d\n", blue, nc, increment;
+    printf "%sTotal decrease:%s %d\n", green, nc, total_decrease;
+    printf "%sLast Decrease:%s %d Seconds ago\n", yellow, nc, last_decrement_gap;
+    printf "%sAvg Time per Batch (200 increments):%s %.2f Seconds\n", cyan, nc, avg_time_per_batch;
+    printf "\n%s=== Completion Estimates ===%s\n", blue, nc;
+    printf "Time to complete your %s%d%s remaining Increments: %s%.2f days%s\n", 
+        yellow, increment, nc, green, (increment * (avg_time_per_batch/200)) / 86400, nc;
     printf "___________________________________________________________\n";
 }
 '
