@@ -40,17 +40,20 @@ fi
 # Process entries with awk
 echo -e "${BOLD}=== Increment Analysis (last 30 submissions) ===${NC}"
 echo "___________________________________________________________"
-echo ""
 
 echo "$log_entries" | awk -v current_time="$(date +%s)" \
     -v yellow="${YELLOW}" -v red="${RED}" -v nc="${NC}" -v bold="${BOLD}" '
 BEGIN {
     total_time=0;
     total_decrement=0;
-    count=0;
+    gap_count=0;
     first_entry = 1;
+    total_entries = 0;
 }
 {
+    # Count each entry
+    total_entries++;
+    
     # Extract timestamp and increment from JSON format
     match($0, /"ts":([0-9]+\.[0-9]+)/, ts);
     match($0, /"increment":([0-9]+)/, inc);
@@ -70,7 +73,7 @@ BEGIN {
         if (decrement > 0) {
             total_time += time_gap;
             total_decrement += decrement;
-            count++;
+            gap_count++;
         }
     }
     
@@ -78,7 +81,7 @@ BEGIN {
     previous_increment = increment;
 }
 END {
-    if (count == 0) {
+    if (gap_count == 0) {
         printf "%sNo increment changes detected%s\n", yellow, nc;
         exit 1;
     }
@@ -97,10 +100,10 @@ END {
     
     # Calculate time span of the proofs (only valid intervals)
     span_minutes = (previous_time - first_time) / 60;
-    avg_interval = count > 0 ? span_minutes / count : 0;
+    avg_interval = gap_count > 0 ? span_minutes / gap_count : 0;
     
     # Calculate batch statistics
-    avg_time_per_batch = (count > 0 && total_decrement > 0) ? (total_time / (total_decrement/200)) : 0;
+    avg_time_per_batch = (gap_count > 0 && total_decrement > 0) ? (total_time / (total_decrement/200)) : 0;
     total_decrease = first_increment - previous_increment;
     
     # Increment Information
@@ -121,7 +124,7 @@ END {
     }
     
     printf "When active, proofs were submitted every %.2f minutes\n", avg_interval;
-    printf "The analyzed %d proofs were submitted within %.2f minutes\n\n", count + 1, span_minutes;
+    printf "The analyzed %d proofs were submitted within %.2f minutes\n\n", total_entries, span_minutes;
     
     # Add warning if last proof is much older than the average interval
     if (minutes_since_last > (avg_interval * 10)) {
@@ -137,7 +140,6 @@ END {
         
         # Completion Estimates
         printf "=== Completion Estimates ===\n";
-        days_to_complete = (previous_increment * (avg_time_per_batch/200)) / 86400;
         printf "Time to complete your %d remaining Increments: %.2f days\n\n", 
             previous_increment, days_to_complete;
     } else {
