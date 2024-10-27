@@ -31,12 +31,9 @@ TIME_CHECK="120"
 #     done
 # }
 
-# Function to get last N proof submissions for the last N minutes
 get_proof_entries() {
-    local required_proofs=30
     journalctl -u ceremonyclient.service --no-hostname --since "$TIME_CHECK minutes ago" -r | \
     grep "proof batch.*increment" | \
-    head -n 30 | \
     tac
 }
 
