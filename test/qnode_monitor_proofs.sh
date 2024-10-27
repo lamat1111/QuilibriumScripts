@@ -145,10 +145,10 @@ END {
     
     # Add warning if last proof is much older than the average interval
     if (minutes_since_last > (avg_interval * 10)) {
-        printf "%sNote: Proof submission delay detected\n", yellow;
+        printf "%sNote: Proof submission delay detected%s\n", yellow, nc;
         printf "Last proof is %.1fx older than the average interval\n", minutes_since_last/avg_interval;
         printf "This could be normal and the node could recover on its own\n";
-        printf "If needed, wait at least 1 hour between restarts%s\n\n", nc;
+        printf "If needed, wait at least 1 hour between restarts\n\n";
     }
         
     # Processing Speed
