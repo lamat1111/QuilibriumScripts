@@ -6,7 +6,7 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 BOLD='\033[1m'
 
-echo "Checking your increments..."
+echo "Checking your log for proofs submission.."
 
 # Get more log entries initially to ensure we catch enough proofs
 log_entries=$(journalctl -u ceremonyclient.service -o short-iso -n 2000 | grep 'publishing' | tail -n 30)
