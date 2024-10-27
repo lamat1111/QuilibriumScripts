@@ -29,8 +29,11 @@ ANIM_PID=$!
 # Trap to ensure we kill the animation on script exit
 trap "kill $ANIM_PID 2>/dev/null" EXIT
 
-# Always fetch 30 minutes of logs
-MINUTES_TO_FETCH=30
+# Fetch 60 minutes of logs
+MINUTES_TO_FETCH=60
+
+# Get current timestamp before fetching logs
+current_timestamp=$(date +%s.%N)
 
 # Get recent log entries more efficiently
 log_entries=$(journalctl -u ceremonyclient.service --no-hostname --since "$MINUTES_TO_FETCH minutes ago" | grep increment)
@@ -46,10 +49,10 @@ if [ -z "$log_entries" ]; then
 fi
 
 # Process entries with awk
-echo -e "${BOLD}=== Increment Analysis (checking last 30 minutes) ===${NC}"
+echo -e "${BOLD}=== Increment Analysis (checking last 60 minutes) ===${NC}"
 echo "___________________________________________________________"
 
-echo "$log_entries" | awk -v current_time="$(date +%s)" \
+echo "$log_entries" | awk -v current_time="$current_timestamp" \
     -v green="${GREEN}" -v yellow="${YELLOW}" -v blue="${BLUE}" -v cyan="${CYAN}" -v nc="${NC}" '
 BEGIN {
     total_time=0;
@@ -87,15 +90,18 @@ END {
         exit 1;
     }
     
-    last_decrement_gap = int(current_time - previous_time);
-    last_decrement_minutes = last_decrement_gap / 60;
+    # Calculate minutes since last proof with higher precision
+    time_since_last = current_time - previous_time;
+    if (time_since_last < 0) time_since_last = 0;  # Safeguard against negative values
+    minutes_since_last = time_since_last / 60;
+    
     avg_time_per_batch = (count > 0 && total_decrement > 0) ? (total_time / (total_decrement/200)) : 0;
     total_decrease = first_increment - increment;
     
     printf "%sStarting increment:%s %d\n", blue, nc, first_increment;
     printf "%sCurrent increment:%s %d\n", blue, nc, increment;
     printf "%sTotal decrease:%s %d\n", green, nc, total_decrease;
-    printf "%sLast Decrease:%s %.1f minutes ago\n", yellow, nc, last_decrement_minutes;
+    printf "%sLast Decrease:%s %.1f minutes ago\n", yellow, nc, minutes_since_last;
     printf "%sAvg Time per Batch (200 increments):%s %.2f Seconds\n", cyan, nc, avg_time_per_batch;
     printf "\n%s=== Completion Estimates ===%s\n", blue, nc;
     printf "Time to complete your %s%d%s remaining Increments: %s%.2f days%s\n", 
