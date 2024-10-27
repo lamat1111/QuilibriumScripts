@@ -10,11 +10,11 @@ echo
 echo "Checking your increments..."
 
 # Get log entries with better filtering
-og_entries=$(journalctl -u ceremonyclient.service --no-hostname -n 10000 | grep "proof batch.*increment" | tail -n 30)
+og_entries=$(journalctl -u ceremonyclient.service --no-hostname -n 20000 | grep "proof batch.*increment" | tail -n 30)
 
 # Check if we have any entries
 if [ -z "$log_entries" ]; then
-    echo -e "${YELLOW}WARNING: No proof submissions found in last 10000 log entries!${NC}"
+    echo -e "${YELLOW}WARNING: No proof submissions found in the last 20.000 log entries!${NC}"
     exit 1
 fi
 
