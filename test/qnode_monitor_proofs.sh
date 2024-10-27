@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# Color definitions
-GREEN='\033[0;32m'
-BLUE='\033[0;34m'
+# Color definitions - only keeping warning/error colors
 YELLOW='\033[1;33m'
-CYAN='\033[0;36m'
+RED='\033[0;31m'
 NC='\033[0m' # No Color
 BOLD='\033[1m'
+
+
 
 # Start animation in background
 echo "Checking your increments..."
@@ -35,7 +35,7 @@ echo -e "${BOLD}=== Increment Analysis (checking last 60 minutes) ===${NC}"
 echo "___________________________________________________________"
 
 echo "$log_entries" | awk -v current_time="$current_timestamp" \
-    -v green="${GREEN}" -v yellow="${YELLOW}" -v blue="${BLUE}" -v cyan="${CYAN}" -v nc="${NC}" '
+    -v yellow="${YELLOW}" -v red="${RED}" -v nc="${NC}" -v bold="${BOLD}" '
 BEGIN {
     total_time=0;
     total_decrement=0;
@@ -72,6 +72,14 @@ END {
         exit 1;
     }
     
+    # Check if increment has reached 0
+    if (increment == 0) {
+        printf "\n🎉 Congratulations! 🎉\n";
+        printf "%sYou have already minted all your rewards!%s\n", bold, nc;
+        printf "___________________________________________________________\n";
+        exit 0;
+    }
+    
     # Calculate minutes since last proof with higher precision
     time_since_last = current_time - previous_time;
     if (time_since_last < 0) time_since_last = 0;  # Safeguard against negative values
@@ -80,14 +88,21 @@ END {
     avg_time_per_batch = (count > 0 && total_decrement > 0) ? (total_time / (total_decrement/200)) : 0;
     total_decrease = first_increment - increment;
     
-    printf "%sStarting increment:%s %d\n", blue, nc, first_increment;
-    printf "%sCurrent increment:%s %d\n", blue, nc, increment;
-    printf "%sTotal decrease:%s %d\n", green, nc, total_decrease;
-    printf "%sLast Decrease:%s %.1f minutes ago\n", yellow, nc, minutes_since_last;
-    printf "%sAvg Time per Batch (200 increments):%s %.2f Seconds\n", cyan, nc, avg_time_per_batch;
-    printf "\n%s=== Completion Estimates ===%s\n", blue, nc;
-    printf "Time to complete your %s%d%s remaining Increments: %s%.2f days%s\n", 
-        yellow, increment, nc, green, (increment * (avg_time_per_batch/200)) / 86400, nc;
+    printf "Starting increment: %d\n", first_increment;
+    printf "Current increment: %d\n", increment;
+    printf "Total decrease: %d\n", total_decrease;
+    
+    # Use yellow for warnings about timing
+    if (minutes_since_last > 10) {
+        printf "%sLast Decrease: %.1f minutes ago%s\n", yellow, minutes_since_last, nc;
+    } else {
+        printf "Last Decrease: %.1f minutes ago\n", minutes_since_last;
+    }
+    
+    printf "Avg Time per Batch (200 increments): %.2f Seconds\n", avg_time_per_batch;
+    printf "\n=== Completion Estimates ===\n";
+    printf "Time to complete your %d remaining Increments: %.2f days\n", 
+        increment, (increment * (avg_time_per_batch/200)) / 86400;
     printf "___________________________________________________________\n";
 }
 '
