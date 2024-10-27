@@ -32,8 +32,11 @@ ANIM_PID=$!
 # Trap to ensure we kill the animation on script exit
 trap "kill $ANIM_PID 2>/dev/null" EXIT
 
-# Get all recent log entries with increments
-log_entries=$(journalctl -u ceremonyclient.service --no-hostname | grep increment | tail -n 2000)
+# Calculate how many minutes of logs we need (time interval + 5 minutes buffer)
+MINUTES_TO_FETCH=$((TIME_INTERVAL + 5))
+
+# Get recent log entries more efficiently
+log_entries=$(journalctl -u ceremonyclient.service --no-hostname --since "$MINUTES_TO_FETCH minutes ago" | grep increment)
 
 # Get the most recent timestamp
 latest_ts=$(echo "$log_entries" | tail -n 1 | grep -o '"ts":[0-9]*\.[0-9]*' | cut -d: -f2)
@@ -104,13 +107,14 @@ END {
     }
     
     last_decrement_gap = int(current_time - previous_time);
+    last_decrement_minutes = last_decrement_gap / 60;
     avg_time_per_batch = (count > 0 && total_decrement > 0) ? (total_time / (total_decrement/200)) : 0;
     total_decrease = first_increment - increment;
     
     printf "%sStarting increment:%s %d\n", blue, nc, first_increment;
     printf "%sCurrent increment:%s %d\n", blue, nc, increment;
     printf "%sTotal decrease:%s %d\n", green, nc, total_decrease;
-    printf "%sLast Decrease:%s %d Seconds ago\n", yellow, nc, last_decrement_gap;
+    printf "%sLast Decrease:%s %.1f minutes ago\n", yellow, nc, last_decrement_minutes;
     printf "%sAvg Time per Batch (200 increments):%s %.2f Seconds\n", cyan, nc, avg_time_per_batch;
     printf "\n%s=== Completion Estimates ===%s\n", blue, nc;
     printf "Time to complete your %s%d%s remaining Increments: %s%.2f days%s\n", 
