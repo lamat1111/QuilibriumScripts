@@ -96,19 +96,21 @@ last_increment=$(echo "$log_entries" | head -n1 | grep -o '"increment":[0-9]*' |
 # Simple check: just verify if the overall trend is decreasing
 if [ "$first_increment" -le "$last_increment" ]; then
     log_and_print "${RED}Error: Increments are not decreasing${NC}"
-    log_and_print "First proof increment: $first_increment"
-    log_and_print "Latest proof increment: $last_increment"
+    log_and_print "First increment: $first_increment"
+    log_and_print "Latest increment: $last_increment"
     log_and_print "Restarting ceremonyclient service..."
     log_and_print ""
     systemctl restart ceremonyclient
     exit 1
 fi
 
+# Replace the output section with:
 log_and_print "Proof check passed:"
-log_and_print "First proof increment: $first_increment"
-log_and_print "Latest proof increment: $last_increment"
-log_and_print "Total decrease: $((first_increment - last_increment))"
-log_and_print "Number of proofs in last hour: $entry_count"
+log_and_print "First increment: $first_increment"
+log_and_print "Latest increment: $last_increment"
+log_and_print "Total increment decrease: $((first_increment - last_increment))"
+log_and_print "Number of batches: $(((first_increment - last_increment) / 200))"
+log_and_print "Number of proof messages in last hour: $entry_count"
 log_and_print ""
 
 #####################
