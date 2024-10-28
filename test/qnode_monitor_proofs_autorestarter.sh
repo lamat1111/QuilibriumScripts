@@ -26,15 +26,14 @@ fi
 # Function to log with timestamp and print to console
 log_and_print() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" >> "$LOG_FILE"
-    echo "$1"
+    echo -e "$1"  # -e flag to interpret color codes
 }
 
-echo "Checking proofs from the last 60 minutes..."
+log_and_print "Checking proofs from the last 60 minutes..."
 
 # Get all proof entries from the past 60 minutes
 log_entries=$(journalctl -u ceremonyclient.service --no-hostname --since "60 minutes ago" -r | \
-              grep "proof batch.*increment" | \
-              tac)
+              grep "proof batch.*increment")
 
 # Count how many entries we got
 entry_count=$(echo "$log_entries" | grep -c "proof batch")
@@ -48,76 +47,27 @@ if [ $entry_count -eq 0 ]; then
     exit 1
 fi
 
-# Extract all increments and store them in an array
-declare -a increments
-while read -r line; do
-    if [[ $line =~ \"increment\":([0-9]*) ]]; then
-        increments+=(${BASH_REMATCH[1]})
-    fi
-done <<< "$log_entries"
+# Get first and last increment values
+first_increment=$(echo "$log_entries" | tail -n1 | grep -o '"increment":[0-9]*' | cut -d':' -f2)
+last_increment=$(echo "$log_entries" | head -n1 | grep -o '"increment":[0-9]*' | cut -d':' -f2)
 
-# Print number of proofs found
-log_and_print "Found $entry_count proofs in the last 60 minutes"
-
-# Function to check if increments are decreasing overall
-check_decreasing_trend() {
-    local len=${#increments[@]}
-    local first_value=${increments[0]}
-    local last_value=${increments[$((len-1))]}
-    
-    if [ $first_value -lt $last_value ]; then
-        return 1
-    fi
-    
-    local prev_value=${increments[0]}
-    local equal_count=0
-    local max_equal_allowed=3
-    
-    for ((i=1; i<len; i++)); do
-        current_value=${increments[$i]}
-        
-        if [ $current_value -gt $prev_value ]; then
-            return 1
-        elif [ $current_value -eq $prev_value ]; then
-            ((equal_count++))
-            if [ $equal_count -gt $max_equal_allowed ]; then
-                return 1
-            fi
-        else
-            equal_count=0
-        fi
-        
-        prev_value=$current_value
-    done
-    
-    return 0
-}
-
-# Check the trend
-if ! check_decreasing_trend; then
-    log_and_print "${RED}Error: Increments are not showing a consistent decreasing trend${NC}"
-    log_and_print "First increment: ${increments[0]}"
-    log_and_print "Last increment: ${increments[$((${#increments[@]}-1))]}"
-    log_and_print "Increment sequence:"
-    for inc in "${increments[@]}"; do
-        log_and_print "$inc"
-    done
+# Simple check: just verify if the overall trend is decreasing
+if [ "$first_increment" -le "$last_increment" ]; then
+    log_and_print "${RED}Error: Increments are not decreasing${NC}"
+    log_and_print "First proof increment: $first_increment"
+    log_and_print "Latest proof increment: $last_increment"
     log_and_print "Restarting ceremonyclient service..."
     log_and_print ""
     systemctl restart ceremonyclient
     exit 1
 fi
 
-{
-    echo "Proof check passed:"
-    echo "First increment: ${increments[0]}"
-    echo "Last increment: ${increments[$((${#increments[@]}-1))]}"
-    echo "Total decrease: $((increments[0] - increments[$((${#increments[@]}-1))]))"
-    echo "Number of proofs analyzed: ${#increments[@]}"
-    echo ""
-} | while IFS= read -r line; do
-    log_and_print "$line"
-done
+log_and_print "Proof check passed:"
+log_and_print "First proof increment: $first_increment"
+log_and_print "Latest proof increment: $last_increment"
+log_and_print "Total decrease: $((first_increment - last_increment))"
+log_and_print "Number of proofs in last hour: $entry_count"
+log_and_print ""
 
 #####################
 # Logs - clean
