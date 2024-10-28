@@ -9,33 +9,6 @@ NC='\033[0m' # No Color
 SCRIPT_PATH="$0"
 GITHUB_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/test/qnode_monitor_proofs_autorestarter.sh"
 
-# Check and update crontab if needed
-check_and_update_crontab() {
-    echo "Checking crontab configuration..."
-    
-    # Check if hourly cron exists
-    if crontab -l 2>/dev/null | grep -q "0 \* \* \* \* .*qnode_monitor_proofs_autorestarter.sh"; then
-        echo -e "${YELLOW}Found hourly cron schedule. Updating to run every 30 minutes...${NC}"
-        
-        # Replace hourly with every 30 minutes
-        (crontab -l 2>/dev/null | grep -v "qnode_monitor_proofs_autorestarter.sh"; \
-         echo "*/30 * * * * $SCRIPT_PATH") | crontab -
-        
-        echo -e "${GREEN}Crontab updated successfully${NC}"
-    else
-        # Check if 30-minute cron already exists
-        if ! crontab -l 2>/dev/null | grep -q "qnode_monitor_proofs_autorestarter.sh"; then
-            echo "No monitoring cron found. Adding 30-minute schedule..."
-            (crontab -l 2>/dev/null; echo "*/30 * * * * $SCRIPT_PATH") | crontab -
-            echo -e "${GREEN}Crontab entry added successfully${NC}"
-        else
-            echo "Correct crontab entry already exists"
-        fi
-    fi
-}
-
-# Run crontab check
-check_and_update_crontab
 
 # Function to check for updates
 check_for_update() {
@@ -73,6 +46,37 @@ check_for_update() {
 
 # Run update check
 check_for_update
+
+
+# Check and update crontab if needed
+check_and_update_crontab() {
+    echo "Checking crontab configuration..."
+    
+    # Check if hourly cron exists
+    if crontab -l 2>/dev/null | grep -q "0 \* \* \* \* .*qnode_monitor_proofs_autorestarter.sh"; then
+        echo -e "${YELLOW}Found hourly cron schedule. Updating to run every 30 minutes...${NC}"
+        
+        # Replace hourly with every 30 minutes
+        (crontab -l 2>/dev/null | grep -v "qnode_monitor_proofs_autorestarter.sh"; \
+         echo "*/30 * * * * $SCRIPT_PATH") | crontab -
+        
+        echo -e "${GREEN}Crontab updated successfully${NC}"
+    else
+        # Check if 30-minute cron already exists
+        if ! crontab -l 2>/dev/null | grep -q "qnode_monitor_proofs_autorestarter.sh"; then
+            echo "No monitoring cron found. Adding 30-minute schedule..."
+            (crontab -l 2>/dev/null; echo "*/30 * * * * $SCRIPT_PATH") | crontab -
+            echo -e "${GREEN}Crontab entry added successfully${NC}"
+        else
+            echo "Correct crontab entry already exists"
+        fi
+    fi
+}
+
+# Run crontab check
+check_and_update_crontab
+
+
 
 #####################
 # Logs - add
