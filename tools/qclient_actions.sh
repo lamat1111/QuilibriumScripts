@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.3.5"
+SCRIPT_VERSION="1.3.6"
 
 # Define the script path
 SCRIPT_PATH=$HOME/scripts
@@ -195,6 +195,7 @@ create_transaction() {
         else
             echo "❌ Invalid address format. Address must start with '0x' followed by 64 hexadecimal characters."
             echo "Example: 0x7fe21cc8205c9031943daf4797307871fbf9ffe0851781acc694636d92712345"
+            echo
         fi
     done
 
@@ -211,10 +212,12 @@ create_transaction() {
         else
             echo "❌ Invalid address format. Address must start with '0x' followed by 64 hexadecimal characters."
             echo "Example: 0x8ae31dc9205c9031943daf4797307871fbf9ffe0851781acc694636d92756789"
+            echo
         fi
     done
 
     # Get amount or coin ID
+    echo
     echo "How would you like to make the transfer?"
     echo "1) Transfer a specific amount"
     echo "2) Transfer a specific coin"
@@ -222,7 +225,8 @@ create_transaction() {
 
     if [[ $transfer_type == "1" ]]; then
         while true; do
-            read -p "Enter the amount to transfer (in QUIL): " amount
+            echo
+            read -p "Enter the QUIL amount to transfer (format 0.00): " amount
             # Validate amount is a positive number
             if [[ ! $amount =~ ^[0-9]*\.?[0-9]+$ ]] || [[ $(echo "$amount <= 0" | bc -l) -eq 1 ]]; then
                 echo "❌ Invalid amount. Please enter a positive number."
@@ -239,6 +243,7 @@ create_transaction() {
             else
                 echo "❌ Invalid coin ID format. ID must start with '0x' followed by 64 hexadecimal characters."
                 echo "Example: 0x1148092cdce78c721835601ef39f9c2cd8b48b7787cbea032dd3913a4106a58d"
+                echo
             fi
         done
         transfer_param="$coin_id"
@@ -319,6 +324,7 @@ reject_transaction() {
         else
             echo "❌ Invalid transaction ID format. ID must start with '0x' followed by 64 hexadecimal characters."
             echo "Example: 0x27fff099dee515ece193d2af09b164864e4bb60c19eb6719b5bc981f92151009"
+            echo
         fi
     done
 
@@ -366,6 +372,7 @@ mutual_transfer() {
                 else
                     echo "❌ Invalid Rendezvous ID format. ID must start with '0x' followed by 64 hexadecimal characters."
                     echo "Example: 0x2ad567e4fc1ac335a8d3d6077de2ee998aff996b51936da04ee1b0f5dc196a4f"
+                    echo
                 fi
             done
             
