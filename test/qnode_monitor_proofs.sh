@@ -50,7 +50,8 @@ count_proofs=$(echo "$log_entries" | wc -l)
 
 if [ -z "$log_entries" ]; then
     echo "WARNING: No proof submissions found in the last $TIME_CHECK minutes!"
-    echo "This is also true if you have already minted all your rewards."
+    echo "This could also true if you have already minted all your rewards."
+    echo "If you don't see your full balance now, you likely have more rewards to mint, and your proof submission process may be just stuck"
     exit 1
 fi
 
