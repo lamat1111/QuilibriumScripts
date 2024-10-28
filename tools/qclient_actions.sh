@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.3.1"
+SCRIPT_VERSION="1.3.2"
 
 # Define the script path
 SCRIPT_PATH=$HOME/scripts
@@ -29,6 +29,8 @@ display_menu() {
 =================================================================
 /////////////////// QCLIENT ACTIONS - $SCRIPT_VERSION /////////////////////
 =================================================================
+⚠️ This menu is in BETA - read the 'Disclaimer' and 'Security Settings'
+-----------------------------------------------------------------
 1) Check balance / address       7) Mint all rewards
 2) Check individual coins
 
