@@ -271,7 +271,7 @@ create_transaction() {
         echo "Coin ID: $coin_id"
     fi
     echo
-    echo "Command to be executed:"
+    echo "Command that will be executed:"
     echo "$cmd"
     echo
 
