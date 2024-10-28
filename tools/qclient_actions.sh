@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.3.9"
+SCRIPT_VERSION="1.4.0"
 
 # Define the script path
 SCRIPT_PATH=$HOME/scripts
@@ -33,12 +33,12 @@ display_menu() {
               only test with small amounts first
           read the 'Disclaimer' and 'Security Settings'
 -----------------------------------------------------------------
-1) Check balance / address       7) Mint all rewards
-2) Check individual coins
+1) Check balance / address       7) Token split
+2) Check individual coins        8) Token merge
 
-3) Create transaction            8) Token split
-4) Accept transaction            9) Token merge
-5) Reject transaction
+3) Create transaction            9) Mint all rewards
+4) Accept transaction            
+5) Reject transaction            
 
 6) Perform mutual transfer
 -----------------------------------------------------------------
@@ -70,9 +70,9 @@ main() {
             4) accept_transaction; prompt_return_to_menu || break ;;
             5) reject_transaction; prompt_return_to_menu || break ;;
             6) mutual_transfer; prompt_return_to_menu || break ;;
-            7) mint_all; prompt_return_to_menu || break ;;
-            8) token_split; prompt_return_to_menu || break ;;
-            9) token_merge; prompt_return_to_menu || break ;; 
+            7) token_split; prompt_return_to_menu || break ;;
+            8) token_merge; prompt_return_to_menu || break ;; 
+            9) mint_all; prompt_return_to_menu || break ;;
             [sS]) security_settings; press_any_key || break ;;
             [bB]) best_providers; press_any_key || break ;;
             [dD]) donations; press_any_key || break ;;
@@ -191,7 +191,7 @@ create_transaction() {
     echo "On the current Qclient version you can only send whole coins, not 'amount' of QUIL"
     echo "So you will need the address of the coin you want to send"
     echo "You can check your coin addresses with option 2 in the menu"
-    echo "You can split a coin in 2 coins with option 8."
+    echo "You can split a coin in 2 coins with option 7."
 
     # Get and validate recipient address
     while true; do
