@@ -242,6 +242,28 @@ else
     echo "✅ Both Node and Qclient need to be updated. Proceeding..."
 fi
 
+# Function to clean up old releases
+cleanup_old_releases() {
+    local directory=$1
+    local current_binary=$2
+    local prefix=$3
+
+    echo "⏳ Cleaning up old $prefix releases in $directory..."
+
+    # Delete old binary files, .dgst files, and signature files in one go
+    if find "$directory" -type f \( \
+        -name "${prefix}-*-${OS_ARCH}" -o \
+        -name "${prefix}-*-${OS_ARCH}.dgst" -o \
+        -name "${prefix}-*-${OS_ARCH}.dgst.sig.*" \
+    \) ! -name "${current_binary}*" -delete; then
+        echo "✅ Removed old $prefix files (binary, .dgst, and signatures)."
+    else
+        echo "ℹ️ No old $prefix files to remove."
+    fi
+
+    echo "✅ Cleanup of old $prefix releases completed."
+    echo
+}
 
 
 if [ "$NODE_NEEDS_UPDATE" = true ]; then
@@ -360,6 +382,11 @@ if [ "$NODE_NEEDS_UPDATE" = true ]; then
         echo "------------------------"
     done
 
+    # Delete old node releases after node binary download and verification
+    echo "⏳ Starting cleanup of old node releases..."
+    sleep 1
+    cleanup_old_releases "$HOME/ceremonyclient/node" "$NODE_BINARY" "node"
+
     echo "✅ Node binary download completed."
 
 else
@@ -420,56 +447,15 @@ if [ "$QCLIENT_NEEDS_UPDATE" = true ]; then
         fi
     done
 
-    echo "✅ Qclient download completed."
-
-else
-    : # Do nothing
-fi
-
-
-if [ "$NODE_NEEDS_UPDATE" = true ] && [ "$QCLIENT_NEEDS_UPDATE" = true ]; then
-
-    #==========================
-    # DELETE OLD RELEASES
-    #==========================
-
-    display_header "DELETING OLD RELEASES"
-
-    # Function to clean up old releases
-    cleanup_old_releases() {
-        local directory=$1
-        local current_binary=$2
-        local prefix=$3
-
-        echo "⏳ Cleaning up old $prefix releases in $directory..."
-
-        # Delete old binary files, .dgst files, and signature files in one go
-        if find "$directory" -type f \( \
-            -name "${prefix}-*-${OS_ARCH}" -o \
-            -name "${prefix}-*-${OS_ARCH}.dgst" -o \
-            -name "${prefix}-*-${OS_ARCH}.dgst.sig.*" \
-        \) ! -name "${current_binary}*" -delete; then
-            echo "✅ Removed old $prefix files (binary, .dgst, and signatures)."
-        else
-            echo "ℹ️ No old $prefix files to remove."
-        fi
-
-        echo "✅ Cleanup of old $prefix releases completed."
-        echo
-    }
-
-    # After node binary download and verification
-    echo "⏳ Starting cleanup of old node releases..."
-    sleep 1
-    cleanup_old_releases "$HOME/ceremonyclient/node" "$NODE_BINARY" "node"
-
     # After qclient binary download and verification
     echo "⏳ Starting cleanup of old qclient releases..."
     sleep 1
     cleanup_old_releases "$HOME/ceremonyclient/client" "$QCLIENT_BINARY" "qclient"
 
+    echo "✅ Qclient download completed."
+
 else
-    echo "✅ Skipping deletion of old releases to preserve current installations."
+    : # Do nothing
 fi
 
 
