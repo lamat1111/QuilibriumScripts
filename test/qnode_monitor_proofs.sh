@@ -11,26 +11,6 @@ echo "Checking your log (this will take a minute)..."
 #minutes in the past to check
 TIME_CHECK="120" 
 
-# Function to get last N proof submissions - can be very slow if there are no proofs, it scans the log until it finds them
-# get_proof_entries() {
-#     local required_proofs=30
-#     local found_proofs=0
-#     local buffer=""
-    
-#     # Read journalctl output in reverse, line by line, until we have enough proofs
-#     journalctl -u ceremonyclient.service --no-hostname -r | while IFS= read -r line; do
-#         if echo "$line" | grep -q "proof batch.*increment"; then
-#             buffer="$line\n$buffer"
-#             ((found_proofs++))
-            
-#             if [ $found_proofs -eq $required_proofs ]; then
-#                 echo -e "$buffer"
-#                 exit 0
-#             fi
-#         fi
-#     done
-# }
-
 get_proof_entries() {
     journalctl -u ceremonyclient.service --no-hostname --since "$TIME_CHECK minutes ago" -r | \
     grep "proof batch.*increment" | \
@@ -41,8 +21,6 @@ get_proof_entries() {
 log_entries=$(get_proof_entries)
 
 # Check if we have any entries
-
-# Function to count proof entries
 count_proofs=$(echo "$log_entries" | wc -l)
 
 if [ -z "$log_entries" ]; then
@@ -51,14 +29,17 @@ if [ -z "$log_entries" ]; then
     exit 1
 fi
 
-
 # Process entries with awk
 echo
 echo -e "${BOLD}=== Proof submissions in last $TIME_CHECK minutes ===${NC}"
 echo "___________________________________________________________"
 
+# Modified awk command with properly escaped color codes
 echo "$log_entries" | awk -v current_time="$(date +%s)" \
-    -v yellow="${YELLOW}" -v red="${RED}" -v nc="${NC}" -v bold="${BOLD}" \
+    -v yellow="\033[1;33m" \
+    -v red="\033[0;31m" \
+    -v nc="\033[0m" \
+    -v bold="\033[1m" \
     -v time_check="$TIME_CHECK" '
 BEGIN {
     total_time=0;
