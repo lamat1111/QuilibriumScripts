@@ -274,7 +274,6 @@ create_transaction() {
     read -p "Do you want to proceed with this transaction? (y/n): " confirm
 
     if [[ ${confirm,,} == "y" ]]; then
-        echo "✅ Executing transaction..."
         eval "$cmd"
         echo
         echo "⚠️ Important: This transaction is pending."
