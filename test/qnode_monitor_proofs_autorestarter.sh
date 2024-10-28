@@ -3,7 +3,49 @@
 # Color definitions for output
 RED='\033[0;31m'
 YELLOW='\033[1;33m'
+GREEN='\033[0;32m'
 NC='\033[0m' # No Color
+
+SCRIPT_PATH="$0"
+GITHUB_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/test/qnode_monitor_proofs_autorestarter.sh"
+
+# Function to check for updates
+check_for_update() {
+    echo "Checking for updates..."
+    
+    # Download the remote script to a temporary file
+    local temp_file="/tmp/qnode_monitor_update.sh"
+    if ! curl -s -L "$GITHUB_URL" -o "$temp_file"; then
+        echo -e "${YELLOW}Warning: Could not check for updates${NC}"
+        return 1
+    fi
+    
+    # Check if files are different
+    if ! cmp -s "$SCRIPT_PATH" "$temp_file"; then
+        echo -e "${GREEN}New version found. Updating...${NC}"
+        # Copy the new version over the current script
+        if cp "$temp_file" "$SCRIPT_PATH"; then
+            # Make sure it's executable
+            chmod +x "$SCRIPT_PATH"
+            echo -e "${GREEN}Update successful. Restarting script...${NC}"
+            # Clean up
+            rm "$temp_file"
+            # Execute the new version
+            exec "$SCRIPT_PATH"
+            # Exit the current script
+            exit 0
+        else
+            echo -e "${RED}Error: Update failed${NC}"
+        fi
+    else
+        echo "No updates found."
+        rm "$temp_file"
+    fi
+}
+
+# Run update check
+check_for_update
+
 
 #####################
 # Logs - add
