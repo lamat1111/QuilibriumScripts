@@ -77,6 +77,22 @@ log_and_print "Checking proofs from the last 60 minutes..."
 log_entries=$(journalctl -u ceremonyclient.service --no-hostname --since "60 minutes ago" -r | \
               grep "proof batch.*increment")
 
+# First, check for increment:0 message
+if echo "$log_entries" | grep -q '"increment":0'; then
+    log_and_print "=========================================="
+    log_and_print "${GREEN}All proofs have been submitted!${NC}"
+    log_and_print "=========================================="
+    log_and_print "Removing monitoring crontab..."
+    
+    # Remove the crontab entry if it exists
+    crontab -l | grep -v "qnode_monitor_proofs_autorestarter.sh" | crontab -
+    
+    log_and_print "Monitoring script will no longer run."
+    log_and_print "=========================================="
+    log_and_print ""
+    exit 0
+fi
+
 # Count how many entries we got
 entry_count=$(echo "$log_entries" | grep -c "proof batch")
 
