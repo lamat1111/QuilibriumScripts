@@ -131,7 +131,7 @@ entry_count=$(echo "$log_entries" | grep -c "proof batch")
 
 # Check if we have any entries
 if [ $entry_count -eq 0 ]; then
-    log_and_print "${RED}Error: No proofs found in the last 30 minutes${NC}"
+    log_and_print "Error: No proofs found in the last 30 minutes"
     log_and_print "Restarting ceremonyclient service..."
     log_and_print ""
     systemctl restart ceremonyclient
@@ -144,7 +144,7 @@ last_increment=$(echo "$log_entries" | head -n1 | grep -o '"increment":[0-9]*' |
 
 # Simple check: just verify if the overall trend is decreasing
 if [ "$first_increment" -le "$last_increment" ]; then
-    log_and_print "${RED}Error: Increments are not decreasing${NC}"
+    log_and_print "Error: Increments are not decreasing$"
     log_and_print "First increment: $first_increment"
     log_and_print "Latest increment: $last_increment"
     log_and_print "Restarting ceremonyclient service..."
