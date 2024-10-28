@@ -98,8 +98,10 @@ fi
 
 # Function to log with timestamp and print to console
 log_and_print() {
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" >> "$LOG_FILE"
-    echo -e "$1"  # -e flag to interpret color codes
+    # Strip color codes for log file
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $(echo "$1" | sed 's/\x1b\[[0-9;]*m//g')" >> "$LOG_FILE"
+    # Print to console with colors
+    echo -e "$1"
 }
 
 log_and_print "Checking proofs from the last 30 minutes..."
