@@ -105,12 +105,18 @@ if [ "$first_increment" -le "$last_increment" ]; then
 fi
 
 # Replace the output section with:
-log_and_print "Proof check passed:"
+# Replace the output section with:
+log_and_print "=========================================="
+log_and_print "Proof check passed!"
+log_and_print "=========================================="
 log_and_print "First increment: $first_increment"
 log_and_print "Latest increment: $last_increment"
+log_and_print "------------------------------------------"
 log_and_print "Total increment decrease: $((first_increment - last_increment))"
 log_and_print "Number of batches: $(((first_increment - last_increment) / 200))"
+log_and_print "------------------------------------------"
 log_and_print "Number of proof messages in last hour: $entry_count"
+log_and_print "=========================================="
 log_and_print ""
 
 #####################
