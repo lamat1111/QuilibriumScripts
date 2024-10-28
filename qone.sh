@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.1.7"
+SCRIPT_VERSION="2.1.8"
 
 #==========================
 # INSTALL APPS
@@ -664,7 +664,7 @@ Let your node run for 30 minutes, then choose option 3. Done!
                               13) Restore backup                
 4) Node Log                                    
 5) Update node                14) Qclient install      
-6) Stop node                                                             
+6) Stop node                  15) Qclient actions                                         
 7) Restart node                               
 8) Node version               16) System cleaner               
 9) Node info                                      
