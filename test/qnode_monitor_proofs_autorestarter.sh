@@ -9,6 +9,34 @@ NC='\033[0m' # No Color
 SCRIPT_PATH="$0"
 GITHUB_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/test/qnode_monitor_proofs_autorestarter.sh"
 
+# Check and update crontab if needed
+check_and_update_crontab() {
+    echo "Checking crontab configuration..."
+    
+    # Check if hourly cron exists
+    if crontab -l 2>/dev/null | grep -q "0 \* \* \* \* .*qnode_monitor_proofs_autorestarter.sh"; then
+        echo -e "${YELLOW}Found hourly cron schedule. Updating to run every 30 minutes...${NC}"
+        
+        # Replace hourly with every 30 minutes
+        (crontab -l 2>/dev/null | grep -v "qnode_monitor_proofs_autorestarter.sh"; \
+         echo "*/30 * * * * $SCRIPT_PATH") | crontab -
+        
+        echo -e "${GREEN}Crontab updated successfully${NC}"
+    else
+        # Check if 30-minute cron already exists
+        if ! crontab -l 2>/dev/null | grep -q "qnode_monitor_proofs_autorestarter.sh"; then
+            echo "No monitoring cron found. Adding 30-minute schedule..."
+            (crontab -l 2>/dev/null; echo "*/30 * * * * $SCRIPT_PATH") | crontab -
+            echo -e "${GREEN}Crontab entry added successfully${NC}"
+        else
+            echo "Correct crontab entry already exists"
+        fi
+    fi
+}
+
+# Run crontab check
+check_and_update_crontab
+
 # Function to check for updates
 check_for_update() {
     echo "Checking for updates..."
@@ -46,7 +74,6 @@ check_for_update() {
 # Run update check
 check_for_update
 
-
 #####################
 # Logs - add
 #####################
@@ -71,10 +98,10 @@ log_and_print() {
     echo -e "$1"  # -e flag to interpret color codes
 }
 
-log_and_print "Checking proofs from the last 60 minutes..."
+log_and_print "Checking proofs from the last 30 minutes..."
 
-# Get all proof entries from the past 60 minutes
-log_entries=$(journalctl -u ceremonyclient.service --no-hostname --since "60 minutes ago" -r | \
+# Get all proof entries from the past 30 minutes
+log_entries=$(journalctl -u ceremonyclient.service --no-hostname --since "30 minutes ago" -r | \
               grep "proof batch.*increment")
 
 # First, check for increment:0 message
@@ -98,7 +125,7 @@ entry_count=$(echo "$log_entries" | grep -c "proof batch")
 
 # Check if we have any entries
 if [ $entry_count -eq 0 ]; then
-    log_and_print "${RED}Error: No proofs found in the last 60 minutes${NC}"
+    log_and_print "${RED}Error: No proofs found in the last 30 minutes${NC}"
     log_and_print "Restarting ceremonyclient service..."
     log_and_print ""
     systemctl restart ceremonyclient
@@ -120,8 +147,7 @@ if [ "$first_increment" -le "$last_increment" ]; then
     exit 1
 fi
 
-# Replace the output section with:
-# Replace the output section with:
+# Output section
 log_and_print "=========================================="
 log_and_print "Proof check passed!"
 log_and_print "=========================================="
@@ -131,7 +157,8 @@ log_and_print "------------------------------------------"
 log_and_print "Total increment decrease: $((first_increment - last_increment))"
 log_and_print "Number of batches: $(((first_increment - last_increment) / 200))"
 log_and_print "------------------------------------------"
-log_and_print "Number of proof messages in last hour: $entry_count"
+log_and_print "Number of proof messages in last 30 minutes: $entry_count"
+log_and_print "Average proofs per minute: $(echo "scale=2; $entry_count/30" | bc)"
 log_and_print "=========================================="
 log_and_print ""
 
