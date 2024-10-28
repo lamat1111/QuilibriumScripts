@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.3.8"
+SCRIPT_VERSION="1.3.9"
 
 # Define the script path
 SCRIPT_PATH=$HOME/scripts
@@ -190,6 +190,8 @@ create_transaction() {
     echo "=========================="
     echo "On the current Qclient version you can only send whole coins, not 'amount' of QUIL"
     echo "So you will need the address of the coin you want to send"
+    echo "You can check your coin addresses with option 2 in the menu"
+    echo "You can split a coin in 2 coins with option 8."
 
     # Get and validate recipient address
     while true; do
