@@ -42,8 +42,8 @@ display_menu() {
 
 6) Perform mutual transfer
 -----------------------------------------------------------------
-B) ⭐ Best server providers     X) Disclaimer                           
-D) 💜 Donations                 S) Security settings
+B) ⭐ Best server providers      X) Disclaimer                           
+D) 💜 Donations                  S) Security settings
 -----------------------------------------------------------------    
 E) Exit
 
