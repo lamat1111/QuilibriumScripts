@@ -162,7 +162,7 @@ log_and_print "Total increment decrease: $((first_increment - last_increment))"
 log_and_print "Number of batches: $(((first_increment - last_increment) / 200))"
 log_and_print "Avg batch time: $(echo "scale=2; (30*60)/$(((first_increment - last_increment) / 200))" | bc) seconds"
 log_and_print "------------------------------------------"
-log_and_print "Number of proof messages in last 30 minutes: $entry_count"
+log_and_print "Proof messages: $entry_count"
 log_and_print "=========================================="
 log_and_print ""
 
