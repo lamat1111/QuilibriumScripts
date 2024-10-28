@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.3.7"
+SCRIPT_VERSION="1.3.8"
 
 # Define the script path
 SCRIPT_PATH=$HOME/scripts
@@ -36,8 +36,8 @@ display_menu() {
 1) Check balance / address       7) Mint all rewards
 2) Check individual coins
 
-3) Create transaction
-4) Accept transaction
+3) Create transaction            8) Token split
+4) Accept transaction            9) Token merge
 5) Reject transaction
 
 6) Perform mutual transfer
@@ -71,6 +71,8 @@ main() {
             5) reject_transaction; prompt_return_to_menu || break ;;
             6) mutual_transfer; prompt_return_to_menu || break ;;
             7) mint_all; prompt_return_to_menu || break ;;
+            8) token_split; prompt_return_to_menu || break ;;
+            9) token_merge; prompt_return_to_menu || break ;; 
             [sS]) security_settings; press_any_key || break ;;
             [bB]) best_providers; press_any_key || break ;;
             [dD]) donations; press_any_key || break ;;
@@ -228,7 +230,7 @@ create_transaction() {
     if [[ $transfer_type == "1" ]]; then
         while true; do
             echo
-            read -p "Enter the QUIL amount to transfer (format 0.00): " amount
+            read -p "Enter the QUIL amount to transfer (format 0.000000): " amount
             # Validate amount is a positive number
             if [[ ! $amount =~ ^[0-9]*\.?[0-9]+$ ]] || [[ $(echo "$amount <= 0" | bc -l) -eq 1 ]]; then
                 echo "❌ Invalid amount. Please enter a positive number."
@@ -348,7 +350,7 @@ mutual_transfer() {
     case $role_choice in
         1) # Receiver
             echo "You are the receiver."
-            read -p "Enter the expected amount (in QUIL): " expected_amount
+            read -p "Enter the expected QUIL amount (format 0.000000): " expected_amount
             
             # Validate amount is a positive number
             if [[ ! $expected_amount =~ ^[0-9]*\.?[0-9]+$ ]] || [[ $(echo "$expected_amount <= 0" | bc -l) -eq 1 ]]; then
@@ -394,6 +396,117 @@ mutual_transfer() {
             return
             ;;
     esac
+}
+
+token_split() {
+    echo
+    echo "Token splitting"
+    echo "==============="
+    echo "This will split a coin into two new coins with specified amounts"
+    
+    # Get and validate the coin ID to split
+    while true; do
+        read -p "Enter the coin ID to split: " coin_id
+        if validate_hash "$coin_id"; then
+            break
+        else
+            echo "❌ Invalid coin ID format. ID must start with '0x' followed by 64 hexadecimal characters."
+            echo "Example: 0x1148092cdce78c721835601ef39f9c2cd8b48b7787cbea032dd3913a4106a58d"
+            echo
+        fi
+    done
+
+    # Get and validate the first amount
+    while true; do
+        read -p "Enter the amount for the first coin  (format 0.000000): " left_amount
+        if [[ ! $left_amount =~ ^[0-9]*\.?[0-9]+$ ]] || [[ $(echo "$left_amount <= 0" | bc -l) -eq 1 ]]; then
+            echo "❌ Invalid amount. Please enter a positive number."
+            continue
+        fi
+        break
+    done
+
+    # Get and validate the second amount
+    while true; do
+        read -p "Enter the amount for the second coin  (format 0.000000): " right_amount
+        if [[ ! $right_amount =~ ^[0-9]*\.?[0-9]+$ ]] || [[ $(echo "$right_amount <= 0" | bc -l) -eq 1 ]]; then
+            echo "❌ Invalid amount. Please enter a positive number."
+            continue
+        fi
+        break
+    done
+
+    # Show split details for confirmation
+    echo
+    echo "Split Details:"
+    echo "=============="
+    echo "Original Coin: $coin_id"
+    echo "First Amount: $left_amount QUIL"
+    echo "Second Amount: $right_amount QUIL"
+    echo
+    echo "Command that will be executed:"
+    echo "$QCLIENT_EXEC token split $coin_id $left_amount $right_amount $CONFIG_FLAG"
+    echo
+
+    # Ask for confirmation
+    read -p "Do you want to proceed with this split? (y/n): " confirm
+
+    if [[ ${confirm,,} == "y" ]]; then
+        $QCLIENT_EXEC token split "$coin_id" "$left_amount" "$right_amount" $CONFIG_FLAG
+    else
+        echo "❌ Split operation cancelled."
+    fi
+}
+
+token_merge() {
+    echo
+    echo "Token merging"
+    echo "============="
+    echo "This will merge two coins into a single new coin"
+    
+    # Get and validate the first coin ID
+    while true; do
+        read -p "Enter the first coin ID: " left_coin
+        if validate_hash "$left_coin"; then
+            break
+        else
+            echo "❌ Invalid coin ID format. ID must start with '0x' followed by 64 hexadecimal characters."
+            echo "Example: 0x1148092cdce78c721835601ef39f9c2cd8b48b7787cbea032dd3913a4106a58d"
+            echo
+        fi
+    done
+
+    # Get and validate the second coin ID
+    while true; do
+        read -p "Enter the second coin ID: " right_coin
+        if validate_hash "$right_coin"; then
+            break
+        else
+            echo "❌ Invalid coin ID format. ID must start with '0x' followed by 64 hexadecimal characters."
+            echo "Example: 0x0140e01731256793bba03914f3844d645fbece26553acdea8ac4de4d84f91690"
+            echo
+        fi
+    done
+
+    # Show merge details for confirmation
+    echo
+    echo "Merge Details:"
+    echo "=============="
+    echo "First Coin: $left_coin"
+    echo "Second Coin: $right_coin"
+    echo
+    echo "Command that will be executed:"
+    echo "$QCLIENT_EXEC token merge $left_coin $right_coin $CONFIG_FLAG"
+    echo
+
+    # Ask for confirmation
+    read -p "Do you want to proceed with this merge? (y/n): " confirm
+
+    if [[ ${confirm,,} == "y" ]]; then
+        $QCLIENT_EXEC token merge "$left_coin" "$right_coin" $CONFIG_FLAG
+    else
+        echo "❌ Merge operation cancelled."
+    fi
 }
 
 donations() {
