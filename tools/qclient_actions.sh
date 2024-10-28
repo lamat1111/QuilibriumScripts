@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.3.4"
+SCRIPT_VERSION="1.3.5"
 
 # Define the script path
 SCRIPT_PATH=$HOME/scripts
@@ -171,25 +171,76 @@ mint_all() {
     echo
 }
 
+# Function to validate Quilibrium hashes (addresses, transaction IDs, etc)
+validate_hash() {
+    local hash="$1"
+    local hash_regex="^0x[0-9a-fA-F]{64}$"
+    
+    if [[ ! $hash =~ $hash_regex ]]; then
+        return 1
+    fi
+    return 0
+}
+
 create_transaction() {
     echo
     echo "Creating a new transaction"
     echo "=========================="
 
-    # Get recipient address
-    read -p "Enter the recipient's address: " to_address
+    # Get and validate recipient address
+    while true; do
+        read -p "Enter the recipient's address: " to_address
+        if validate_hash "$to_address"; then
+            break
+        else
+            echo "❌ Invalid address format. Address must start with '0x' followed by 64 hexadecimal characters."
+            echo "Example: 0x7fe21cc8205c9031943daf4797307871fbf9ffe0851781acc694636d92712345"
+        fi
+    done
 
-    # Get refund address (optional)
-    read -p "Enter the refund address (press Enter to use your own address): " refund_address
+    # Get and validate refund address (optional)
+    while true; do
+        read -p "Enter the refund address (press Enter to use your own address): " refund_address
+        if [[ -z "$refund_address" ]]; then
+            break
+        elif [[ "$refund_address" == "$to_address" ]]; then
+            echo "❌ Refund address cannot be the same as recipient address."
+            continue
+        elif validate_hash "$refund_address"; then
+            break
+        else
+            echo "❌ Invalid address format. Address must start with '0x' followed by 64 hexadecimal characters."
+            echo "Example: 0x8ae31dc9205c9031943daf4797307871fbf9ffe0851781acc694636d92756789"
+        fi
+    done
 
     # Get amount or coin ID
-    read -p "Do you want to transfer a specific amount (A) or use a specific coin (C)? " transfer_type
+    echo "How would you like to make the transfer?"
+    echo "1) Transfer a specific amount"
+    echo "2) Transfer a specific coin"
+    read -p "Enter your choice (1 or 2): " transfer_type
 
-    if [[ $transfer_type == "A" || $transfer_type == "a" ]]; then
-        read -p "Enter the amount to transfer (in QUIL): " amount
-        transfer_param="$amount"
-    elif [[ $transfer_type == "C" || $transfer_type == "c" ]]; then
-        read -p "Enter the coin ID to transfer: " coin_id
+    if [[ $transfer_type == "1" ]]; then
+        while true; do
+            read -p "Enter the amount to transfer (in QUIL): " amount
+            # Validate amount is a positive number
+            if [[ ! $amount =~ ^[0-9]*\.?[0-9]+$ ]] || [[ $(echo "$amount <= 0" | bc -l) -eq 1 ]]; then
+                echo "❌ Invalid amount. Please enter a positive number."
+                continue
+            fi
+            transfer_param="$amount"
+            break
+        done
+    elif [[ $transfer_type == "2" ]]; then
+        while true; do
+            read -p "Enter the coin ID to transfer: " coin_id
+            if validate_hash "$coin_id"; then
+                break
+            else
+                echo "❌ Invalid coin ID format. ID must start with '0x' followed by 64 hexadecimal characters."
+                echo "Example: 0x1148092cdce78c721835601ef39f9c2cd8b48b7787cbea032dd3913a4106a58d"
+            fi
+        done
         transfer_param="$coin_id"
     else
         echo "❌ Invalid option. Aborting transaction creation."
@@ -209,7 +260,7 @@ create_transaction() {
     echo "===================="
     echo "Recipient: $to_address"
     echo "Refund Address: ${refund_address:-"(Your own address)"}"
-    if [[ $transfer_type == "A" || $transfer_type == "a" ]]; then
+    if [[ $transfer_type == "1" ]]; then
         echo "Amount: $amount QUIL"
     else
         echo "Coin ID: $coin_id"
@@ -235,13 +286,22 @@ create_transaction() {
     fi
 }
 
+
 accept_transaction() {
     echo
     echo "Accepting a pending transaction"
     echo "==============================="
 
-    # Prompt for the Pending Transaction ID
-    read -p "Enter the transaction ID: " pending_tx_id
+    # Get and validate the Pending Transaction ID
+    while true; do
+        read -p "Enter the transaction ID: " pending_tx_id
+        if validate_hash "$pending_tx_id"; then
+            break
+        else
+            echo "❌ Invalid transaction ID format. ID must start with '0x' followed by 64 hexadecimal characters."
+            echo "Example: 0x0382e4da0c7c0133a1b53453b05096272b80c1575c6828d0211c4e371f7c81bb"
+        fi
+    done
 
     # Execute the command and display its output
     $QCLIENT_EXEC token accept "$pending_tx_id" $CONFIG_FLAG
@@ -252,8 +312,16 @@ reject_transaction() {
     echo "Rejecting a pending transaction"
     echo "==============================="
 
-    # Prompt for the Pending Transaction ID
-    read -p "Enter the transaction ID: " pending_tx_id
+    # Get and validate the Pending Transaction ID
+    while true; do
+        read -p "Enter the transaction ID: " pending_tx_id
+        if validate_hash "$pending_tx_id"; then
+            break
+        else
+            echo "❌ Invalid transaction ID format. ID must start with '0x' followed by 64 hexadecimal characters."
+            echo "Example: 0x27fff099dee515ece193d2af09b164864e4bb60c19eb6719b5bc981f92151009"
+        fi
+    done
 
     # Execute the command and display its output
     $QCLIENT_EXEC token reject "$pending_tx_id" $CONFIG_FLAG
@@ -274,24 +342,47 @@ mutual_transfer() {
         1) # Receiver
             echo "You are the receiver."
             read -p "Enter the expected amount (in QUIL): " expected_amount
+            
+            # Validate amount is a positive number
+            if [[ ! $expected_amount =~ ^[0-9]*\.?[0-9]+$ ]] || [[ $(echo "$expected_amount <= 0" | bc -l) -eq 1 ]]; then
+                echo "❌ Invalid amount. Please enter a positive number."
+                return
+            fi
+            
             echo
             echo "Please provide the sender with the Rendezvous ID"
             echo "and then wait for them to connect for the transaction to go through."
             echo
-            echo "Executing mutual receive command..."
             $QCLIENT_EXEC token mutual-receive "$expected_amount" $CONFIG_FLAG
             ;;
             
         2) # Sender
             echo "You are the sender."
-            read -p "Enter the Rendezvous ID provided by the receiver: " rendezvous_id
+            
+            # Get and validate the Rendezvous ID
+            while true; do
+                read -p "Enter the Rendezvous ID provided by the receiver: " rendezvous_id
+                if validate_hash "$rendezvous_id"; then
+                    break
+                else
+                    echo "❌ Invalid Rendezvous ID format. ID must start with '0x' followed by 64 hexadecimal characters."
+                    echo "Example: 0x2ad567e4fc1ac335a8d3d6077de2ee998aff996b51936da04ee1b0f5dc196a4f"
+                fi
+            done
+            
             read -p "Enter the amount to transfer (in QUIL): " amount
-            echo "Executing mutual transfer command..."
+            
+            # Validate amount is a positive number
+            if [[ ! $amount =~ ^[0-9]*\.?[0-9]+$ ]] || [[ $(echo "$amount <= 0" | bc -l) -eq 1 ]]; then
+                echo "❌ Invalid amount. Please enter a positive number."
+                return
+            fi
+            
             $QCLIENT_EXEC token mutual-transfer "$rendezvous_id" "$amount" $CONFIG_FLAG
             ;;
             
         *) 
-            echo "Invalid choice. Mutual transfer cancelled."
+            echo "❌ Invalid choice. Mutual transfer cancelled."
             return
             ;;
     esac
