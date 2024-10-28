@@ -1,5 +1,21 @@
 #!/bin/bash
 
+# Quick check for required tools
+if ! command -v gawk >/dev/null 2>&1 || ! command -v journalctl >/dev/null 2>&1 || ! command -v grep >/dev/null 2>&1; then
+    echo "Some required tools are missing. Please install them:"
+    echo
+    if command -v apt-get >/dev/null 2>&1; then
+        echo "Run: sudo apt-get install gawk systemd grep"
+    elif command -v yum >/dev/null 2>&1; then
+        echo "Run: sudo yum install gawk systemd grep"
+    elif command -v apk >/dev/null 2>&1; then
+        echo "Run: apk add gawk systemd grep"
+    else
+        echo "Please install: gawk, systemd, and grep"
+    fi
+    exit 1
+fi
+
 # Check if terminal supports colors
 if [ -t 1 ] && command -v tput >/dev/null 2>&1 && tput colors >/dev/null 2>&1; then
     # Terminal supports colors
