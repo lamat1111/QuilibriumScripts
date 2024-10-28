@@ -30,7 +30,7 @@ display_menu() {
 /////////////////// QCLIENT ACTIONS - $SCRIPT_VERSION /////////////////////
 =================================================================
                ⚠️ This menu is still in BETA ⚠️
-               only test with small amounts first
+              only test with small amounts first
           read the 'Disclaimer' and 'Security Settings'
 -----------------------------------------------------------------
 1) Check balance / address       7) Mint all rewards
