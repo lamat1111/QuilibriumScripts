@@ -1,10 +1,19 @@
 #!/bin/bash
 
-# Color definitions
-YELLOW='\033[1;33m'
-RED='\033[0;31m'
-NC='\033[0m' # No Color
-BOLD='\033[1m'
+# Check if terminal supports colors
+if [ -t 1 ] && command -v tput >/dev/null 2>&1 && tput colors >/dev/null 2>&1; then
+    # Terminal supports colors
+    YELLOW='\033[1;33m'
+    RED='\033[0;31m'
+    NC='\033[0m' # No Color
+    BOLD='\033[1m'
+else
+    # No color support - use empty strings
+    YELLOW=''
+    RED=''
+    NC=''
+    BOLD=''
+fi
 
 echo "Checking your log (this will take a minute)..."
 
@@ -24,24 +33,34 @@ log_entries=$(get_proof_entries)
 count_proofs=$(echo "$log_entries" | wc -l)
 
 if [ -z "$log_entries" ]; then
-    echo -e "${YELLOW}WARNING: No proof submissions found in the last $TIME_CHECK minutes!${NC}"
+    echo "WARNING: No proof submissions found in the last $TIME_CHECK minutes!"
     echo "This is also true if you have already minted all your rewards."
     exit 1
 fi
 
 # Process entries with awk
 echo
-echo -e "${BOLD}=== Proof submissions in last $TIME_CHECK minutes ===${NC}"
+echo "=== Proof submissions in last $TIME_CHECK minutes ==="
 echo "___________________________________________________________"
 
-# Modified awk command with properly escaped color codes
+# Modified awk command with color support check
 echo "$log_entries" | awk -v current_time="$(date +%s)" \
-    -v yellow="\033[1;33m" \
-    -v red="\033[0;31m" \
-    -v nc="\033[0m" \
-    -v bold="\033[1m" \
+    -v use_colors="$([[ -n $YELLOW ]] && echo 1 || echo 0)" \
     -v time_check="$TIME_CHECK" '
 BEGIN {
+    # Set color codes based on terminal support
+    if (use_colors) {
+        yellow="\033[1;33m";
+        red="\033[0;31m";
+        nc="\033[0m";
+        bold="\033[1m";
+    } else {
+        yellow="";
+        red="";
+        nc="";
+        bold="";
+    }
+    
     total_time=0;
     total_decrement=0;
     gap_count=0;
