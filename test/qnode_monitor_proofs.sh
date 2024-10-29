@@ -163,7 +163,7 @@ END {
     # Add warning if last proof is much older than the average interval
     if (minutes_since_last > (avg_interval * 10)) {
         printf "%sNote: Proof submission delay detected%s\n", yellow, nc;
-        printf "Last proof is older than the average interval\n", minutes_since_last/avg_interval;
+        printf "Last proof is older than the average interval\n";
         printf "This could be normal and the node could recover on its own\n";
         printf "If needed, wait at least 1 hour between restarts\n\n";
     }
@@ -174,7 +174,7 @@ END {
         printf "Avg Time per Batch (200 increments): %.2f Seconds\n\n", avg_time_per_batch;
         
         # Completion Estimates
-        printf "=== Completion Estimates... dont' take this too seriously ===\n";
+        printf "=== Completion Estimates (don'\''t take this too seriously) ===\n";
         days_to_complete = (previous_increment * (avg_time_per_batch/200)) / 86400;
         printf "Time to complete your %d remaining Increments: %.2f days\n\n", 
             previous_increment, days_to_complete;
@@ -183,6 +183,6 @@ END {
     }
     
     printf "___________________________________________________________\n";
-}
-'
+}'
+
 echo
