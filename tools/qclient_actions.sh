@@ -346,6 +346,8 @@ mutual_transfer() {
     echo
     echo "Performing a mutual transfer"
     echo "============================"
+    echo "Mutual transfers are not avilable on Qclient version 2.0.x"
+    echo
 
     # Ask user if they are the sender or receiver
     echo "Are you the sender or receiver of this mutual transfer?"
