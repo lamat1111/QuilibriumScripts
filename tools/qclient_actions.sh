@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.4.7"
+SCRIPT_VERSION="1.4.8"
 
 
 #=====================
@@ -174,10 +174,11 @@ create_transaction() {
     echo
     echo "Creating a new transaction"
     echo "=========================="
-    echo "On the current Qclient version you can only send whole coins, not 'amount' of QUIL"
-    echo "So you will need the address of the coin you want to send"
-    echo "You can check your coin addresses with option 2 in the menu"
-    echo "You can split a coin in 2 coins with option 7."
+    echo "- On the current Qclient version you can only send whole coins, not 'amount' of QUIL"
+    echo "- Yu will need the address (ID) of the coin you want to send."
+    echo "- You can check your coin addresses with option 2 in the menu."
+    echo "- You can split a coin in 2 coins with option 7."
+    echo
 
     # Get and validate recipient address
     while true; do
