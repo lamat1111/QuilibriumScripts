@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.4.1"
+SCRIPT_VERSION="1.4.2"
 
 
 #=====================
@@ -411,6 +411,12 @@ token_split() {
     echo "Token splitting"
     echo "==============="
     echo "This will split a coin into two new coins with specified amounts"
+    echo
+    echo "⚠️ This is very much still a BETA feature and works slowly."
+    echo "The token split operation can be slow in this period of intense activity."
+    echo "There is no confirmation message either after a token split :-("
+    echo "But if you keep trying the split comand, it will go thorugh eventually."
+    echo
     
     # Get and validate the coin ID to split
     while true; do
@@ -471,6 +477,12 @@ token_merge() {
     echo "Token merging"
     echo "============="
     echo "This will merge two coins into a single new coin"
+    echo
+    echo "⚠️ This is very much still a BETA feature and works slowly."
+    echo "The token merge operation can be slow in this period of intense activity."
+    echo "There is no confirmation message either after a token merge :-("
+    echo "But if you keep trying the merge comand, it will go thorugh eventually."
+    echo
     
     # Get and validate the first coin ID
     while true; do
