@@ -413,7 +413,7 @@ token_split() {
     echo "⚠️ This is very much still a BETA feature and works slowly."
     echo "The token split operation can be slow in this period of intense activity."
     echo "There is no confirmation message either after a token split :-("
-    echo "But if you keep trying the split comand, it will go thorugh eventually."
+    echo "But if you keep trying the split comand, it will go through eventually."
     echo
     
     # Get and validate the coin ID to split
@@ -479,7 +479,7 @@ token_merge() {
     echo "⚠️ This is very much still a BETA feature and works slowly."
     echo "The token merge operation can be slow in this period of intense activity."
     echo "There is no confirmation message either after a token merge :-("
-    echo "But if you keep trying the merge comand, it will go thorugh eventually."
+    echo "But if you keep trying the merge comand, it will go through eventually."
     echo
     
     # Get and validate the first coin ID
