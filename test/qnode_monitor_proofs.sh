@@ -174,7 +174,7 @@ END {
         printf "Avg Time per Batch (200 increments): %.2f Seconds\n\n", avg_time_per_batch;
         
         # Completion Estimates
-        printf "=== Completion Estimates ===\n";
+        printf "=== Completion Estimates... dont' take this too seriously ===\n";
         days_to_complete = (previous_increment * (avg_time_per_batch/200)) / 86400;
         printf "Time to complete your %d remaining Increments: %.2f days\n\n", 
             previous_increment, days_to_complete;
