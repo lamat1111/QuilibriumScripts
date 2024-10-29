@@ -216,3 +216,216 @@ create_transaction() {
     read -p "Enter your choice (1 or 2): " transfer_type
 
     if [[ $transfer_type == "1" ]]; then
+        while true; do
+            echo
+            read -p "Enter the QUIL amount to transfer (format 0.000000): " amount
+            # Validate amount is a positive number
+            if [[ ! $amount =~ ^[0-9]*\.?[0-9]+$ ]] || [[ $(echo "$amount <= 0" | bc -l) -eq 1 ]]; then
+                echo "❌ Invalid amount. Please enter a positive number."
+                continue
+            fi
+            transfer_param="$amount"
+            break
+        done
+    elif [[ $transfer_type == "2" ]]; then
+        while true; do
+            read -p "Enter the coin ID to transfer: " coin_id
+            if validate_hash "$coin_id"; then
+                break
+            else
+                echo "❌ Invalid coin ID format. ID must start with '0x' followed by 64 hexadecimal characters."
+                echo "Example: 0x1148092cdce78c721835601ef39f9c2cd8b48b7787cbea032dd3913a4106a58d"
+                echo
+            fi
+        done
+        transfer_param="$coin_id"
+    else
+        echo "❌ Invalid option. Aborting transaction creation."
+        return
+    fi
+
+    # Construct the command
+    if [[ -z "$refund_address" ]]; then
+        cmd="$QCLIENT_EXEC token transfer $to_address $transfer_param $CONFIG_FLAG"
+    else
+        cmd="$QCLIENT_EXEC token transfer $to_address $refund_address $transfer_param $CONFIG_FLAG"
+    fi
+
+    # Show transaction details for confirmation
+    echo
+    echo "Transaction Details:"
+    echo "===================="
+    echo "Recipient: $to_address"
+    echo "Refund Address: ${refund_address:-"(Your own address)"}"
+    if [[ $transfer_type == "1" ]]; then
+        echo "Amount: $amount QUIL"
+    else
+        echo "Coin ID: $coin_id"
+    fi
+    echo
+    echo "Command that will be executed:"
+    echo "$cmd"
+    echo
+
+    # Ask for confirmation
+    read -p "Do you want to proceed with this transaction? (y/n): " confirm
+
+    if [[ ${confirm,,} == "y" ]]; then
+        eval "$cmd"
+        echo
+        echo "Currently there is no transaction ID, and the receiver does not have to accept the transaction."
+        echo "Unless you received an error, your transaction should be already on its way to the receiver."
+    else
+        echo "❌ Transaction cancelled."
+    fi
+}
+
+token_split() {
+    # Pre-action confirmation
+    description="This will split a coin into two new coins with specified amounts"
+    warning_message="- This is a BETA feature and works slowly.
+- The token split operation can be slow in this period of intense activity.
+- There is no confirmation message after a token split.
+- But if you keep trying the split command, it will go through eventually."
+
+    if ! confirm_proceed "token splitting" "$description" "$warning_message"; then
+        return 1
+    fi
+    
+    # Get and validate the coin ID to split
+    while true; do
+        read -p "Enter the coin ID to split: " coin_id
+        if validate_hash "$coin_id"; then
+            break
+        else
+            echo "❌ Invalid coin ID format. ID must start with '0x' followed by 64 hexadecimal characters."
+            echo "Example: 0x1148092cdce78c721835601ef39f9c2cd8b48b7787cbea032dd3913a4106a58d"
+            echo
+        fi
+    done
+
+    # Get and validate the first amount
+    while true; do
+        read -p "Enter the amount for the first coin  (format 0.000000): " left_amount
+        if [[ ! $left_amount =~ ^[0-9]*\.?[0-9]+$ ]] || [[ $(echo "$left_amount <= 0" | bc -l) -eq 1 ]]; then
+            echo "❌ Invalid amount. Please enter a positive number."
+            continue
+        fi
+        break
+    done
+
+    # Get and validate the second amount
+    while true; do
+        read -p "Enter the amount for the second coin  (format 0.000000): " right_amount
+        if [[ ! $right_amount =~ ^[0-9]*\.?[0-9]+$ ]] || [[ $(echo "$right_amount <= 0" | bc -l) -eq 1 ]]; then
+            echo "❌ Invalid amount. Please enter a positive number."
+            continue
+        fi
+        break
+    done
+
+    # Show split details for confirmation
+    echo
+    echo "Split Details:"
+    echo "=============="
+    echo "Original Coin: $coin_id"
+    echo "First Amount: $left_amount QUIL"
+    echo "Second Amount: $right_amount QUIL"
+    echo
+    echo "Command that will be executed:"
+    echo "$QCLIENT_EXEC token split $coin_id $left_amount $right_amount $CONFIG_FLAG"
+    echo
+
+    # Ask for confirmation
+    read -p "Do you want to proceed with this split? (y/n): " confirm
+
+    if [[ ${confirm,,} == "y" ]]; then
+        $QCLIENT_EXEC token split "$coin_id" "$left_amount" "$right_amount" $CONFIG_FLAG
+    else
+        echo "❌ Split operation cancelled."
+    fi
+}
+
+token_merge() {
+    # Pre-action confirmation
+    description="This will merge two coins into a single new coin"
+    warning_message="- This is a BETA feature and works slowly.
+- The token merge operation can be slow in this period of intense activity.
+- There is no confirmation message after a token merge.
+- But if you keep trying the merge command, it will go through eventually."
+
+    if ! confirm_proceed "token merging" "$description" "$warning_message"; then
+        return 1
+    fi
+    
+    # Get and validate the first coin ID
+    while true; do
+        read -p "Enter the first coin ID: " left_coin
+        if validate_hash "$left_coin"; then
+            break
+        else
+            echo "❌ Invalid coin ID format. ID must start with '0x' followed by 64 hexadecimal characters."
+            echo "Example: 0x1148092cdce78c721835601ef39f9c2cd8b48b7787cbea032dd3913a4106a58d"
+            echo
+        fi
+    done
+
+    # Get and validate the second coin ID
+    while true; do
+        read -p "Enter the second coin ID: " right_coin
+        if validate_hash "$right_coin"; then
+            break
+        else
+            echo "❌ Invalid coin ID format. ID must start with '0x' followed by 64 hexadecimal characters."
+            echo "Example: 0x0140e01731256793bba03914f3844d645fbece26553acdea8ac4de4d84f91690"
+            echo
+        fi
+    done
+
+    # Show merge details for confirmation
+    echo
+    echo "Merge Details:"
+    echo "=============="
+    echo "First Coin: $left_coin"
+    echo "Second Coin: $right_coin"
+    echo
+    echo "Command that will be executed:"
+    echo "$QCLIENT_EXEC token merge $left_coin $right_coin $CONFIG_FLAG"
+    echo
+
+    # Ask for confirmation
+    read -p "Do you want to proceed with this merge? (y/n): " confirm
+
+    if [[ ${confirm,,} == "y" ]]; then
+        $QCLIENT_EXEC token merge "$left_coin" "$right_coin" $CONFIG_FLAG
+    else
+        echo "❌ Merge operation cancelled."
+    fi
+}
+
+donations() {
+    echo '
+
+Donations
+=========
+
+Quilbrium.one is a one-man volunteer effort.
+If you would like to chip in some financial help, thank you!
+
+You can send ERC-20 tokens at this address:
+0x0fd383A1cfbcf4d1F493Dd71b798ebca89e8a013
+
+Or visit this page: https://iri.quest/q-donations
+'
+}
+
+disclaimer() {
+    echo '
+
+Disclaimer
+==========
+
+This tool and all related scripts are unofficial and are being shared as-is.
+I take no responsibility for potential bugs or any misuse of the available options. 
+
+All scripts are open
