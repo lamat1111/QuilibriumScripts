@@ -1,12 +1,29 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.4.0"
+SCRIPT_VERSION="1.4.1"
+
+
+#=====================
+# Variables
+#=====================
 
 # Define the script path
 SCRIPT_PATH=$HOME/scripts
 # Or define the absolute script path by following symlinks
 # SCRIPT_PATH="$(readlink -f "${BASH_SOURCE[0]}")"
+
+# Qclient binary determination
+QCLIENT_DIR="$HOME/ceremonyclient/client"
+CONFIG_FLAG="--config $HOME/ceremonyclient/node/.config"
+
+QCLIENT_EXEC=$(find "$QCLIENT_DIR" -name "qclient-*" ! -name "*.dgst" ! -name "*.sig*" -type f -executable 2>/dev/null | sort -V | tail -n 1)
+
+if [ -z "$QCLIENT_EXEC" ]; then
+    echo "❌ No matching qclient binary found in $QCLIENT_DIR"
+    exit 1
+fi
+
 
 #=====================
 # Menu interface
@@ -86,19 +103,6 @@ main() {
 
 }
 
-#=====================
-# Qclient binary determination
-#=====================
-
-QCLIENT_DIR="$HOME/ceremonyclient/client"
-CONFIG_FLAG="--config $HOME/ceremonyclient/node/.config"
-
-QCLIENT_EXEC=$(find "$QCLIENT_DIR" -name "qclient-*" ! -name "*.dgst" ! -name "*.sig*" -type f -executable 2>/dev/null | sort -V | tail -n 1)
-
-if [ -z "$QCLIENT_EXEC" ]; then
-    echo "❌ No matching qclient binary found in $QCLIENT_DIR"
-    exit 1
-fi
 
 #=====================
 # Menu functions
