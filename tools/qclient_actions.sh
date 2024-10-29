@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.4.3"
+SCRIPT_VERSION="1.4.4"
 
 
 #=====================
@@ -50,14 +50,10 @@ display_menu() {
               only test with small amounts first
           read the 'Disclaimer' and 'Security Settings'
 -----------------------------------------------------------------
-1) Check balance / address       7) Token split
-2) Check individual coins        8) Token merge
+1) Check balance / address       7) Coin split
+2) Check individual coins        8) Coin merge
 
 3) Create transaction            9) Mint all rewards
-4) Accept transaction            
-5) Reject transaction            
-
-6) Perform mutual transfer
 -----------------------------------------------------------------
 B) ⭐ Best server providers      X) Disclaimer                           
 D) 💜 Donations                  S) Security settings
@@ -291,10 +287,12 @@ create_transaction() {
     if [[ ${confirm,,} == "y" ]]; then
         eval "$cmd"
         echo
-        echo "⚠️ Important: This transaction is pending."
-        echo "The receiver needs to accept it for the transfer to complete."
-        echo "Please provide the receiver with the Pending Transaction ID"
-        echo "from the command response above."
+        echo "Currently there is no transaction ID, and the receiver does not have to accept the transaction."
+        echo "Unless you received an error, your transaction should be already on its way to the receiver."
+        #echo "⚠️ Important: This transaction is pending."
+        #echo "The receiver needs to accept it for the transfer to complete."
+        #echo "Please provide the receiver with the Pending Transaction ID"
+        #echo "from the command response above."
     else
         echo "❌ Transaction cancelled."
     fi
