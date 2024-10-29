@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.4.4"
+SCRIPT_VERSION="1.4.5"
 
 
 #=====================
@@ -457,14 +457,14 @@ token_split() {
     echo "Second Amount: $right_amount QUIL"
     echo
     echo "Command that will be executed:"
-    echo "$QCLIENT_EXEC coin split $coin_id $left_amount $right_amount $CONFIG_FLAG"
+    echo "$QCLIENT_EXEC token split $coin_id $left_amount $right_amount $CONFIG_FLAG"
     echo
 
     # Ask for confirmation
     read -p "Do you want to proceed with this split? (y/n): " confirm
 
     if [[ ${confirm,,} == "y" ]]; then
-        $QCLIENT_EXEC coin split "$coin_id" "$left_amount" "$right_amount" $CONFIG_FLAG
+        $QCLIENT_EXEC token split "$coin_id" "$left_amount" "$right_amount" $CONFIG_FLAG
     else
         echo "❌ Split operation cancelled."
     fi
@@ -514,14 +514,14 @@ token_merge() {
     echo "Second Coin: $right_coin"
     echo
     echo "Command that will be executed:"
-    echo "$QCLIENT_EXEC coin merge $left_coin $right_coin $CONFIG_FLAG"
+    echo "$QCLIENT_EXEC token merge $left_coin $right_coin $CONFIG_FLAG"
     echo
 
     # Ask for confirmation
     read -p "Do you want to proceed with this merge? (y/n): " confirm
 
     if [[ ${confirm,,} == "y" ]]; then
-        $QCLIENT_EXEC coin merge "$left_coin" "$right_coin" $CONFIG_FLAG
+        $QCLIENT_EXEC token merge "$left_coin" "$right_coin" $CONFIG_FLAG
     else
         echo "❌ Merge operation cancelled."
     fi
