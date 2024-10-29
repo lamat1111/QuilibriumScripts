@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.4.6"
+SCRIPT_VERSION="1.4.7"
 
 
 #=====================
@@ -428,4 +428,147 @@ Disclaimer
 This tool and all related scripts are unofficial and are being shared as-is.
 I take no responsibility for potential bugs or any misuse of the available options. 
 
-All scripts are open
+All scripts are open source; feel free to inspect them before use.
+Repo: https://github.com/lamat1111/QuilibriumScripts
+'
+}
+
+best_providers() {
+    echo '
+
+Best Server Providers
+====================
+
+Check out the best server providers for your node
+at ★ https://iri.quest/q-best-providers ★
+
+Avoid using providers that specifically ban crypto and mining.
+'
+}
+
+security_settings() {
+    echo '
+
+Security Settings
+================
+
+This script performs QUIL transactions. You can inspect the source code by running:
+cat "'$SCRIPT_PATH/qclient_actions.sh'"
+
+The script also auto-updates to the latest version automatically.
+If you want to disable auto-updates, comment out the line "check_for_updates"
+in the script itself.
+
+DISCLAIMER:
+The author assumes no responsibility for any QUIL loss due to misuse of this script.
+Use this script at your own risk and always verify transactions before confirming them.
+'
+}
+
+
+#=====================
+# One-time alias setup
+#=====================
+
+# Replace the current SCRIPT_DIR definition with:
+SCRIPT_DIR="$HOME/scripts"  # Hardcoded path
+# Or use this more dynamic approach that follows symlinks:
+#SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
+
+ALIAS_MARKER_FILE="$SCRIPT_DIR/.qclient_actions_alias_added"
+
+add_alias_if_needed() {
+    if [ ! -f "$ALIAS_MARKER_FILE" ]; then
+        local comment_line="# This alias calls the \"qclient actions\" menu by typing \"qclient\""
+        local alias_line="alias qclient='/root/scripts/$(basename "${BASH_SOURCE[0]}")'"  # Hardcoded path
+        if ! grep -q "$alias_line" "$HOME/.bashrc"; then
+            echo "" >> "$HOME/.bashrc"  # Add a blank line for better readability
+            echo "$comment_line" >> "$HOME/.bashrc"
+            echo "$alias_line" >> "$HOME/.bashrc"
+            echo "Alias added to .bashrc."
+            
+            # Source .bashrc to make the alias immediately available
+            if [ -n "$BASH_VERSION" ]; then
+                source "$HOME/.bashrc"
+                echo "Alias 'qclient' is now active."
+            else
+                echo "Please run 'source ~/.bashrc' or restart your terminal to use the 'qclient' command."
+            fi
+        fi
+        touch "$ALIAS_MARKER_FILE"
+    fi
+}
+
+
+#=====================
+# Check for updates
+#=====================
+
+check_for_updates() {
+    if ! command -v curl &> /dev/null; then
+        return 1
+    fi
+
+    local GITHUB_RAW_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qclient_actions.sh"
+    local LATEST_VERSION
+
+    LATEST_VERSION=$(curl -sS "$GITHUB_RAW_URL" | sed -n 's/^SCRIPT_VERSION="\(.*\)"$/\1/p')
+    
+    if [ $? -ne 0 ] || [ -z "$LATEST_VERSION" ]; then
+        return 1
+    fi
+    
+    # Version comparison function
+    version_gt() { test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1"; }
+    
+    if version_gt "$LATEST_VERSION" "$SCRIPT_VERSION"; then
+        if curl -sS -o "$HOME/scripts/qclient_actions_new.sh" "$GITHUB_RAW_URL"; then
+            chmod +x "$HOME/scripts/qclient_actions_new.sh"
+            mv "$HOME/scripts/qclient_actions_new.sh" "$HOME/scripts/qclient_actions.sh"
+            exec "$HOME/scripts/qclient_actions.sh"
+        fi
+    fi
+}
+
+
+#=====================
+# Main Menu Loop
+#=====================
+
+main() {
+    while true; do
+        display_menu
+        
+        read -rp "Enter your choice: " choice
+        
+        case $choice in
+            1) check_balance; prompt_return_to_menu || break ;;
+            2) check_coins; prompt_return_to_menu || break ;;
+            3) create_transaction; prompt_return_to_menu || break ;;
+            4) accept_transaction; prompt_return_to_menu || break ;;
+            5) reject_transaction; prompt_return_to_menu || break ;;
+            6) mutual_transfer; prompt_return_to_menu || break ;;
+            7) token_split && prompt_return_to_menu || continue ;; # Modified to handle the return
+            8) token_merge && prompt_return_to_menu || continue ;; # Modified to handle the return
+            9) mint_all && prompt_return_to_menu || continue ;; # Modified to handle the return
+            [sS]) security_settings; press_any_key || break ;;
+            [bB]) best_providers; press_any_key || break ;;
+            [dD]) donations; press_any_key || break ;;
+            [xX]) disclaimer; press_any_key || break ;;
+            [eE]) echo ; break ;;
+            *) echo "Invalid option, please try again."; prompt_return_to_menu || break ;;
+        esac
+    done
+
+    echo
+}
+
+
+#=====================
+# Run
+#=====================
+
+check_for_updates
+add_alias_if_needed
+
+main
