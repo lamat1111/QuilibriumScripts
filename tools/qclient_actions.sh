@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.4.5"
+SCRIPT_VERSION="1.4.6"
 
 
 #=====================
