@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.4.8"
+SCRIPT_VERSION="1.4.9"
 
 
 #=====================
@@ -192,22 +192,22 @@ create_transaction() {
         fi
     done
 
-    # Get and validate refund address (optional)
-    while true; do
-        read -p "Enter the refund address (press Enter to use your own address): " refund_address
-        if [[ -z "$refund_address" ]]; then
-            break
-        elif [[ "$refund_address" == "$to_address" ]]; then
-            echo "❌ Refund address cannot be the same as recipient address."
-            continue
-        elif validate_hash "$refund_address"; then
-            break
-        else
-            echo "❌ Invalid address format. Address must start with '0x' followed by 64 hexadecimal characters."
-            echo "Example: 0x8ae31dc9205c9031943daf4797307871fbf9ffe0851781acc694636d92756789"
-            echo
-        fi
-    done
+    # # Get and validate refund address (optional)
+    # while true; do
+    #     read -p "Enter the refund address (press Enter to use your own address): " refund_address
+    #     if [[ -z "$refund_address" ]]; then
+    #         break
+    #     elif [[ "$refund_address" == "$to_address" ]]; then
+    #         echo "❌ Refund address cannot be the same as recipient address."
+    #         continue
+    #     elif validate_hash "$refund_address"; then
+    #         break
+    #     else
+    #         echo "❌ Invalid address format. Address must start with '0x' followed by 64 hexadecimal characters."
+    #         echo "Example: 0x8ae31dc9205c9031943daf4797307871fbf9ffe0851781acc694636d92756789"
+    #         echo
+    #     fi
+    # done
 
     # Get amount or coin ID
     echo
@@ -246,18 +246,18 @@ create_transaction() {
     fi
 
     # Construct the command
-    if [[ -z "$refund_address" ]]; then
+    # if [[ -z "$refund_address" ]]; then
         cmd="$QCLIENT_EXEC token transfer $to_address $transfer_param $CONFIG_FLAG"
-    else
-        cmd="$QCLIENT_EXEC token transfer $to_address $refund_address $transfer_param $CONFIG_FLAG"
-    fi
+    # else
+    #     cmd="$QCLIENT_EXEC token transfer $to_address $refund_address $transfer_param $CONFIG_FLAG"
+    # fi
 
     # Show transaction details for confirmation
     echo
     echo "Transaction Details:"
     echo "===================="
     echo "Recipient: $to_address"
-    echo "Refund Address: ${refund_address:-"(Your own address)"}"
+    # echo "Refund Address: ${refund_address:-"(Your own address)"}"
     if [[ $transfer_type == "1" ]]; then
         echo "Amount: $amount QUIL"
     else
