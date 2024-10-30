@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.5.8"
+SCRIPT_VERSION="1.5.9"
 
 
 #=====================
@@ -114,31 +114,29 @@ validate_hash() {
     return 0
 }
 
-# Function to show a spinner while waiting
 wait_with_spinner() {
-    local message="$1"
-    local seconds="$2"
+    local message="${1:-Wait for %s seconds...}"  # Default message if none provided
+    local seconds="$2"     # Wait duration
     local chars="⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
     local pid
 
-    # Start the spinner in the background
+    # Replace %s with seconds in message if present
+    message="${message//%s/$seconds}"
+
     (
         while true; do
             for (( i=0; i<${#chars}; i++ )); do
-                echo -en "\r$message ${chars:$i:1} "
+                echo -en "\r\033[1;34m$message\033[0m ${chars:$i:1} "
                 sleep 0.1
             done
         done
     ) &
     pid=$!
 
-    # Wait for specified duration
     sleep "$seconds"
-
-    # Kill the spinner
     kill $pid 2>/dev/null
     wait $pid 2>/dev/null
-    echo -en "\r\033[K"  # Clear the line
+    echo -en "\r\033[K"
 }
 
 #=====================
@@ -294,7 +292,7 @@ create_transaction() {
         
         # Show updated coins after transaction
         echo
-        wait_with_spinner "Showing your coins 30 secs..." 30
+        wait_with_spinner "Showing your coins in %s secs..." 30
         echo
         echo "Your coins after transaction:"
         echo "============================="
@@ -375,7 +373,7 @@ token_split() {
         
         # Show updated coins after split
         echo
-        wait_with_spinner "Showing your coins 30 secs..." 30
+        wait_with_spinner "Showing your coins in %s secs..." 30
         echo
         echo "Your coins after splitting:"
         echo "==========================="
@@ -447,7 +445,7 @@ token_merge() {
         
         # Show updated coins after merge
         echo
-        wait_with_spinner "Showing your coins 30 secs..." 30
+        wait_with_spinner "Showing your coins in %s secs..." 30
         echo
         echo "Your coins after merging:"
         echo "========================="
