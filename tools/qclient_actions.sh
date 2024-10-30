@@ -294,7 +294,8 @@ create_transaction() {
         echo "Unless you received an error, your transaction should be already on its way to the receiver."
         
         # Show updated coins after transaction
-        wait_with_spinner "Showing your coins in a moment..." 15
+        echo
+        wait_with_spinner "Showing your coins 30 secs..." 30
         echo
         echo "Your coins after transaction:"
         echo "============================="
@@ -374,7 +375,8 @@ token_split() {
         $QCLIENT_EXEC token split "$coin_id" "$left_amount" "$right_amount" $CONFIG_FLAG
         
         # Show updated coins after split
-        wait_with_spinner "Showing your coins in a moment..." 15
+        echo
+        wait_with_spinner "Showing your coins 30 secs..." 30
         echo
         echo "Your coins after splitting:"
         echo "==========================="
@@ -445,7 +447,8 @@ token_merge() {
         $QCLIENT_EXEC token merge "$left_coin" "$right_coin" $CONFIG_FLAG
         
         # Show updated coins after merge
-        wait_with_spinner "Showing your coins in a moment..." 15
+        echo
+        wait_with_spinner "Showing your coins 30 secs..." 30
         echo
         echo "Your coins after merging:"
         echo "========================="
