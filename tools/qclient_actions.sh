@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.5.5"
+SCRIPT_VERSION="1.5.6"
 
 
 #=====================
@@ -310,12 +310,8 @@ create_transaction() {
 token_split() {
     # Pre-action confirmation
     description="This will split a coin into two new coins with specified amounts"
-    warning_message="- This is a BETA feature and works slowly.
-- The token split operation can be slow in this period of intense activity.
-- There is no confirmation message after a token split.
-- But if you keep trying the split command, it will go through eventually."
 
-    if ! confirm_proceed "token splitting" "$description" "$warning_message"; then
+    if ! confirm_proceed "token splitting" "$description"; then
         return 1
     fi
     
@@ -394,12 +390,8 @@ token_split() {
 token_merge() {
     # Pre-action confirmation
     description="This will merge two coins into a single new coin"
-    warning_message="- This is a BETA feature and works slowly.
-- The token merge operation can be slow in this period of intense activity.
-- There is no confirmation message after a token merge.
-- But if you keep trying the merge command, it will go through eventually."
 
-    if ! confirm_proceed "token merging" "$description" "$warning_message"; then
+    if ! confirm_proceed "token merging" "$description"; then
         return 1
     fi
     
