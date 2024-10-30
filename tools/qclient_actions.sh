@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.4.9"
+SCRIPT_VERSION="1.5.0"
 
 
 #=====================
@@ -212,9 +212,9 @@ create_transaction() {
     # Get amount or coin ID
     echo
     echo "How would you like to make the transfer?"
-    echo "1) Transfer a specific amount - not available yet on the current Qclient version!"
+    echo "1) Transfer a specific amount - not available yet in the current Qclient version!"
     echo "2) Transfer a specific coin"
-    read -p "Enter your choice (1 or 2): " transfer_type
+    read -p "Enter your choice (only 2 is available): " transfer_type
 
     if [[ $transfer_type == "1" ]]; then
         while true; do
