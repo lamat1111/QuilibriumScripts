@@ -53,7 +53,7 @@ display_menu() {
 1) Check balance / address       7) Coin split
 2) Check individual coins        8) Coin merge
 
-3) Create transaction            9) Mint all rewards
+3) Create transaction            9) Mint all rewards (UNTESTED)
 -----------------------------------------------------------------
 B) ⭐ Best server providers      X) Disclaimer                           
 D) 💜 Donations                  S) Security settings
@@ -191,7 +191,12 @@ check_coins() {
 
 mint_all() {
     description="This will mint all your available rewards"
-    warning_message="- This command will only work when the network is synced and stable
+    warning_message="- This command has not been tested yet so it is better if you execute it by yourself and not via the menu option
+- Execute it inside a tmux session so you can logout of your machine and check back later, 
+  as the command will take a long time to mint all your increments. 
+  It will stop by itself when it reaches increment 0.
+
+IMPORTANT:
 - Your node must be stopped.
 - You must use the public RPC. In your config.yml the 'listenGrpcMultiaddr' field must be empty
 - There is no confirmation. So once you hit enter, it will execute. It won't give you a preview of what's going to happen. So double check everything!"
