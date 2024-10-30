@@ -113,6 +113,33 @@ validate_hash() {
     return 0
 }
 
+# Function to show a spinner while waiting
+wait_with_spinner() {
+    local message="$1"
+    local seconds="$2"
+    local chars="⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
+    local pid
+
+    # Start the spinner in the background
+    (
+        while true; do
+            for (( i=0; i<${#chars}; i++ )); do
+                echo -en "\r$message ${chars:$i:1} "
+                sleep 0.1
+            done
+        done
+    ) &
+    pid=$!
+
+    # Wait for specified duration
+    sleep "$seconds"
+
+    # Kill the spinner
+    kill $pid 2>/dev/null
+    wait $pid 2>/dev/null
+    echo -en "\r\033[K"  # Clear the line
+}
+
 #=====================
 # Menu functions
 #=====================
@@ -261,7 +288,7 @@ create_transaction() {
         echo "Unless you received an error, your transaction should be already on its way to the receiver."
         
         # Show updated coins after transaction
-        sleep 3
+        wait_with_spinner "Showing your coins in a moment..." 10
         echo
         echo "Your coins after transaction:"
         echo "============================="
@@ -345,7 +372,7 @@ token_split() {
         $QCLIENT_EXEC token split "$coin_id" "$left_amount" "$right_amount" $CONFIG_FLAG
         
         # Show updated coins after split
-        sleep 3
+        wait_with_spinner "Showing your coins in a moment..." 10
         echo
         echo "Your coins after splitting:"
         echo "==========================="
@@ -420,7 +447,7 @@ token_merge() {
         $QCLIENT_EXEC token merge "$left_coin" "$right_coin" $CONFIG_FLAG
         
         # Show updated coins after merge
-        sleep 3
+        wait_with_spinner "Showing your coins in a moment..." 10
         echo
         echo "Your coins after merging:"
         echo "========================="
