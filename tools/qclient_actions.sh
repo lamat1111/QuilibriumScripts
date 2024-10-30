@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.5.9"
+SCRIPT_VERSION="1.6.0"
 
 
 #=====================
@@ -201,6 +201,78 @@ IMPORTANT:
 }
 
 create_transaction() {
+    # Pre-action confirmation
+    description="This will transfer a coin to another address"
+    warning="⚠️ Make sure the recipient address is correct. This operation cannot be undone!
+    ⚠️ The account address is different from the node peerID!
+    ⚠️ Account addresses and coin IDs have the same format, so be sure to not send a coin to another coin address!"
+        
+    if ! confirm_proceed "coin transfer" "$description" "$warning"; then
+        return 1
+    fi
+
+    # Get and validate recipient address
+    while true; do
+        read -p "Enter the recipient's account address: " to_address
+        if validate_hash "$to_address"; then
+            break
+        else
+            echo "❌ Invalid address format. Address must start with '0x' followed by 64 hexadecimal characters."
+            echo "Example: 0x7fe21cc8205c9031943daf4797307871fbf9ffe0851781acc694636d92712345"
+            echo
+        fi
+    done
+
+    # Get coin ID
+    echo "Your current coins before transaction:"
+    echo "======================================"
+    check_coins
+    echo
+    
+    while true; do
+        read -p "Enter the coin ID to transfer: " coin_id
+        if validate_hash "$coin_id"; then
+            break
+        else
+            echo "❌ Invalid coin ID format. ID must start with '0x' followed by 64 hexadecimal characters."
+            echo "Example: 0x1148092cdce78c721835601ef39f9c2cd8b48b7787cbea032dd3913a4106a58d"
+            echo
+        fi
+    done
+
+    # Construct and show command
+    cmd="$QCLIENT_EXEC token transfer $to_address $coin_id $CONFIG_FLAG"
+    echo
+    echo "Transaction Details:"
+    echo "===================="
+    echo "Recipient: $to_address"
+    echo "Coin ID: $coin_id"
+    echo
+    echo "Command that will be executed:"
+    echo "$cmd"
+    echo
+
+    read -p "Do you want to proceed with this transaction? (y/n): " confirm
+
+    if [[ ${confirm,,} == "y" ]]; then
+        eval "$cmd"
+        echo
+        echo "Transaction sent. The receiver does not need to accept it."
+        
+        wait_with_spinner "Checking updated coins in %s seconds..." 30
+        echo
+        echo "Your coins after transaction:"
+        echo "============================="
+        check_coins
+        echo
+        echo "If you don't see the changes yet, wait a moment and check your coins again from the main menu."
+    else
+        echo "❌ Transaction cancelled."
+    fi
+}
+
+# This one has both amount or ofcoin options, needs to be corrected
+create_transaction_qclient_2.1.x() {
     echo
     echo "Creating a new transaction"
     echo "=========================="
