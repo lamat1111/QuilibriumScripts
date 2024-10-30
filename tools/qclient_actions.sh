@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.5.3"
+SCRIPT_VERSION="1.5.4"
 
 
 #=====================
@@ -206,12 +206,6 @@ create_transaction() {
     echo "- You can split a coin in 2 coins with option 7."
     echo
 
-    # Show current coins before transaction
-    echo "Your current coins before transaction:"
-    echo "==================================="
-    check_coins
-    echo
-
     # Get and validate recipient address
     while true; do
         read -p "Enter the recipient's address: " to_address
@@ -245,6 +239,11 @@ create_transaction() {
         done
     elif [[ $transfer_type == "2" ]]; then
         while true; do
+            # Show current coins before transaction
+            echo "Your current coins before transaction:"
+            echo "======================================"
+            check_coins
+            echo
             read -p "Enter the coin ID to transfer: " coin_id
             if validate_hash "$coin_id"; then
                 break
