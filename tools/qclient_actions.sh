@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.6.0"
+SCRIPT_VERSION="1.6.1"
 
 
 #=====================
@@ -53,7 +53,7 @@ display_menu() {
 1) Check balance / address       7) Coin split
 2) Check individual coins        8) Coin merge
 
-3) Create transaction            9) Mint all rewards (UNTESTED)
+3) Create transaction           10) Mint all rewards (UNTESTED)
 -----------------------------------------------------------------
 B) ⭐ Best server providers      X) Disclaimer                           
 D) 💜 Donations                  S) Security settings
@@ -529,6 +529,64 @@ token_merge() {
     fi
 }
 
+token_merge_all() {
+    description="This will merge all your coins into a single coin"
+    warning="⚠️ This is an experimental feature. Please make sure you have a backup of your keys."
+
+    if ! confirm_proceed "merge all coins" "$description" "$warning"; then
+        return 1
+    fi
+
+    echo
+    echo "Current coins before merging:"
+    echo "============================"
+    coins_output=$($QCLIENT_EXEC token coins $CONFIG_FLAG)
+    echo "$coins_output"
+    echo
+
+    # Extract coin IDs and values
+    coin_ids=($(echo "$coins_output" | grep -o '0x[0-9a-fA-F]\{64\}'))
+    coin_values=($(echo "$coins_output" | grep -o '[0-9]*\.[0-9]*' | grep -v '^0\.'))
+    coin_count=${#coin_ids[@]}
+
+    if [ "$coin_count" -lt 2 ]; then
+        echo "❌ Not enough coins to merge. You need at least 2 coins."
+        return 1
+    fi
+
+    # Calculate total value
+    merged_value=0
+    for value in "${coin_values[@]}"; do
+        merged_value=$(echo "$merged_value + $value" | bc)
+    done
+
+    # Build merge command
+    merge_cmd="$QCLIENT_EXEC token merge ${coin_ids[*]} $CONFIG_FLAG"
+
+    echo "Found $coin_count coins to merge"
+    echo "Merged amount in QUIL will be $merged_value"
+    echo
+    echo "Command that will be executed:"
+    echo "$merge_cmd"
+    echo
+
+    read -p "Do you want to proceed with merging all coins? (y/n): " confirm
+    if [[ ${confirm,,} != "y" ]]; then
+        echo "❌ Operation cancelled."
+        return 1
+    fi
+
+    echo
+    echo "Executing merge operation..."
+    eval "$merge_cmd"
+
+    echo
+    echo "Merge operation completed. Checking final coins:"
+    echo "============================================="
+    wait_with_spinner "Retrieving final coin status in %s seconds..." 30
+    check_coins
+}
+
 donations() {
     echo '
 
@@ -674,9 +732,10 @@ main() {
             4) accept_transaction; prompt_return_to_menu || break ;;
             5) reject_transaction; prompt_return_to_menu || break ;;
             6) mutual_transfer; prompt_return_to_menu || break ;;
-            7) token_split && prompt_return_to_menu || continue ;; # Modified to handle the return
-            8) token_merge && prompt_return_to_menu || continue ;; # Modified to handle the return
-            9) mint_all && prompt_return_to_menu || continue ;; # Modified to handle the return
+            7) token_split && prompt_return_to_menu || continue ;;
+            8) token_merge && prompt_return_to_menu || continue ;;
+            9) token_merge_all && prompt_return_to_menu || continue ;;
+            10) mint_all && prompt_return_to_menu || continue ;;
             [sS]) security_settings; press_any_key || break ;;
             [bB]) best_providers; press_any_key || break ;;
             [dD]) donations; press_any_key || break ;;
@@ -684,7 +743,6 @@ main() {
             [eE]) echo ; break ;;
             *) echo "Invalid option, please try again."; prompt_return_to_menu || break ;;
         esac
-    done
 
     echo
 }
