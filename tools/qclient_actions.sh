@@ -81,30 +81,24 @@ EOF
 confirm_proceed() {
     local action_name="$1"
     local description="$2"
-    local warning_message="$3"
+    local warning_message="${3:-}"  # Use parameter expansion to handle optional warning
     
     echo
     echo "$action_name:"
-    echo "$(printf '%*s' "${#action_name}" | tr ' ' '-')"  # Create a line of dashes matching the title length
-    echo "$description"
-    echo
-    echo "$warning_message"
+    echo "$(printf '%*s' "${#action_name}" | tr ' ' '-')"
+    [ -n "$description" ] && echo "$description"
+    [ -n "$warning_message" ] && echo -e "\n$warning_message"
     echo
     
     while true; do
         read -rp "Do you want to proceed with $action_name? (Y/N): " confirm
         case $confirm in
-            [Yy]* ) 
-                return 0  # User confirmed
-                ;;
+            [Yy]* ) return 0 ;;
             [Nn]* ) 
                 echo "Operation cancelled."
                 display_menu
-                return 1  # User cancelled
-                ;;
-            * ) 
-                echo "Please answer Y or N."
-                ;;
+                return 1 ;;
+            * ) echo "Please answer Y or N." ;;
         esac
     done
 }
