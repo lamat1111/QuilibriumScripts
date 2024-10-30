@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.5.0"
+SCRIPT_VERSION="1.5.1"
 
 
 #=====================
@@ -175,9 +175,14 @@ create_transaction() {
     echo "Creating a new transaction"
     echo "=========================="
     echo "- On the current Qclient version you can only send whole coins, not 'amount' of QUIL"
-    echo "- Yu will need the address (ID) of the coin you want to send."
-    echo "- You can check your coin addresses with option 2 in the menu."
+    echo "- You will need the address (ID) of the coin you want to send."
     echo "- You can split a coin in 2 coins with option 7."
+    echo
+
+    # Show current coins before transaction
+    echo "Your current coins before transaction:"
+    echo "==================================="
+    check_coins
     echo
 
     # Get and validate recipient address
@@ -191,23 +196,6 @@ create_transaction() {
             echo
         fi
     done
-
-    # # Get and validate refund address (optional)
-    # while true; do
-    #     read -p "Enter the refund address (press Enter to use your own address): " refund_address
-    #     if [[ -z "$refund_address" ]]; then
-    #         break
-    #     elif [[ "$refund_address" == "$to_address" ]]; then
-    #         echo "❌ Refund address cannot be the same as recipient address."
-    #         continue
-    #     elif validate_hash "$refund_address"; then
-    #         break
-    #     else
-    #         echo "❌ Invalid address format. Address must start with '0x' followed by 64 hexadecimal characters."
-    #         echo "Example: 0x8ae31dc9205c9031943daf4797307871fbf9ffe0851781acc694636d92756789"
-    #         echo
-    #     fi
-    # done
 
     # Get amount or coin ID
     echo
@@ -246,18 +234,13 @@ create_transaction() {
     fi
 
     # Construct the command
-    # if [[ -z "$refund_address" ]]; then
-        cmd="$QCLIENT_EXEC token transfer $to_address $transfer_param $CONFIG_FLAG"
-    # else
-    #     cmd="$QCLIENT_EXEC token transfer $to_address $refund_address $transfer_param $CONFIG_FLAG"
-    # fi
+    cmd="$QCLIENT_EXEC token transfer $to_address $transfer_param $CONFIG_FLAG"
 
     # Show transaction details for confirmation
     echo
     echo "Transaction Details:"
     echo "===================="
     echo "Recipient: $to_address"
-    # echo "Refund Address: ${refund_address:-"(Your own address)"}"
     if [[ $transfer_type == "1" ]]; then
         echo "Amount: $amount QUIL"
     else
@@ -276,6 +259,16 @@ create_transaction() {
         echo
         echo "Currently there is no transaction ID, and the receiver does not have to accept the transaction."
         echo "Unless you received an error, your transaction should be already on its way to the receiver."
+        
+        # Show updated coins after transaction
+        sleep 3
+        echo
+        echo "Your coins after transaction:"
+        echo "============================="
+        check_coins
+        echo
+        echo "If you don't see the changes yet, wait a moment and check your coins again from the main menu."
+        echo "If still nothing changes, you may want to try to execute the operation again."
     else
         echo "❌ Transaction cancelled."
     fi
@@ -293,6 +286,14 @@ token_split() {
         return 1
     fi
     
+    # Show current coins
+    echo
+    echo "Your current coins before splitting:"
+    echo "=================================="
+    check_coins
+    echo "Please select one of the above coins to split."
+    echo
+
     # Get and validate the coin ID to split
     while true; do
         read -p "Enter the coin ID to split: " coin_id
@@ -342,6 +343,16 @@ token_split() {
 
     if [[ ${confirm,,} == "y" ]]; then
         $QCLIENT_EXEC token split "$coin_id" "$left_amount" "$right_amount" $CONFIG_FLAG
+        
+        # Show updated coins after split
+        sleep 3
+        echo
+        echo "Your coins after splitting:"
+        echo "==========================="
+        check_coins
+        echo
+        echo "If you don't see the changes yet, wait a moment and check your coins again from the main menu."
+        echo "If still nothing changes, you may want to try to execute the operation again."
     else
         echo "❌ Split operation cancelled."
     fi
@@ -358,6 +369,14 @@ token_merge() {
     if ! confirm_proceed "token merging" "$description" "$warning_message"; then
         return 1
     fi
+    
+    # Show current coins
+    echo
+    echo "Your current coins before merging:"
+    echo "================================"
+    check_coins
+    echo "Please select two of the above coins to merge."
+    echo
     
     # Get and validate the first coin ID
     while true; do
@@ -399,6 +418,16 @@ token_merge() {
 
     if [[ ${confirm,,} == "y" ]]; then
         $QCLIENT_EXEC token merge "$left_coin" "$right_coin" $CONFIG_FLAG
+        
+        # Show updated coins after merge
+        sleep 3
+        echo
+        echo "Your coins after merging:"
+        echo "========================="
+        check_coins
+        echo
+        echo "If you don't see the changes yet, wait a moment and check your coins again from the main menu."
+        echo "If still nothing changes, you may want to try to execute the operation again."
     else
         echo "❌ Merge operation cancelled."
     fi
