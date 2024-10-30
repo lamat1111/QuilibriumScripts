@@ -115,18 +115,17 @@ validate_hash() {
 }
 
 wait_with_spinner() {
-    local message="${1:-Wait for %s seconds...}"  # Default message if none provided
-    local seconds="$2"     # Wait duration
+    local message="${1:-Wait for %s seconds...}"
+    local seconds="$2"
     local chars="⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
     local pid
 
-    # Replace %s with seconds in message if present
     message="${message//%s/$seconds}"
 
     (
         while true; do
             for (( i=0; i<${#chars}; i++ )); do
-                echo -en "\r\033[1;34m$message\033[0m ${chars:$i:1} "
+                echo -en "\r$message ${chars:$i:1} "
                 sleep 0.1
             done
         done
