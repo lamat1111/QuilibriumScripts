@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.6.1"
+SCRIPT_VERSION="1.6.2"
 
 
 #=====================
@@ -736,15 +736,14 @@ main() {
             8) token_merge && prompt_return_to_menu || continue ;;
             9) token_merge_all && prompt_return_to_menu || continue ;;
             10) mint_all && prompt_return_to_menu || continue ;;
-            [sS]) security_settings; press_any_key || break ;;
-            [bB]) best_providers; press_any_key || break ;;
-            [dD]) donations; press_any_key || break ;;
-            [xX]) disclaimer; press_any_key || break ;;
-            [eE]) echo ; break ;;
-            *) echo "Invalid option, please try again."; prompt_return_to_menu || break ;;
+            [sS]) security_settings; press_any_key ;;
+            [bB]) best_providers; press_any_key ;;
+            [dD]) donations; press_any_key ;;
+            [xX]) disclaimer; press_any_key ;;
+            [eE]) echo; break ;;
+            *) echo "Invalid option, please try again." ;;
         esac
-
-    echo
+    done
 }
 
 
