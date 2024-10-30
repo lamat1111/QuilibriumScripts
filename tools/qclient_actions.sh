@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.6.2"
+SCRIPT_VERSION="1.6.3"
 
 
 #=====================
@@ -50,10 +50,11 @@ display_menu() {
               only test with small amounts first
           read the 'Disclaimer' and 'Security Settings'
 -----------------------------------------------------------------
-1) Check balance / address       7) Coin split
-2) Check individual coins        8) Coin merge
+1) Check balance / address       7) Split coin
+2) Check individual coins        8) Merge coin
+3) Create transaction            9) Merge all coins
 
-3) Create transaction           10) Mint all rewards (UNTESTED)
+                                10) Mint all rewards (UNTESTED)
 -----------------------------------------------------------------
 B) ⭐ Best server providers      X) Disclaimer                           
 D) 💜 Donations                  S) Security settings
@@ -531,18 +532,17 @@ token_merge() {
 
 token_merge_all() {
     description="This will merge all your coins into a single coin"
-    warning="⚠️ This is an experimental feature. Please make sure you have a backup of your keys."
+
+    echo
+    echo "Current coins that will be merged:"
+    echo "----------------------------------"
+    coins_output=$($QCLIENT_EXEC token coins $CONFIG_FLAG)
+    echo "$coins_output"
+    echo
 
     if ! confirm_proceed "merge all coins" "$description" "$warning"; then
         return 1
     fi
-
-    echo
-    echo "Current coins before merging:"
-    echo "============================"
-    coins_output=$($QCLIENT_EXEC token coins $CONFIG_FLAG)
-    echo "$coins_output"
-    echo
 
     # Extract coin IDs and values
     coin_ids=($(echo "$coins_output" | grep -o '0x[0-9a-fA-F]\{64\}'))
