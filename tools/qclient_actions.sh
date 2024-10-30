@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.5.4"
+SCRIPT_VERSION="1.5.5"
 
 
 #=====================
@@ -60,7 +60,14 @@ D) 💜 Donations                  S) Security settings
 -----------------------------------------------------------------    
 E) Exit
 
-⚠️ Most Qclient commands won't work until the network is synced and stable.
+⚠️ QCLIENT COMMANDS MAY BE SLOW DURING THIS PERIOD OF INTENSE ACTIVITY ⚠️
+
+Most Qclient commands won't work if you use the local RPC at the moment.
+Set your config.yml to use the public RPC if you haven't done so already.
+You can use option 3 in the Q1 menu to so it.
+
+Even with the public RPC enabled, token operations may not go through immediately,
+wait at least 60 seconds before trying again a command.
 
 EOF
 }
