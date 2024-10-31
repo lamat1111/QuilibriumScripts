@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.6.4"
+SCRIPT_VERSION="1.6.5"
 
 
 #=====================
@@ -463,7 +463,7 @@ token_merge() {
     # Pre-action confirmation
     description="This will merge two coins into a single new coin"
 
-    if ! confirm_proceed "token merging" "$description"; then
+    if ! confirm_proceed "Token merging" "$description"; then
         return 1
     fi
     
@@ -534,16 +534,16 @@ token_merge() {
 token_merge_all() {
     description="This will merge all your coins into a single coin"
 
+    if ! confirm_proceed "Merge all coins" "$description"; then
+        return 1
+    fi
+
     echo
     echo "Current coins that will be merged:"
     echo "----------------------------------"
     coins_output=$($QCLIENT_EXEC token coins $CONFIG_FLAG)
     echo "$coins_output"
     echo
-
-    if ! confirm_proceed "merge all coins" "$description" "$warning"; then
-        return 1
-    fi
 
     # Extract coin IDs and values
     coin_ids=($(echo "$coins_output" | grep -o '0x[0-9a-fA-F]\{64\}'))
