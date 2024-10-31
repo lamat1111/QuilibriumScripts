@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.7.0"
+SCRIPT_VERSION="1.7.1"
 
 
 #=====================
@@ -574,6 +574,8 @@ token_merge_all() {
 
     if [ "$coin_count" -lt 2 ]; then
         echo "❌ Not enough coins to merge. You need at least 2 coins."
+        echo
+        read -p "Press Enter to return to the main menu..."
         return 1
     fi
 
