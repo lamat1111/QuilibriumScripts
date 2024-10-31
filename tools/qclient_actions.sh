@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.7.5"
+SCRIPT_VERSION="1.7.6"
 
 
 #=====================
@@ -46,10 +46,6 @@ display_menu() {
 =================================================================
 /////////////////// QCLIENT ACTIONS - $SCRIPT_VERSION /////////////////////
 =================================================================
-               ⚠️ This menu is still in BETA ⚠️
-              only test with small amounts first
-          read the 'Disclaimer' and 'Security Settings'
------------------------------------------------------------------
 1) Check balance / address       7) Split coin
 2) Check individual coins        8) Merge coin
 3) Create transaction            9) Merge all coins
