@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.7.2"
+SCRIPT_VERSION="1.7.3"
 
 
 #=====================
@@ -425,6 +425,9 @@ token_split() {
 
     # Get and validate the first amount
     while true; do
+        echo
+        echo "⚠️ The 2 splitted amounts must add up exactly to the coin original amount."
+        echo
         read -p "Enter the amount for the first coin  (format 0.000000): " left_amount
         check_exit "$left_amount" && return 1
         if [[ ! $left_amount =~ ^[0-9]*\.?[0-9]+$ ]] || [[ $(echo "$left_amount <= 0" | bc -l) -eq 1 ]]; then
