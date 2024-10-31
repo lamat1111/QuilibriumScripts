@@ -32,7 +32,7 @@ exec 1> >(while read line; do echo "[$(date '+%Y-%m-%d %H:%M:%S')] $line"; done 
 #####################
 
 # Parse command line arguments
-DIFF=600  # Default value for diff
+DIFF=3600  # Default value for diff
 
 if [ -z "$QUIL_SERVICE_NAME" ]; then
     QUIL_SERVICE_NAME="ceremonyclient"
