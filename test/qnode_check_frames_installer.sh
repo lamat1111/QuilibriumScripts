@@ -48,7 +48,7 @@ fi
 
 # Download the script
 echo "Downloading qnode_check_for_frames.sh..."
-if ! curl -sSL "https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/test/qnode_check_for_frames.sh" -o ~/scripts/qnode_check_for_frames.sh; then
+if ! curl -sSL "https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/test/qnode_check_frames.sh" -o ~/scripts/qnode_check_frames.sh; then
     echo -e "${RED}Failed to download the script${NC}"
     exit 1
 fi
@@ -57,7 +57,7 @@ echo
 sleep 1
 
 # Make script executable
-if ! chmod +x ~/scripts/qnode_check_for_frames.sh; then
+if ! chmod +x ~/scripts/qnode_check_frames.sh; then
     echo -e "${RED}Failed to make script executable${NC}"
     exit 1
 fi
@@ -73,15 +73,15 @@ TEMP_CRON_NEW=$(mktemp)
 crontab -l > "$TEMP_CRON" 2>/dev/null
 
 # Check for existing frame checker cron entries
-if grep -q "check-for-frames.sh\|qnode_check_for_frames.sh" "$TEMP_CRON"; then
+if grep -q "check-for-frames.sh\|qnode_check_frames.sh" "$TEMP_CRON"; then
     echo -e "${YELLOW}Found existing frame checker cron job(s). Removing...${NC}"
-    grep -v "check-for-frames.sh\|qnode_check_for_frames.sh" "$TEMP_CRON" > "$TEMP_CRON_NEW"
+    grep -v "check-frames.sh\|qnode_check_frames.sh" "$TEMP_CRON" > "$TEMP_CRON_NEW"
     mv "$TEMP_CRON_NEW" "$TEMP_CRON"
     echo -e "${GREEN}Old cron jobs removed successfully${NC}"
 fi
 
-# Add new cron job
-echo "*/10 * * * * ${HOME}/scripts/qnode_check_for_frames.sh" >> "$TEMP_CRON"
+# Add new cron job (changed to run every hour)
+echo "0 * * * * ${HOME}/scripts/qnode_check_frames.sh" >> "$TEMP_CRON"
 
 # Install new crontab
 if ! crontab "$TEMP_CRON"; then
@@ -95,9 +95,9 @@ echo -e "${GREEN}Cron job installed successfully${NC}"
 rm "$TEMP_CRON" "$TEMP_CRON_NEW" 2>/dev/null
 
 # Check and remove old script if it exists
-if [ -f "$HOME/check-for-frames.sh" ]; then
-    echo -e "${YELLOW}Found old script at $HOME/check-for-frames.sh${NC}"
-    if rm "$HOME/check-for-frames.sh"; then
+if [ -f "$HOME/check-frames.sh" ]; then
+    echo -e "${YELLOW}Found old script at $HOME/check-frames.sh${NC}"
+    if rm "$HOME/check-frames.sh"; then
         echo -e "${GREEN}Successfully removed old script${NC}"
         echo
         sleep 1
@@ -114,14 +114,15 @@ LOG_DIR="$HOME/scripts/logs"
 if [ ! -d "$LOG_DIR" ]; then
     echo "Log directory does not exist. Creating $LOG_DIR..."
     if ! mkdir -p "$LOG_DIR" 2>/dev/null; then
-        echo "ERROR: Failed to create log directory $LOG_DIR"
+        echo -e "${RED}ERROR: Failed to create log directory $LOG_DIR${NC}"
         exit 1
     fi
+    echo -e "${GREEN}Log directory created successfully${NC}"
 fi
 
 echo -e "${GREEN}Installation completed successfully!${NC}"
-echo "Script location: ~/scripts/qnode_check_for_frames.sh"
-echo "Cron job will run every 10 minutes"
+echo "Script location: ~/scripts/qnode_check_frames.sh"
+echo "Cron job will run every hour"
 echo
 sleep 1
 
