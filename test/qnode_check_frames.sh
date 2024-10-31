@@ -28,10 +28,11 @@ exec 1> >(while read line; do echo "[$(date '+%Y-%m-%d %H:%M:%S')] $line"; done 
 # Script
 #####################
 
-# Calculate timestamps for sampling points (now, 20min ago, 40min ago, and 60min ago)
+# Calculate timestamps for sampling points
 now=$(date '+%Y-%m-%d %H:%M:%S')
-min20_ago=$(date -d '20 minutes ago' '+%Y-%m-%d %H:%M:%S')
-min40_ago=$(date -d '40 minutes ago' '+%Y-%m-%d %H:%M:%S')
+min15_ago=$(date -d '15 minutes ago' '+%Y-%m-%d %H:%M:%S')
+min30_ago=$(date -d '30 minutes ago' '+%Y-%m-%d %H:%M:%S')
+min45_ago=$(date -d '45 minutes ago' '+%Y-%m-%d %H:%M:%S')
 hour_ago=$(date -d '60 minutes ago' '+%Y-%m-%d %H:%M:%S')
 
 # Function to get frame number at a specific time
@@ -41,20 +42,21 @@ get_frame_at_time() {
     
     journalctl -u $QUIL_SERVICE_NAME --no-hostname --output=json \
         --since "$target_time" --until "$(date -d "$target_time + $window_size" '+%Y-%m-%d %H:%M:%S')" |
-        grep '"frame_number":' |
-        head -n 1 |
-        jq -r 'select(.frame_number != null) | [.REALTIME_TIMESTAMP, .frame_number] | @csv'
+        jq -r 'select(.frame_number != null and .msg == "evaluating next frame") | [.ts, .frame_number] | @csv' |
+        head -n 1
 }
 
 # Get frame numbers at sampling points
 current_data=$(get_frame_at_time "$now")
-min20_data=$(get_frame_at_time "$min20_ago")
-min40_data=$(get_frame_at_time "$min40_ago")
-hour_data=$(get_frame_at_time "$hour_ago")
+min15_data=$(get_frame_at_time "$min15_ago")
+min30_data=$(get_frame_at_time "$min30_ago")
+min45_data=$(get_frame_at_time "$min45_ago")
 
 # Extract latest frame and timestamp
 if [ -z "$current_data" ]; then
-    echo -e "${YELLOW}WARNING: No current frame data found. Restarting the node...${NC}"
+    echo -e "${YELLOW}WARNING: No current frame data found. Service might be stuck. Last log entries:${NC}"
+    journalctl -u $QUIL_SERVICE_NAME --no-hostname -n 5
+    echo -e "${YELLOW}Restarting the node...${NC}"
     service $QUIL_SERVICE_NAME restart
     exit 1
 fi
@@ -64,19 +66,18 @@ latest_frame=$(echo "$current_data" | cut -d',' -f2 | tr -d '"')
 
 # Convert timestamp to seconds
 current_ts=$(date +%s)
-latest_ts_seconds=$(echo "scale=0; $latest_ts/1000000" | bc)
-time_diff=$(( current_ts - latest_ts_seconds ))
+time_diff=$(( current_ts - ${latest_ts%.*} ))
 
 # Extract all frame numbers for comparison
-frame20=$(echo "$min20_data" | cut -d',' -f2 | tr -d '"')
-frame40=$(echo "$min40_data" | cut -d',' -f2 | tr -d '"')
-frame60=$(echo "$hour_data" | cut -d',' -f2 | tr -d '"')
+frame15=$(echo "$min15_data" | cut -d',' -f2 | tr -d '"')
+frame30=$(echo "$min30_data" | cut -d',' -f2 | tr -d '"')
+frame45=$(echo "$min45_data" | cut -d',' -f2 | tr -d '"')
 
 echo "Frame number analysis:"
 echo "Current frame: $latest_frame"
-echo "20 min ago  : ${frame20:-N/A}"
-echo "40 min ago  : ${frame40:-N/A}"
-echo "60 min ago  : ${frame60:-N/A}"
+echo "15 min ago  : ${frame15:-N/A}"
+echo "30 min ago  : ${frame30:-N/A}"
+echo "45 min ago  : ${frame45:-N/A}"
 echo "Time since last frame: $time_diff seconds ($(( time_diff/60 )) minutes)"
 
 # Check frame progression across samples
@@ -93,9 +94,9 @@ is_greater() {
 }
 
 # Check progression through all valid samples
-if [ ! -z "$frame60" ]; then prev_frame=$frame60; fi
-if [ ! -z "$frame40" ] && is_greater "$frame40"; then frame_increased=true; prev_frame=$frame40; fi
-if [ ! -z "$frame20" ] && is_greater "$frame20"; then frame_increased=true; prev_frame=$frame20; fi
+if [ ! -z "$frame45" ]; then prev_frame=$frame45; fi
+if [ ! -z "$frame30" ] && is_greater "$frame30"; then frame_increased=true; prev_frame=$frame30; fi
+if [ ! -z "$frame15" ] && is_greater "$frame15"; then frame_increased=true; prev_frame=$frame15; fi
 if [ ! -z "$latest_frame" ] && is_greater "$latest_frame"; then frame_increased=true; fi
 
 if [ "$frame_increased" = false ]; then
