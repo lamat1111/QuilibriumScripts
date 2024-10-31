@@ -23,37 +23,27 @@ This script will clean up your system from temp files and old logs
 Made with 🔥 by LaMat - https://quilibrium.one
 ===========================================================================
 
-Processing... ⏳
-
 EOF
 }
 
-# Function to show progress
-show_progress() {
-    local pid=$1
-    local delay=0.1
-    local spinstr='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏'
-    while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
-        local temp=${spinstr#?}
-        printf " [%c] " "$spinstr"
-        local spinstr=$temp${spinstr%"$temp"}
-        printf "\b\b\b\b"
-        sleep $delay
-    done
-    printf "    \b\b\b\b"
+# Function to show status message
+show_status() {
+    echo "Cleaning: $1..."
 }
 
-# Function to calculate freed space
+# Function to calculate freed space in MB
 calculate_freed_space() {
     local before=$1
     local after=$2
-    echo "scale=2; $before - $after" | bc
+    echo "scale=2; ($before - $after) * 1024" | bc
 }
 
 # Backup function for important logs before cleaning
 backup_important_logs() {
     local backup_dir="/var/log/cleaned_logs_backup"
     local date_stamp=$(date +%Y%m%d_%H%M%S)
+    
+    show_status "Important system logs"
     
     # Create backup directory if it doesn't exist
     sudo mkdir -p "$backup_dir"
@@ -77,94 +67,90 @@ clean_system() {
     # Backup important logs first
     backup_important_logs
 
-    # APT cleanup
+    show_status "APT cache"
     sudo apt-get clean >/dev/null 2>&1
     sudo apt-get autoclean >/dev/null 2>&1
     sudo apt-get autoremove --purge -y >/dev/null 2>&1
 
-    # Remove old kernels (keeping the current and one previous version)
+    show_status "Old kernels"
     sudo dpkg -l 'linux-*' | sed '/^ii/!d;/'"$(uname -r | sed "s/\(.*\)-\([^0-9]\+\)/\1/")"'/d;s/^[^ ]* [^ ]* \([^ ]*\).*/\1/;/[0-9]/!d' | grep -v $(uname -r) | head -n -1 | xargs sudo apt-get -y purge >/dev/null 2>&1
 
-    # Clean package manager cache
+    show_status "Package manager cache"
     sudo rm -rf /var/cache/apt/archives/* >/dev/null 2>&1
     sudo rm -rf /var/cache/apt/archives/partial/* >/dev/null 2>&1
 
-    # Clean temporary files
+    show_status "Temporary files"
     sudo rm -rf /tmp/* >/dev/null 2>&1
     sudo rm -rf /var/tmp/* >/dev/null 2>&1
 
-    # Clean old logs (keeping last 7 days)
+    show_status "Old log files"
     sudo find /var/log -type f -name "*.log" -mtime +7 -exec rm -f {} \; >/dev/null 2>&1
     sudo find /var/log -type f -name "*.log.*" -mtime +7 -exec rm -f {} \; >/dev/null 2>&1
     
-    # Clean and optimize systemd journal
+    show_status "Systemd journal"
     sudo journalctl --rotate >/dev/null 2>&1
     sudo journalctl --vacuum-time=7d >/dev/null 2>&1
-    
-    # Clean old systemd journal files
     sudo rm -f /var/log/journal/*/*.journal~ >/dev/null 2>&1
 
-    # Clean old audit logs if they exist
     if [ -d "/var/log/audit" ]; then
+        show_status "Audit logs"
         sudo find /var/log/audit -type f -mtime +7 -exec rm -f {} \; >/dev/null 2>&1
     fi
 
-    # Clean crash reports
+    show_status "Crash reports"
     sudo rm -rf /var/crash/* >/dev/null 2>&1
 
-    # Clean up failed systemd units
+    show_status "Failed systemd units"
     sudo systemctl reset-failed >/dev/null 2>&1
 
-    # Clean Docker if installed (with extra safety checks)
     if command -v docker >/dev/null; then
-        # Remove unused containers, networks, and dangling images
+        show_status "Docker system"
         docker system prune -f >/dev/null 2>&1
-        
-        # Remove unused volumes (be careful with this one)
-        # docker volume prune -f >/dev/null 2>&1  # Commented out for safety
     fi
 
-    # Clean old sessions
+    show_status "Old sessions"
     sudo rm -rf /var/lib/systemd/sessions/* >/dev/null 2>&1
 
-    # Clean obsolete alternatives
+    show_status "Obsolete alternatives"
     sudo update-alternatives --remove-all ls >/dev/null 2>&1
 
-    # Clean Linux Server Performance logs
+    show_status "Performance logs"
     sudo rm -rf /var/log/sa/* >/dev/null 2>&1
 
-    # Clean old wtmp and btmp logs (login records)
+    show_status "Login records"
     sudo truncate -s 0 /var/log/wtmp >/dev/null 2>&1
     sudo truncate -s 0 /var/log/btmp >/dev/null 2>&1
 
-    # Clean old mail logs if they exist
     if [ -d "/var/log/mail" ]; then
+        show_status "Mail logs"
         sudo find /var/log/mail -type f -mtime +7 -exec rm -f {} \; >/dev/null 2>&1
     fi
 }
 
 # Main function
 main() {
-    # show banner
+    # Show banner
     show_banner
+    
+    echo "Starting cleanup..."
+    echo
     
     # Get initial sizes
     initial_size=$(df -BG / | tail -1 | awk '{print $4}' | sed 's/G//')
 
-    # Run cleanup in background and show progress
-    clean_system &
-    show_progress $!
+    # Run cleanup
+    clean_system
 
     # Get final sizes
     final_size=$(df -BG / | tail -1 | awk '{print $4}' | sed 's/G//')
     
     # Calculate freed space
-    freed_space=$(calculate_freed_space $final_size $initial_size)
+    freed_space=$(calculate_freed_space $initial_size $final_size)
 
     # Show completion message
     echo
-    echo -e "\n✅ Cleanup completed successfully!"
-    echo -e "Freed approximately ${freed_space}GB of space"
+    echo "✅ Cleanup completed successfully!"
+    echo "💾 Freed approximately ${freed_space}MB of space"
 }
 
 # Execute main function
