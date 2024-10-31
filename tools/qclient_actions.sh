@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.7.6"
+SCRIPT_VERSION="1.7.7"
 
 
 #=====================
@@ -232,6 +232,7 @@ create_transaction() {
     done
 
     # Get coin ID
+    echo
     echo "Your current coins before transaction:"
     echo "--------------------------------------"
     check_coins
