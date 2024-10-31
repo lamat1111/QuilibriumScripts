@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.7.4"
+SCRIPT_VERSION="1.7.5"
 
 
 #=====================
@@ -193,7 +193,9 @@ check_coins() {
 }
 
 mint_all() {
-    echo "This command will mint all your available rewards"
+    echo "Mint all Rewards"
+    echo "================"
+    echo "This command will mint all your available rewards."
     echo
     echo "IMPORTANT:"
     echo "- Your node must be stopped."
