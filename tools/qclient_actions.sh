@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.7.1"
+SCRIPT_VERSION="1.7.2"
 
 
 #=====================
@@ -204,7 +204,7 @@ IMPORTANT:
 - You must use the public RPC. In your config.yml the 'listenGrpcMultiaddr' field must be empty
 - There is no confirmation. So once you hit enter, it will execute. It won't give you a preview of what's going to happen. So double check everything!"
 
-    if ! confirm_proceed "minting all rewards" "$description" "$warning_message"; then
+    if ! confirm_proceed "Minting all rewards" "$description" "$warning_message"; then
         return 1
     fi
 
@@ -239,7 +239,7 @@ create_transaction() {
 
     # Get coin ID
     echo "Your current coins before transaction:"
-    echo "======================================"
+    echo "--------------------------------------"
     check_coins
     echo
     
@@ -259,7 +259,7 @@ create_transaction() {
     cmd="$QCLIENT_EXEC token transfer $to_address $coin_id $CONFIG_FLAG"
     echo
     echo "Transaction Details:"
-    echo "===================="
+    echo "--------------------"
     echo "Recipient: $to_address"
     echo "Coin ID: $coin_id"
     echo
@@ -277,7 +277,7 @@ create_transaction() {
         wait_with_spinner "Checking updated coins in %s seconds..." 30
         echo
         echo "Your coins after transaction:"
-        echo "============================="
+        echo "-----------------------------"
         check_coins
         echo
         echo "If you don't see the changes yet, wait a moment and check your coins again from the main menu."
@@ -333,7 +333,7 @@ create_transaction_qclient_2.1.x() {
         while true; do
             # Show current coins before transaction
             echo "Your current coins before transaction:"
-            echo "======================================"
+            echo "--------------------------------------"
             check_coins
             echo
             read -p "Enter the coin ID to transfer: " coin_id
@@ -358,7 +358,7 @@ create_transaction_qclient_2.1.x() {
     # Show transaction details for confirmation
     echo
     echo "Transaction Details:"
-    echo "===================="
+    echo "--------------------"
     echo "Recipient: $to_address"
     if [[ $transfer_type == "1" ]]; then
         echo "Amount: $amount QUIL"
@@ -384,7 +384,7 @@ create_transaction_qclient_2.1.x() {
         wait_with_spinner "Showing your coins in %s secs..." 30
         echo
         echo "Your coins after transaction:"
-        echo "============================="
+        echo "-----------------------------"
         check_coins
         echo
         echo "If you don't see the changes yet, wait a moment and check your coins again from the main menu."
@@ -398,14 +398,14 @@ token_split() {
     # Pre-action confirmation
     description="This will split a coin into two new coins with specified amounts"
 
-    if ! confirm_proceed "token splitting" "$description"; then
+    if ! confirm_proceed "Split Coin" "$description"; then
         return 1
     fi
     
     # Show current coins
     echo
     echo "Your current coins before splitting:"
-    echo "=================================="
+    echo "------------------------------------"
     check_coins
     echo "Please select one of the above coins to split."
     echo
@@ -448,7 +448,7 @@ token_split() {
     # Show split details for confirmation
     echo
     echo "Split Details:"
-    echo "=============="
+    echo "--------------"
     echo "Original Coin: $coin_id"
     echo "First Amount: $left_amount QUIL"
     echo "Second Amount: $right_amount QUIL"
@@ -468,7 +468,7 @@ token_split() {
         wait_with_spinner "Showing your coins in %s secs..." 30
         echo
         echo "Your coins after splitting:"
-        echo "==========================="
+        echo "---------------------------"
         check_coins
         echo
         echo "If you don't see the changes yet, wait a moment and check your coins again from the main menu."
@@ -482,14 +482,14 @@ token_merge() {
     # Pre-action confirmation
     description="This will merge two coins into a single new coin"
 
-    if ! confirm_proceed "Token merging" "$description"; then
+    if ! confirm_proceed "Merge Coins" "$description"; then
         return 1
     fi
     
     # Show current coins
     echo
     echo "Your current coins before merging:"
-    echo "================================"
+    echo "----------------------------------"
     check_coins
     echo "Please select two of the above coins to merge."
     echo
@@ -523,7 +523,7 @@ token_merge() {
     # Show merge details for confirmation
     echo
     echo "Merge Details:"
-    echo "=============="
+    echo "--------------"
     echo "First Coin: $left_coin"
     echo "Second Coin: $right_coin"
     echo
@@ -542,7 +542,7 @@ token_merge() {
         wait_with_spinner "Showing your coins in %s secs..." 30
         echo
         echo "Your coins after merging:"
-        echo "========================="
+        echo "-------------------------"
         check_coins
         echo
         echo "If you don't see the changes yet, wait a moment and check your coins again from the main menu."
@@ -556,7 +556,7 @@ token_merge_all() {
     description="This will merge all your coins into a single coin"
 
     echo
-    echo "Merge all coins:"
+    echo "Merge all Coins:"
     echo "================"
     echo "$description"
     echo
@@ -604,7 +604,7 @@ token_merge_all() {
 
     echo
     echo "Merge operation completed. Checking final coins:"
-    echo "============================================="
+    echo "------------------------------------------------"
     wait_with_spinner "Retrieving final coin status in %s seconds..." 30
     check_coins
 }
