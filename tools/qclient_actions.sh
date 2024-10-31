@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.6.9"
+SCRIPT_VERSION="1.7.0"
 
 
 #=====================
@@ -143,8 +143,8 @@ check_exit() {
     local input="$1"
     if [[ "$input" == "e" ]]; then
         echo "Returning to main menu..."
-        display_menu
-        return 0
+        main
+        exit 0
     fi
     return 1
 }
