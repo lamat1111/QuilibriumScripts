@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.6.6"
+SCRIPT_VERSION="1.6.7"
 
 
 #=====================
@@ -534,13 +534,14 @@ token_merge() {
 token_merge_all() {
     description="This will merge all your coins into a single coin"
 
-    if ! confirm_proceed "Merge all coins" "$description"; then
-        return 1
-    fi
-
     echo
+    echo "Merge all coins:"
+    echo "================"
+    echo "$description"
+    echo
+
     echo "Current coins that will be merged:"
-    echo "----------------------------------"
+    echo "---------------------------------"
     coins_output=$($QCLIENT_EXEC token coins $CONFIG_FLAG)
     echo "$coins_output"
     echo
@@ -561,19 +562,14 @@ token_merge_all() {
         merged_value=$(echo "$merged_value + $value" | bc)
     done
 
-    # Build merge command
     merge_cmd="$QCLIENT_EXEC token merge ${coin_ids[*]} $CONFIG_FLAG"
 
     echo "Found $coin_count coins to merge"
     echo "Merged amount in QUIL will be $merged_value"
     echo
-    echo "Command that will be executed:"
-    echo "$merge_cmd"
-    echo
 
-    read -p "Do you want to proceed with merging all coins? (y/n): " confirm
-    if [[ ${confirm,,} != "y" ]]; then
-        echo "❌ Operation cancelled."
+    # Now ask for confirmation
+    if ! confirm_proceed "Merge all coins" "$description"; then
         return 1
     fi
 
