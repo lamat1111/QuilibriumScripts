@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.6.3"
+SCRIPT_VERSION="1.6.4"
 
 
 #=====================
@@ -205,8 +205,8 @@ create_transaction() {
     # Pre-action confirmation
     description="This will transfer a coin to another address"
     warning="⚠️ Make sure the recipient address is correct. This operation cannot be undone!
-    ⚠️ The account address is different from the node peerID!
-    ⚠️ Account addresses and coin IDs have the same format, so be sure to not send a coin to another coin address!"
+⚠️ The account address is different from the node peerID!
+⚠️ Account addresses and coin IDs have the same format, so be sure to not send a coin to another coin address!"
         
     if ! confirm_proceed "coin transfer" "$description" "$warning"; then
         return 1
