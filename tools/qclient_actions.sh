@@ -214,6 +214,7 @@ create_transaction() {
 
     # Get and validate recipient address
     while true; do
+            echo
         read -p "Enter the recipient's account address: " to_address
         if validate_hash "$to_address"; then
             break
