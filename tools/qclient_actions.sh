@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.6.5"
+SCRIPT_VERSION="1.6.6"
 
 
 #=====================
@@ -86,7 +86,7 @@ confirm_proceed() {
     
     echo
     echo "$action_name:"
-    echo "$(printf '%*s' "${#action_name}" | tr ' ' '-')"
+    echo "$(printf '%*s' "${#action_name}" | tr ' ' '=')"
     [ -n "$description" ] && echo "$description"
     [ -n "$warning_message" ] && echo -e "\n$warning_message"
     echo
