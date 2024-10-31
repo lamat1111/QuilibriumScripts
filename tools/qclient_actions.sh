@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.6.7"
+SCRIPT_VERSION="1.6.8"
 
 
 #=====================
@@ -92,7 +92,7 @@ confirm_proceed() {
     echo
     
     while true; do
-        read -rp "Do you want to proceed with $action_name? (Y/N): " confirm
+        read -rp "Do you want to proceed with $action_name? (y/n): " confirm
         case $confirm in
             [Yy]* ) return 0 ;;
             [Nn]* ) 
@@ -147,8 +147,8 @@ prompt_return_to_menu() {
     echo
     while true; do
     echo
-    echo "--------------------------------------"
-        read -rp "Go back to Qclient Actions menu? (Y/N): " choice
+    echo "----------------------------------------"
+        read -rp "Go back to Qclient Actions menu? (y/n): " choice
         case $choice in
             [Yy]* ) return 0 ;;  # Return true (0) to continue the loop
             [Nn]* ) return 1 ;;  # Return false (1) to break the loop
@@ -568,8 +568,10 @@ token_merge_all() {
     echo "Merged amount in QUIL will be $merged_value"
     echo
 
-    # Now ask for confirmation
-    if ! confirm_proceed "Merge all coins" "$description"; then
+    # Ask for confirmation
+    read -p "Do you want to proceed? (y/n): " confirm
+    if [[ ${confirm,,} != "y" ]]; then
+        echo "❌ Operation cancelled."
         return 1
     fi
 
