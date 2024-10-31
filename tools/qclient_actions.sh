@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.6.8"
+SCRIPT_VERSION="1.6.9"
 
 
 #=====================
@@ -139,6 +139,17 @@ wait_with_spinner() {
     echo -en "\r\033[K"
 }
 
+check_exit() {
+    local input="$1"
+    if [[ "$input" == "e" ]]; then
+        echo "Returning to main menu..."
+        display_menu
+        return 0
+    fi
+    return 1
+}
+
+
 #=====================
 # Menu functions
 #=====================
@@ -216,6 +227,7 @@ create_transaction() {
     while true; do
             echo
         read -p "Enter the recipient's account address: " to_address
+        check_exit "$to_address" && return 1
         if validate_hash "$to_address"; then
             break
         else
@@ -233,6 +245,7 @@ create_transaction() {
     
     while true; do
         read -p "Enter the coin ID to transfer: " coin_id
+        check_exit "$coin_id" && return 1
         if validate_hash "$coin_id"; then
             break
         else
@@ -286,6 +299,7 @@ create_transaction_qclient_2.1.x() {
     # Get and validate recipient address
     while true; do
         read -p "Enter the recipient's address: " to_address
+        check_exit "$to_address" && return 1
         if validate_hash "$to_address"; then
             break
         else
@@ -306,6 +320,7 @@ create_transaction_qclient_2.1.x() {
         while true; do
             echo
             read -p "Enter the QUIL amount to transfer (format 0.000000): " amount
+            check_exit "$amount" && return 1
             # Validate amount is a positive number
             if [[ ! $amount =~ ^[0-9]*\.?[0-9]+$ ]] || [[ $(echo "$amount <= 0" | bc -l) -eq 1 ]]; then
                 echo "❌ Invalid amount. Please enter a positive number."
@@ -322,6 +337,7 @@ create_transaction_qclient_2.1.x() {
             check_coins
             echo
             read -p "Enter the coin ID to transfer: " coin_id
+            check_exit "$coin_id" && return 1
             if validate_hash "$coin_id"; then
                 break
             else
@@ -397,6 +413,7 @@ token_split() {
     # Get and validate the coin ID to split
     while true; do
         read -p "Enter the coin ID to split: " coin_id
+        check_exit "$coin_id" && return 1
         if validate_hash "$coin_id"; then
             break
         else
@@ -409,6 +426,7 @@ token_split() {
     # Get and validate the first amount
     while true; do
         read -p "Enter the amount for the first coin  (format 0.000000): " left_amount
+        check_exit "$left_amount" && return 1
         if [[ ! $left_amount =~ ^[0-9]*\.?[0-9]+$ ]] || [[ $(echo "$left_amount <= 0" | bc -l) -eq 1 ]]; then
             echo "❌ Invalid amount. Please enter a positive number."
             continue
@@ -419,6 +437,7 @@ token_split() {
     # Get and validate the second amount
     while true; do
         read -p "Enter the amount for the second coin  (format 0.000000): " right_amount
+        check_exit "$right_amount" && return 1
         if [[ ! $right_amount =~ ^[0-9]*\.?[0-9]+$ ]] || [[ $(echo "$right_amount <= 0" | bc -l) -eq 1 ]]; then
             echo "❌ Invalid amount. Please enter a positive number."
             continue
@@ -478,6 +497,7 @@ token_merge() {
     # Get and validate the first coin ID
     while true; do
         read -p "Enter the first coin ID: " left_coin
+        check_exit "$left_coin" && return 1
         if validate_hash "$left_coin"; then
             break
         else
@@ -490,6 +510,7 @@ token_merge() {
     # Get and validate the second coin ID
     while true; do
         read -p "Enter the second coin ID: " right_coin
+        check_exit "$right_coin" && return 1
         if validate_hash "$right_coin"; then
             break
         else
