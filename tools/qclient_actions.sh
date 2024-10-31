@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.7.3"
+SCRIPT_VERSION="1.7.4"
 
 
 #=====================
@@ -193,23 +193,19 @@ check_coins() {
 }
 
 mint_all() {
-    description="This will mint all your available rewards"
-    warning_message="- This command has not been tested yet so it is better if you execute it by yourself and not via the menu option
-- Execute it inside a tmux session so you can logout of your machine and check back later, 
-  as the command will take a long time to mint all your increments. 
-  It will stop by itself when it reaches increment 0.
-
-IMPORTANT:
-- Your node must be stopped.
-- You must use the public RPC. In your config.yml the 'listenGrpcMultiaddr' field must be empty
-- There is no confirmation. So once you hit enter, it will execute. It won't give you a preview of what's going to happen. So double check everything!"
-
-    if ! confirm_proceed "Minting all rewards" "$description" "$warning_message"; then
-        return 1
-    fi
-
-    echo "Proceeding with minting..."
-    $QCLIENT_EXEC token mint all $CONFIG_FLAG
+    echo "This command will mint all your available rewards"
+    echo
+    echo "IMPORTANT:"
+    echo "- Your node must be stopped."
+    echo "- You must use the public RPC. In your config.yml the 'listenGrpcMultiaddr' field must be empty"
+    echo "- The process will stop by itself when it reaches increment 0 (all rewards minted)."
+    echo
+    echo "Steps to mint all rewards:"
+    echo "- Create a tmux session"
+    echo "- Execute the below command:"
+    echo
+    echo "$QCLIENT_EXEC token mint all $CONFIG_FLAG"
+    echo
 }
 
 create_transaction() {
