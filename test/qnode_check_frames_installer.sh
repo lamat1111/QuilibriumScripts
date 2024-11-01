@@ -81,7 +81,7 @@ if grep -q "check-for-frames.sh\|qnode_check_frames.sh" "$TEMP_CRON"; then
 fi
 
 # Add new cron job (changed to run every hour)
-echo "0 * * * * ${HOME}/scripts/qnode_check_frames.sh" >> "$TEMP_CRON"
+echo "0 */2 * * * ${HOME}/scripts/qnode_check_frames.sh" >> "$TEMP_CRON"
 
 # Install new crontab
 if ! crontab "$TEMP_CRON"; then
