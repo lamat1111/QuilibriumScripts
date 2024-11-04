@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.7.8"
+SCRIPT_VERSION="1.7.9"
 
 
 #=====================
@@ -476,78 +476,56 @@ token_split() {
     fi
 }
 
-token_merge() {
-    # Pre-action confirmation
-    description="This will merge two coins into a single new coin"
+token_merge_all() {
+    description="This will merge all your coins into a single coin"
 
-    if ! confirm_proceed "Merge Coins" "$description"; then
+    echo
+    echo "Merge all Coins:"
+    echo "================"
+    echo "$description"
+    echo
+
+    echo "Current coins that will be merged:"
+    echo "---------------------------------"
+    coins_output=$($QCLIENT_EXEC token coins $CONFIG_FLAG)
+    echo "$coins_output"
+    echo
+
+    # Extract coin values and calculate total (modified regex to catch all numbers)
+    coin_values=($(echo "$coins_output" | grep -o '[0-9]\+\.[0-9]\+' | grep -v '^0\.0*$'))
+    coin_count=${#coin_values[@]}
+
+    if [ "$coin_count" -lt 2 ]; then
+        echo "❌ Not enough coins to merge. You need at least 2 coins."
+        echo
+        read -p "Press Enter to return to the main menu..."
         return 1
     fi
-    
-    # Show current coins
-    echo
-    echo "Your current coins before merging:"
-    echo "----------------------------------"
-    check_coins
-    echo "Please select two of the above coins to merge."
-    echo
-    
-    # Get and validate the first coin ID
-    while true; do
-        read -p "Enter the first coin ID: " left_coin
-        check_exit "$left_coin" && return 1
-        if validate_hash "$left_coin"; then
-            break
-        else
-            echo "❌ Invalid coin ID format. ID must start with '0x' followed by 64 hexadecimal characters."
-            echo "Example: 0x1148092cdce78c721835601ef39f9c2cd8b48b7787cbea032dd3913a4106a58d"
-            echo
-        fi
+
+    # Calculate total value
+    total_value=0
+    for value in "${coin_values[@]}"; do
+        total_value=$(echo "$total_value + $value" | bc)
     done
 
-    # Get and validate the second coin ID
-    while true; do
-        read -p "Enter the second coin ID: " right_coin
-        check_exit "$right_coin" && return 1
-        if validate_hash "$right_coin"; then
-            break
-        else
-            echo "❌ Invalid coin ID format. ID must start with '0x' followed by 64 hexadecimal characters."
-            echo "Example: 0x0140e01731256793bba03914f3844d645fbece26553acdea8ac4de4d84f91690"
-            echo
-        fi
-    done
-
-    # Show merge details for confirmation
-    echo
-    echo "Merge Details:"
-    echo "--------------"
-    echo "First Coin: $left_coin"
-    echo "Second Coin: $right_coin"
-    echo
-    echo "Command that will be executed:"
-    echo "$QCLIENT_EXEC token merge $left_coin $right_coin $CONFIG_FLAG"
+    echo "Found $coin_count coins to merge"
+    echo "Total amount in QUIL will be $total_value"
     echo
 
     # Ask for confirmation
-    read -p "Do you want to proceed with this merge? (y/n): " confirm
-
-    if [[ ${confirm,,} == "y" ]]; then
-        $QCLIENT_EXEC token merge "$left_coin" "$right_coin" $CONFIG_FLAG
-        
-        # Show updated coins after merge
-        echo
-        wait_with_spinner "Showing your coins in %s secs..." 30
-        echo
-        echo "Your coins after merging:"
-        echo "-------------------------"
-        check_coins
-        echo
-        echo "If you don't see the changes yet, wait a moment and check your coins again from the main menu."
-        echo "If still nothing changes, you may want to try to execute the operation again."
-    else
-        echo "❌ Merge operation cancelled."
+    read -p "Do you want to proceed? (y/n): " confirm
+    if [[ ${confirm,,} != "y" ]]; then
+        echo "❌ Operation cancelled."
+        return 1
     fi
+
+    echo
+    echo "Executing merge-all operation..."
+    $QCLIENT_EXEC token merge-all $CONFIG_FLAG
+
+    echo
+    wait_with_spinner "Retrieving final coin status in %s seconds..." 30
+    check_coins
 }
 
 token_merge_all() {
