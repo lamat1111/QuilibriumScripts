@@ -565,10 +565,9 @@ token_merge_all() {
     echo "$coins_output"
     echo
 
-    # Extract coin IDs and values
-    coin_ids=($(echo "$coins_output" | grep -o '0x[0-9a-fA-F]\{64\}'))
+    # Extract coin values and calculate total
     coin_values=($(echo "$coins_output" | grep -o '[0-9]*\.[0-9]*' | grep -v '^0\.'))
-    coin_count=${#coin_ids[@]}
+    coin_count=${#coin_values[@]}
 
     if [ "$coin_count" -lt 2 ]; then
         echo "❌ Not enough coins to merge. You need at least 2 coins."
@@ -578,15 +577,13 @@ token_merge_all() {
     fi
 
     # Calculate total value
-    merged_value=0
+    total_value=0
     for value in "${coin_values[@]}"; do
-        merged_value=$(echo "$merged_value + $value" | bc)
+        total_value=$(echo "$total_value + $value" | bc)
     done
 
-    merge_cmd="$QCLIENT_EXEC token merge ${coin_ids[*]} $CONFIG_FLAG"
-
     echo "Found $coin_count coins to merge"
-    echo "Merged amount in QUIL will be $merged_value"
+    echo "Total amount in QUIL will be $total_value"
     echo
 
     # Ask for confirmation
@@ -597,12 +594,9 @@ token_merge_all() {
     fi
 
     echo
-    echo "Executing merge operation..."
-    eval "$merge_cmd"
+    $QCLIENT_EXEC token merge all $CONFIG_FLAG
 
     echo
-    echo "Merge operation completed. Checking final coins:"
-    echo "------------------------------------------------"
     wait_with_spinner "Retrieving final coin status in %s seconds..." 30
     check_coins
 }
