@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.7.9"
+SCRIPT_VERSION="1.8.0"
 
 
 #=====================
@@ -50,7 +50,7 @@ display_menu() {
 2) Check individual coins        8) Merge coin
 3) Create transaction            9) Merge all coins
 
-                                10) Mint all rewards (UNTESTED)
+                                10) Mint all rewards
 -----------------------------------------------------------------
 B) ⭐ Best server providers      X) Disclaimer                           
 D) 💜 Donations                  S) Security settings
