@@ -86,7 +86,7 @@ EOF
 5)  Update node                 13) Restore backup
 6)  Stop node                                
 7)  Start node                  14) Qclient install/update   
-8)  Restart node                15) Qclient actions (BETA)
+8)  Restart node                15) Qclient actions
 9)  Node info & balance         
 10) Node status                 16) Auto-update ON/OFF                              
 -----------------------------------------------------------------
