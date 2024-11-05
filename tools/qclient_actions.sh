@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.8.7"
+SCRIPT_VERSION="1.8.8"
 
 
 #=====================
@@ -522,14 +522,15 @@ token_split_advanced() {
     echo
     read -p "Enter your choice (1-3): " split_method
 
-    # Function to format decimal number with leading zero
+    # Function to format decimal number with leading zero and trim trailing zeros
     format_decimal() {
         local num="$1"
+        # Ensure leading zero
         if [[ $num =~ ^\..*$ ]]; then
-            echo "0$num"
-        else
-            echo "$num"
+            num="0$num"
         fi
+        # Trim trailing zeros but maintain required decimals
+        echo $num | sed 's/\.$//' | sed 's/0*$//'
     }
 
     case $split_method in
@@ -547,20 +548,20 @@ token_split_advanced() {
                     continue
                 fi
                 
-                # Calculate sum
+                # Calculate sum with full precision
                 sum=0
                 for amount in "${amounts[@]}"; do
                     if [[ ! $amount =~ ^[0-9]*\.?[0-9]+$ ]]; then
                         echo "❌ Invalid amount format: $amount"
                         continue 2
                     fi
-                    sum=$(echo "$sum + $amount" | bc)
+                    sum=$(echo "scale=12; $sum + $amount" | bc)
                 done
                 
                 # Compare with total amount (allowing for small rounding differences)
-                diff=$(echo "scale=6; ($sum - $total_amount)^2 < 0.000001" | bc)
+                diff=$(echo "scale=12; ($sum - $total_amount)^2 < 0.000000000001" | bc)
                 if [ "$diff" -eq 1 ]; then
-                    # Format amounts with leading zeros
+                    # Format amounts
                     formatted_amounts=()
                     for amount in "${amounts[@]}"; do
                         formatted_amounts+=($(format_decimal "$amount"))
@@ -583,17 +584,22 @@ token_split_advanced() {
                     continue
                 fi
                 
-                # Calculate base amount with extra precision
-                base_amount=$(echo "scale=6; $total_amount / $num_parts" | bc)
+                # Calculate base amount with full precision
+                base_amount=$(echo "scale=12; $total_amount / $num_parts" | bc)
                 
                 # Generate array of amounts
                 amounts=()
                 remaining=$total_amount
+                
+                # For all parts except the last one
                 for ((i=1; i<num_parts; i++)); do
-                    amounts+=($(format_decimal "$base_amount"))
-                    remaining=$(echo "$remaining - $base_amount" | bc)
+                    current_amount=$(format_decimal "$base_amount")
+                    amounts+=("$current_amount")
+                    remaining=$(echo "scale=12; $remaining - $current_amount" | bc)
                 done
-                amounts+=($(format_decimal "$remaining"))  # Last amount includes rounding adjustment
+                
+                # Last amount is the remaining value
+                amounts+=($(format_decimal "$remaining"))
                 break
             done
             ;;
@@ -619,21 +625,22 @@ token_split_advanced() {
                         echo "❌ Invalid percentage format: $pct"
                         continue 2
                     fi
-                    sum=$(echo "$sum + $pct" | bc)
+                    sum=$(echo "scale=12; $sum + $pct" | bc)
                 done
                 
                 # Check if percentages sum to 100
-                diff=$(echo "scale=6; ($sum - 100)^2 < 0.000001" | bc)
+                diff=$(echo "scale=12; ($sum - 100)^2 < 0.000000000001" | bc)
                 if [ "$diff" -eq 1 ]; then
                     # Convert percentages to amounts
                     amounts=()
                     remaining=$total_amount
                     for ((i=0; i<${#percentages[@]}-1; i++)); do
-                        amount=$(echo "scale=6; $total_amount * ${percentages[$i]} / 100" | bc)
-                        amounts+=($(format_decimal "$amount"))
-                        remaining=$(echo "$remaining - $amount" | bc)
+                        amount=$(echo "scale=12; $total_amount * ${percentages[$i]} / 100" | bc)
+                        formatted_amount=$(format_decimal "$amount")
+                        amounts+=("$formatted_amount")
+                        remaining=$(echo "scale=12; $remaining - $formatted_amount" | bc)
                     done
-                    amounts+=($(format_decimal "$remaining"))  # Last amount includes rounding adjustment
+                    amounts+=($(format_decimal "$remaining"))
                     break
                 else
                     echo "❌ Percentages must sum to 100 (current sum: $sum)"
