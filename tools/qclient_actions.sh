@@ -596,7 +596,6 @@ token_merge_all() {
     fi
 
     echo
-    echo "Executing merge-all operation..."
     $QCLIENT_EXEC token merge-all $CONFIG_FLAG
 
     # Show updated coins after merge
