@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.8.2"
+SCRIPT_VERSION="1.8.3"
 
 
 #=====================
@@ -596,7 +596,7 @@ token_merge_all() {
     fi
 
     echo
-    $QCLIENT_EXEC token merge-all $CONFIG_FLAG
+    $QCLIENT_EXEC token merge all $CONFIG_FLAG
 
     # Show updated coins after merge
     echo
