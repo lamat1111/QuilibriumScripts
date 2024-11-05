@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.8.9"
+SCRIPT_VERSION="1.9.0"
 
 
 #=====================
@@ -478,7 +478,7 @@ token_split() {
 
 token_split_advanced() {
     # Pre-action confirmation
-    description="This will split a coin into multiple new coins using different methods"
+    description="This will split a coin into multiple new coins (up to 50) using different methods"
 
     if ! confirm_proceed "Split Coin" "$description"; then
         return 1
