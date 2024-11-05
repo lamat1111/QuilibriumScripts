@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.8.3"
+SCRIPT_VERSION="1.8.4"
 
 
 #=====================
@@ -476,6 +476,204 @@ token_split() {
     fi
 }
 
+token_split_multi() {
+    # Pre-action confirmation
+    description="This will split a coin into multiple new coins using different methods"
+
+    if ! confirm_proceed "Enhanced Split Coin" "$description"; then
+        return 1
+    }
+    
+    # Show current coins
+    echo
+    echo "Your current coins before splitting:"
+    echo "------------------------------------"
+    check_coins
+    echo
+
+    # Get and validate the coin ID to split
+    while true; do
+        read -p "Enter the coin ID to split: " coin_id
+        check_exit "$coin_id" && return 1
+        if validate_hash "$coin_id"; then
+            break
+        else
+            echo "❌ Invalid coin ID format. ID must start with '0x' followed by 64 hexadecimal characters."
+            echo
+        fi
+    done
+
+    # Get the coin amount for the selected coin
+    coin_info=$($QCLIENT_EXEC token coins $CONFIG_FLAG | grep "$coin_id")
+    if [[ $coin_info =~ ([0-9]+\.[0-9]+)\ QUIL ]]; then
+        total_amount=${BASH_REMATCH[1]}
+    else
+        echo "❌ Could not determine coin amount. Please try again."
+        return 1
+    fi
+
+    echo
+    echo "Selected coin amount: $total_amount QUIL"
+    echo
+    echo "Choose split method:"
+    echo "1) Enter custom amounts (comma-separated)"
+    echo "2) Split in equal amounts"
+    echo "3) Split by percentages"
+    echo
+    read -p "Enter your choice (1-3): " split_method
+
+    case $split_method in
+        1)  # Custom amounts
+            while true; do
+                echo
+                echo "Enter amounts separated by comma (up to 100 values, must sum to $total_amount)"
+                echo "Example: 1.5,2.3,0.7"
+                read -p "> " amounts_input
+                
+                IFS=',' read -ra amounts <<< "$amounts_input"
+                
+                if [ ${#amounts[@]} -gt 100 ]; then
+                    echo "❌ Too many values (maximum 100)"
+                    continue
+                fi
+                
+                # Calculate sum
+                sum=0
+                for amount in "${amounts[@]}"; do
+                    if [[ ! $amount =~ ^[0-9]*\.?[0-9]+$ ]]; then
+                        echo "❌ Invalid amount format: $amount"
+                        continue 2
+                    fi
+                    sum=$(echo "$sum + $amount" | bc)
+                done
+                
+                # Compare with total amount (allowing for small rounding differences)
+                diff=$(echo "scale=6; ($sum - $total_amount)^2 < 0.000001" | bc)
+                if [ "$diff" -eq 1 ]; then
+                    break
+                else
+                    echo "❌ Sum of amounts ($sum) does not match coin amount ($total_amount)"
+                    continue
+                fi
+            done
+            ;;
+            
+        2)  # Equal amounts
+            while true; do
+                echo
+                read -p "Enter number of parts to split into (2-100): " num_parts
+                if ! [[ "$num_parts" =~ ^[2-9]|[1-9][0-9]|100$ ]]; then
+                    echo "❌ Please enter a number between 2 and 100"
+                    continue
+                fi
+                
+                # Calculate base amount with extra precision
+                base_amount=$(echo "scale=6; $total_amount / $num_parts" | bc)
+                
+                # Generate array of amounts
+                amounts=()
+                remaining=$total_amount
+                for ((i=1; i<num_parts; i++)); do
+                    amounts+=($base_amount)
+                    remaining=$(echo "$remaining - $base_amount" | bc)
+                done
+                amounts+=($remaining)  # Last amount includes rounding adjustment
+                break
+            done
+            ;;
+            
+        3)  # Percentage split
+            while true; do
+                echo
+                echo "Enter percentages separated by comma (must sum to 100)"
+                echo "Example: 50,30,20"
+                read -p "> " percentages_input
+                
+                IFS=',' read -ra percentages <<< "$percentages_input"
+                
+                if [ ${#percentages[@]} -gt 100 ]; then
+                    echo "❌ Too many values (maximum 100)"
+                    continue
+                fi
+                
+                # Calculate sum of percentages
+                sum=0
+                for pct in "${percentages[@]}"; do
+                    if [[ ! $pct =~ ^[0-9]*\.?[0-9]+$ ]]; then
+                        echo "❌ Invalid percentage format: $pct"
+                        continue 2
+                    fi
+                    sum=$(echo "$sum + $pct" | bc)
+                done
+                
+                # Check if percentages sum to 100
+                diff=$(echo "scale=6; ($sum - 100)^2 < 0.000001" | bc)
+                if [ "$diff" -eq 1 ]; then
+                    # Convert percentages to amounts
+                    amounts=()
+                    remaining=$total_amount
+                    for ((i=0; i<${#percentages[@]}-1; i++)); do
+                        amount=$(echo "scale=6; $total_amount * ${percentages[$i]} / 100" | bc)
+                        amounts+=($amount)
+                        remaining=$(echo "$remaining - $amount" | bc)
+                    done
+                    amounts+=($remaining)  # Last amount includes rounding adjustment
+                    break
+                else
+                    echo "❌ Percentages must sum to 100 (current sum: $sum)"
+                    continue
+                fi
+            done
+            ;;
+            
+        *)  echo "❌ Invalid choice"
+            return 1
+            ;;
+    esac
+
+    # Construct command with all amounts
+    cmd="$QCLIENT_EXEC token split $coin_id"
+    for amount in "${amounts[@]}"; do
+        cmd="$cmd $amount"
+    done
+    cmd="$cmd $CONFIG_FLAG"
+
+    # Show split details for confirmation
+    echo
+    echo "Split Details:"
+    echo "--------------"
+    echo "Original Coin: $coin_id"
+    echo "Original Amount: $total_amount QUIL"
+    echo "Number of parts: ${#amounts[@]}"
+    echo "Split amounts:"
+    for ((i=0; i<${#amounts[@]}; i++)); do
+        echo "Part $((i+1)): ${amounts[$i]} QUIL"
+    done
+    echo
+    echo "Command that will be executed:"
+    echo "$cmd"
+    echo
+
+    # Ask for confirmation
+    read -p "Do you want to proceed with this split? (y/n): " confirm
+
+    if [[ ${confirm,,} == "y" ]]; then
+        eval "$cmd"
+        
+        # Show updated coins after split
+        echo
+        wait_with_spinner "Showing your coins in %s secs..." 30
+        echo
+        echo "Your coins after splitting:"
+        echo "---------------------------"
+        check_coins
+        echo
+        echo "If you don't see the changes yet, wait a moment and check your coins again from the main menu."
+    else
+        echo "❌ Split operation cancelled."
+    fi
+}
+
 token_merge() {
     # Pre-action confirmation
     description="This will merge two coins into a single new coin"
@@ -759,6 +957,7 @@ main() {
             8) token_merge && prompt_return_to_menu || continue ;;
             9) token_merge_all && prompt_return_to_menu || continue ;;
             10) mint_all && prompt_return_to_menu || continue ;;
+            11) token_split_multi && prompt_return_to_menu || continue ;;
             [sS]) security_settings; press_any_key ;;
             [bB]) best_providers; press_any_key ;;
             [dD]) donations; press_any_key ;;
