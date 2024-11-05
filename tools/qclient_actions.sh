@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.8.8"
+SCRIPT_VERSION="1.8.9"
 
 
 #=====================
@@ -480,7 +480,7 @@ token_split_advanced() {
     # Pre-action confirmation
     description="This will split a coin into multiple new coins using different methods"
 
-    if ! confirm_proceed "Split Coin - Advanced" "$description"; then
+    if ! confirm_proceed "Split Coin" "$description"; then
         return 1
     fi
     
@@ -976,11 +976,11 @@ main() {
             4) accept_transaction; prompt_return_to_menu || break ;;
             5) reject_transaction; prompt_return_to_menu || break ;;
             6) mutual_transfer; prompt_return_to_menu || break ;;
-            7) token_split && prompt_return_to_menu || continue ;;
+            7) token_split_advanced && prompt_return_to_menu || continue ;;
             8) token_merge && prompt_return_to_menu || continue ;;
             9) token_merge_all && prompt_return_to_menu || continue ;;
             10) mint_all && prompt_return_to_menu || continue ;;
-            11) token_split_advanced && prompt_return_to_menu || continue ;;
+            11) token_split && prompt_return_to_menu || continue ;;
             [sS]) security_settings; press_any_key ;;
             [bB]) best_providers; press_any_key ;;
             [dD]) donations; press_any_key ;;
