@@ -516,7 +516,7 @@ token_split_advanced() {
     echo "Selected coin amount: $total_amount QUIL"
     echo
     echo "Choose split method:"
-    echo "1) Enter custom amounts (comma-separated)"
+    echo "1) Enter custom amounts"
     echo "2) Split in equal amounts"
     echo "3) Split by percentages"
     echo
