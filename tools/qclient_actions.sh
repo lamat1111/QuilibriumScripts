@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.8.5"
+SCRIPT_VERSION="1.8.6"
 
 
 #=====================
@@ -482,7 +482,7 @@ token_split_advanced() {
 
     if ! confirm_proceed "Split Coin - Advanced" "$description"; then
         return 1
-    }
+    fi
     
     # Show current coins
     echo
