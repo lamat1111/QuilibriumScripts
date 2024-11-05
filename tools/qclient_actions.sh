@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.9.0"
+SCRIPT_VERSION="1.9.1"
 
 
 #=====================
@@ -483,11 +483,28 @@ token_split_advanced() {
     if ! confirm_proceed "Split Coin" "$description"; then
         return 1
     fi
-    
-    # Show current coins
+
+    # Show split options first
     echo
-    echo "Your current coins before splitting:"
-    echo "------------------------------------"
+    echo "Choose split method:"
+    echo "1) Split in custom amounts"
+    echo "2) Split in equal amounts"
+    echo "3) Split by percentages"
+    echo
+    read -p "Enter your choice (1-3): " split_method
+
+    case $split_method in
+        [1-3])  # Valid choice, continue
+            ;;
+        *)  echo "❌ Invalid choice"
+            return 1
+            ;;
+    esac
+
+    # Now show coins and get coin selection
+    echo
+    echo "Your current coins:"
+    echo "-----------------"
     check_coins
     echo
 
@@ -515,12 +532,6 @@ token_split_advanced() {
     echo
     echo "Selected coin amount: $total_amount QUIL"
     echo
-    echo "Choose split method:"
-    echo "1) Split in custom amounts"
-    echo "2) Split in equal amounts"
-    echo "3) Split by percentages"
-    echo
-    read -p "Enter your choice (1-3): " split_method
 
     # Function to format decimal number with leading zero and trim trailing zeros
     format_decimal() {
