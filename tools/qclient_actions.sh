@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.8.6"
+SCRIPT_VERSION="1.8.7"
 
 
 #=====================
@@ -522,6 +522,16 @@ token_split_advanced() {
     echo
     read -p "Enter your choice (1-3): " split_method
 
+    # Function to format decimal number with leading zero
+    format_decimal() {
+        local num="$1"
+        if [[ $num =~ ^\..*$ ]]; then
+            echo "0$num"
+        else
+            echo "$num"
+        fi
+    }
+
     case $split_method in
         1)  # Custom amounts
             while true; do
@@ -550,6 +560,12 @@ token_split_advanced() {
                 # Compare with total amount (allowing for small rounding differences)
                 diff=$(echo "scale=6; ($sum - $total_amount)^2 < 0.000001" | bc)
                 if [ "$diff" -eq 1 ]; then
+                    # Format amounts with leading zeros
+                    formatted_amounts=()
+                    for amount in "${amounts[@]}"; do
+                        formatted_amounts+=($(format_decimal "$amount"))
+                    done
+                    amounts=("${formatted_amounts[@]}")
                     break
                 else
                     echo "❌ Sum of amounts ($sum) does not match coin amount ($total_amount)"
@@ -574,10 +590,10 @@ token_split_advanced() {
                 amounts=()
                 remaining=$total_amount
                 for ((i=1; i<num_parts; i++)); do
-                    amounts+=($base_amount)
+                    amounts+=($(format_decimal "$base_amount"))
                     remaining=$(echo "$remaining - $base_amount" | bc)
                 done
-                amounts+=($remaining)  # Last amount includes rounding adjustment
+                amounts+=($(format_decimal "$remaining"))  # Last amount includes rounding adjustment
                 break
             done
             ;;
@@ -614,10 +630,10 @@ token_split_advanced() {
                     remaining=$total_amount
                     for ((i=0; i<${#percentages[@]}-1; i++)); do
                         amount=$(echo "scale=6; $total_amount * ${percentages[$i]} / 100" | bc)
-                        amounts+=($amount)
+                        amounts+=($(format_decimal "$amount"))
                         remaining=$(echo "$remaining - $amount" | bc)
                     done
-                    amounts+=($remaining)  # Last amount includes rounding adjustment
+                    amounts+=($(format_decimal "$remaining"))  # Last amount includes rounding adjustment
                     break
                 else
                     echo "❌ Percentages must sum to 100 (current sum: $sum)"
