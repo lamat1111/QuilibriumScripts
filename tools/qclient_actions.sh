@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.8.1"
+SCRIPT_VERSION="1.8.2"
 
 
 #=====================
@@ -599,9 +599,16 @@ token_merge_all() {
     echo "Executing merge-all operation..."
     $QCLIENT_EXEC token merge-all $CONFIG_FLAG
 
+    # Show updated coins after merge
     echo
-    wait_with_spinner "Retrieving final coin status in %s seconds..." 30
+    wait_with_spinner "Showing your coins in %s secs..." 30
+    echo
+    echo "Your coins after merging:"
+    echo "-------------------------"
     check_coins
+    echo
+    echo "If you don't see the changes yet, wait a moment and check your coins again from the main menu."
+    echo "If still nothing changes, you may want to try to execute the operation again."
 }
 
 donations() {
