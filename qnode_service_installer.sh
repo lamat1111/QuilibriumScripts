@@ -21,7 +21,7 @@ cat << "EOF"
                         \___|        
                               
 ===========================================================================
-                 ✨ QNODE / QCLIENT INSTALLER ✨
+                   ✨ QNODE / QCLIENT INSTALLER ✨
 ===========================================================================
 This script will install your Quilibrum node as a service.
 It will run your node from the binary file, and you will have to
