@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.5.2"
+SCRIPT_VERSION="2.5.3"
 
 #=====================
 # Menu interface
@@ -556,7 +556,7 @@ quil_balance() {
         echo "If it still doesn't work you can try the direct commands: https://iri.quest/q-node-info"
         echo
         if [ -d "$NODE_DIR" ]; then
-            "$NODE_EXEC" -balance
+            cd "$NODE_DIR" && ./"$NODE_BINARY" -balance
         else
             echo "Error: Node directory not found. Is the node installed correctly?"
         fi
@@ -576,7 +576,7 @@ node_info() {
         echo "If this doesn't work you can try the direct commands: https://iri.quest/q-node-info"
         echo
         if [ -d "$NODE_DIR" ]; then
-            "$NODE_EXEC" -node-info
+            cd "$NODE_DIR" && ./"$NODE_BINARY" -node-info
         else
             echo "Error: Node directory not found. Is the node installed correctly?"
         fi
@@ -821,6 +821,7 @@ CLIENT_DIR="${INSTALLATION_DIR}/client"
 # Find the latest executables
 NODE_EXEC=$(find "${NODE_DIR}" -name "node-[0-9]*" ! -name "*.dgst" ! -name "*.sig*" -type f -executable 2>/dev/null | sort -V | tail -n 1)
 QCLIENT_EXEC=$(find "${CLIENT_DIR}" -name "qclient-[0-9]*" ! -name "*.dgst" ! -name "*.sig*" -type f -executable 2>/dev/null | sort -V | tail -n 1)
+NODE_BINARY=$(basename "$NODE_EXEC")
 
 # URLs for scripts
 PREREQUISITES_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/server_setup.sh"
