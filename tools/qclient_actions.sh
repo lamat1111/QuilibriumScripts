@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.9.4"
+SCRIPT_VERSION="1.9.5"
 
 
 #=====================
@@ -1115,9 +1115,9 @@ main() {
             4) accept_transaction; prompt_return_to_menu || break ;;
             5) reject_transaction; prompt_return_to_menu || break ;;
             6) mutual_transfer; prompt_return_to_menu || break ;;
-            7) token_split_advanced && prompt_return_to_menu || continue ;;
-            8) token_merge && prompt_return_to_menu || continue ;;
-            9) mint_all && prompt_return_to_menu || continue ;;
+            7) token_split_advanced && prompt_return_to_menu || break;;
+            8) token_merge && prompt_return_to_menu || break ;;
+            9) mint_all && prompt_return_to_menu || break ;;
             [sS]) security_settings; press_any_key ;;
             [bB]) best_providers; press_any_key ;;
             [dD]) donations; press_any_key ;;
