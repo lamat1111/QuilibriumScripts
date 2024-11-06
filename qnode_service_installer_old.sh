@@ -2,11 +2,12 @@
 
 # Step 0: Welcome
 
+#Node version is not used - executiu via release_autorun 
 #Comment out for automatic creation of the node version
-#NODE_VERSION=2.0.3
+#NODE_VERSION=2.0
 
 #Comment out for automatic creation of the qclient version
-#QCLIENT_VERSION=2.0.2.4
+#QCLIENT_VERSION=1.4.19.1
 
 cat << "EOF"
 
@@ -20,9 +21,9 @@ cat << "EOF"
                     \___Q1Q\ \______|  QUILIBRIUM.ONE
                         \___|        
                               
-===========================================================================
-                 ✨ QNODE / QCLIENT INSTALLER ✨
-===========================================================================
+===================================================================
+                 ✨ QNODE SERVICE INSTALLER ✨
+===================================================================
 This script will install your Quilibrum node as a service.
 It will run your node from the binary file, and you will have to
 update manually.
@@ -31,7 +32,7 @@ Be sure to run the 'Server Setup' script first.
 Follow the guide at https://docs.quilibrium.one
 
 Made with 🔥 by LaMat - https://quilibrium.one
-===========================================================================
+====================================================================
 
 Processing... ⏳
 
@@ -102,16 +103,16 @@ check_and_install curl
 
 display_header "CREATING PATH VARIABLES"
 
-#useful variables
-SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
-QUILIBRIUM_RELEASES="https://releases.quilibrium.com"
-NODE_RELEASE_URL="https://releases.quilibrium.com/release"
-QCLIENT_RELEASE_URL="https://releases.quilibrium.com/qclient-release"
+# Determine the ExecStart line based on the architecture
+ARCH=$(uname -m)
+OS=$(uname -s)
 
+
+# ONLY NECESSARY IF RUNNING THE NODE VIA BINARY IN THE SERVICE
 # Determine node latest version
 # Check if NODE_VERSION is empty
 if [ -z "$NODE_VERSION" ]; then
-    NODE_VERSION=$(curl -s "$NODE_RELEASE_URL" | grep -E "^node-[0-9]+(\.[0-9]+)*" | grep -v "dgst" | sed 's/^node-//' | cut -d '-' -f 1 | head -n 1)
+    NODE_VERSION=$(curl -s https://releases.quilibrium.com/release | grep -E "^node-[0-9]+(\.[0-9]+)*" | grep -v "dgst" | sed 's/^node-//' | cut -d '-' -f 1 | head -n 1)
     if [ -z "$NODE_VERSION" ]; then
         echo "❌ Error: Unable to determine the latest node release automatically."
         echo "The script cannot proceed without a correct node version number."
@@ -135,11 +136,11 @@ fi
 # Determine qclient latest version
 # Check if QCLIENT_VERSION is empty
 if [ -z "$QCLIENT_VERSION" ]; then
-    QCLIENT_VERSION=$(curl -s "$QCLIENT_RELEASE_URL" | grep -E "^qclient-[0-9]+(\.[0-9]+)*" | sed 's/^qclient-//' | cut -d '-' -f 1 |  head -n 1)
+    QCLIENT_VERSION=$(curl -s https://releases.quilibrium.com/qclient-release | grep -E "^qclient-[0-9]+(\.[0-9]+)*" | sed 's/^qclient-//' | cut -d '-' -f 1 |  head -n 1)
     if [ -z "$QCLIENT_VERSION" ]; then
-        echo "⚠️ Warning: Unable to determine the latest Qclient release automatically. Continuing without it."
-        echo "The script won't be able to install the Qclient, but it will still install your node."
-        echo "You can install the Qclient later manually if you need to."
+        echo "⚠️ Warning: Unable to determine QCLIENT_VERSION automatically. Continuing without it."
+        echo "The script won't be able to install the qclient, but it will still install your node."
+        echo "You can install the qclient later manually if you need to."
         echo
         sleep 1
     else
@@ -149,30 +150,31 @@ else
     echo "✅ Using specified Qclient version: $QCLIENT_VERSION"
 fi
 
-# Detect OS and architecture in a unified way
-case "$OSTYPE" in
-    "linux-gnu"*)
-        release_os="linux"
-        case "$(uname -m)" in
-            "x86_64") release_arch="amd64" ;;
-            "aarch64") release_arch="arm64" ;;
-            *) echo "❌ Error: Unsupported system architecture ($(uname -m))"; exit 1 ;;
-        esac ;;
-    "darwin"*)
-        release_os="darwin"
-        case "$(uname -m)" in
-            "x86_64") release_arch="amd64" ;;
-            "arm64") release_arch="arm64" ;;
-            *) echo "❌ Error: Unsupported system architecture ($(uname -m))"; exit 1 ;;
-        esac ;;
-    *) echo "❌ Error: Unsupported operating system ($OSTYPE)"; exit 1 ;;
-esac
-
-# Set binary names based on detected OS and architecture
-NODE_BINARY="node-$NODE_VERSION-$release_os-$release_arch"
-QCLIENT_BINARY="qclient-$QCLIENT_VERSION-$release_os-$release_arch"
-
-echo
+# Determine the node binary name based on the architecture and OS
+if [ "$ARCH" = "x86_64" ]; then
+    if [ "$OS" = "Linux" ]; then
+        NODE_BINARY="node-$NODE_VERSION-linux-amd64"
+        #GO_BINARY="go1.22.4.linux-amd64.tar.gz"
+        [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-amd64"
+    elif [ "$OS" = "Darwin" ]; then
+        NODE_BINARY="node-$NODE_VERSION-darwin-amd64"
+        #GO_BINARY="go1.22.4.darwin-amd64.tar.gz"
+        [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-amd64"
+    fi
+elif [ "$ARCH" = "aarch64" ]; then
+    if [ "$OS" = "Linux" ]; then
+        NODE_BINARY="node-$NODE_VERSION-linux-arm64"
+        #GO_BINARY="go1.22.4.linux-arm64.tar.gz"
+        [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-arm64"
+    elif [ "$OS" = "Darwin" ]; then
+        NODE_BINARY="node-$NODE_VERSION-darwin-arm64"
+        #GO_BINARY="go1.22.4.darwin-arm64.tar.gz"
+        [ -n "$QCLIENT_VERSION" ] && QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-arm64"
+    fi
+else
+    echo "❌ Error: Unsupported system architecture ($ARCH) or operating system ($OS)."
+    exit 1
+fi
 
 #==========================
 # GIT CLONE
@@ -187,16 +189,19 @@ if [ "$GIT_CLONE" = true ]; then
     sleep 1  # Add a 1-second delay
     cd $HOME
     if [ -d "ceremonyclient" ]; then
-        echo "⚠️ Looks like you already have a node installed!"
-        echo "The directory 'ceremonyclient' already exists. Skipping git clone..."
-        echo
-        else
-        until git clone --depth 1 --branch release https://github.com/QuilibriumNetwork/ceremonyclient.git || git clone https://source.quilibrium.com/quilibrium/ceremonyclient.git; do
-            echo "Git clone failed, retrying..."
-            sleep 2
-        done
+    echo "⚠️ Looks like you already have a node installed!"
+    echo "The directory 'ceremonyclient' already exists. Skipping git clone..."
+    echo
+    else
+    until git clone --depth 1 --branch release https://github.com/QuilibriumNetwork/ceremonyclient.git || git clone https://source.quilibrium.com/quilibrium/ceremonyclient.git; do
+        echo "Git clone failed, retrying..."
+        sleep 2
+    done
     fi
     echo
+
+else
+        : # do nothing
 fi
 
 #==========================
@@ -213,56 +218,63 @@ if [ "$GIT_CLONE" = false ]; then
     mkdir -p "$HOME/ceremonyclient/client"
 
     echo "Directories created successfully."
+
+else
+        : # do nothing
 fi
+
+
+get_os_arch() {
+    local os=$(uname -s | tr '[:upper:]' '[:lower:]')
+    local arch=$(uname -m)
+
+    case "$os" in
+        linux|darwin) ;;
+        *) echo "Unsupported operating system: $os" >&2; return 1 ;;
+    esac
+
+    case "$arch" in
+        x86_64|amd64) arch="amd64" ;;
+        arm64|aarch64) arch="arm64" ;;
+        *) echo "Unsupported architecture: $arch" >&2; return 1 ;;
+    esac
+
+    echo "${os}-${arch}"
+}
+
+# Get the current OS and architecture
+OS_ARCH=$(get_os_arch)
+
+# Base URL for the Quilibrium releases
+RELEASE_FILES_URL="https://releases.quilibrium.com/release"
+
+# Fetch the list of files from the release page
+# Updated regex to allow for an optional fourth version number
+RELEASE_FILES=$(curl -s $RELEASE_FILES_URL | grep -oE "node-[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?-${OS_ARCH}(\.dgst)?(\.sig\.[0-9]+)?")
 
 # Change to the download directory
-if ! cd ~/ceremonyclient/node; then
-    echo "❌ Error: Unable to change to the node directory"
-    exit 1
-fi
+cd $HOME/ceremonyclient/node
 
-# Fetch the file list with error handling
-if ! files=$(curl -s -f --connect-timeout 10 --max-time 30 "$NODE_RELEASE_URL"); then
-    echo "❌ Error: Failed to connect to $NODE_RELEASE_URL"
-    echo "Please check your internet connection and try again."
-    exit 1
-fi
-
-# Filter files for current architecture
-files=$(echo "$files" | grep "$release_os-$release_arch" || true)
-
-if [ -z "$files" ]; then
-    echo "❌ Error: No node files found for $release_os-$release_arch"
-    echo "This could be due to network issues or no releases for your architecture."
-    exit 1
-fi
-
-# Download files
-for file in $files; do
-    version=$(echo "$file" | cut -d '-' -f 2)
-    if ! test -f "./$file"; then
-        echo "⏳ Downloading $file..."
-        if ! curl -s -f --connect-timeout 10 --max-time 300 "$QUILIBRIUM_RELEASES/$file" > "$file"; then
-            echo "❌ Failed to download $file"
-            rm -f "$file" # Cleanup failed download
-            continue
-        fi
-        echo "Successfully downloaded $file"
-        
-        # Make binary executable if it's not a signature or digest file
-        if [[ ! $file =~ \.(dgst|sig)$ ]]; then
-            if ! chmod +x "$file"; then
+# Download each file
+for file in $RELEASE_FILES; do
+    echo "Downloading $file..."
+    if curl -L -o "$file" "https://releases.quilibrium.com/$file" --fail --silent; then
+        echo "✅ Successfully downloaded $file"
+        # Check if the file is the base binary (without .dgst or .sig suffix)
+        if [[ $file =~ ^node-[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?-${OS_ARCH}$ ]]; then
+            if chmod +x "$file"; then
+                echo "✅ Made $file executable"
+            else
                 echo "❌ Failed to make $file executable"
-                continue
             fi
-            echo "Made $file executable"
         fi
     else
-        echo "File $file already exists, skipping"
+        echo "❌ Failed to download $file"
     fi
+    echo "------------------------"
 done
 
-
+echo "✅ Node binary download completed."
 
 #==========================
 # DOWNLOAD QCLIENT
@@ -270,52 +282,56 @@ done
 
 display_header "UPDATING QCLIENT"
 
+# Base URL for the Quilibrium releases
+BASE_URL="https://releases.quilibrium.com"
+
+
 # Change to the download directory
-if ! cd ~/ceremonyclient/client; then
-    echo "❌ Error: Unable to change to the qclient directory"
+if ! cd $HOME/ceremonyclient/client; then
+    echo "❌ Error: Unable to change to the download directory"
     exit 1
 fi
 
-# Fetch the file list with error handling
-if ! files=$(curl -s -f --connect-timeout 10 --max-time 30 "$QCLIENT_RELEASE_URL"); then
-    echo "❌ Error: Failed to connect to $QCLIENT_RELEASE_URL"
-    echo "Please check your internet connection and try again."
-    exit 1
-fi
-
-# Filter files for current architecture
-files=$(echo "$files" | grep "$release_os-$release_arch" || true)
-
-if [ -z "$files" ]; then
-    echo "❌ Error: No qclient files found for $release_os-$release_arch"
-    echo "This could be due to network issues or no releases for your architecture."
-    exit 1
-fi
-
-# Download files
-for file in $files; do
-    version=$(echo "$file" | cut -d '-' -f 2)
-    if ! test -f "./$file"; then
-        echo "⏳ Downloading $file..."
-        if ! curl -s -f --connect-timeout 10 --max-time 300 "$QUILIBRIUM_RELEASES/$file" > "$file"; then
-            echo "❌ Failed to download $file"
-            rm -f "$file" # Cleanup failed download
-            continue
-        fi
-        echo "Successfully downloaded $file"
-        
-        # Make binary executable if it's not a signature or digest file
-        if [[ ! $file =~ \.(dgst|sig)$ ]]; then
-            if ! chmod +x "$file"; then
-                echo "❌ Failed to make $file executable"
-                continue
-            fi
-            echo "Made $file executable"
-        fi
+# Function to download file and overwrite if it exists
+download_and_overwrite() {
+    local url="$1"
+    local filename="$2"
+    if curl -L -o "$filename" "$url" --fail --silent; then
+        echo "✅ Successfully downloaded $filename"
+        return 0
     else
-        echo "File $file already exists, skipping"
+        return 1
+    fi
+}
+
+# Download the main binary
+echo "Downloading $QCLIENT_BINARY..."
+if download_and_overwrite "$BASE_URL/$QCLIENT_BINARY" "$QCLIENT_BINARY"; then
+    chmod +x $QCLIENT_BINARY
+    # Rename the binary to qclient, overwriting if it exists
+    #mv -f "$QCLIENT_BINARY" qclient
+    #chmod +x qclient
+    #echo "✅ Renamed to qclient and made executable"
+else
+    echo "❌ Failed to download qclient binary. Manual installation is required."
+fi
+
+# Download the .dgst file
+echo "Downloading ${QCLIENT_BINARY}.dgst..."
+if ! download_and_overwrite "$BASE_URL/${QCLIENT_BINARY}.dgst" "${QCLIENT_BINARY}.dgst"; then
+    echo "❌ Failed to download .dgst file. Manual installation is required."
+fi
+
+# Download signature files
+echo "Downloading signature files..."
+for i in {1..20}; do
+    sig_file="${QCLIENT_BINARY}.dgst.sig.${i}"
+    if download_and_overwrite "$BASE_URL/$sig_file" "$sig_file"; then
+        echo "Downloaded $sig_file"
     fi
 done
+
+echo "✅ Qclient download completed."
 
 
 #==========================
