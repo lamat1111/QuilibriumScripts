@@ -338,7 +338,7 @@ if [ "$NODE_NEEDS_UPDATE" = true ]; then
                 rm -f "$file" # Cleanup failed download
                 continue
             fi
-            echo "✅ Successfully downloaded $file"
+            echo "Successfully downloaded $file"
             
             # Make binary executable if it's not a signature or digest file
             if [[ ! $file =~ \.(dgst|sig)$ ]]; then
@@ -346,10 +346,10 @@ if [ "$NODE_NEEDS_UPDATE" = true ]; then
                     echo "❌ Failed to make $file executable"
                     continue
                 fi
-                echo "✅ Made $file executable"
+                echo "Made $file executable"
             fi
         else
-            echo "ℹ️ File $file already exists, skipping"
+            echo "File $file already exists, skipping"
         fi
     done
 fi
@@ -394,7 +394,7 @@ if [ "$QCLIENT_NEEDS_UPDATE" = true ]; then
                 rm -f "$file" # Cleanup failed download
                 continue
             fi
-            echo "✅ Successfully downloaded $file"
+            echo "Successfully downloaded $file"
             
             # Make binary executable if it's not a signature or digest file
             if [[ ! $file =~ \.(dgst|sig)$ ]]; then
@@ -402,10 +402,10 @@ if [ "$QCLIENT_NEEDS_UPDATE" = true ]; then
                     echo "❌ Failed to make $file executable"
                     continue
                 fi
-                echo "✅ Made $file executable"
+                echo "Made $file executable"
             fi
         else
-            echo "ℹ️ File $file already exists, skipping"
+            echo "File $file already exists, skipping"
         fi
     done
 fi
