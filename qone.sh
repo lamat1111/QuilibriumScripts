@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.5.1"
+SCRIPT_VERSION="2.5.2"
 
 #=====================
 # Menu interface
@@ -960,21 +960,21 @@ display_version_status() {
 
 # Put these at the top with other functions
 get_latest_node_version() {
-    curl -s https://releases.quilibrium.com/release | grep -oP 'node-\K[0-9]+(\.[0-9]+){2,3}' | sort -V | tail -n 1
+    curl -s https://releases.quilibrium.com/release | grep -oP 'node-\K[0-9]+(\.[0-9]+){1,4}' | sort -V | tail -n 1
+}
+
+get_latest_qclient_version() {
+    curl -s https://releases.quilibrium.com/qclient-release | grep -oP 'qclient-\K[0-9]+(\.[0-9]+){1,4}' | sort -V | tail -n 1
 }
 
 get_current_node_version() {
-    basename "$NODE_EXEC" | grep -oP 'node-\K[0-9]+(\.[0-9]+){2,3}'
-}
-
-# Same for qclient
-get_latest_qclient_version() {
-    curl -s https://releases.quilibrium.com/qclient-release | grep -oP 'qclient-\K[0-9]+(\.[0-9]+){2,3}' | sort -V | tail -n 1
+    basename "$NODE_EXEC" | grep -oP 'node-\K[0-9]+(\.[0-9]+){1,4}(?=-|$)'
 }
 
 get_current_qclient_version() {
-    basename "$QCLIENT_EXEC" | grep -oP 'qclient-\K[0-9]+(\.[0-9]+){2,3}'
+    basename "$QCLIENT_EXEC" | grep -oP 'qclient-\K[0-9]+(\.[0-9]+){1,4}(?=-|$)'
 }
+
 
 # Function to perform a fresh check of installations and versions
 fresh_check() {
