@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.9.3"
+SCRIPT_VERSION="1.9.4"
 
 
 #=====================
@@ -72,17 +72,27 @@ EOF
 # Helper Functions
 #=====================
 
+# Function to format titles consistently
+format_title() {
+    local title="$1"
+    local width=${#title}
+    local padding="=="
+    local separator="-"
+    
+    # Create the top border with padding
+    printf "\n=== %s ===\n" "$title"
+    # Create the bottom border
+    printf "%s\n" "$(printf '%*s' $((width + 8)) | tr ' ' '-')"
+}
+
 # Pre-action confirmation function
 confirm_proceed() {
     local action_name="$1"
     local description="$2"
-    local warning_message="${3:-}"  # Use parameter expansion to handle optional warning
     
     echo
-    echo "$action_name:"
-    echo "$(printf '%*s' "${#action_name}" | tr ' ' '=')"
-    [ -n "$description" ] && echo "$description"
-    [ -n "$warning_message" ] && echo -e "\n$warning_message"
+    echo "$(format_title "$action_name")"
+    [ -n "$description" ] && echo "$description"  # Removed the \n
     echo
     
     while true; do
@@ -172,7 +182,7 @@ press_any_key() {
 
 check_balance() {
     echo
-    echo "Token balance and account address:"
+    echo "$(format_title "Token balance and account address")"
     echo
     $QCLIENT_EXEC token balance $CONFIG_FLAG
     echo
@@ -180,15 +190,15 @@ check_balance() {
 
 check_coins() {
     echo
-    echo "Individual coins:"
+    echo "$(format_title "Individual coins")"
     echo
     $QCLIENT_EXEC token coins $CONFIG_FLAG
     echo
 }
 
 mint_all() {
-    echo "Mint all Rewards"
-    echo "================"
+    echo
+    echo "$(format_title "Mint All Rewards")"
     echo "This command will mint all your available rewards."
     echo
     echo "IMPORTANT:"
@@ -205,13 +215,14 @@ mint_all() {
 }
 
 create_transaction() {
-    # Pre-action confirmation
-    description="This will transfer a coin to another address"
-    warning="⚠️ Make sure the recipient address is correct. This operation cannot be undone!
-⚠️ The account address is different from the node peerID!
-⚠️ Account addresses and coin IDs have the same format, so be sure to not send a coin to another coin address!"
+    description="This will transfer a coin to another address.
+
+IMPORTANT:
+- Make sure the recipient address is correct - this operation cannot be undone
+- The account address is different from the node peerID
+- Account addresses and coin IDs have the same format - don't send to a coin address"
         
-    if ! confirm_proceed "coin transfer" "$description" "$warning"; then
+    if ! confirm_proceed "Create Transaction" "$description"; then
         return 1
     fi
 
@@ -281,13 +292,13 @@ create_transaction() {
 
 # This one has both amount or ofcoin options, needs to be corrected
 create_transaction_qclient_2.1.x() {
-    echo
-    echo "Creating a new transaction"
-    echo "=========================="
-    echo "- On the current Qclient version you can only send whole coins, not 'amount' of QUIL"
-    echo "- You will need the address (ID) of the coin you want to send."
-    echo "- You can split a coin in 2 coins with option 7."
-    echo
+    echo "$(format_title "Create transaction")"
+    description="This will transfer a coin to another address.
+
+IMPORTANT:
+- Make sure the recipient address is correct - this operation cannot be undone
+- The account address is different from the node peerID
+- Account addresses and coin IDs have the same format - don't send to a coin address"
 
     # Get and validate recipient address
     while true; do
@@ -388,10 +399,9 @@ create_transaction_qclient_2.1.x() {
 }
 
 token_split() {
-    # Pre-action confirmation
     description="This will split a coin into two new coins with specified amounts"
 
-    if ! confirm_proceed "Split Coin" "$description"; then
+    if ! confirm_proceed "Split Coins" "$description"; then
         return 1
     fi
     
@@ -475,10 +485,9 @@ token_split() {
 }
 
 token_split_advanced() {
-    # Pre-action confirmation
     description="This will split a coin into multiple new coins (up to 50) using different methods"
 
-    if ! confirm_proceed "Split Coin" "$description"; then
+    if ! confirm_proceed "Split Coins" "$description"; then
         return 1
     fi
 
@@ -707,12 +716,11 @@ token_split_advanced() {
 }
 
 token_merge() {
-    # Pre-action confirmation
     description="This function allows you to merge either two specific coins or all your coins into a single coin"
 
     if ! confirm_proceed "Merge Coins" "$description"; then
         return 1
-    fi    # This was the problem - had an extra 'fi'
+    fi
     
     # Display merge options first
     echo
@@ -840,7 +848,6 @@ token_merge() {
 }
 
 token_merge_simple() {
-    # Pre-action confirmation
     description="This will merge two coins into a single new coin"
 
     if ! confirm_proceed "Merge Coins" "$description"; then
@@ -914,13 +921,11 @@ token_merge_simple() {
 }
 
 token_merge_all() {
-    description="This will merge all your coins into a single coin"
+    description="This will merge all your coins into a single coin."
 
-    echo
-    echo "Merge all Coins:"
-    echo "================"
-    echo "$description"
-    echo
+    if ! confirm_proceed "Merge All Coins" "$description"; then
+        return 1
+    fi
 
     echo "Current coins that will be merged:"
     echo "---------------------------------"
@@ -974,11 +979,9 @@ token_merge_all() {
 }
 
 donations() {
+    echo
+    echo "$(format_title "Donations")"
     echo '
-
-Donations
-=========
-
 Quilbrium.one is a one-man volunteer effort.
 If you would like to chip in some financial help, thank you!
 
@@ -990,11 +993,9 @@ Or visit this page: https://iri.quest/q-donations
 }
 
 disclaimer() {
+    echo
+    echo "$(format_title "Disclaimer")"
     echo '
-
-Disclaimer
-==========
-
 This tool and all related scripts are unofficial and are being shared as-is.
 I take no responsibility for potential bugs or any misuse of the available options. 
 
@@ -1004,11 +1005,9 @@ Repo: https://github.com/lamat1111/QuilibriumScripts
 }
 
 best_providers() {
+    echo
+    echo "$(format_title "Best Server Providers")"
     echo '
-
-Best Server Providers
-====================
-
 Check out the best server providers for your node
 at ★ https://iri.quest/q-best-providers ★
 
@@ -1017,11 +1016,9 @@ Avoid using providers that specifically ban crypto and mining.
 }
 
 security_settings() {
+    echo
+    echo "$(format_title "Security Settings")"
     echo '
-
-Security Settings
-================
-
 This script performs QUIL transactions. You can inspect the source code by running:
 cat "'$SCRIPT_PATH/qclient_actions.sh'"
 
