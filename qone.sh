@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.5.0"
+SCRIPT_VERSION="2.5.1"
 
 #=====================
 # Menu interface
@@ -819,8 +819,8 @@ NODE_DIR="${INSTALLATION_DIR}/node"
 CLIENT_DIR="${INSTALLATION_DIR}/client"
 
 # Find the latest executables
-NODE_EXEC=$(find "${NODE_DIR}" -name "node-*" ! -name "*.dgst" ! -name "*.sig*" -type f -executable 2>/dev/null | sort -V | tail -n 1)
-QCLIENT_EXEC=$(find "${CLIENT_DIR}" -name "qclient-*" -type f -executable 2>/dev/null | sort -V | tail -n 1)
+NODE_EXEC=$(find "${NODE_DIR}" -name "node-[0-9]*" ! -name "*.dgst" ! -name "*.sig*" -type f -executable 2>/dev/null | sort -V | tail -n 1)
+QCLIENT_EXEC=$(find "${CLIENT_DIR}" -name "qclient-[0-9]*" ! -name "*.dgst" ! -name "*.sig*" -type f -executable 2>/dev/null | sort -V | tail -n 1)
 
 # URLs for scripts
 PREREQUISITES_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/server_setup.sh"
