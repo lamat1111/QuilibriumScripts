@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.9.2"
+SCRIPT_VERSION="1.9.3"
 
 
 #=====================
@@ -46,11 +46,9 @@ display_menu() {
 =================================================================
 /////////////////// QCLIENT ACTIONS - $SCRIPT_VERSION /////////////////////
 =================================================================
-1) Check balance / address       7) Split coin
-2) Check individual coins        8) Merge coin
-3) Create transaction            9) Merge all coins
-
-                                10) Mint all rewards
+1) Check balance / address       7) Split coins
+2) Check individual coins        8) Merge coins
+3) Create transaction            9) Mint all rewards
 -----------------------------------------------------------------
 B) ⭐ Best server providers      X) Disclaimer                           
 D) 💜 Donations                  S) Security settings
@@ -708,7 +706,7 @@ token_split_advanced() {
     fi
 }
 
-token_merge_new() {
+token_merge() {
     # Pre-action confirmation
     description="This function allows you to merge either two specific coins or all your coins into a single coin"
 
@@ -841,7 +839,7 @@ token_merge_new() {
     echo "If still nothing changes, you may want to try to execute the operation again."
 }
 
-token_merge() {
+token_merge_simple() {
     # Pre-action confirmation
     description="This will merge two coins into a single new coin"
 
@@ -1122,10 +1120,7 @@ main() {
             6) mutual_transfer; prompt_return_to_menu || break ;;
             7) token_split_advanced && prompt_return_to_menu || continue ;;
             8) token_merge && prompt_return_to_menu || continue ;;
-            9) token_merge_all && prompt_return_to_menu || continue ;;
-            10) mint_all && prompt_return_to_menu || continue ;;
-            11) token_split && prompt_return_to_menu || continue ;;
-            12) token_merge_new && prompt_return_to_menu || continue ;;
+            9) mint_all && prompt_return_to_menu || continue ;;
             [sS]) security_settings; press_any_key ;;
             [bB]) best_providers; press_any_key ;;
             [dD]) donations; press_any_key ;;
