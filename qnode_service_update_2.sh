@@ -252,8 +252,6 @@ if [ "$NODE_NEEDS_UPDATE" = true ]; then
         else
             echo "✅ Go version $GO_VERSION is already installed. No action needed."
         fi
-    else
-        : # do nothing
     fi
 
 
@@ -647,8 +645,6 @@ if [ -f "$CONFIG_FILE1" ] || [ -f "$CONFIG_FILE2" ]; then
     done
 
     echo "All config files processed."
-else
-    : #do nothing
 fi
 
 #==========================
