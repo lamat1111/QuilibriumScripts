@@ -21,9 +21,9 @@ cat << "EOF"
                     \___Q1Q\ \______|  QUILIBRIUM.ONE
                         \___|        
                               
-===================================================================
-                 ✨ QNODE SERVICE INSTALLER ✨
-===================================================================
+===========================================================================
+                 ✨ QNODE / QCLIENT INSTALLER ✨
+===========================================================================
 This script will install your Quilibrum node as a service.
 It will run your node from the binary file, and you will have to
 update manually.
@@ -32,7 +32,7 @@ Be sure to run the 'Server Setup' script first.
 Follow the guide at https://docs.quilibrium.one
 
 Made with 🔥 by LaMat - https://quilibrium.one
-====================================================================
+===========================================================================
 
 Processing... ⏳
 
@@ -188,19 +188,16 @@ if [ "$GIT_CLONE" = true ]; then
     sleep 1  # Add a 1-second delay
     cd $HOME
     if [ -d "ceremonyclient" ]; then
-    echo "⚠️ Looks like you already have a node installed!"
-    echo "The directory 'ceremonyclient' already exists. Skipping git clone..."
-    echo
-    else
-    until git clone --depth 1 --branch release https://github.com/QuilibriumNetwork/ceremonyclient.git || git clone https://source.quilibrium.com/quilibrium/ceremonyclient.git; do
-        echo "Git clone failed, retrying..."
-        sleep 2
-    done
+        echo "⚠️ Looks like you already have a node installed!"
+        echo "The directory 'ceremonyclient' already exists. Skipping git clone..."
+        echo
+        else
+        until git clone --depth 1 --branch release https://github.com/QuilibriumNetwork/ceremonyclient.git || git clone https://source.quilibrium.com/quilibrium/ceremonyclient.git; do
+            echo "Git clone failed, retrying..."
+            sleep 2
+        done
     fi
     echo
-
-else
-        : # do nothing
 fi
 
 #==========================
@@ -217,9 +214,6 @@ if [ "$GIT_CLONE" = false ]; then
     mkdir -p "$HOME/ceremonyclient/client"
 
     echo "Directories created successfully."
-
-else
-        : # do nothing
 fi
 
 # Change to the download directory
@@ -254,7 +248,7 @@ for file in $files; do
             rm -f "$file" # Cleanup failed download
             continue
         fi
-        echo "✅ Successfully downloaded $file"
+        echo "Successfully downloaded $file"
         
         # Make binary executable if it's not a signature or digest file
         if [[ ! $file =~ \.(dgst|sig)$ ]]; then
@@ -262,10 +256,10 @@ for file in $files; do
                 echo "❌ Failed to make $file executable"
                 continue
             fi
-            echo "✅ Made $file executable"
+            echo "Made $file executable"
         fi
     else
-        echo "ℹ️ File $file already exists, skipping"
+        echo "File $file already exists, skipping"
     fi
 done
 
@@ -309,7 +303,7 @@ for file in $files; do
             rm -f "$file" # Cleanup failed download
             continue
         fi
-        echo "✅ Successfully downloaded $file"
+        echo "Successfully downloaded $file"
         
         # Make binary executable if it's not a signature or digest file
         if [[ ! $file =~ \.(dgst|sig)$ ]]; then
@@ -317,10 +311,10 @@ for file in $files; do
                 echo "❌ Failed to make $file executable"
                 continue
             fi
-            echo "✅ Made $file executable"
+            echo "Made $file executable"
         fi
     else
-        echo "ℹ️ File $file already exists, skipping"
+        echo "File $file already exists, skipping"
     fi
 done
 

@@ -13,7 +13,7 @@ cat << "EOF"
                         \___|        
                               
 ===========================================================================
-                    ✨ QNODE NODE / QCLIENT UPDATER ✨
+                      ✨ QNODE / QCLIENT UPDATER ✨
 ===========================================================================
 This script will update your Quilibrium node when running it as a service.
 It will run your node from the binary file, and you will have to
