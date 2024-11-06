@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script version
-SCRIPT_VERSION="1.2"
+SCRIPT_VERSION="1.2.1"
 
 # Function to check for newer script version
 check_for_updates() {
@@ -30,6 +30,18 @@ check_python3() {
     fi
 }
 
+# Install lsof if it's not present
+if ! command -v lsof >/dev/null 2>&1; then
+    echo "⌛️ Installing lsof..."
+    if [ "$(id -u)" -eq 0 ]; then
+        apt-get update >/dev/null 2>&1
+        apt-get install -y lsof >/dev/null 2>&1
+    else
+        sudo apt-get update >/dev/null 2>&1
+        sudo apt-get install -y lsof >/dev/null 2>&1
+    fi
+fi
+
 # Check if the script is run as root
 if [ "$(id -u)" -eq 0 ]; then
     SUDO=""
@@ -42,13 +54,13 @@ IP_ADDRESS=$(curl -s -4 icanhazip.com)
 
 # Function to find an available port
 find_available_port() {
-  while true; do
-    PORT=$(shuf -i 1025-65535 -n 1)
-    if ! lsof -i:$PORT > /dev/null; then
-      echo $PORT
-      return
-    fi
-  done
+    while true; do
+        PORT=$(shuf -i 1025-65535 -n 1)
+        if ! lsof -i:$PORT > /dev/null 2>&1; then
+            echo $PORT
+            return
+        fi
+    done
 }
 
 # Find a random available port above 1024
@@ -60,53 +72,46 @@ FIREWALL_CMD_OPENED=false
 
 # Check if the firewall is blocking the port and open it if necessary
 if command -v ufw > /dev/null 2>&1; then
-  # Check if ufw is enabled
-  if $SUDO ufw status | grep -q "Status: active"; then
-    # Check if the port is allowed
-    if ! $SUDO ufw status | grep -q "$PORT/tcp"; then
-      #cho "Opening port $PORT in the firewall..."
-      $SUDO ufw allow $PORT/tcp > /dev/null 2>&1
-      UFW_OPENED=true
+    if $SUDO ufw status | grep -q "Status: active"; then
+        if ! $SUDO ufw status | grep -q "$PORT/tcp"; then
+            $SUDO ufw allow $PORT/tcp > /dev/null 2>&1
+            UFW_OPENED=true
+        fi
     fi
-  fi
 elif command -v firewall-cmd > /dev/null 2>&1; then
-  # Check if firewalld is running
-  if $SUDO firewall-cmd --state | grep -q "running"; then
-    # Check if the port is allowed
-    if ! $SUDO firewall-cmd --list-ports | grep -q "$PORT/tcp"; then
-      #echo "Opening port $PORT in the firewall..."
-      $SUDO firewall-cmd --add-port=$PORT/tcp --permanent > /dev/null 2>&1
-      $SUDO firewall-cmd --reload > /dev/null 2>&1
-      FIREWALL_CMD_OPENED=true
+    if $SUDO firewall-cmd --state | grep -q "running"; then
+        if ! $SUDO firewall-cmd --list-ports | grep -q "$PORT/tcp"; then
+            $SUDO firewall-cmd --add-port=$PORT/tcp --permanent > /dev/null 2>&1
+            $SUDO firewall-cmd --reload > /dev/null 2>&1
+            FIREWALL_CMD_OPENED=true
+        fi
     fi
-  fi
 else
-  echo "No recognized firewall management tool found."
+    echo "No recognized firewall management tool found."
 fi
 
 # Function to clean up and exit
 cleanup() {
-  echo "Stopping the web server and cleaning up..."
-  kill $SERVER_PID
+    echo "Stopping the web server and cleaning up..."
+    kill $SERVER_PID
 
-  # Close the port if it was opened by this script
-  if $UFW_OPENED; then
-    echo "Closing port $PORT in the firewall..."
-    $SUDO ufw delete allow $PORT/tcp > /dev/null 2>&1
-  fi
+    # Close the port if it was opened by this script
+    if $UFW_OPENED; then
+        echo "Closing port $PORT in the firewall..."
+        $SUDO ufw delete allow $PORT/tcp > /dev/null 2>&1
+    fi
 
-  if $FIREWALL_CMD_OPENED; then
-    echo "Closing port $PORT in the firewall..."
-    $SUDO firewall-cmd --remove-port=$PORT/tcp --permanent > /dev/null 2>&1
-    $SUDO firewall-cmd --reload > /dev/null 2>&1
-  fi
+    if $FIREWALL_CMD_OPENED; then
+        echo "Closing port $PORT in the firewall..."
+        $SUDO firewall-cmd --remove-port=$PORT/tcp --permanent > /dev/null 2>&1
+        $SUDO firewall-cmd --reload > /dev/null 2>&1
+    fi
 }
 
 # Trap SIGINT (Ctrl+C) and call cleanup function
 trap "echo 'Then press ENTER to stop the web server.'; trap - SIGINT" SIGINT
 
 # Start a temporary web server
-#echo "Starting temporary web server on port $PORT..."
 cd $HOME/scripts
 python3 -m http.server $PORT > /dev/null 2>&1 &
 SERVER_PID=$!
