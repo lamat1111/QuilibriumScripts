@@ -148,9 +148,9 @@ done
 echo "✅ Packages installed successfully or already present."
 echo
 
-#==========================
+#################################
 # GO UPGRADE
-#==========================
+#################################
 
 # Check the currently installed Go version
 if go version &>/dev/null; then
