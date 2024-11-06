@@ -352,6 +352,7 @@ if [ "$NODE_NEEDS_UPDATE" = true ]; then
             echo "ℹ️ File $file already exists, skipping"
         fi
     done
+fi
 
 if [ "$QCLIENT_NEEDS_UPDATE" = true ]; then
 
@@ -574,6 +575,8 @@ echo "⏳ Reloading daemon and restarting the node to apply the new settings..."
 sudo systemctl daemon-reload
 sudo systemctl restart ceremonyclient
 echo "✅ Service file update completed and applied."
+
+fi
 
 
 #==========================
