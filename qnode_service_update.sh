@@ -53,11 +53,11 @@ NODE_RELEASE_URL="https://releases.quilibrium.com/release"
 QCLIENT_RELEASE_URL="https://releases.quilibrium.com/qclient-release"
 
 # Check if the service file exists
-if [ ! -f "$SERVICE_FILE" ]; then
-    echo "❌ Error: you are not running your node via service file:  $SERVICE_FILE"
-    echo "This update script won't work for you. Exiting."
-    exit 1
-fi
+# if [ ! -f "$SERVICE_FILE" ]; then
+#     echo "❌ Error: you are not running your node via service file:  $SERVICE_FILE"
+#     echo "This update script won't work for you. Exiting."
+#     exit 1
+# fi
 
 # Function to display section headers
 display_header() {
