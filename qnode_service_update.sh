@@ -474,8 +474,11 @@ update_service_section() {
     local value="$2"
     local file="$3"
     
-    if grep -q "^$key=" "$file"; then
-        # If the key exists, update its value
+    if grep -q "^$key=$value$" "$file"; then
+        # If the key exists with exactly the same value, do nothing
+        return
+    elif grep -q "^$key=" "$file"; then
+        # If the key exists but with different value, update it
         sudo sed -i "s|^$key=.*|$key=$value|" "$file"
     else
         # If the key doesn't exist, add it before the [Install] section
