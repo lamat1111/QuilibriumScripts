@@ -474,9 +474,6 @@ update_service_section() {
     local value="$2"
     local file="$3"
     
-    # Escape forward slashes in the value for sed
-    value=$(echo "$value" | sed 's/\//\\\//g')
-    
     if grep -q "^$key=" "$file"; then
         # If the key exists, update its value
         sudo sed -i "s|^$key=.*|$key=$value|" "$file"
