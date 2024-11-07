@@ -15,7 +15,7 @@ cat << EOF
                         \___|        
                               
 ===========================================================================
-                      ✨ QNODE / QCLIENT UPDATER ✨
+                 ✨ QNODE / QCLIENT UPDATER - $SCRIPT_VERSION ✨
 ===========================================================================
 This script will update your Quilibrium node when running it as a service.
 It will run your node from the binary file, and you will have to
@@ -30,7 +30,7 @@ Made with 🔥 by LaMat - https://quilibrium.one
 
 ---------------------------------------------------------------------------
 
-⏳ Processing... (v $SCRIPT_VERSION)
+⏳ Processing... 
 
 EOF
 

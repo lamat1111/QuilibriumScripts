@@ -23,7 +23,7 @@ cat << EOF
                         \___|        
                               
 ===========================================================================
-                   ✨ QNODE / QCLIENT INSTALLER ✨
+                 ✨ QNODE / QCLIENT INSTALLER - $SCRIPT_VERSION ✨
 ===========================================================================
 This script will install your Quilibrum node as a service.
 It will run your node from the binary file, and you will have to
@@ -35,7 +35,7 @@ Follow the guide at https://docs.quilibrium.one
 Made with 🔥 by LaMat - https://quilibrium.one
 ===========================================================================
 
-Processing... ⏳  (v $SCRIPT_VERSION)
+Processing... ⏳
 
 EOF
 
