@@ -8,7 +8,9 @@
 #Comment out for automatic creation of the qclient version
 #QCLIENT_VERSION=2.0.2.4
 
-cat << "EOF"
+SCRIPT_VERSION="2.0"
+
+cat << EOF
 
                     Q1Q1Q1\    Q1\   
                    Q1  __Q1\ Q1Q1 |  
@@ -33,7 +35,7 @@ Follow the guide at https://docs.quilibrium.one
 Made with 🔥 by LaMat - https://quilibrium.one
 ===========================================================================
 
-Processing... ⏳
+Processing... ⏳  (v $SCRIPT_VERSION)
 
 EOF
 
