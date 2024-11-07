@@ -1,6 +1,8 @@
 #!/bin/bash
 
-cat << "EOF"
+SCRIPT_VERSION="2.0"
+
+cat << EOF
 
                     Q1Q1Q1\    Q1\   
                    Q1  __Q1\ Q1Q1 |  
@@ -28,7 +30,7 @@ Made with 🔥 by LaMat - https://quilibrium.one
 
 ---------------------------------------------------------------------------
 
-⏳ Processing... 
+⏳ Processing... (v $SCRIPT_VERSION)
 
 EOF
 
