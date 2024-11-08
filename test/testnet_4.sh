@@ -56,29 +56,25 @@ echo "⏳Downloading qClient"
 sleep 1
 cd ~/testnet/ceremonyclient/node
 
-# Only download if the binary doesn't exist or is different
-if [ ! -f "$NODE_BINARY" ] || ! cmp -s <(curl -s https://releases.quilibrium.com/$NODE_BINARY) "$NODE_BINARY" 2>/dev/null; then
-    wget -N https://releases.quilibrium.com/$NODE_BINARY
-    chmod +x $NODE_BINARY
-    rm -f ./node
-    echo "removed node old version"
-    ln -sf ./$NODE_BINARY ./node
-    echo "linked $NODE_BINARY to node"
-fi
+# Always download and overwrite
+wget -O $NODE_BINARY https://releases.quilibrium.com/$NODE_BINARY
+chmod +x $NODE_BINARY
+rm -f ./node
+echo "removed node old version"
+cp -p ./$NODE_BINARY ./node
+echo "copied $NODE_BINARY to node"
 echo "✅ Node binary for testnet downloaded and permissions configured completed."
 
 #==========================
 # qCLIENT BINARY DOWNLOAD
 #==========================
-# Only download if the binary doesn't exist or is different
-if [ ! -f "$QCLIENT_BINARY" ] || ! cmp -s <(curl -s https://releases.quilibrium.com/$QCLIENT_BINARY) "$QCLIENT_BINARY" 2>/dev/null; then
-    wget -N https://releases.quilibrium.com/$QCLIENT_BINARY
-    chmod +x $QCLIENT_BINARY
-    rm -f ./qclient
-    echo "removed qclient old version"
-    ln -sf ./$QCLIENT_BINARY ./qclient
-    echo "linked $QCLIENT_BINARY to qclient"
-fi
+# Always download and overwrite
+wget -O $QCLIENT_BINARY https://releases.quilibrium.com/$QCLIENT_BINARY
+chmod +x $QCLIENT_BINARY
+rm -f ./qclient
+echo "removed qclient old version"
+cp -p ./$QCLIENT_BINARY ./qclient
+echo "copied $QCLIENT_BINARY to qclient"
 echo "✅ qClient binary for testnet downloaded and permissions configured completed."
 echo
 
