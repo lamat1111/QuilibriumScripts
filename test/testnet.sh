@@ -142,7 +142,7 @@ sudo service qtest start
 
 # Step 8: See the logs of the ceremonyclient service
 echo "🎉Welcome to Quilibrium testnet node $VERSION"
-echo "⏳ Waiting 60 seconds to generate the edit the config.yml file"
+echo "⏳ Waiting 60 seconds to the edit the generated config.yml file"
 sleep 60  # Add a 5-second delay
 
 echo
