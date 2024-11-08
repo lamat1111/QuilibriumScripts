@@ -36,13 +36,9 @@ else
     echo "git is installed"
 fi
 
-# Step 4:Download Ceremonyclient
-echo "⏳Creating Testnet Directories"
+echo "⏳ Creating Testnet Directories"
 sleep 1  # Add a 1-second delay
-mkdir testnet
-cd ~/testnet
-mkdir ceremonyclient
-cd ~/testnet/ceremonyclient/
+mkdir -p ~/testnet/ceremonyclient/{node,client}
 
 # Determine the ExecStart line based on the architecture
 ARCH=$(uname -m)
