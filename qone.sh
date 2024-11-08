@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.5.3"
+SCRIPT_VERSION="2.5.4"
 
 #=====================
 # Menu interface
@@ -598,7 +598,10 @@ node_logs() {
     # Trap CTRL+C to directly call display_menu
     trap 'display_menu "skip_check"' INT
 
-    sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
+    sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat | while read -r line; do
+        timestamp=$(date "+%b %d %H:%M:%S")
+        echo "$timestamp $(echo "$line" | sed -E 's/"level":"info","ts":[0-9.]+,//')"
+    done
 
     # If the command exited without CTRL+C, call display_menu
     if [ $? -ne 130 ]; then
