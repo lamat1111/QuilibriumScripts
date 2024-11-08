@@ -47,6 +47,11 @@ echo "⏳ Creating Testnet Directories"
 sleep 1
 mkdir -p ~/qtestnet/node
 
+# Step 6: Create or Update Ceremonyclient Service
+echo "⏳ Stopping Ceremonyclient Service if running"
+sudo systemctl stop qtest.service 2>/dev/null || true
+sleep 2
+
 #==========================
 # NODE BINARY DOWNLOAD
 #==========================
@@ -86,10 +91,15 @@ HOME=$(eval echo ~$HOME_DIR)
 NODE_PATH="$HOME/qtestnet/node"
 EXEC_START="$NODE_PATH/node"
 
-# Step 6: Create or Update Ceremonyclient Service
-echo "⏳ Stopping Ceremonyclient Service if running"
-sudo systemctl stop qtest.service 2>/dev/null || true
-sleep 2
+# Check if this is a cluster node by examining the existing service file
+if [ -f "/lib/systemd/system/qtest.service" ]; then
+    if grep -q "qnode_cluster_run_testnet.sh" "/lib/systemd/system/qtest.service"; then
+        echo "⚠️ Detected cluster node configuration."
+        echo "✅ Cluster nodes have different configurations. Your existing setup will be preserved."
+        echo "⚠️ Please restart your cluster manually when ready."
+        exit 0
+    fi
+fi
 
 echo "⏳ Creating/Updating Ceremonyclient Testnet Service"
 sleep 2
