@@ -213,6 +213,16 @@ else
     echo "Bootstrap peers already updated, skipping"
 fi
 
+# Update GRPC and REST multiaddr settings
+if grep -q '^listenGrpcMultiaddr: ""' "$CONFIG_FILE" || grep -q '^listenRESTMultiaddr: ""' "$CONFIG_FILE"; then
+    # Update the multiaddr settings
+    sed -i 's|^listenGrpcMultiaddr: ""|listenGrpcMultiaddr: "/ip4/127.0.0.1/tcp/8337"|' "$CONFIG_FILE"
+    sed -i 's|^listenRESTMultiaddr: ""|listenRESTMultiaddr: "/ip4/127.0.0.1/tcp/8338"|' "$CONFIG_FILE"
+    echo "Updated GRPC and REST multiaddr settings"
+else
+    echo "GRPC and REST multiaddr settings already configured, skipping"
+fi
+
 # Restart service only if config was changed
 if [ $? -eq 0 ]; then
     echo "Restarting service with new configuration"
