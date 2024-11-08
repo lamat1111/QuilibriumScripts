@@ -37,6 +37,17 @@ sleep 3
 
 EOF
 
+# Check and stop ceremonyclient service if it exists
+if systemctl list-units --full -all | grep -Fq "ceremonyclient.service"; then
+    echo "⚠️ Detected existing ceremonyclient service"
+    echo "⏳ Stopping ceremonyclient service..."
+    sudo systemctl stop ceremonyclient.service
+    sleep 2
+    echo "✅ ceremonyclient service stopped"
+else
+    echo "ℹ️ No existing ceremonyclient service detected"
+fi
+
 
 # For DEBIAN OS - Check if sudo is installed
 if ! command -v sudo &> /dev/null; then
