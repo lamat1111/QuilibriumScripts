@@ -33,9 +33,9 @@ Made with 🔥 by LaMat - https://quilibrium.one
 
 Processing... ⏳
 
-sleep 3
-
 EOF
+
+sleep 3
 
 # Check and stop ceremonyclient service if it exists
 if systemctl list-units --full -all | grep -Fq "ceremonyclient.service"; then
@@ -176,7 +176,6 @@ sleep 1
 sudo systemctl start qtest.service
 
 # Step 8: Wait for config file generation and update
-echo "🎉Welcome to Quilibrium testnet node $NODE_VERSION"
 echo "⏳ Waiting for config.yml file generation (30 seconds)"
 sleep 30
 
