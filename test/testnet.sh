@@ -1,18 +1,44 @@
 #!/bin/bash
 # Set the version number
 
-VERSION="2.0.3-b6-testnet"
-qClientVERSION="2.0.2.4"
+NODE_VERSION="2.0.3-b6-testnet"
+QCLIENT_VERSION="2.0.2.4"
 
-cd ~
-# Step 0: Welcome"
-echo "The script is prepared for Ubuntu machines. If you are using another operating system, please check the compatibility of the script."
-echo "This script will be building new fresh Node for Quilibrium Testnet. Your use is at your own risk. 0xOzgur does not accept any liability."
-echo "⏳Enjoy and sit back while you are building your Quilibrium Testnet Node!"
-echo "⏳Processing..."
-sleep 5
+SCRIPT_VERSION="1.1"
 
-# For DEBIAN OS - Check if sudo and git is installed
+cat << EOF
+
+                    Q1Q1Q1\    Q1\   
+                   Q1  __Q1\ Q1Q1 |  
+                   Q1 |  Q1 |\_Q1 |  
+                   Q1 |  Q1 |  Q1 |  
+                   Q1 |  Q1 |  Q1 |  
+                   Q1  Q1Q1 |  Q1 |  
+                   \Q1Q1Q1 / Q1Q1Q1\ 
+                    \___Q1Q\ \______|  QUILIBRIUM.ONE
+                        \___|        
+                              
+===========================================================================
+                 ✨ TESTNET NODE INSTALLER - $SCRIPT_VERSION ✨
+===========================================================================
+This script will install a testet Quilibrium node.
+If you are running this ona machine hosting a mainnet node, 
+you have to stop that one first.
+
+The testnet node will be installed ina different folder,
+and won't interfere with your mainnet node files.
+
+Made with 🔥 by LaMat - https://quilibrium.one
+===========================================================================
+
+Processing... ⏳
+
+sleep 3
+
+EOF
+
+
+# For DEBIAN OS - Check if sudo is installed
 if ! command -v sudo &> /dev/null; then
     echo "sudo could not be found"
     echo "Installing sudo..."
@@ -28,24 +54,24 @@ OS=$(uname -s)
 # Determine the node binary name based on the architecture and OS
 if [ "$ARCH" = "x86_64" ]; then
     if [ "$OS" = "Linux" ]; then
-        NODE_BINARY="node-$VERSION-linux-amd64"
-        QCLIENT_BINARY="qclient-$qClientVERSION-linux-amd64"
+        NODE_BINARY="node-$NODE_VERSION-linux-amd64"
+        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-amd64"
     elif [ "$OS" = "Darwin" ]; then
-        NODE_BINARY="node-$VERSION-darwin-amd64"
-        QCLIENT_BINARY="qclient-$qClientVERSION-darwin-arm64"
+        NODE_BINARY="node-$NODE_VERSION-darwin-amd64"
+        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-arm64"
     fi
 elif [ "$ARCH" = "aarch64" ]; then
     if [ "$OS" = "Linux" ]; then
-        NODE_BINARY="node-$VERSION-linux-arm64"
+        NODE_BINARY="node-$NODE_VERSION-linux-arm64"
     elif [ "$OS" = "Darwin" ]; then
-        NODE_BINARY="node-$VERSION-darwin-arm64"
-        QCLIENT_BINARY="qclient-$qClientVERSION-linux-arm64"
+        NODE_BINARY="node-$NODE_VERSION-darwin-arm64"
+        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-arm64"
     fi
 fi
 
-echo "⏳ Creating Testnet Directories"
+echo "⏳ Creating Testnet Directories: ~/testnet/node"
 sleep 1
-mkdir -p ~/qtestnet/node
+mkdir -p ~/testnet/node
 
 # Step 6: Create or Update Ceremonyclient Service
 echo "⏳ Stopping Ceremonyclient Service if running"
@@ -59,7 +85,7 @@ sleep 2
 # Step 4: Download qClient
 echo "⏳Downloading qClient"
 sleep 1
-cd ~/qtestnet/node
+cd ~/testnet/node
 
 # Always download and overwrite
 wget -O $NODE_BINARY https://releases.quilibrium.com/$NODE_BINARY
@@ -88,7 +114,7 @@ echo
 HOME=$(eval echo ~$HOME_DIR)
 
 # Use the home directory in the path
-NODE_PATH="$HOME/qtestnet/node"
+NODE_PATH="$HOME/testnet/node"
 EXEC_START="$NODE_PATH/node"
 
 # Check if this is a cluster node by examining the existing service file
@@ -139,11 +165,11 @@ sleep 1
 sudo systemctl start qtest.service
 
 # Step 8: Wait for config file generation and update
-echo "🎉Welcome to Quilibrium testnet node $VERSION"
+echo "🎉Welcome to Quilibrium testnet node $NODE_VERSION"
 echo "⏳ Waiting for config.yml file generation (30 seconds)"
 sleep 30
 
-CONFIG_FILE="$HOME/qtestnet/node/.config/config.yml"
+CONFIG_FILE="$HOME/testnet/node/.config/config.yml"
 
 # Wait for config file to exist
 for i in {1..30}; do
@@ -183,5 +209,18 @@ if [ $? -eq 0 ]; then
     sudo systemctl restart qtest.service
 fi
 
-echo "Setup complete. Showing logs:"
+echo
+echo "Important info:"
+echo "------------------------------------------------------------"
+echo "Installation folder: $NODE_PATH"
+echo "Current node version: $NODE_VERSION \(renamed as simply 'node')"
+echo
+echo "service name: qtest"
+echo "Start service: service qtest start"
+echo "Stop service: service qtest stop"
+echo "node log: journalctl -u qtest.service -f --no-hostname -o cat"
+echo "-------------------------------------------------------------"
+sleep 3
+echo
+echo "Showing node logs:"
 sudo journalctl -u qtest.service -f --no-hostname -o cat
