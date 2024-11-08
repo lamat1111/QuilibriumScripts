@@ -45,7 +45,7 @@ fi
 
 echo "⏳ Creating Testnet Directories"
 sleep 1
-mkdir -p ~/testnet/ceremonyclient/{node,client}
+mkdir -p ~/qtestnet/node
 
 #==========================
 # NODE BINARY DOWNLOAD
@@ -54,7 +54,7 @@ mkdir -p ~/testnet/ceremonyclient/{node,client}
 # Step 4: Download qClient
 echo "⏳Downloading qClient"
 sleep 1
-cd ~/testnet/ceremonyclient/node
+cd ~/qtestnet/node
 
 # Always download and overwrite
 wget -O $NODE_BINARY https://releases.quilibrium.com/$NODE_BINARY
@@ -83,7 +83,7 @@ echo
 HOME=$(eval echo ~$HOME_DIR)
 
 # Use the home directory in the path
-NODE_PATH="$HOME/testnet/ceremonyclient/node"
+NODE_PATH="$HOME/qtestnet/node"
 EXEC_START="$NODE_PATH/node"
 
 # Step 6: Create or Update Ceremonyclient Service
@@ -130,10 +130,10 @@ sudo systemctl start qtest.service
 
 # Step 8: Wait for config file generation and update
 echo "🎉Welcome to Quilibrium testnet node $VERSION"
-echo "⏳ Waiting for config.yml file generation (60 seconds)"
-sleep 60
+echo "⏳ Waiting for config.yml file generation (30 seconds)"
+sleep 30
 
-CONFIG_FILE="$HOME/testnet/ceremonyclient/node/.config/config.yml"
+CONFIG_FILE="$HOME/qtestnet/node/.config/config.yml"
 
 # Wait for config file to exist
 for i in {1..30}; do
