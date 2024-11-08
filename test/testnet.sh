@@ -222,13 +222,13 @@ fi
 echo
 echo "Important info:"
 echo "------------------------------------------------------------"
-echo "Installation folder: $NODE_PATH"
-echo "Current node version: $NODE_VERSION \(renamed as simply 'node')"
+echo "Installation folder:  $NODE_PATH"
+echo "Current node version: $NODE_VERSION \\(renamed as simply 'node'\\)"
 echo
-echo "service name: qtest"
+echo "service name:  qtest"
 echo "Start service: service qtest start"
-echo "Stop service: service qtest stop"
-echo "node log: journalctl -u qtest.service -f --no-hostname -o cat"
+echo "Stop service:  service qtest stop"
+echo "node log:      journalctl -u qtest.service -f --no-hostname -o cat"
 echo "-------------------------------------------------------------"
 sleep 3
 echo
