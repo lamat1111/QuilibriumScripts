@@ -1,7 +1,7 @@
 #!/bin/bash
 # Set the version number
 
-NODE_VERSION="2.0.3-b6-testnet"
+NODE_VERSION="2.0.3-b7-testnet"
 QCLIENT_VERSION="2.0.2.4"
 
 SCRIPT_VERSION="1.1"
