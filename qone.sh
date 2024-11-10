@@ -1,14 +1,13 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.5.7"
+SCRIPT_VERSION="2.5.8"
 
 # ------------------------------------------------------------------
 SHOW_TEMP_MESSAGE=true  # Toggle to control message visibility
 TEMP_MESSAGE=$(cat << 'EOF'
-⚠️ JOIN THE 'QUILIBRIUM ONE' TELEGRAM CHANNEL
-Join https://t.me/quilibriumone for important updates
-on all the Q1 scripts.
+⚠️ Join the Q1 Telegram channel >> https://t.me/quilibriumone
+    for important updates on all Q1 scripts.
 EOF
 )
 
