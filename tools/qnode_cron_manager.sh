@@ -1,14 +1,21 @@
 #!/bin/bash
 
-# Set the execution mode here:
-# 0 - Run normally with prompts
-# 1 - Run option 1 (deactivate all)
-# 2 - Run option 2 (activate all)
-# 3 - Run option 3 (deactivate qnode_rewards_to_gsheet_2.py only)
-# 4 - Run option 4 (deactivate qnode_rewards_to_gsheet.py only)
-# 5 - Run option 5 (activate qnode_rewards_to_gsheet_2.py only)
-# 6 - Run option 6 (activate qnode_rewards_to_gsheet.py only)
-EXECUTION_MODE=6
+# Function to display usage
+show_usage() {
+    echo "Usage: $0 [MODE]"
+    echo "Available modes:"
+    echo "  0 - Run normally with interactive prompts"
+    echo "  1 - Deactivate all monitoring cronjobs"
+    echo "  2 - Activate all monitoring cronjobs"
+    echo "  3 - Deactivate qnode_rewards_to_gsheet_2.py only"
+    echo "  4 - Deactivate qnode_rewards_to_gsheet.py only"
+    echo "  5 - Activate qnode_rewards_to_gsheet_2.py only"
+    echo "  6 - Activate qnode_rewards_to_gsheet.py only"
+    echo "Example: $0 1"
+}
+
+# Set execution mode from command line argument or default to 0
+EXECUTION_MODE=${1:-0}
 
 # Function to display current crontab
 show_crontab() {
@@ -64,6 +71,13 @@ modify_all_crontabs() {
     crontab "$temp_file"
     rm "$temp_file"
 }
+
+# Validate execution mode
+if ! [[ "$EXECUTION_MODE" =~ ^[0-6]$ ]]; then
+    echo "Error: Invalid execution mode '$EXECUTION_MODE'"
+    show_usage
+    exit 1
+fi
 
 # Main execution logic
 case $EXECUTION_MODE in
@@ -135,9 +149,5 @@ case $EXECUTION_MODE in
     6)
         modify_specific_crontab "qnode_rewards_to_gsheet\.py" "activate"
         show_crontab
-        ;;
-    *)
-        echo "Invalid EXECUTION_MODE. Please set it to a value between 0 and 6."
-        exit 1
         ;;
 esac
