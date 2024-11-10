@@ -1220,7 +1220,7 @@ confirm_action() {
 
 $1
 
-✅ Do you want to proceed? (y/n):
+➤ Do you want to proceed? (y/n):
 EOF
     read -p "> " confirm
     if [[ "$confirm" =~ ^[Yy]$ ]]; then
