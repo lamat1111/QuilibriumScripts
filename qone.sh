@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.5.8"
+SCRIPT_VERSION="2.5.9"
 
 # ------------------------------------------------------------------
 SHOW_TEMP_MESSAGE=true  # Toggle to control message visibility
@@ -621,20 +621,21 @@ node_logs() {
     echo "⌛️  Displaying your node log...  (Press CTRL+C to return to the main menu)"
     echo
 
-    # Trap CTRL+C to directly call display_menu
-    trap 'display_menu "skip_check"' INT
+    # Create a subshell for the log monitoring
+    (
+        # Trap CTRL+C within the subshell
+        trap 'exit 0' INT
 
-    sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat | while read -r line; do
-        timestamp=$(date "+%b %d %H:%M:%S")
-        echo "$timestamp $(echo "$line" | sed -E 's/"level":"info","ts":[0-9.]+,//')"
-    done
+        sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat | while read -r line; do
+            timestamp=$(date "+%b %d %H:%M:%S")
+            echo "$timestamp $(echo "$line" | sed -E 's/"level":"info","ts":[0-9.]+,//')"
+        done
+    )
 
-    # If the command exited without CTRL+C, call display_menu
-    if [ $? -ne 130 ]; then
-        display_menu "skip_check"
-    fi
+    # After the subshell exits (either naturally or via CTRL+C)
+    display_menu "skip_check"
+    return 0
 }
-
 
 start_node() {
     if [ ! -f "$SERVICE_FILE" ]; then
