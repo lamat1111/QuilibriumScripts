@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.6.1"
+SCRIPT_VERSION="2.6.2"
 
 # ------------------------------------------------------------------
 SHOW_TEMP_MESSAGE=true  # Toggle to control message visibility
