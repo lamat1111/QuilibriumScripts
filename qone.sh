@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.5.9"
+SCRIPT_VERSION="2.6.0"
 
 # ------------------------------------------------------------------
 SHOW_TEMP_MESSAGE=true  # Toggle to control message visibility
@@ -138,7 +138,7 @@ main() {
                 fi
                 ;;
             3) confirm_action "$(wrap_text "$setup_grpcurl_message" "")" "Set up gRPCurl" configure_grpcurl && prompt_return_to_menu "skip_check" ;;
-            4) node_logs; press_any_key ;;
+            4) node_logs; display_menu "skip_check" ;;
             5) 
                 if confirm_action "$(wrap_text "$update_node_message" "")" "Update node" update_node; then
                     prompt_return_to_menu
@@ -613,8 +613,7 @@ node_info() {
 node_logs() {
     if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
-        display_menu "skip_check"
-        return 0
+        return 1
     fi
 
     echo
@@ -631,10 +630,6 @@ node_logs() {
             echo "$timestamp $(echo "$line" | sed -E 's/"level":"info","ts":[0-9.]+,//')"
         done
     )
-
-    # After the subshell exits (either naturally or via CTRL+C)
-    display_menu "skip_check"
-    return 0
 }
 
 start_node() {
