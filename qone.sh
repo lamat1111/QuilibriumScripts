@@ -214,7 +214,7 @@ It only works after 15-30 minutes that the node has been running.
 '
 
 prover_pause_message='
-This action will send a pause message to the newtwork.
+This action will send a pause message to the network.
 Only use this to avoid penalties if your machine has crashed for hardware failure and cannot recover.
 '
 
