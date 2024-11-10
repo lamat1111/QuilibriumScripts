@@ -8,7 +8,7 @@
 # 4 - Run option 4 (deactivate qnode_rewards_to_gsheet.py only)
 # 5 - Run option 5 (activate qnode_rewards_to_gsheet_2.py only)
 # 6 - Run option 6 (activate qnode_rewards_to_gsheet.py only)
-EXECUTION_MODE=0
+EXECUTION_MODE=5
 
 # Function to display current crontab
 show_crontab() {
