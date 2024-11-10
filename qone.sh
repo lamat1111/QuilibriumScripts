@@ -1,7 +1,16 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.5.5"
+SCRIPT_VERSION="2.5.6"
+
+# ------------------------------------------------------------------
+SHOW_TEMP_MESSAGE=true  # Toggle to control message visibility
+TEMP_MESSAGE=$(cat << 'EOF'
+⚠️ JOIN THE 'QUILIBRIUM ONE' TELEGRAM CHANNEL
+Join https://t.me/quilibriumone for important updates
+on all the Q1 scripts.
+EOF
+)
 
 #=====================
 # Menu interface
@@ -114,6 +123,7 @@ main() {
         fi
 
         read -rp "Enter your choice: " choice
+        display_temp_message
         
         case $choice in
             1) 
@@ -1232,6 +1242,16 @@ wrap_text() {
     local text="$1"
     local indent="$2"
     echo "$text" | fold -s -w 80 | awk -v indent="$indent" '{printf "%s%s\n", indent, $0}'
+}
+
+display_temp_message() {
+    if [ "$SHOW_TEMP_MESSAGE" = true ] && [ -n "$TEMP_MESSAGE" ]; then
+        echo                                  
+        echo "------------------------------------------------------------------"
+        echo "$TEMP_MESSAGE"                                        
+        echo "------------------------------------------------------------------"
+        echo 
+    fi
 }
 
 
