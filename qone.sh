@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.6.0"
+SCRIPT_VERSION="2.6.1"
 
 # ------------------------------------------------------------------
 SHOW_TEMP_MESSAGE=true  # Toggle to control message visibility
 TEMP_MESSAGE=$(cat << 'EOF'
-⚠️ Join the Q1 Telegram channel >> https://t.me/quilibriumone
-    for important updates on all Q1 scripts.
+➤ Join the Q1 Telegram channel >> https://t.me/quilibriumone
+➤ for important updates on all Q1 scripts.
 EOF
 )
 
@@ -1242,11 +1242,10 @@ wrap_text() {
 }
 
 display_temp_message() {
-    if [ "$SHOW_TEMP_MESSAGE" = true ] && [ -n "$TEMP_MESSAGE" ]; then
-        echo                                  
-        echo "------------------------------------------------------------------"
+    if [ "$SHOW_TEMP_MESSAGE" = true ] && [ -n "$TEMP_MESSAGE" ]; then                              
+        echo "──────────────────────────────────────────────────────────────────"
         echo "$TEMP_MESSAGE"                                        
-        echo "------------------------------------------------------------------"
+        echo "──────────────────────────────────────────────────────────────────"
         echo 
     fi
 }
