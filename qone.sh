@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.5.4"
+SCRIPT_VERSION="2.5.5"
 
 #=====================
 # Menu interface
@@ -88,12 +88,14 @@ EOF
 7)  Start node                  14) Qclient install/update   
 8)  Restart node                15) Qclient actions
 9)  Node info & balance         
-10) Node status                 16) Auto-update ON/OFF                              
+10) Node status                 16) Auto-update ON/OFF                  
 -----------------------------------------------------------------
-B) ⭐ Best server providers     A) Menu autoload on login                            
-D) 💜 Donations                 H) Help
+B) ⭐ Best server providers     D) 💜 Donations 
+-----------------------------------------------------------------
+P) Prover Pause                  H) Help                                          
+A) Menu autoload on login        X) Disclaimer
 -----------------------------------------------------------------    
-E) Exit                         X) Disclaimer
+E) Exit                         
  
                         
 EOF
@@ -151,6 +153,7 @@ main() {
             [dD]) donations; press_any_key ;;
             [eE]) exit ;;
             [aA]) handle_menu_autoload; press_any_key ;;
+            [pP]) confirm_action "$(wrap_text "$prover_pause_message" "")" "Send a 'Prover Pause' message" prover_pause && prompt_return_to_menu "skip_check" ;;
             [xX]) disclaimer; press_any_key ;;
             [hH]) help_message; press_any_key ;;
             *) echo "Invalid option, please try again."; press_any_key ;;
@@ -197,6 +200,11 @@ If this a fresh node installation, let the node run for 30 minutes before doing 
 peer_manifest_message='
 This action will check the peer manifest to provide information about the difficulty metric score of your node. 
 It only works after 15-30 minutes that the node has been running.
+'
+
+prover_pause_message='
+This action will send a pause message to the newtwork.
+Only use this to avoid penalties if your machine has crashed for hardware failure and cannot recover.
 '
 
 balance_log_message='
@@ -344,20 +352,27 @@ To remove the script completely, run: rm ~/qone.sh
     Restores your node backup from StorJ.
     You need a Storj account https://www.storj.io/ and a Public/Secret access key.
 
-14) System cleaner:
-    Performs system cleanup tasks. It will not affect your node.
-
-15) Qclient install:
+14) Qclient install:
     Installs or update the Qclient, to manage your QUIL tokens via CLI.
 
-16) Qclient actions:
+15) Qclient actions:
     Opens a submenu with serveral actions for the Qclient, like: check balance,
     create transaction, accept transaction etc.  
 
-17) Auto-update ON/OFF:
+16) Auto-update ON/OFF:
     Sets up auto-updates for Node and Qclient via service file and timer.
     If they are already set up, it will activate or deactivate them on user choice.
     The timer checks for updates every 1 hour at a random minute.
+
+ P) Prover Pause:
+    Sends a pause message to the network. Only use this to avoid
+    penalties if your machine has crashed due to hardware failure
+    and cannot recover.
+
+ A) Menu autoload on login:
+    Toggles whether the Q1 menu automatically loads when you
+    log in via SSH. When enabled, provides quick access to
+    node management tools.
 
 '
 
@@ -670,6 +685,36 @@ node_status() {
         '
 
         echo
+    fi
+}
+
+prover_pause() {
+    # First check if the node binary exists
+    if [ -z "$QCLIENT_EXEC" ]; then
+        echo "Error: Qclient not found. Is it installed correctly?"
+        return 1
+    fi
+
+    # Check if the service is running
+    if systemctl is-active --quiet ceremonyclient.service; then
+        echo
+        echo "⚠️ It seems your node is running correctly, are you sure you want to send the \"Prover Pause\" message?"
+        read -p "Proceed? (y/n): " second_confirm
+        if [[ ! "$second_confirm" =~ ^[Yy]$ ]]; then
+            echo "Operation cancelled."
+            return 1
+        fi
+    fi
+
+    echo
+    echo "⌛️ Sending Prover Pause message..."
+    # Execute the prover pause command
+    if "$QCLIENT_EXEC" config prover pause --config "$HOME/ceremonyclient/node/.config"; then
+        echo "✅ Prover Pause message sent successfully."
+        return 0
+    else
+        echo "❌ Failed to send Prover Pause message."
+        return 1
     fi
 }
 
