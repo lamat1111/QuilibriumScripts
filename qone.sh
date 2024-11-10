@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.5.6"
+SCRIPT_VERSION="2.5.7"
 
 # ------------------------------------------------------------------
 SHOW_TEMP_MESSAGE=true  # Toggle to control message visibility
@@ -122,8 +122,10 @@ main() {
             REDRAW_MENU=false
         fi
 
-        read -rp "Enter your choice: " choice
         display_temp_message
+
+        read -rp "Enter your choice: " choice
+        
         
         case $choice in
             1) 
