@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.6.3"
+SCRIPT_VERSION="2.6.4"
 
 # ------------------------------------------------------------------
 SHOW_TEMP_MESSAGE=true  # Toggle to control message visibility
@@ -598,14 +598,16 @@ node_info() {
     else
         echo
         echo "⌛️  Displaying node info..."
-        echo "If this doesn't work you can try the direct commands: https://iri.quest/q-node-info"
         echo
         if [ -d "$NODE_DIR" ]; then
             cd "$NODE_DIR" && ./"$NODE_BINARY" -node-info
         else
             echo "Error: Node directory not found. Is the node installed correctly?"
         fi
-        echo
+        echo "------------------------------------"
+        echo "If this doesn't work you can try the direct commands: https://iri.quest/q-node-info"
+        echo "If you where on public RPC previously, and receive errors when querying your -node-info,"
+        echo "you may want to restart your node and let it run until it begins to sync."
     fi
 }
 
