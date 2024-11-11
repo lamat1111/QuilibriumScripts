@@ -985,6 +985,9 @@ donations() {
 Quilbrium.one is a one-man volunteer effort.
 If you would like to chip in some financial help, thank you!
 
+You can send native QUIL at this address:
+0x13ba39b5a6ad1bcbe4c6d938bc42f678e5ec0863ad24489e4fbd4462e1b6e320
+
 You can send ERC-20 tokens at this address:
 0x0fd383A1cfbcf4d1F493Dd71b798ebca89e8a013
 
