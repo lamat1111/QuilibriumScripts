@@ -604,6 +604,7 @@ node_info() {
         else
             echo "Error: Node directory not found. Is the node installed correctly?"
         fi
+        echo
         echo "------------------------------------"
         echo "If this doesn't work you can try the direct commands: https://iri.quest/q-node-info"
         echo "If you where on public RPC previously, and receive errors when querying your -node-info,"
