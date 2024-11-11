@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.6.2"
+SCRIPT_VERSION="2.6.3"
 
 # ------------------------------------------------------------------
 SHOW_TEMP_MESSAGE=true  # Toggle to control message visibility
@@ -82,14 +82,14 @@ Let your node run for 30 minutes, then choose option 3. Done!
 
 1) Prepare your server  
 2) Install node
-3) Set up gRPCurl   
+3) Set up gRPC   
 
 EOF
     fi
 
     cat << EOF
 -----------------------------------------------------------------
-3)  Set up gRPCurl              11) Balance log
+3)  Set up gRPC                 11) Balance log
 4)  Node Log                    12) Backup your node
 5)  Update node                 13) Restore backup
 6)  Stop node                                
@@ -137,7 +137,7 @@ main() {
                     prompt_return_to_menu
                 fi
                 ;;
-            3) confirm_action "$(wrap_text "$setup_grpcurl_message" "")" "Set up gRPCurl" configure_grpcurl && prompt_return_to_menu "skip_check" ;;
+            3) confirm_action "$(wrap_text "$setup_grpcurl_message" "")" "Set up gRPC" configure_grpcurl && prompt_return_to_menu "skip_check" ;;
             4) node_logs; display_menu "skip_check" ;;
             5) 
                 if confirm_action "$(wrap_text "$update_node_message" "")" "Update node" update_node; then
@@ -322,7 +322,7 @@ To remove the script completely, run: rm ~/qone.sh
     Ensure that your server meets all the requirements and that you have 
     already prepared your server via Step 1.
 
- 3) Set up gRPCurl:
+ 3) Set up gRPC:
     Edits your config.yml to enable communication with the network. 
     If this is a fresh node installation, let the node run for 30 minutes before doing this.
     You can run the action multiple times and it wiill not cause issues.
@@ -419,7 +419,6 @@ configure_grpcurl() {
     curl -sSL -o ~/scripts/qnode_gRPC_calls_setup.sh "$GRPCURL_CONFIG_URL"
     chmod +x ~/scripts/qnode_gRPC_calls_setup.sh
     ~/scripts/qnode_gRPC_calls_setup.sh
-    prompt_return_to_menu
     return $?
 }
 
