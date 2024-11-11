@@ -15,10 +15,12 @@ Description=Run QNode Service Update every 10 minutes at a consistent time
 OnBootSec=5min
 # Runs every 10 minutes
 OnCalendar=*:0/10
-# Random delay up to 10 minutes (600 seconds)
+# Initial random delay up to 10 minutes
 RandomizedDelaySec=600
-# Makes the random delay consistent between restarts
+# Makes the random delay consistent
 FixedRandomDelay=true
+# Keep timing persistent across reboots
+Persistent=true
 Unit=qnode-autoupdate.service
 
 [Install]
