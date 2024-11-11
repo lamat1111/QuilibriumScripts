@@ -76,6 +76,8 @@ setup_local_grpc() {
     echo "listenRESTMultiaddr: \"/ip4/127.0.0.1/tcp/8338\"" | sudo tee -a .config/config.yml > /dev/null || { echo "❌ Failed to enable REST! Exiting..."; exit 1; }
 
     echo "✅ Local gRPC and REST setup completed."
+    echo "⚠️ If you where on public RPC previously, and receive errors when querying your -node-info,"
+    echo "you may want to restart your node and let it run until it begins to sync."
     return 0  # Explicitly return success
 }
 
