@@ -53,8 +53,6 @@ SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
 QUILIBRIUM_RELEASES="https://releases.quilibrium.com"
 NODE_RELEASE_URL="https://releases.quilibrium.com/release"
 QCLIENT_RELEASE_URL="https://releases.quilibrium.com/qclient-release"
-NODE_DIR="$HOME/ceremonyclient/node"
-CLIENT_DIR="$HOME/ceremonyclient/client"
 
 # Check if the service file exists
 # if [ ! -f "$SERVICE_FILE" ]; then
@@ -62,10 +60,6 @@ CLIENT_DIR="$HOME/ceremonyclient/client"
 #     echo "This update script won't work for you. Exiting."
 #     exit 1
 # fi
-
-#==========================
-# UTILITY FUNCTIONS
-#==========================
 
 # Function to display section headers
 display_header() {
@@ -75,33 +69,6 @@ display_header() {
     echo "=============================================================="
     echo
 }
-
-
-# The cleanup function
-cleanup_old_releases() {
-    local directory=$1
-    local prefix=$2
-    
-    echo "⏳ Cleaning up old $prefix releases in $directory..."
-    
-    # Find the latest executable binary (will be the one we want to keep)
-    local current_binary=$(find "$directory" -name "${prefix}-[0-9]*" ! -name "*.dgst" ! -name "*.sig*" -type f -executable 2>/dev/null | sort -V | tail -n 1)
-    
-    if [ -z "$current_binary" ]; then
-        echo "❌ No current $prefix binary found"
-        return 1
-    fi
-    
-    # Get just the filename without the path
-    current_binary=$(basename "$current_binary")
-    echo "Current binary: $current_binary"
-    
-    # Find and delete old files in one go - simpler approach
-    find "$directory" -type f -name "${prefix}-[0-9.]*-${release_os}-${release_arch}*" ! -name "${current_binary}*" -delete
-    
-    echo "✅ Cleanup completed for $prefix"
-}
-
 
 #==========================
 # INSTALL APPS
@@ -387,10 +354,6 @@ if [ "$NODE_NEEDS_UPDATE" = true ]; then
             echo "File $file already exists, skipping"
         fi
     done
-
-    display_header "CLEANING UP OLD NODE RELEASES"
-    cleanup_old_releases "$NODE_DIR" "node"
-
 fi
 
 if [ "$QCLIENT_NEEDS_UPDATE" = true ]; then
@@ -447,10 +410,57 @@ if [ "$QCLIENT_NEEDS_UPDATE" = true ]; then
             echo "File $file already exists, skipping"
         fi
     done
-    
-    display_header "CLEANING UP OLD QCLIENT RELEASES"
-    cleanup_old_releases "$CLIENT_DIR" "qclient"
+fi
 
+
+if [ "$NODE_NEEDS_UPDATE" = true ] && [ "$QCLIENT_NEEDS_UPDATE" = true ]; then
+
+    #==========================
+    # DELETE OLD RELEASES
+    #==========================
+
+    display_header "DELETING OLD RELEASES"
+
+    # Function to clean up old releases
+    cleanup_old_releases() {
+        local directory=$1
+        local current_binary=$2
+        local prefix=$3
+        
+        echo "⏳ Cleaning up old $prefix releases in $directory..."
+        
+        # Get the current version
+        local current_version=$(echo "$current_binary" | grep -o "${prefix}-[0-9.]\+" | sed "s/${prefix}-//")
+        echo "Current version: $current_version"
+        
+        # Direct variable reference in find command
+        find "$directory" -type f -name "${prefix}-[0-9.]*-${release_os}-${release_arch}*" | while read file; do
+            version=$(echo "$file" | grep -o "${prefix}-[0-9.]\+" | sed "s/${prefix}-//")
+            
+            if [ "$version" = "$current_version" ]; then
+                echo "Keeping current version file: $file"
+                continue
+            fi
+            
+            echo "Removing old version file: $file"
+            rm -f "$file"
+        done
+        
+        echo "✅ Cleanup completed for $prefix"
+    }
+
+    # After node binary download and verification
+    echo "⏳ Starting cleanup of old node releases..."
+    sleep 1
+    cleanup_old_releases "$HOME/ceremonyclient/node" "$NODE_BINARY" "node"
+
+    # After qclient binary download and verification
+    echo "⏳ Starting cleanup of old qclient releases..."
+    sleep 1
+    cleanup_old_releases "$HOME/ceremonyclient/client" "$QCLIENT_BINARY" "qclient"
+
+else
+    echo "✅ Skipping deletion of old releases to preserve current installations."
 fi
 
 
