@@ -2,6 +2,28 @@
 
 SCRIPT_VERSION="2.0"
 
+
+# Check for sudo privileges immediately
+check_sudo() {
+    if ! sudo -v &> /dev/null; then
+        cat << EOF
+
+❌ Error: This script requires sudo privileges to run properly.
+Please run this script again with sudo privileges to ensure proper version detection
+and updates.
+
+You can either:
+1. Run the script with sudo: sudo bash <script_name>
+2. Grant your user sudo privileges and try again
+
+EOF
+        exit 1
+    fi
+}
+
+# Run sudo check before anything else
+check_sudo
+
 cat << EOF
 
                     Q1Q1Q1\    Q1\   
