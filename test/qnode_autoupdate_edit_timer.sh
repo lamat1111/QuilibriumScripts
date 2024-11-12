@@ -9,17 +9,12 @@ fi
 # Create the new timer configuration
 cat > /etc/systemd/system/qnode-autoupdate.timer << 'EOF'
 [Unit]
-Description=Run QNode Service Update every 10 minutes at a consistent time
+Description=Run QNode Service Update every hour at a consistent random minute
 
 [Timer]
 OnBootSec=5min
-# Runs every 10 minutes
-OnCalendar=*:0/10
-# Initial random delay up to 10 minutes
-RandomizedDelaySec=600
-# Makes the random delay consistent
-FixedRandomDelay=true
-# Keep timing persistent across reboots
+OnCalendar=hourly
+RandomizedDelaySec=3600
 Persistent=true
 Unit=qnode-autoupdate.service
 
