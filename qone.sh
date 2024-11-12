@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.6.5"
+SCRIPT_VERSION="2.6.6"
 
 # ------------------------------------------------------------------
 SHOW_TEMP_MESSAGE=true  # Toggle to control message visibility
@@ -377,6 +377,9 @@ To remove the script completely, run: rm ~/qone.sh
     Sets up auto-updates for Node and Qclient via service file and timer.
     If they are already set up, it will activate or deactivate them on user choice.
     The timer checks for updates every 1 hour at a random minute.
+    Only use if you run with sudo privileges.
+    In general, not recommended as autoupdating can lead to issues and penalties,
+    if something goes wrong and you are not there to fix the issue.
 
  P) Prover Pause:
     Sends a pause message to the network. Only use this to avoid
@@ -436,6 +439,8 @@ update_node() {
 }
 
 autoupdate_setup() {
+    echo
+    echo "Only use this option if you run your machine with sudo privileges"
     echo
     echo "⌛️ Setting up auto-update..."
     mkdir -p ~/scripts
