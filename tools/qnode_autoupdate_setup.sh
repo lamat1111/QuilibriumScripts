@@ -10,13 +10,16 @@ check_sudo() {
 
 # Function to download and execute the latest script
 download_update_script() {
-    mkdir -p ~/scripts && \
-    curl -sSL "https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/qnode_service_update.sh" -o ~/scripts/qnode_service_update.sh && \
-    chmod +x ~/scripts/qnode_service_update.sh
+    mkdir -p ${HOME}/scripts && \
+    curl -sSL "https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/qnode_service_update.sh" -o ${HOME}/scripts/qnode_service_update.sh && \
+    chmod +x ${HOME}/scripts/qnode_service_update.sh
 }
 
 # Function to create service file
 create_service_file() {
+    # Store the current user's home directory
+    CURRENT_HOME=${HOME}
+    
     cat << EOF > /etc/systemd/system/qnode-autoupdate.service
 [Unit]
 Description=QNode Service Update Script
@@ -24,8 +27,10 @@ After=network.target
 
 [Service]
 Type=oneshot
-ExecStart=/bin/bash $HOME/scripts/qnode_service_update.sh
-User=$(whoami)
+ExecStart=/bin/bash ${CURRENT_HOME}/scripts/qnode_service_update.sh
+User=$(id -un)
+StandardOutput=journal
+StandardError=journal
 
 [Install]
 WantedBy=multi-user.target
@@ -72,7 +77,6 @@ Unit=qnode-autoupdate.service
 WantedBy=timers.target
 EOF
 }
-
 
 # Function to activate service and timer
 activate_service_and_timer() {
