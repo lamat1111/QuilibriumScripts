@@ -56,7 +56,6 @@ fi
 echo "QCLIENT_BINARY set to: $QCLIENT_BINARY"
 
 # Create directories if they don't exist
-mkdir -p "$HOME/ceremonyclient"
 mkdir -p "$HOME/ceremonyclient/client"
 
 echo "Directories created successfully."
