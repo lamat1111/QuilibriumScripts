@@ -33,6 +33,7 @@ OS_ARCH=$(get_os_arch)
 RELEASE_FILES=$(curl -s $RELEASE_FILES_URL | grep -oE "node-[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?-${OS_ARCH}(\.dgst)?(\.sig\.[0-9]+)?")
 
 # Change to the download directory
+mkdir -p ~/ceremonyclient/node
 cd ~/ceremonyclient/node
 
 # Download each file
