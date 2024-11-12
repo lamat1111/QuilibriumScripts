@@ -426,20 +426,27 @@ if [ "$NODE_NEEDS_UPDATE" = true ] && [ "$QCLIENT_NEEDS_UPDATE" = true ]; then
         local directory=$1
         local current_binary=$2
         local prefix=$3
-        local arch_pattern="$release_os-$release_arch"
-
+        
         echo "⏳ Cleaning up old $prefix releases in $directory..."
-
-        # Delete old binary files, .dgst files, and signature files in one go
-        if find "$directory" -type f \( \
-            -name "${prefix}-*-${arch_pattern}" -o \
-            -name "${prefix}-*-${arch_pattern}.dgst" -o \
-            -name "${prefix}-*-${arch_pattern}.dgst.sig.*" \
-        \) ! -name "${current_binary}*" -delete; then
-            echo "✅ Removed old $prefix files (binary, .dgst, and signatures)."
-        else
-            echo "No old $prefix files to remove."
-        fi
+        
+        # Get the current version
+        local current_version=$(echo "$current_binary" | grep -o "${prefix}-[0-9.]\+" | sed "s/${prefix}-//")
+        echo "Current version: $current_version"
+        
+        # Direct variable reference in find command
+        find "$directory" -type f -name "${prefix}-[0-9.]*-${release_os}-${release_arch}*" | while read file; do
+            version=$(echo "$file" | grep -o "${prefix}-[0-9.]\+" | sed "s/${prefix}-//")
+            
+            if [ "$version" = "$current_version" ]; then
+                echo "Keeping current version file: $file"
+                continue
+            fi
+            
+            echo "Removing old version file: $file"
+            rm -f "$file"
+        done
+        
+        echo "✅ Cleanup completed for $prefix"
     }
 
     # After node binary download and verification
