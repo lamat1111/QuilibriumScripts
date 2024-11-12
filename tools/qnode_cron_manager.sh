@@ -27,20 +27,20 @@ show_crontab() {
 
 # Function to modify specific crontab entry
 modify_specific_crontab() {
-    local pattern=$1
+    local script_name=$1
     local action=$2
     local temp_file=$(mktemp)
     
     crontab -l > "$temp_file"
     
     if [ "$action" = "deactivate" ]; then
-        # Check if the line is not already commented and contains the pattern
-        sed -i "/${pattern}/ s/^[^#]/&#/" "$temp_file"
-        echo "Deactivated cronjob containing ${pattern}"
+        # Add anchor to ensure exact match of script name
+        sed -i "/${script_name//./\\.}$/!b;/^#/!s/^/#/" "$temp_file"
+        echo "Deactivated cronjob for ${script_name}"
     elif [ "$action" = "activate" ]; then
-        # Remove any number of leading # characters
-        sed -i "/${pattern}/ s/^#\+//" "$temp_file"
-        echo "Activated cronjob containing ${pattern}"
+        # Add anchor to ensure exact match of script name
+        sed -i "/${script_name//./\\.}$/s/^#*//" "$temp_file"
+        echo "Activated cronjob for ${script_name}"
     fi
     
     crontab "$temp_file"
@@ -56,15 +56,15 @@ modify_all_crontabs() {
     
     if [ "$action" = "deactivate" ]; then
         # Check if the lines are not already commented
-        sed -i '/qnode_rewards_to_gsheet_2\.py/ s/^[^#]/&#/' "$temp_file"
-        sed -i '/qnode_rewards_to_gsheet\.py/ s/^[^#]/&#/' "$temp_file"
-        sed -i '/qnode_balance_checker\.sh/ s/^[^#]/&#/' "$temp_file"
+        sed -i '/qnode_rewards_to_gsheet_2\.py$/!b;/^#/!s/^/#/' "$temp_file"
+        sed -i '/qnode_rewards_to_gsheet\.py$/!b;/^#/!s/^/#/' "$temp_file"
+        sed -i '/qnode_balance_checker\.sh$/!b;/^#/!s/^/#/' "$temp_file"
         echo "Deactivated all node balance monitoring cronjobs."
     elif [ "$action" = "activate" ]; then
         # Remove any number of leading # characters
-        sed -i '/qnode_rewards_to_gsheet_2\.py/ s/^#\+//' "$temp_file"
-        sed -i '/qnode_rewards_to_gsheet\.py/ s/^#\+//' "$temp_file"
-        sed -i '/qnode_balance_checker\.sh/ s/^#\+//' "$temp_file"
+        sed -i '/qnode_rewards_to_gsheet_2\.py$/s/^#*//' "$temp_file"
+        sed -i '/qnode_rewards_to_gsheet\.py$/s/^#*//' "$temp_file"
+        sed -i '/qnode_balance_checker\.sh$/s/^#*//' "$temp_file"
         echo "Activated all node balance monitoring cronjobs."
     fi
     
@@ -102,16 +102,16 @@ case $EXECUTION_MODE in
                     modify_all_crontabs "activate"
                     ;;
                 3)
-                    modify_specific_crontab "qnode_rewards_to_gsheet_2\.py" "deactivate"
+                    modify_specific_crontab "qnode_rewards_to_gsheet_2.py" "deactivate"
                     ;;
                 4)
-                    modify_specific_crontab "qnode_rewards_to_gsheet\.py" "deactivate"
+                    modify_specific_crontab "qnode_rewards_to_gsheet.py" "deactivate"
                     ;;
                 5)
-                    modify_specific_crontab "qnode_rewards_to_gsheet_2\.py" "activate"
+                    modify_specific_crontab "qnode_rewards_to_gsheet_2.py" "activate"
                     ;;
                 6)
-                    modify_specific_crontab "qnode_rewards_to_gsheet\.py" "activate"
+                    modify_specific_crontab "qnode_rewards_to_gsheet.py" "activate"
                     ;;
                 7)
                     echo "Exiting..."
@@ -135,19 +135,19 @@ case $EXECUTION_MODE in
         show_crontab
         ;;
     3)
-        modify_specific_crontab "qnode_rewards_to_gsheet_2\.py" "deactivate"
+        modify_specific_crontab "qnode_rewards_to_gsheet_2.py" "deactivate"
         show_crontab
         ;;
     4)
-        modify_specific_crontab "qnode_rewards_to_gsheet\.py" "deactivate"
+        modify_specific_crontab "qnode_rewards_to_gsheet.py" "deactivate"
         show_crontab
         ;;
     5)
-        modify_specific_crontab "qnode_rewards_to_gsheet_2\.py" "activate"
+        modify_specific_crontab "qnode_rewards_to_gsheet_2.py" "activate"
         show_crontab
         ;;
     6)
-        modify_specific_crontab "qnode_rewards_to_gsheet\.py" "activate"
+        modify_specific_crontab "qnode_rewards_to_gsheet.py" "activate"
         show_crontab
         ;;
 esac
