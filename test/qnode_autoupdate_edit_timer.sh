@@ -36,6 +36,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Restart the timer
+systemctl enable qnode-autoupdate.timer
 systemctl restart qnode-autoupdate.timer
 if [ $? -ne 0 ]; then
     echo "Failed to restart timer"
