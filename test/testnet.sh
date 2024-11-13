@@ -11,8 +11,9 @@ QCLIENT_VERSION="2.0.3"
 HOME=$(eval echo ~$HOME_DIR)
 
 # Use the home directory in the path
-NODE_PATH="$HOME/testnet/node"
+NODE_PATH="$HOME/testnet"
 EXEC_START="$NODE_PATH/node"
+CONFIG_FILE="$HOME/testnet/.config/config.yml"
 
 cat << EOF
 
@@ -57,6 +58,7 @@ else
 fi
 
 
+
 # For DEBIAN OS - Check if sudo is installed
 if ! command -v sudo &> /dev/null; then
     echo "sudo could not be found"
@@ -90,10 +92,10 @@ fi
 
 echo "⏳ Creating Testnet Directories: ~/testnet/node"
 sleep 1
-mkdir -p ~/testnet/node
+mkdir -p $HOME/testnet && cd ~/testnet
 
 # Step 6: Create or Update Ceremonyclient Service
-echo "⏳ Stopping Ceremonyclient Service if running"
+echo "⏳ Stopping Qtest Service if running"
 sudo systemctl stop qtest.service 2>/dev/null || true
 sleep 2
 
@@ -104,8 +106,6 @@ sleep 2
 # Step 4: Download qClient
 echo "⏳Downloading qClient"
 sleep 1
-cd ~/testnet/node
-
 # Always download and overwrite
 wget -O $NODE_BINARY https://releases.quilibrium.com/$NODE_BINARY
 chmod +x $NODE_BINARY
@@ -170,38 +170,13 @@ else
     echo "Service file unchanged"
 fi
 
-# Step 7: Start the ceremonyclient service
-echo "✅Starting Ceremonyclient Testnet Service"
-sleep 1
-sudo systemctl start qtest.service
+# Generate config.yml file
+echo "⏳ Generating .config/config.yml file"
+./node --signature-check=false -peer-id
+sleep 5
 
-# Step 8: Wait for config file generation and update
-echo "⏳ Waiting for config.yml file generation (30 seconds)"
-sleep 30
-
-CONFIG_FILE="$HOME/testnet/node/.config/config.yml"
-
-# Wait for config file to exist
-for i in {1..30}; do
-    if [ -f "$CONFIG_FILE" ]; then
-        break
-    fi
-    echo "Waiting for config file to be generated... (attempt $i/30)"
-    sleep 2
-done
-
-if [ ! -f "$CONFIG_FILE" ]; then
-    echo "Error: Config file was not generated within the timeout period"
-    exit 1
-fi
 
 echo "⏳ Editing config.yml file"
-
-# Backup the original file if it hasn't been backed up yet
-if [ ! -f "${CONFIG_FILE}.bak" ]; then
-    cp "$CONFIG_FILE" "${CONFIG_FILE}.bak"
-fi
-
 # Update bootstrap peers only if they haven't been updated
 if ! grep -q "91.242.214.79" "$CONFIG_FILE"; then
     # Comment out existing bootstrap peers
