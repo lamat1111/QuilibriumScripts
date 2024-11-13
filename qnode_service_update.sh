@@ -77,6 +77,11 @@ NODE_RELEASE_URL="https://releases.quilibrium.com/release"
 QCLIENT_RELEASE_URL="https://releases.quilibrium.com/qclient-release"
 NODE_DIR="$HOME/ceremonyclient/node"
 CLIENT_DIR="$HOME/ceremonyclient/client"
+# Get current node version
+current_node_binary=$(find "$NODE_DIR" -name "node-[0-9]*" ! -name "*.dgst" ! -name "*.sig*" -type f -executable 2>/dev/null | sort -V | tail -n 1)
+if [ -n "$current_node_binary" ]; then
+    CURRENT_NODE_VERSION=$(basename "$current_node_binary" | grep -o '[0-9]\+\.[0-9]\+\(\.[0-9]\+\)*' || echo "")
+fi
 
 # Check if the service file exists
 # if [ ! -f "$SERVICE_FILE" ]; then
