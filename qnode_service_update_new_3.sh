@@ -355,7 +355,7 @@ if [ "$NODE_NEEDS_UPDATE" = true ]; then
         FREE_SPACE=$(df -k "$NODE_DIR" | awk 'NR==2 {print $4}')
         REQUIRED_FREE_PERCENT=20
 
-        # Calculate required space (config size + 15% of total space)
+        # Calculate required space (config size + x% of total space)
         REQUIRED_SPACE=$((CONFIG_SIZE + (TOTAL_SPACE * REQUIRED_FREE_PERCENT / 100)))
 
         echo "📊 Space Analysis:"
@@ -382,13 +382,12 @@ if [ "$NODE_NEEDS_UPDATE" = true ]; then
             else
                 echo "⏳ Starting backup process..."
 
-                # Remove any existing backup
-                BACKUP_PATH="$NODE_DIR/.config_bak_${CURRENT_NODE_VERSION}"
-                if [ -d "$BACKUP_PATH" ]; then
-                    echo "⏳ Removing existing backup..."
-                    rm -rf "$BACKUP_PATH"
-                fi
+                # Remove any existing backup - matching any config backup with q1backup pattern
+                echo "⏳ Cleaning up any existing backups..."
+                find "$NODE_DIR" -maxdepth 1 -name ".config_q1backup_*" -type d -exec rm -rf {} \;
 
+                # Create new backup with updated naming convention
+                BACKUP_PATH="$NODE_DIR/.config_q1backup_${CURRENT_NODE_VERSION}"
                 echo "⏳ Creating backup at: $BACKUP_PATH"
                 
                 if cp -r "$NODE_DIR/.config" "$BACKUP_PATH"; then
