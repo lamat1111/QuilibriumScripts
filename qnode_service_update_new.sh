@@ -340,6 +340,69 @@ if [ "$NODE_NEEDS_UPDATE" = true ]; then
     sleep 1
 
     #==========================
+    # .CONFIG BACKUP
+    #==========================
+
+    display_header "CONFIG BACKUP"
+
+    # Check if .config exists
+    if [ ! -d "$NODE_DIR/.config" ]; then
+        echo "⚠️ No .config directory found. Skipping backup..."
+    else
+        # Calculate sizes
+        CONFIG_SIZE=$(du -s "$NODE_DIR/.config" | awk '{print $1}')
+        TOTAL_SPACE=$(df -k "$NODE_DIR" | awk 'NR==2 {print $2}')
+        FREE_SPACE=$(df -k "$NODE_DIR" | awk 'NR==2 {print $4}')
+        REQUIRED_FREE_PERCENT=15
+
+        # Calculate required space (config size + 15% of total space)
+        REQUIRED_SPACE=$((CONFIG_SIZE + (TOTAL_SPACE * REQUIRED_FREE_PERCENT / 100)))
+
+        echo "📊 Space Analysis:"
+        echo "- Config Size: $((CONFIG_SIZE/1024)) MB"
+        echo "- Free Space: $((FREE_SPACE/1024)) MB"
+        echo "- Required Free Space: $((REQUIRED_SPACE/1024)) MB"
+
+        # Check if we have enough space
+        if [ $FREE_SPACE -lt $REQUIRED_SPACE ]; then
+            echo "❌ Not enough free space for safe backup."
+            echo "⚠️ Required: $((REQUIRED_SPACE/1024)) MB, Available: $((FREE_SPACE/1024)) MB"
+            echo "⚠️ Skipping backup to prevent disk space issues..."
+        else
+            # Ask user with timeout
+            echo
+            echo "Would you like to backup your .config folder? [Y/n]"
+            echo "Auto-selecting YES in 15 seconds..."
+            
+            read -t 15 -r REPLY
+            REPLY=${REPLY:-Y}
+            
+            if [[ ! $REPLY =~ ^[Yy]$ ]] && [ ! -z "$REPLY" ]; then
+                echo "❌ Backup skipped by user."
+            else
+                echo "⏳ Starting backup process..."
+
+                # Remove any existing backup
+                BACKUP_PATH="$NODE_DIR/.config_bak_${CURRENT_NODE_VERSION}"
+                if [ -d "$BACKUP_PATH" ]; then
+                    echo "⏳ Removing existing backup..."
+                    rm -rf "$BACKUP_PATH"
+                fi
+
+                echo "⏳ Creating backup at: $BACKUP_PATH"
+                
+                if cp -r "$NODE_DIR/.config" "$BACKUP_PATH"; then
+                    echo "✅ Backup completed successfully!"
+                    echo "📂 Backup location: $BACKUP_PATH"
+                else
+                    echo "❌ Backup failed!"
+                    rm -rf "$BACKUP_PATH" 2>/dev/null
+                fi
+            fi
+        fi
+    fi
+
+    #==========================
     # CEREMONYCLIENT REPO UPDATE
     #==========================
 
@@ -414,6 +477,10 @@ if [ "$NODE_NEEDS_UPDATE" = true ]; then
             echo "File $file already exists, skipping"
         fi
     done
+
+    #==========================
+    # CLEAN UP OLD RELEASE
+    #==========================
 
     display_header "CLEANING UP OLD NODE RELEASES"
     cleanup_old_releases "$NODE_DIR" "node"
