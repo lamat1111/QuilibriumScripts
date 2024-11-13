@@ -1,10 +1,18 @@
 #!/bin/bash
+
+
+SCRIPT_VERSION="1.3"
+
 # Set the version number
-
 NODE_VERSION="2.0.3-b9-testnet"
-QCLIENT_VERSION="2.0.2.4"
+QCLIENT_VERSION="2.0.3"
 
-SCRIPT_VERSION="1.2"
+# Get the current user's home directory
+HOME=$(eval echo ~$HOME_DIR)
+
+# Use the home directory in the path
+NODE_PATH="$HOME/testnet/node"
+EXEC_START="$NODE_PATH/node"
 
 cat << EOF
 
@@ -119,14 +127,6 @@ cp -p ./$QCLIENT_BINARY ./qclient
 echo "copied $QCLIENT_BINARY to qclient"
 echo "✅ qClient binary for testnet downloaded and permissions configured completed."
 echo
-
-# Step 5: Determine the ExecStart line based on the architecture
-# Get the current user's home directory
-HOME=$(eval echo ~$HOME_DIR)
-
-# Use the home directory in the path
-NODE_PATH="$HOME/testnet/node"
-EXEC_START="$NODE_PATH/node"
 
 # Check if this is a cluster node by examining the existing service file
 if [ -f "/lib/systemd/system/qtest.service" ]; then
