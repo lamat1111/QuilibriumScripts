@@ -34,12 +34,12 @@ modify_specific_crontab() {
     crontab -l > "$temp_file"
     
     if [ "$action" = "deactivate" ]; then
-        # Add anchor to ensure exact match of script name
-        sed -i "/${script_name//./\\.}$/!b;/^#/!s/^/#/" "$temp_file"
+        # Use word boundaries to ensure exact match
+        sed -i "\|\b${script_name}\b|{/^#/!s/^/#/}" "$temp_file"
         echo "Deactivated cronjob for ${script_name}"
     elif [ "$action" = "activate" ]; then
-        # Add anchor to ensure exact match of script name
-        sed -i "/${script_name//./\\.}$/s/^#*//" "$temp_file"
+        # Use word boundaries to ensure exact match
+        sed -i "\|\b${script_name}\b|s/^#*//" "$temp_file"
         echo "Activated cronjob for ${script_name}"
     fi
     
@@ -55,16 +55,15 @@ modify_all_crontabs() {
     crontab -l > "$temp_file"
     
     if [ "$action" = "deactivate" ]; then
-        # Check if the lines are not already commented
-        sed -i '/qnode_rewards_to_gsheet_2\.py$/!b;/^#/!s/^/#/' "$temp_file"
-        sed -i '/qnode_rewards_to_gsheet\.py$/!b;/^#/!s/^/#/' "$temp_file"
-        sed -i '/qnode_balance_checker\.sh$/!b;/^#/!s/^/#/' "$temp_file"
+        # More precise matching for each script
+        sed -i '\|\bqnode_rewards_to_gsheet_2\.py\b|{/^#/!s/^/#/}' "$temp_file"
+        sed -i '\|\bqnode_rewards_to_gsheet\.py\b|{/^#/!s/^/#/}' "$temp_file"
+        sed -i '\|\bqnode_balance_checker\.sh\b|{/^#/!s/^/#/}' "$temp_file"
         echo "Deactivated all node balance monitoring cronjobs."
     elif [ "$action" = "activate" ]; then
-        # Remove any number of leading # characters
-        sed -i '/qnode_rewards_to_gsheet_2\.py$/s/^#*//' "$temp_file"
-        sed -i '/qnode_rewards_to_gsheet\.py$/s/^#*//' "$temp_file"
-        sed -i '/qnode_balance_checker\.sh$/s/^#*//' "$temp_file"
+        sed -i '\|\bqnode_rewards_to_gsheet_2\.py\b|s/^#*//' "$temp_file"
+        sed -i '\|\bqnode_rewards_to_gsheet\.py\b|s/^#*//' "$temp_file"
+        sed -i '\|\bqnode_balance_checker\.sh\b|s/^#*//' "$temp_file"
         echo "Activated all node balance monitoring cronjobs."
     fi
     
