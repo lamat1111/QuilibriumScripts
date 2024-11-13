@@ -8,7 +8,7 @@
 #Comment out for automatic creation of the qclient version
 #QCLIENT_VERSION=2.0.2.4
 
-SCRIPT_VERSION="2.0"
+SCRIPT_VERSION="2.1"
 
 cat << EOF
 
@@ -338,6 +338,7 @@ sleep 1
 calculate_gomaxprocs() {
     local ram_gb=$(free -g | awk '/^Mem:/{print $2}')
     local cpu_cores=$(nproc)
+    local original_calc=0
     
     # Check if RAM is at least double the number of CPU cores
     if [ $ram_gb -ge $((cpu_cores * 2)) ]; then
@@ -348,15 +349,34 @@ calculate_gomaxprocs() {
             gomaxprocs=$cpu_cores
         fi
         gomaxprocs=$((gomaxprocs + 1))
-        echo $gomaxprocs
+        original_calc=$gomaxprocs
+        
+        # Ensure GOMAXPROCS is never less than 4
+        if [ $gomaxprocs -lt 4 ]; then
+            echo "WARNING:$original_calc:4"  # Special format to handle warning
+        else
+            echo $gomaxprocs
+        fi
     fi
 }
 
-GOMAXPROCS=$(calculate_gomaxprocs)
+GOMAXPROCS_OUTPUT=$(calculate_gomaxprocs)
 
-if [ "$GOMAXPROCS" -eq "0" ]; then
+# Parse the output to handle warning case
+if [[ $GOMAXPROCS_OUTPUT == WARNING:*:* ]]; then
+    # Extract original and new values from warning output
+    ORIGINAL_CALC=$(echo $GOMAXPROCS_OUTPUT | cut -d':' -f2)
+    GOMAXPROCS=4
+    display_header "⚠️  WARNING: INSUFFICIENT RESOURCES DETECTED"
+    echo "You only have enough RAM to run ${ORIGINAL_CALC} cores, which are not sufficient for your node."
+    echo "We have still set your service to run the minimum number of cores (4),"
+    echo "but you will likely have OOM (out of memory errors) once the node begins to produce proofs."
+    echo
+elif [ "$GOMAXPROCS_OUTPUT" -eq "0" ]; then
+    GOMAXPROCS=0
     echo "✅ RAM is sufficient (at least double the CPU cores). GOMAXPROCS setting is not needed."
 else
+    GOMAXPROCS=$GOMAXPROCS_OUTPUT
     echo "✅ GOMAXPROCS has been set to $GOMAXPROCS based on your server's resources."
 fi
 echo
