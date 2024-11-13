@@ -631,16 +631,16 @@ if [ -f "$CONFIG_FILE1" ] || [ -f "$CONFIG_FILE2" ]; then
         
         echo "✅ Checking node version in config file '$(basename "$config_file")'."
         
-        # Get the current NODE_BINARY from the config file
-        config_node_binary=$(grep "^NODE_BINARY=" "$config_file" | cut -d '=' -f 2 | tr -d '"' | tr -d "'")
+        # Get the current NODE_BINARY from the config file - handle both formats
+        config_node_binary=$(grep -E "^NODE_BINARY\s*=\s*" "$config_file" | sed -E 's/^NODE_BINARY\s*=\s*//' | tr -d '"' | tr -d "'")
         
         if [ -z "$config_node_binary" ]; then
             echo "❌ Could not find NODE_BINARY in config file"
             return
         fi
         
-        # Compare NODE_BINARY values
-        if [ "$config_node_binary" = "$NODE_BINARY" ]; then
+        # Compare NODE_BINARY values after trimming any whitespace
+        if [ "$(echo "$config_node_binary" | tr -d '[:space:]')" = "$(echo "$NODE_BINARY" | tr -d '[:space:]')" ]; then
             echo "NODE_BINARY values match. No update needed."
         else
             echo "⏳ NODE_BINARY values differ. Updating config file..."
@@ -650,8 +650,17 @@ if [ -f "$CONFIG_FILE1" ] || [ -f "$CONFIG_FILE2" ]; then
             # Create a backup of the config file
             cp "$config_file" "${config_file}.backup"
             
-            # Update the config file using a temporary file to handle special characters
-            sed "s|^NODE_BINARY=.*|NODE_BINARY=$NODE_BINARY|" "$config_file" > "${config_file}.tmp"
+            # Update the config file preserving the original spacing format
+            # First, detect the format used in the file
+            if grep -q "^NODE_BINARY\s*=\s*" "$config_file"; then
+                # Format with spaces exists, preserve it
+                original_format=$(grep -E "^NODE_BINARY\s*=\s*" "$config_file" | sed -E 's/NODE_BINARY(\s*=\s*).*/\1/')
+                sed -E "s|^NODE_BINARY\s*=\s*.*|NODE_BINARY${original_format}${NODE_BINARY}|" "$config_file" > "${config_file}.tmp"
+            else
+                # No spaces format
+                sed "s|^NODE_BINARY=.*|NODE_BINARY=${NODE_BINARY}|" "$config_file" > "${config_file}.tmp"
+            fi
+            
             mv "${config_file}.tmp" "$config_file"
             
             if [ $? -eq 0 ]; then
