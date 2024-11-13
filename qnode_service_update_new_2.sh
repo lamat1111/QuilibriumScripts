@@ -353,15 +353,15 @@ if [ "$NODE_NEEDS_UPDATE" = true ]; then
         CONFIG_SIZE=$(du -s "$NODE_DIR/.config" | awk '{print $1}')
         TOTAL_SPACE=$(df -k "$NODE_DIR" | awk 'NR==2 {print $2}')
         FREE_SPACE=$(df -k "$NODE_DIR" | awk 'NR==2 {print $4}')
-        REQUIRED_FREE_PERCENT=15
+        REQUIRED_FREE_PERCENT=20
 
         # Calculate required space (config size + 15% of total space)
         REQUIRED_SPACE=$((CONFIG_SIZE + (TOTAL_SPACE * REQUIRED_FREE_PERCENT / 100)))
 
         echo "📊 Space Analysis:"
-        echo "- Config Size: $((CONFIG_SIZE/1024)) MB"
-        echo "- Free Space: $((FREE_SPACE/1024)) MB"
-        echo "- Required Free Space: $((REQUIRED_SPACE/1024)) MB"
+        echo "- Config Folder Size: $((CONFIG_SIZE/1024)) MB"
+        echo "- Current Free Space: $((FREE_SPACE/1024)) MB"
+        echo "- Required Free Space (current + $REQUIRED_FREE_PERCENT%): $((REQUIRED_SPACE/1024)) MB"
 
         # Check if we have enough space
         if [ $FREE_SPACE -lt $REQUIRED_SPACE ]; then
@@ -372,9 +372,9 @@ if [ "$NODE_NEEDS_UPDATE" = true ]; then
             # Ask user with timeout
             echo
             echo "Would you like to backup your .config folder? [Y/n]"
-            echo "Auto-selecting YES in 15 seconds..."
+            echo "Auto-selecting YES in 20 seconds..."
             
-            read -t 15 -r REPLY
+            read -t 20 -r REPLY
             REPLY=${REPLY:-Y}
             
             if [[ ! $REPLY =~ ^[Yy]$ ]] && [ ! -z "$REPLY" ]; then
