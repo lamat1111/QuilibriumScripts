@@ -1,7 +1,19 @@
 #!/bin/bash
 
-SERVICE_NAME=ceremonyclient
-#SERVICE_NAME=qmaster
+# Description:
+# This script analyzes proof submission rates from either the qmaster or ceremonyclient service.
+# It calculates submission rates, trends, and provides statistical analysis over a specified time window.
+# The script automatically checks for qmaster service first, falling back to ceremonyclient if not found.
+#
+# Usage: ./script.sh [minutes]
+# Default time window is 180 minutes (3 hours)
+
+# Check if qmaster service exists
+if systemctl list-units --full -all | grep -Fq "qmaster.service"; then
+    SERVICE_NAME=qmaster
+else
+    SERVICE_NAME=ceremonyclient
+fi
 
 # Colors and formatting
 BOLD='\033[1m'
@@ -36,10 +48,10 @@ HOURS_AGO=$((MINUTES_AGO / 60))
 TEMP_FILE=$(mktemp)
 RATE_DATA=$(mktemp)
 
-# Get logs and extract timestamps
 print_header "📊 COLLECTING DATA"
 echo -e "Analyzing proof submissions for the last ${BOLD}$MINUTES_AGO${RESET} minutes..."
 
+# Extract timestamps
 journalctl -u $SERVICE_NAME.service --since "${HOURS_AGO} hours ago" | \
     grep -F "msg\":\"submitting data proof" | \
     sed -E 's/.*"ts":([0-9]+\.[0-9]+).*/\1/' > "$TEMP_FILE"
@@ -62,34 +74,30 @@ if [ -s "$TEMP_FILE" ]; then
     RATE_PER_HOUR=$(echo "$TOTAL_PROOFS / $HOURS" | bc -l)
     RATE_PER_MINUTE=$(echo "$TOTAL_PROOFS / $MINUTES" | bc -l)
     
-    # Divide the time window into 10-minute intervals for rate calculation
+    # Divide time window into 10-minute intervals for regression
     INTERVAL=600  # 10 minutes in seconds
-    
-    # Generate rate data points for regression
     current_ts=$FIRST_TS
     while (( $(echo "$current_ts < $LAST_TS" | bc -l) )); do
         next_ts=$(echo "$current_ts + $INTERVAL" | bc -l)
         count=$(awk -v start="$current_ts" -v end="$next_ts" '$1 >= start && $1 < end' "$TEMP_FILE" | wc -l)
-        # Output: time_offset_in_hours rate_per_hour
         time_offset=$(echo "($current_ts - $FIRST_TS) / 3600" | bc -l)
         rate=$(echo "$count * (3600 / $INTERVAL)" | bc -l)
         echo "$time_offset $rate" >> "$RATE_DATA"
         current_ts=$next_ts
     done
     
-    # Calculate linear regression using awk
+    # Calculate linear regression
     REGRESSION=$(awk '
     BEGIN {
         sum_x = 0; sum_y = 0
         sum_xy = 0; sum_xx = 0
-        sum_yy = 0; n = 0
+        n = 0
     }
     {
         x = $1; y = $2
         sum_x += x; sum_y += y
         sum_xy += x * y
         sum_xx += x * x
-        sum_yy += y * y
         n++
     }
     END {
@@ -97,28 +105,14 @@ if [ -s "$TEMP_FILE" ]; then
             printf "0 0 0"
             exit
         }
-        mean_x = sum_x / n
-        mean_y = sum_y / n
-        
         slope = (n * sum_xy - sum_x * sum_y) / (n * sum_xx - sum_x * sum_x)
-        intercept = mean_y - slope * mean_x
-        
-        ss_tot = 0; ss_res = 0
-        for (i = 1; i <= n; i++) {
-            x = $1; y = $2
-            y_pred = slope * x + intercept
-            ss_tot += (y - mean_y) * (y - mean_y)
-            ss_res += (y - y_pred) * (y - y_pred)
-        }
-        r_squared = (ss_tot > 0) ? (1 - ss_res / ss_tot) : 0
-        
-        printf "%.6f %.6f %.6f", slope, intercept, r_squared
+        r_squared = (sum_xy - sum_x * sum_y / n)^2 / \
+                   ((sum_xx - sum_x^2/n) * (sum_yy - sum_y^2/n))
+        printf "%.6f %.6f", slope, r_squared
     }' "$RATE_DATA")
     
-    # Extract regression values
     SLOPE=$(echo "$REGRESSION" | cut -d' ' -f1)
-    INTERCEPT=$(echo "$REGRESSION" | cut -d' ' -f2)
-    R_SQUARED=$(echo "$REGRESSION" | cut -d' ' -f3)
+    R_SQUARED=$(echo "$REGRESSION" | cut -d' ' -f2)
     
     # Calculate percentage change per hour
     PCT_CHANGE_PER_HOUR=$(echo "($SLOPE / $RATE_PER_HOUR) * 100" | bc -l)
@@ -140,16 +134,15 @@ if [ -s "$TEMP_FILE" ]; then
     
     if (( $(echo "$R_SQUARED > 0.7" | bc -l) )); then
         CONFIDENCE_COLOR=$GREEN
-        CONFIDENCE="High confidence"
+        CONFIDENCE="High"
     elif (( $(echo "$R_SQUARED > 0.3" | bc -l) )); then
         CONFIDENCE_COLOR=$YELLOW
-        CONFIDENCE="Medium confidence"
+        CONFIDENCE="Medium"
     else
         CONFIDENCE_COLOR=$RED
-        CONFIDENCE="Low confidence"
+        CONFIDENCE="Low"
     fi
     
-    # Output sections
     print_header "📈 OVERALL STATISTICS"
     echo -e "Time Window:    ${BOLD}$(printf "%.1f" $HOURS)${RESET} hours (${BOLD}$(printf "%.1f" $MINUTES)${RESET} minutes)"
     echo -e "Total Proofs:   ${BOLD}$TOTAL_PROOFS${RESET}"
@@ -162,14 +155,14 @@ if [ -s "$TEMP_FILE" ]; then
     echo -e "Rate Change:    $(format_value $SLOPE "proofs/hr²")"
     echo -e "Change Rate:    ${TREND_COLOR}$(printf "%+.2f" $PCT_CHANGE_PER_HOUR)%%${RESET} per hour"
     echo -e "Trend:         ${TREND_COLOR}$TREND_ARROW ${BOLD}$TREND${RESET}"
-    echo -e "Confidence:    ${CONFIDENCE_COLOR}$CONFIDENCE${RESET} (R² = $(printf "%.4f" $R_SQUARED))"
+    echo -e "Confidence:    ${CONFIDENCE_COLOR}$CONFIDENCE${RESET} confidence (R² = $(printf "%.4f" $R_SQUARED))"
     
     print_header "📋 SUMMARY"
     echo -e "${BOLD}${TREND_COLOR}$TREND_ARROW${RESET} Proof submission rate is ${TREND_COLOR}${BOLD}$TREND${RESET} at"
-    echo -e "   ${BOLD}$(printf "%+.2f" $PCT_CHANGE_PER_HOUR)%%${RESET} per hour with ${CONFIDENCE_COLOR}${BOLD}$CONFIDENCE${RESET}"
+    echo -e "   ${BOLD}$(printf "%+.2f" $PCT_CHANGE_PER_HOUR)%%${RESET} per hour with ${CONFIDENCE_COLOR}${BOLD}$CONFIDENCE${RESET} confidence"
 else
     echo -e "\n${RED}${BOLD}No proofs found in the last $MINUTES_AGO minutes${RESET}"
 fi
 
 # Cleanup
-rm "$TEMP_FILE" "$RATE_DATA"
+rm -f "$TEMP_FILE" "$RATE_DATA"
