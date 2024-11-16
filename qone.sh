@@ -96,7 +96,7 @@ EOF
 7)  Start node                  14) Qclient install/update
 8)  Restart node                15) Qclient actions
 9)  Node info & balance          
-10) Node status                 16) Proof rate check (BETA)
+10) Node status                 16) Proofs rate check (BETA)
 -----------------------------------------------------------------
 P) Prover Pause                  H) Help 
 A) Auto-update ON/OFF            X) Disclaimer                                             

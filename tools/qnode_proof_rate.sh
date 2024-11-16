@@ -147,6 +147,10 @@ if [ -s "$TEMP_FILE" ]; then
         CONFIDENCE_COLOR=$RED
         CONFIDENCE="Low"
     fi
+
+    echo "This script is still in BETA, feel free to post"
+    echo "your suggestions for improvements in the Q1 Telegram channel"
+    echo
     
     print_header "📈 OVERALL STATISTICS"
     echo -e "Time Window:    ${BOLD}$(printf "%.1f" $HOURS)${RESET} hours (${BOLD}$(printf "%.1f" $MINUTES)${RESET} minutes)"
