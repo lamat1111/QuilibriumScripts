@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.6.6"
+SCRIPT_VERSION="2.6.7"
 
 # ------------------------------------------------------------------
 SHOW_TEMP_MESSAGE=true  # Toggle to control message visibility
@@ -160,6 +160,7 @@ main() {
                 ;;
             15) qclient_actions; clear; display_menu "skip_check" ;;
             16) toggle_autoupdate; press_any_key ;;
+            16) proof_rate; press_any_key ;;
             [bB]) best_providers; press_any_key ;;
             [dD]) donations; press_any_key ;;
             [eE]) exit ;;
@@ -380,6 +381,12 @@ To remove the script completely, run: rm ~/qone.sh
     Only use if you run with sudo privileges.
     In general, not recommended as autoupdating can lead to issues and penalties,
     if something goes wrong and you are not there to fix the issue.
+
+17) Proof rate monitor:
+    Calculates the rate at which your node is submitting proofs in the last 3 hours.
+    To run for a different time window you can run:
+    '\$HOME/scripts/qnode_proof_rate.sh \x', where x is a number of minutes,
+    e.g. \$HOME/scripts/qnode_proof_rate.sh 600
 
  P) Prover Pause:
     Sends a pause message to the network. Only use this to avoid
@@ -705,6 +712,20 @@ node_status() {
     fi
 }
 
+proof_rate() {
+    if [ ! -f "$SERVICE_FILE" ]; then
+        echo "$MISSING_SERVICE_MSG"
+        press_any_key
+    else
+        echo
+        mkdir -p ~/scripts
+        curl -sSL -o ~/scripts/qnode_proof_rate.sh "$PROOF_RATE_URL"
+        chmod +x ~/scripts/qnode_proof_rate.sh
+        ~/scripts/qnode_proof_rate.sh
+        return $?
+    fi
+}
+
 prover_pause() {
     # First check if the node binary exists
     if [ -z "$QCLIENT_EXEC" ]; then
@@ -902,6 +923,7 @@ BACKUP_RESTORE_STORJ_URL="https://raw.githubusercontent.com/lamat1111/Quilibrium
 BALANCE_LOG_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_balance_checker_installer.sh"
 QCLIENT_ACTIONS_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/tools/qclient_actions.sh"
 AUTOUPDATE_SETUP_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_autoupdate_setup.sh"
+PROOF_RATE_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_proof_rate.sh"
 
 TEST_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/test/test_script.sh"
 
