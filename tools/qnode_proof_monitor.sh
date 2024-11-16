@@ -4,6 +4,18 @@
 # This script analyzes proof creation and submission frame ages to determine
 # likelihood of proofs landing successfully.
 # It analyzes both "creating data shard ring proof" and "submitting data proof" events.
+#
+# Usage: ./script.sh [minutes]
+# Example: ./script.sh 600    # analyzes last 10 hours
+
+# Default time window in minutes (1 hour by default)
+DEFAULT_TIME_WINDOW=180
+
+# Get time window from command line argument or use default
+TIME_WINDOW=${1:-$DEFAULT_TIME_WINDOW}
+
+# Convert minutes to hours for journalctl (rounded up)
+HOURS_AGO=$(( (TIME_WINDOW + 59) / 60 ))
 
 # Service Configuration
 if systemctl list-units --full -all | grep -Fq "qmaster.service"; then
@@ -69,14 +81,14 @@ TEMP_CREATE=$(mktemp)
 TEMP_SUBMIT=$(mktemp)
 
 print_header "📊 COLLECTING DATA"
-echo -e "Analyzing proof submissions for the last hour..."
+echo -e "Analyzing proof submissions for the last ${BOLD}$TIME_WINDOW${RESET} minutes (${BOLD}$HOURS_AGO${RESET} hours)..."
 
 # Extract creation and submission data with rounded integers
-journalctl -u $SERVICE_NAME.service --since "1 hour ago" | grep -F "creating data shard ring proof" | \
+journalctl -u $SERVICE_NAME.service --since "$HOURS_AGO hours ago" | grep -F "creating data shard ring proof" | \
     sed -E 's/.*"frame_number":([0-9]+).*"frame_age":([0-9]+\.[0-9]+).*/\1 \2/' | \
     awk '{printf "%d %d\n", $1, $2}' > "$TEMP_CREATE"
 
-journalctl -u $SERVICE_NAME.service --since "1 hour ago" | grep -F "submitting data proof" | \
+journalctl -u $SERVICE_NAME.service --since "$HOURS_AGO hours ago" | grep -F "submitting data proof" | \
     sed -E 's/.*"frame_number":([0-9]+).*"frame_age":([0-9]+\.[0-9]+).*/\1 \2/' | \
     awk '{printf "%d %d\n", $1, $2}' > "$TEMP_SUBMIT"
 
@@ -111,20 +123,24 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
         echo -e "Most of your proofs are within optimal ranges and likely to land successfully"
     elif (( CREATE_OPTIMAL_PCT + $(( CREATE_STATS[1] * 100 / TOTAL_CREATES )) >= 70 )); then
         echo -e "Status: ${YELLOW}${BOLD}SUBOPTIMAL${RESET} 🟡"
-        echo -e "Some proofs may not land successfully. Consider checking system resources."
+        echo -e "Some proofs are at the limit of optimal ranges may not land successfully."
     else
         echo -e "Status: ${RED}${BOLD}CRITICAL${RESET} 🔴"
-        echo -e "Many proofs are outside optimal ranges. System may need attention."
+        echo -e "Many proofs are outside optimal ranges and may not land."
     fi
     
 else
-    echo -e "\n${RED}${BOLD}No proofs found in the last hour${RESET}"
+    echo -e "\n${RED}${BOLD}No proofs found in the last $TIME_WINDOW minutes${RESET}"
 fi
 
 # Cleanup
 rm -f "$TEMP_CREATE" "$TEMP_SUBMIT"
 
-# Print footer with optimal ranges
-print_header "ℹ️ OPTIMAL RANGES"
+# Print footer with optimal ranges and usage
+print_header "ℹ️ USAGE INFO"
+echo -e "Optimal ranges:"
 echo -e "Creation stage:  ${BOLD}$CREATION_OPTIMAL_MIN-$CREATION_OPTIMAL_MAX${RESET} seconds"
 echo -e "Submission stage: ${BOLD}$SUBMISSION_OPTIMAL_MIN-$SUBMISSION_OPTIMAL_MAX${RESET} seconds"
+echo -e "\nTo analyze a different time window:"
+echo -e "$HOME/scripts/qnode_proof_monitor.sh [minutes]"
+echo -e "Example: $HOME/scripts/qnode_proof_monitor.sh 600  # analyzes last 10 hours"
