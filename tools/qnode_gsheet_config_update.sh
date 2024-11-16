@@ -6,10 +6,11 @@ QNODE_DIR="$HOME/ceremonyclient/node"
 
 # Get current node version
 QNODE_BINARY_LOCAL=$(find "$QNODE_DIR" -name "node-[0-9]*" ! -name "*.dgst" ! -name "*.sig*" -type f -executable 2>/dev/null | sort -V | tail -n 1)
-if [ -n "$QNODE_BINARY_LOCAL" ]; then  # Fixed typo in variable name QNODE_BINARY_LOCALL -> QNODE_BINARY_LOCAL
+if [ -n "$QNODE_BINARY_LOCAL" ]; then
     QNODE_VERSION_LOCAL=$(basename "$QNODE_BINARY_LOCAL" | grep -o '[0-9]\+\.[0-9]\+\(\.[0-9]\+\)*' || echo "")
+    QNODE_BINARY_NAME=$(basename "$QNODE_BINARY_LOCAL")  # Get just the binary name without path
     echo "Found local node version: $QNODE_VERSION_LOCAL"
-    echo "Local binary path: $QNODE_BINARY_LOCAL"
+    echo "Local binary name: $QNODE_BINARY_NAME"
 else
     echo "❌ No local node binary found in $QNODE_DIR"
     exit 1
@@ -52,13 +53,13 @@ if [ -f "$CONFIG_FILE1" ] || [ -f "$CONFIG_FILE2" ]; then
 
         echo "Config file currently has: $config_node_binary"
         
-        # Compare binary paths after trimming any whitespace
-        if [ "$(echo "$config_node_binary" | tr -d '[:space:]')" = "$(echo "$QNODE_BINARY_LOCAL" | tr -d '[:space:]')" ]; then
-            echo "✅ Node binary paths match. No update needed."
+        # Compare just the binary names after trimming any whitespace
+        if [ "$(echo "$config_node_binary" | tr -d '[:space:]')" = "$(echo "$QNODE_BINARY_NAME" | tr -d '[:space:]')" ]; then
+            echo "✅ Node binary names match. No update needed."
         else
-            echo "⏳ Node binary paths differ. Updating config file..."
+            echo "⏳ Node binary names differ. Updating config file..."
             echo "Current value: $config_node_binary"
-            echo "New value: $QNODE_BINARY_LOCAL"
+            echo "New value: $QNODE_BINARY_NAME"
             
             # Create a backup of the config file
             cp "$config_file" "${config_file}.backup"
@@ -67,10 +68,10 @@ if [ -f "$CONFIG_FILE1" ] || [ -f "$CONFIG_FILE2" ]; then
             if grep -q "^NODE_BINARY\s*=\s*" "$config_file"; then
                 # Format with spaces exists, preserve it
                 original_format=$(grep -E "^NODE_BINARY\s*=\s*" "$config_file" | sed -E 's/NODE_BINARY(\s*=\s*).*/\1/')
-                sed -E "s|^NODE_BINARY\s*=\s*.*|NODE_BINARY${original_format}${QNODE_BINARY_LOCAL}|" "$config_file" > "${config_file}.tmp"
+                sed -E "s|^NODE_BINARY\s*=\s*.*|NODE_BINARY${original_format}${QNODE_BINARY_NAME}|" "$config_file" > "${config_file}.tmp"
             else
                 # No spaces format
-                sed "s|^NODE_BINARY=.*|NODE_BINARY=${QNODE_BINARY_LOCAL}|" "$config_file" > "${config_file}.tmp"
+                sed "s|^NODE_BINARY=.*|NODE_BINARY=${QNODE_BINARY_NAME}|" "$config_file" > "${config_file}.tmp"
             fi
             
             if [ -s "${config_file}.tmp" ]; then
