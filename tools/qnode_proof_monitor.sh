@@ -116,17 +116,34 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
     # Overall health assessment
     print_header "📋 OVERALL HEALTH ASSESSMENT"
     CREATE_OPTIMAL_PCT=$(( CREATE_STATS[0] * 100 / TOTAL_CREATES ))
-    SUBMIT_OPTIMAL_PCT=$(( SUBMIT_STATS[0] * 100 / TOTAL_SUBMITS ))
+    CREATE_WARNING_PCT=$(( CREATE_STATS[1] * 100 / TOTAL_CREATES ))
+    CREATE_CRITICAL_PCT=$(( CREATE_STATS[2] * 100 / TOTAL_CREATES ))
     
-    if (( CREATE_OPTIMAL_PCT >= 70 && SUBMIT_OPTIMAL_PCT >= 70 )); then
-        echo -e "Status: ${GREEN}${BOLD}HEALTHY${RESET} 🟢"
-        echo -e "Most of your proofs are within optimal ranges and likely to land successfully"
-    elif (( CREATE_OPTIMAL_PCT + $(( CREATE_STATS[1] * 100 / TOTAL_CREATES )) >= 70 )); then
-        echo -e "Status: ${YELLOW}${BOLD}SUBOPTIMAL${RESET} 🟡"
-        echo -e "Some proofs are at the limit of optimal ranges may not land successfully."
-    else
+    SUBMIT_OPTIMAL_PCT=$(( SUBMIT_STATS[0] * 100 / TOTAL_SUBMITS ))
+    SUBMIT_WARNING_PCT=$(( SUBMIT_STATS[1] * 100 / TOTAL_SUBMITS ))
+    SUBMIT_CRITICAL_PCT=$(( SUBMIT_STATS[2] * 100 / TOTAL_SUBMITS ))
+    
+    # Only CRITICAL if majority of proofs are in critical range for both stages
+    if (( CREATE_CRITICAL_PCT > 50 && SUBMIT_CRITICAL_PCT > 50 )); then
         echo -e "Status: ${RED}${BOLD}CRITICAL${RESET} 🔴"
-        echo -e "Many proofs are outside optimal ranges and may not land."
+        echo -e "Majority of proofs are outside optimal ranges. System needs attention."
+    # WARNING if either stage has more warnings+critical than optimal
+    elif (( CREATE_OPTIMAL_PCT < 50 || SUBMIT_OPTIMAL_PCT < 50 )); then
+        echo -e "Status: ${YELLOW}${BOLD}SUBOPTIMAL${RESET} 🟡"
+        echo -e "Some proofs are outside optimal ranges but may still land successfully."
+    else
+        echo -e "Status: ${GREEN}${BOLD}HEALTHY${RESET} 🟢"
+        echo -e "Most proofs are within acceptable ranges and likely to land successfully."
+    fi
+    
+    echo -e "\nSuggestions:"
+    if (( CREATE_CRITICAL_PCT > 30 || SUBMIT_CRITICAL_PCT > 30 )); then
+        echo -e "- Check system resources (CPU, memory, disk I/O)"
+        echo -e "- Verify network connectivity and latency"
+        echo -e "- Consider reducing other system load"
+    elif (( CREATE_WARNING_PCT > 50 || SUBMIT_WARNING_PCT > 50 )); then
+        echo -e "- Monitor system performance"
+        echo -e "- Keep an eye on resource usage"
     fi
     
 else
