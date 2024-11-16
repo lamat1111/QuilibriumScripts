@@ -16,14 +16,14 @@ fi
 # Creation stage thresholds
 CREATION_OPTIMAL_MIN=13
 CREATION_OPTIMAL_MAX=17
-CREATION_WARNING_MAX=30
+CREATION_WARNING_MAX=50  
 
 # Submission stage thresholds
 SUBMISSION_OPTIMAL_MIN=24
 SUBMISSION_OPTIMAL_MAX=28
-SUBMISSION_WARNING_MAX=50
+SUBMISSION_WARNING_MAX=70  
 
-# Colors and formatting (reused from original script)
+# Colors and formatting
 BOLD='\033[1m'
 BLUE='\033[34m'
 GREEN='\033[32m'
@@ -32,10 +32,6 @@ YELLOW='\033[33m'
 CYAN='\033[36m'
 RESET='\033[0m'
 SEPARATOR="━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-
-# Ensure required tools are installed
-command -v bc >/dev/null 2>&1 || { echo "Installing bc..." >&2; sudo apt install -y bc >/dev/null 2>&1; }
-command -v awk >/dev/null 2>&1 || { echo "Installing awk..." >&2; sudo apt install -y gawk >/dev/null 2>&1; }
 
 # Helper function for section headers
 print_header() {
@@ -47,7 +43,7 @@ print_header() {
 format_value() {
     local value=$1
     local unit=$2
-    printf "${BOLD}%9.2f${RESET} ${CYAN}%-10s${RESET}" "$value" "$unit"
+    printf "${BOLD}%9d${RESET} ${CYAN}%-10s${RESET}" "$value" "$unit"
 }
 
 # Helper function to categorize frame age
@@ -56,17 +52,17 @@ categorize_frame_age() {
     local age=$2
     
     if [ "$stage" = "creation" ]; then
-        if (( $(echo "$age >= $CREATION_OPTIMAL_MIN && $age <= $CREATION_OPTIMAL_MAX" | bc -l) )); then
+        if (( age >= CREATION_OPTIMAL_MIN && age <= CREATION_OPTIMAL_MAX )); then
             echo "${GREEN}OPTIMAL${RESET}"
-        elif (( $(echo "$age > $CREATION_OPTIMAL_MAX && $age <= $CREATION_WARNING_MAX" | bc -l) )); then
+        elif (( age > CREATION_OPTIMAL_MAX && age <= CREATION_WARNING_MAX )); then
             echo "${YELLOW}WARNING${RESET}"
         else
             echo "${RED}CRITICAL${RESET}"
         fi
     else  # submission stage
-        if (( $(echo "$age >= $SUBMISSION_OPTIMAL_MIN && $age <= $SUBMISSION_OPTIMAL_MAX" | bc -l) )); then
+        if (( age >= SUBMISSION_OPTIMAL_MIN && age <= SUBMISSION_OPTIMAL_MAX )); then
             echo "${GREEN}OPTIMAL${RESET}"
-        elif (( $(echo "$age > $SUBMISSION_OPTIMAL_MAX && $age <= $SUBMISSION_WARNING_MAX" | bc -l) )); then
+        elif (( age > SUBMISSION_OPTIMAL_MAX && age <= SUBMISSION_WARNING_MAX )); then
             echo "${YELLOW}WARNING${RESET}"
         else
             echo "${RED}CRITICAL${RESET}"
@@ -81,30 +77,28 @@ TEMP_SUBMIT=$(mktemp)
 print_header "📊 COLLECTING DATA"
 echo -e "Analyzing proof submissions for the last hour..."
 
-# Extract creation and submission data
+# Extract creation and submission data with rounded integers
 journalctl -u $SERVICE_NAME.service --since "1 hour ago" | grep -F "creating data shard ring proof" | \
-    sed -E 's/.*"frame_number":([0-9]+).*"frame_age":([0-9]+\.[0-9]+).*/\1 \2/' > "$TEMP_CREATE"
+    sed -E 's/.*"frame_number":([0-9]+).*"frame_age":([0-9]+\.[0-9]+).*/\1 \2/' | \
+    awk '{printf "%d %d\n", $1, $2}' > "$TEMP_CREATE"
 
 journalctl -u $SERVICE_NAME.service --since "1 hour ago" | grep -F "submitting data proof" | \
-    sed -E 's/.*"frame_number":([0-9]+).*"frame_age":([0-9]+\.[0-9]+).*/\1 \2/' > "$TEMP_SUBMIT"
+    sed -E 's/.*"frame_number":([0-9]+).*"frame_age":([0-9]+\.[0-9]+).*/\1 \2/' | \
+    awk '{printf "%d %d\n", $1, $2}' > "$TEMP_SUBMIT"
 
 # Calculate statistics if we have data
 if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
-    # Get latest frame details
-    LAST_CREATE=$(tail -n 1 "$TEMP_CREATE")
-    LAST_SUBMIT=$(tail -n 1 "$TEMP_SUBMIT")
+    # Calculate averages and ranges (rounded to integers)
+    CREATE_AVG=$(awk '{ sum += $2 } END { printf "%d", sum/NR }' "$TEMP_CREATE")
+    SUBMIT_AVG=$(awk '{ sum += $2 } END { printf "%d", sum/NR }' "$TEMP_SUBMIT")
     
-    # Calculate averages and ranges
-    CREATE_AVG=$(awk '{ sum += $2 } END { print sum/NR }' "$TEMP_CREATE")
-    SUBMIT_AVG=$(awk '{ sum += $2 } END { print sum/NR }' "$TEMP_CREATE")
+    CREATE_MIN=$(awk 'NR==1{min=$2;next}{if($2<min){min=$2}}END{printf "%d", min}' "$TEMP_CREATE")
+    CREATE_MAX=$(awk 'NR==1{max=$2;next}{if($2>max){max=$2}}END{printf "%d", max}' "$TEMP_CREATE")
     
-    CREATE_MIN=$(awk 'NR==1{min=$2;next}{if($2<min){min=$2}}END{print min}' "$TEMP_CREATE")
-    CREATE_MAX=$(awk 'NR==1{max=$2;next}{if($2>max){max=$2}}END{print max}' "$TEMP_CREATE")
+    SUBMIT_MIN=$(awk 'NR==1{min=$2;next}{if($2<min){min=$2}}END{printf "%d", min}' "$TEMP_SUBMIT")
+    SUBMIT_MAX=$(awk 'NR==1{max=$2;next}{if($2>max){max=$2}}END{printf "%d", max}' "$TEMP_SUBMIT")
     
-    SUBMIT_MIN=$(awk 'NR==1{min=$2;next}{if($2<min){min=$2}}END{print min}' "$TEMP_SUBMIT")
-    SUBMIT_MAX=$(awk 'NR==1{max=$2;next}{if($2>max){max=$2}}END{print max}' "$TEMP_SUBMIT")
-    
-    # Calculate percentages in each category
+    # Calculate counts
     TOTAL_CREATES=$(wc -l < "$TEMP_CREATE")
     TOTAL_SUBMITS=$(wc -l < "$TEMP_SUBMIT")
     
@@ -119,10 +113,10 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
     
     # Overall health assessment
     print_header "📋 OVERALL HEALTH ASSESSMENT"
-    if (( $(echo "$CREATE_AVG <= $CREATION_OPTIMAL_MAX && $SUBMIT_AVG <= $SUBMISSION_OPTIMAL_MAX" | bc -l) )); then
+    if (( CREATE_AVG <= CREATION_OPTIMAL_MAX && SUBMIT_AVG <= SUBMISSION_OPTIMAL_MAX )); then
         echo -e "Status: ${GREEN}${BOLD}HEALTHY${RESET} 🟢"
         echo -e "Your proofs are likely to land successfully"
-    elif (( $(echo "$CREATE_AVG <= $CREATION_WARNING_MAX && $SUBMIT_AVG <= $SUBMISSION_WARNING_MAX" | bc -l) )); then
+    elif (( CREATE_AVG <= CREATION_WARNING_MAX && SUBMIT_AVG <= SUBMISSION_WARNING_MAX )); then
         echo -e "Status: ${YELLOW}${BOLD}SUBOPTIMAL${RESET} 🟡"
         echo -e "Some proofs may not land successfully"
     else
