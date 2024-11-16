@@ -4,7 +4,7 @@
 export TZ="Europe/Rome"
 
 # Script version
-SCRIPT_VERSION="1.5.7"
+SCRIPT_VERSION="1.5.8"
 
 # Function to check for newer script version
 check_for_updates() {
@@ -19,98 +19,71 @@ check_for_updates() {
 # Check for updates and update if available
 check_for_updates
 
-# Function to fetch node binary and set NODE_BINARY variable
-fetch_node_binary() {
-    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        release_os="linux"
-        release_arch=$(uname -m)
-        if [[ "$release_arch" == "aarch64" ]]; then
-            release_arch="arm64"
-        else
-            release_arch="amd64"
-        fi
-    elif [[ "$OSTYPE" == "darwin"* ]]; then
-        release_os="darwin"
-        release_arch="arm64"
-    else
-        echo "Unsupported OS for releases, please build from source"
-        exit 1
+# Function to get the node binary name
+get_node_binary() {
+    local node_dir="$HOME/ceremonyclient/node"
+    local binary_name
+    binary_name=$(find "$node_dir" -name "node-[0-9]*" ! -name "*.dgst*" ! -name "*.sig*" -type f -executable 2>/dev/null | sort -V | tail -n 1 | xargs basename)
+    
+    if [ -z "$binary_name" ]; then
+        echo "ERROR: No executable node binary found in $node_dir"
+        return 1
     fi
-
-    files=$(curl -s https://releases.quilibrium.com/release | grep "$release_os-$release_arch")
-
-    for file in $files; do
-        version=$(echo "$file" | cut -d '-' -f 2)
-        break
-    done
-
-    NODE_BINARY=node-$version-$release_os-$release_arch
-    echo "$NODE_BINARY"
+    
+    echo "$binary_name"
 }
 
 # Function to get the unclaimed balance
 get_unclaimed_balance() {
     local node_directory="$HOME/ceremonyclient/node"
     local NODE_BINARY
-    NODE_BINARY=$(fetch_node_binary)
+    NODE_BINARY=$(get_node_binary)
+    
+    if [ "$NODE_BINARY" == "ERROR:"* ]; then
+        echo "ERROR"
+        return 1
+    fi
+    
     local node_command="./$NODE_BINARY -balance"
     
     local output
     output=$(cd "$node_directory" && $node_command 2>&1)
     
     local balance
-    balance=$(echo "$output" | grep "Unclaimed balance" | awk '{print $3}' | sed 's/[^0-9.]//g')
+    balance=$(echo "$output" | grep "Owned balance" | awk '{print $3}' | sed 's/QUIL//g' | tr -d ' ')
     
     if [[ "$balance" =~ ^[0-9.]+$ ]]; then
-        # Ensure the balance has two decimal places
-        balance=$(printf "%.5f" "$balance")
         echo "$balance"
     else
-        echo "❌ Error: Failed to retrieve balance."
-        exit 1
+        echo "ERROR"
     fi
 }
-
-# Function to write data to CSV file
-#OLD VERSION (decimal bug)
-# write_to_csv() {
-#     local filename="$HOME/scripts/balance_log.csv"
-#     local data="$1"
-
-#     if [ ! -f "$filename" ] || [ ! -s "$filename" ]; then
-#         echo "\"time\",\"balance\"" > "$filename"
-#     fi
-
-#     # Split the data into time and balance
-#     local time=$(echo "$data" | cut -d',' -f1)
-#     local balance=$(echo "$data" | cut -d',' -f2)
-
-#     # Replace dot with comma in balance for correct CSV formatting
-#     balance=$(echo "$balance" | sed 's/\./,/')
-
-#     # Format the data with quotes
-#     local formatted_data="\"$time\",\"$balance\""
-
-#     echo "$formatted_data" >> "$filename"
-# }
 
 # Function to write data to CSV file
 write_to_csv() {
     local filename="$HOME/scripts/balance_log.csv"
     local data="$1"
+    
     if [ ! -f "$filename" ] || [ ! -s "$filename" ]; then
         echo "time,balance" > "$filename"
     fi
+    
     # Split the data into time and balance
     local time=$(echo "$data" | cut -d',' -f1)
     local balance=$(echo "$data" | cut -d',' -f2)
-    # Round to 2 decimal places and replace dot with comma
-    balance=$(printf "%.2f" "$balance" | sed 's/\./,/')
-    # Format the data with quotes
-    local formatted_data="\"$time\",\"$balance\""
-    echo "$formatted_data" >> "$filename"
+    
+    # Only process if balance is not an error
+    if [ "$balance" != "ERROR" ]; then
+        # Round to 2 decimal places and replace dot with comma
+        balance=$(printf "%.2f" "$balance" | sed 's/\./,/')
+        # Format the data with quotes
+        local formatted_data="\"$time\",\"$balance\""
+        echo "$formatted_data" >> "$filename"
+    else
+        echo "❌ Error: Failed to retrieve balance."
+        exit 1
+    fi
 }
-
 
 # Main function
 main() {
@@ -120,12 +93,12 @@ main() {
     local balance
     balance=$(get_unclaimed_balance)
     
-    if [ -n "$balance" ]; then
-        local filename="$HOME/scripts/balance_log.csv"
-        
+    if [ "$balance" != "ERROR" ]; then
         local data_to_write="$current_time,$balance"
-        
         write_to_csv "$data_to_write"
+    else
+        echo "❌ Error: Failed to retrieve balance."
+        exit 1
     fi
 }
 
