@@ -5,8 +5,11 @@
 # likelihood of proofs landing successfully.
 # It analyzes both "creating data shard ring proof" and "submitting data proof" events.
 #
-# Usage: ./script.sh [minutes]
-# Example: ./script.sh 600    # analyzes last 10 hours
+# Usage:  ~/scripts/qnode_proof_monitor.sh [minutes]
+# Example:  ~/scripts/qnode_proof_monitor.sh 600    # analyzes last 10 hours
+
+# Script version
+SCRIPT_VERSION="1.4"
 
 # Default time window in minutes (1 hour by default)
 DEFAULT_TIME_WINDOW=180
@@ -44,6 +47,19 @@ YELLOW='\033[33m'
 CYAN='\033[36m'
 RESET='\033[0m'
 SEPARATOR="━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+# Function to check for newer script version
+check_for_updates() {
+    LATEST_VERSION=$(wget -qO- "https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_proof_monitor.sh" | grep 'SCRIPT_VERSION="' | head -1 | cut -d'"' -f2)
+    if [ "$SCRIPT_VERSION" != "$LATEST_VERSION" ]; then
+        wget -O ~/scripts/qnode_proof_monitor.sh "https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_proof_monitor.sh"
+        chmod +x ~/scripts/qnode_proof_monitor.sh
+        sleep 1
+    fi
+}
+
+# Check for updates and update if available
+check_for_updates
 
 # Helper function for section headers
 print_header() {
