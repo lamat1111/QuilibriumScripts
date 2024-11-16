@@ -51,6 +51,11 @@ RATE_DATA=$(mktemp)
 print_header "📊 COLLECTING DATA"
 echo -e "Analyzing proof submissions for the last ${BOLD}$MINUTES_AGO${RESET} minutes..."
 
+# Get the last complete log entry and extract ring and workers
+LAST_LOG=$(journalctl -u $SERVICE_NAME.service --since "${HOURS_AGO} hours ago" | grep -F "msg\":\"submitting data proof" | tail -n 1)
+RING_NUMBER=$(echo "$LAST_LOG" | grep -o '"ring":[0-9]*' | cut -d':' -f2)
+ACTIVE_WORKERS=$(echo "$LAST_LOG" | grep -o '"active_workers":[0-9]*' | cut -d':' -f2)
+
 # Extract timestamps
 journalctl -u $SERVICE_NAME.service --since "${HOURS_AGO} hours ago" | \
     grep -F "msg\":\"submitting data proof" | \
@@ -146,6 +151,8 @@ if [ -s "$TEMP_FILE" ]; then
     print_header "📈 OVERALL STATISTICS"
     echo -e "Time Window:    ${BOLD}$(printf "%.1f" $HOURS)${RESET} hours (${BOLD}$(printf "%.1f" $MINUTES)${RESET} minutes)"
     echo -e "Total Proofs:   ${BOLD}$TOTAL_PROOFS${RESET}"
+    echo -e "Ring Number:    ${BOLD}$RING_NUMBER${RESET}"
+    echo -e "Active Workers: ${BOLD}$ACTIVE_WORKERS${RESET}"
     
     print_header "🚀 PROOF SUBMISSION RATES"
     echo -e "Hourly Rate:    $(format_value $RATE_PER_HOUR "proofs/hr")"
