@@ -103,15 +103,19 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
     # Display results
     print_header "🔄 CREATION STAGE ANALYSIS"
     echo -e "Distribution of ${BOLD}$TOTAL_CREATES${RESET} creation events:"
-    echo -e "${GREEN}${BOLD}$(( CREATE_STATS[0] * 100 / TOTAL_CREATES ))%${RESET} Optimal (${CREATION_OPTIMAL_MIN}-${CREATION_OPTIMAL_MAX}s)"
-    echo -e "${BOLD}$(( CREATE_STATS[1] * 100 / TOTAL_CREATES ))%${RESET} Warning (${CREATION_OPTIMAL_MAX}-${CREATION_WARNING_MAX}s)"
-    echo -e "${BOLD}$(( CREATE_STATS[2] * 100 / TOTAL_CREATES ))%${RESET} Critical (>${CREATION_WARNING_MAX}s)"
+    echo -e "${GREEN}${BOLD}$(( CREATE_STATS[0] * 100 / TOTAL_CREATES ))%${RESET} Optimal (${CREATION_OPTIMAL_MIN}-${CREATION_OPTIMAL_MAX}s) - ${BOLD}${CREATE_STATS[0]}${RESET} proofs"
+    echo -e "${BOLD}$(( CREATE_STATS[1] * 100 / TOTAL_CREATES ))%${RESET} Warning (${CREATION_OPTIMAL_MAX}-${CREATION_WARNING_MAX}s) - ${BOLD}${CREATE_STATS[1]}${RESET} proofs"
+    echo -e "${BOLD}$(( CREATE_STATS[2] * 100 / TOTAL_CREATES ))%${RESET} Critical (>${CREATION_WARNING_MAX}s) - ${BOLD}${CREATE_STATS[2]}${RESET} proofs"
     
     print_header "📤 SUBMISSION STAGE ANALYSIS"
     echo -e "Distribution of ${BOLD}$TOTAL_SUBMITS${RESET} submission events:"
-    echo -e "${GREEN}${BOLD}$(( SUBMIT_STATS[0] * 100 / TOTAL_SUBMITS ))%${RESET} Optimal (${SUBMISSION_OPTIMAL_MIN}-${SUBMISSION_OPTIMAL_MAX}s)"
-    echo -e "${BOLD}$(( SUBMIT_STATS[1] * 100 / TOTAL_SUBMITS ))%${RESET} Warning (${SUBMISSION_OPTIMAL_MAX}-${SUBMISSION_WARNING_MAX}s)"
-    echo -e "${BOLD}$(( SUBMIT_STATS[2] * 100 / TOTAL_SUBMITS ))%${RESET} Critical (>${SUBMISSION_WARNING_MAX}s)"
+    echo -e "${GREEN}${BOLD}$(( SUBMIT_STATS[0] * 100 / TOTAL_SUBMITS ))%${RESET} Optimal (${SUBMISSION_OPTIMAL_MIN}-${SUBMISSION_OPTIMAL_MAX}s) - ${BOLD}${SUBMIT_STATS[0]}${RESET} proofs"
+    echo -e "${BOLD}$(( SUBMIT_STATS[1] * 100 / TOTAL_SUBMITS ))%${RESET} Warning (${SUBMISSION_OPTIMAL_MAX}-${SUBMISSION_WARNING_MAX}s) - ${BOLD}${SUBMIT_STATS[1]}${RESET} proofs"
+    echo -e "${BOLD}$(( SUBMIT_STATS[2] * 100 / TOTAL_SUBMITS ))%${RESET} Critical (>${SUBMISSION_WARNING_MAX}s) - ${BOLD}${SUBMIT_STATS[2]}${RESET} proofs"
+
+    print_header "📊 TOTAL PROOFS"
+    echo -e "Total Creation Events:  ${BOLD}$TOTAL_CREATES${RESET} proofs"
+    echo -e "Total Submission Events: ${BOLD}$TOTAL_SUBMITS${RESET} proofs"
     
     # Overall health assessment
     print_header "📋 OVERALL HEALTH ASSESSMENT"
