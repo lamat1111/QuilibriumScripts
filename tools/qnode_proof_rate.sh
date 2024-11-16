@@ -166,3 +166,10 @@ fi
 
 # Cleanup
 rm -f "$TEMP_FILE" "$RATE_DATA"
+
+# Print footer with usage information
+echo -e "\n${BOLD}${BLUE}ℹ️ USAGE INFO${RESET}"
+echo -e "${BLUE}$SEPARATOR${RESET}"
+echo -e "To run for a different time window you can run:"
+echo -e "$HOME/scripts/qnode_proof_rate.sh x, where x is a number of minutes,"
+echo -e "e.g. $HOME/scripts/qnode_proof_rate.sh 600"
