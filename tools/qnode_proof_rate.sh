@@ -1,6 +1,7 @@
 #!/bin/bash
 
 SERVICE_NAME=ceremonyclient
+#SERVICE_NAME=qmaster
 
 # Colors and formatting
 BOLD='\033[1m'
