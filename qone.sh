@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.6.7"
+SCRIPT_VERSION="2.6.8"
 
 # ------------------------------------------------------------------
 SHOW_TEMP_MESSAGE=true  # Toggle to control message visibility
@@ -160,7 +160,7 @@ main() {
                 ;;
             15) qclient_actions; clear; display_menu "skip_check" ;;
             16) toggle_autoupdate; press_any_key ;;
-            16) proof_rate; press_any_key ;;
+            17) proof_rate; press_any_key ;;
             [bB]) best_providers; press_any_key ;;
             [dD]) donations; press_any_key ;;
             [eE]) exit ;;
