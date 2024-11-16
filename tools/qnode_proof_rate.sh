@@ -8,6 +8,9 @@
 # Usage: ./script.sh [minutes]
 # Default time window is 180 minutes (3 hours)
 
+command -v bc >/dev/null 2>&1 || { echo "Installing bc..." >&2; sudo apt install -y bc >/dev/null 2>&1; }
+command -v awk >/dev/null 2>&1 || { echo "Installing awk..." >&2; sudo apt install -y gawk >/dev/null 2>&1; }
+
 # Check if qmaster service exists
 if systemctl list-units --full -all | grep -Fq "qmaster.service"; then
     SERVICE_NAME=qmaster
