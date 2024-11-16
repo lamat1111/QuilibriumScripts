@@ -1,5 +1,7 @@
 #!/bin/bash
 
+SERVICE_NAME=ceremonyclient
+
 # Colors and formatting
 BOLD='\033[1m'
 BLUE='\033[34m'
@@ -37,7 +39,7 @@ RATE_DATA=$(mktemp)
 print_header "📊 COLLECTING DATA"
 echo -e "Analyzing proof submissions for the last ${BOLD}$MINUTES_AGO${RESET} minutes..."
 
-journalctl -u qmaster.service --since "${HOURS_AGO} hours ago" | \
+journalctl -u $SERVICE_NAME.service --since "${HOURS_AGO} hours ago" | \
     grep -F "msg\":\"submitting data proof" | \
     sed -E 's/.*"ts":([0-9]+\.[0-9]+).*/\1/' > "$TEMP_FILE"
 
