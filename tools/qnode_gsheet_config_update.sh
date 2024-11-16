@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Check if running as part of a larger script
+PARENT_SCRIPT=${PARENT_SCRIPT:-0}
+
+set -e  # Exit on error
+
 # CONFIG FILE UPDATE for "REWARDS TO GOOGLE SHEET SCRIPT"
 
 QNODE_DIR="$HOME/ceremonyclient/node"
@@ -10,8 +15,12 @@ QNODE_BINARY_NAME=$(find "$QNODE_DIR" -name "node-[0-9]*" ! -name "*.dgst*" ! -n
 if [ -n "$QNODE_BINARY_NAME" ]; then
     echo "Found local node binary: $QNODE_BINARY_NAME"
 else
-    echo "❌ No local node binary found in $QNODE_DIR"
-    exit 1
+    echo "❌ Error: No local node binary found in $QNODE_DIR"
+    if [ "$PARENT_SCRIPT" = "1" ]; then
+        return 1 2>/dev/null
+    else
+        exit 1
+    fi
 fi
 
 # Define the config files
@@ -38,15 +47,21 @@ if [ -f "$CONFIG_FILE1" ] || [ -f "$CONFIG_FILE2" ]; then
     # Function to update config file
     update_config_file() {
         local config_file="$1"
+        local status=0
         
         echo "✅ Checking node version in config file '$(basename "$config_file")'."
+        
+        if [ ! -w "$config_file" ]; then
+            echo "❌ Error: Config file $config_file is not writable"
+            return 1
+        fi
         
         # Get the current NODE_BINARY from the config file
         config_node_binary=$(grep -E "^NODE_BINARY\s*=\s*" "$config_file" | sed -E 's/^NODE_BINARY\s*=\s*//' | tr -d '"' | tr -d "'")
         
         if [ -z "$config_node_binary" ]; then
-            echo "❌ Could not find NODE_BINARY in config file"
-            return
+            echo "❌ Error: Could not find NODE_BINARY in config file"
+            return 1
         fi
 
         echo "Config file currently has: $config_node_binary"
@@ -60,7 +75,10 @@ if [ -f "$CONFIG_FILE1" ] || [ -f "$CONFIG_FILE2" ]; then
             echo "New value: $QNODE_BINARY_NAME"
             
             # Create a backup of the config file
-            cp "$config_file" "${config_file}.backup"
+            if ! cp "$config_file" "${config_file}.backup"; then
+                echo "❌ Error: Failed to create backup file"
+                return 1
+            fi
             
             # Update the config file preserving the original spacing format
             if grep -q "^NODE_BINARY\s*=\s*" "$config_file"; then
@@ -73,27 +91,47 @@ if [ -f "$CONFIG_FILE1" ] || [ -f "$CONFIG_FILE2" ]; then
             fi
             
             if [ -s "${config_file}.tmp" ]; then
-                mv "${config_file}.tmp" "$config_file"
+                if ! mv "${config_file}.tmp" "$config_file"; then
+                    echo "❌ Error: Failed to update config file"
+                    mv "${config_file}.backup" "$config_file"
+                    return 1
+                fi
                 echo "✅ Config file updated successfully."
+                rm -f "${config_file}.backup"
             else
-                echo "❌ Failed to update config file (empty temp file). Restoring backup..."
+                echo "❌ Error: Generated empty config file"
                 mv "${config_file}.backup" "$config_file"
+                rm -f "${config_file}.tmp"
+                return 1
             fi
         fi
     }
 
     # Array of config files
     config_files=("$CONFIG_FILE1" "$CONFIG_FILE2")
+    overall_status=0
 
     # Loop through config files
     for config_file in "${config_files[@]}"; do
         if [ -f "$config_file" ]; then
-            update_config_file "$config_file"
+            if ! update_config_file "$config_file"; then
+                overall_status=1
+                echo "⚠️  Warning: Failed to update $(basename "$config_file")"
+            fi
             echo "-------------------"
         else
-            echo "Config file not found: $config_file"
+            echo "⚠️  Warning: Config file not found: $config_file"
+            overall_status=1
         fi
     done
 
     echo "All config files processed."
+    if [ $overall_status -ne 0 ]; then
+        echo "⚠️  Warning: Some operations failed"
+        if [ "$PARENT_SCRIPT" = "1" ]; then
+            return $overall_status 2>/dev/null
+        else
+            exit $overall_status
+        fi
+    fi
 fi
