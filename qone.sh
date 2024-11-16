@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.6.8"
+SCRIPT_VERSION="2.6.9"
 
 # ------------------------------------------------------------------
 SHOW_TEMP_MESSAGE=true  # Toggle to control message visibility
@@ -92,17 +92,18 @@ EOF
 3)  Set up gRPC                 11) Balance log
 4)  Node Log                    12) Backup your node
 5)  Update node                 13) Restore backup
-6)  Stop node                                
-7)  Start node                  14) Qclient install/update   
+6)  Stop node                              
+7)  Start node                  14) Qclient install/update
 8)  Restart node                15) Qclient actions
-9)  Node info & balance         
-10) Node status                 16) Auto-update ON/OFF                  
+9)  Node info & balance          
+10) Node status                 16) Proof rate check
 -----------------------------------------------------------------
+P) Prover Pause                  H) Help 
+A) Auto-update ON/OFF            X) Disclaimer                                             
+M) Menu autoload on login       
+----------------------------------------------------------------- 
 B) ⭐ Best server providers     D) 💜 Donations 
------------------------------------------------------------------
-P) Prover Pause                  H) Help                                          
-A) Menu autoload on login        X) Disclaimer
------------------------------------------------------------------    
+-----------------------------------------------------------------   
 E) Exit                         
  
                         
@@ -159,12 +160,12 @@ main() {
                 fi
                 ;;
             15) qclient_actions; clear; display_menu "skip_check" ;;
-            16) toggle_autoupdate; press_any_key ;;
-            17) proof_rate; press_any_key ;;
+            16) proof_rate; press_any_key ;;
+            [aA]) toggle_autoupdate; press_any_key ;;
             [bB]) best_providers; press_any_key ;;
             [dD]) donations; press_any_key ;;
             [eE]) exit ;;
-            [aA]) handle_menu_autoload; press_any_key ;;
+            [mM]) handle_menu_autoload; press_any_key ;;
             [pP]) confirm_action "$(wrap_text "$prover_pause_message" "")" "Send a 'Prover Pause' message" prover_pause && prompt_return_to_menu "skip_check" ;;
             [xX]) disclaimer; press_any_key ;;
             [hH]) help_message; press_any_key ;;
