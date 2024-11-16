@@ -1,6 +1,43 @@
 #!/bin/bash
 
-# [Previous service configuration and formatting code remains the same until the analysis part]
+# Description:
+# This script analyzes proof creation and submission frame ages to determine
+# likelihood of proofs landing successfully.
+# It analyzes both "creating data shard ring proof" and "submitting data proof" events.
+
+# Service Configuration
+if systemctl list-units --full -all | grep -Fq "qmaster.service"; then
+    SERVICE_NAME=qmaster
+else
+    SERVICE_NAME=ceremonyclient
+fi
+
+# Frame Age Thresholds (in seconds)
+# Creation stage thresholds
+CREATION_OPTIMAL_MIN=13
+CREATION_OPTIMAL_MAX=17
+CREATION_WARNING_MAX=50  
+
+# Submission stage thresholds
+SUBMISSION_OPTIMAL_MIN=24
+SUBMISSION_OPTIMAL_MAX=28
+SUBMISSION_WARNING_MAX=70  
+
+# Colors and formatting
+BOLD='\033[1m'
+BLUE='\033[34m'
+GREEN='\033[32m'
+RED='\033[31m'
+YELLOW='\033[33m'
+CYAN='\033[36m'
+RESET='\033[0m'
+SEPARATOR="━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+# Helper function for section headers
+print_header() {
+    echo -e "\n${BOLD}${BLUE}$1${RESET}"
+    echo -e "${BLUE}$SEPARATOR${RESET}"
+}
 
 # Calculate percentage of proofs in each category
 calculate_percentages() {
@@ -27,8 +64,23 @@ calculate_percentages() {
     echo "$optimal $warning $critical"
 }
 
-# [Previous data collection code remains the same until the analysis part]
+# Temporary files
+TEMP_CREATE=$(mktemp)
+TEMP_SUBMIT=$(mktemp)
 
+print_header "📊 COLLECTING DATA"
+echo -e "Analyzing proof submissions for the last hour..."
+
+# Extract creation and submission data with rounded integers
+journalctl -u $SERVICE_NAME.service --since "1 hour ago" | grep -F "creating data shard ring proof" | \
+    sed -E 's/.*"frame_number":([0-9]+).*"frame_age":([0-9]+\.[0-9]+).*/\1 \2/' | \
+    awk '{printf "%d %d\n", $1, $2}' > "$TEMP_CREATE"
+
+journalctl -u $SERVICE_NAME.service --since "1 hour ago" | grep -F "submitting data proof" | \
+    sed -E 's/.*"frame_number":([0-9]+).*"frame_age":([0-9]+\.[0-9]+).*/\1 \2/' | \
+    awk '{printf "%d %d\n", $1, $2}' > "$TEMP_SUBMIT"
+
+# Calculate statistics if we have data
 if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
     CREATE_STATS=($(calculate_percentages "$TEMP_CREATE" "creation"))
     SUBMIT_STATS=($(calculate_percentages "$TEMP_SUBMIT" "submission"))
@@ -64,6 +116,15 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
         echo -e "Status: ${RED}${BOLD}CRITICAL${RESET} 🔴"
         echo -e "Many proofs are outside optimal ranges. System may need attention."
     fi
+    
+else
+    echo -e "\n${RED}${BOLD}No proofs found in the last hour${RESET}"
 fi
 
-# [Rest of the cleanup and footer code remains the same]
+# Cleanup
+rm -f "$TEMP_CREATE" "$TEMP_SUBMIT"
+
+# Print footer with optimal ranges
+print_header "ℹ️ OPTIMAL RANGES"
+echo -e "Creation stage:  ${BOLD}$CREATION_OPTIMAL_MIN-$CREATION_OPTIMAL_MAX${RESET} seconds"
+echo -e "Submission stage: ${BOLD}$SUBMISSION_OPTIMAL_MIN-$SUBMISSION_OPTIMAL_MAX${RESET} seconds"
