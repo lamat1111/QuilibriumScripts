@@ -4,13 +4,11 @@
 
 QNODE_DIR="$HOME/ceremonyclient/node"
 
-# Get current node version
-QNODE_BINARY_LOCAL=$(find "$QNODE_DIR" -name "node-[0-9]*" ! -name "*.dgst" ! -name "*.sig*" -type f -executable 2>/dev/null | sort -V | tail -n 1)
-if [ -n "$QNODE_BINARY_LOCAL" ]; then
-    QNODE_VERSION_LOCAL=$(basename "$QNODE_BINARY_LOCAL" | grep -o '[0-9]\+\.[0-9]\+\(\.[0-9]\+\)*' || echo "")
-    QNODE_BINARY_NAME=$(basename "$QNODE_BINARY_LOCAL")  # Get just the binary name without path
-    echo "Found local node version: $QNODE_VERSION_LOCAL"
-    echo "Local binary name: $QNODE_BINARY_NAME"
+# Get current node binary name (just the executable, excluding .dgst and .sig files)
+QNODE_BINARY_NAME=$(find "$QNODE_DIR" -name "node-[0-9]*" ! -name "*.dgst*" ! -name "*.sig*" -type f -executable 2>/dev/null | sort -V | tail -n 1 | xargs basename)
+
+if [ -n "$QNODE_BINARY_NAME" ]; then
+    echo "Found local node binary: $QNODE_BINARY_NAME"
 else
     echo "❌ No local node binary found in $QNODE_DIR"
     exit 1
@@ -53,8 +51,8 @@ if [ -f "$CONFIG_FILE1" ] || [ -f "$CONFIG_FILE2" ]; then
 
         echo "Config file currently has: $config_node_binary"
         
-        # Compare just the binary names after trimming any whitespace
-        if [ "$(echo "$config_node_binary" | tr -d '[:space:]')" = "$(echo "$QNODE_BINARY_NAME" | tr -d '[:space:]')" ]; then
+        # Compare binary names
+        if [ "$config_node_binary" = "$QNODE_BINARY_NAME" ]; then
             echo "✅ Node binary names match. No update needed."
         else
             echo "⏳ Node binary names differ. Updating config file..."
