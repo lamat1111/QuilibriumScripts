@@ -136,16 +136,6 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
         echo -e "Most proofs are within acceptable ranges and likely to land successfully."
     fi
     
-    echo -e "\nSuggestions:"
-    if (( CREATE_CRITICAL_PCT > 30 || SUBMIT_CRITICAL_PCT > 30 )); then
-        echo -e "- Check system resources (CPU, memory, disk I/O)"
-        echo -e "- Verify network connectivity and latency"
-        echo -e "- Consider reducing other system load"
-    elif (( CREATE_WARNING_PCT > 50 || SUBMIT_WARNING_PCT > 50 )); then
-        echo -e "- Monitor system performance"
-        echo -e "- Keep an eye on resource usage"
-    fi
-    
 else
     echo -e "\n${RED}${BOLD}No proofs found in the last $TIME_WINDOW minutes${RESET}"
 fi
