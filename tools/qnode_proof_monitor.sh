@@ -9,7 +9,7 @@
 # Example:  ~/scripts/qnode_proof_monitor.sh 600    # analyzes last 10 hours
 
 # Script version
-SCRIPT_VERSION="2.0"
+SCRIPT_VERSION="2.1"
 
 # Default time window in minutes (1 hour by default)
 DEFAULT_TIME_WINDOW=180
@@ -195,3 +195,4 @@ echo -e "Submission stage: ${BOLD}$SUBMISSION_OPTIMAL_MIN-$SUBMISSION_OPTIMAL_MA
 echo -e "\nTo analyze a different time window:"
 echo -e "$HOME/scripts/qnode_proof_monitor.sh [minutes]"
 echo -e "Example: $HOME/scripts/qnode_proof_monitor.sh 600  # analyzes last 10 hours"
+echo
