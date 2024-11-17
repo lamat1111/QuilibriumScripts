@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.7.1"
+SCRIPT_VERSION="2.7.2"
 
 # ------------------------------------------------------------------
 SHOW_TEMP_MESSAGE=true  # Toggle to control message visibility
@@ -283,7 +283,8 @@ test_script_message='
 This will run the test script.
 '
 
-help_message='
+help_message() {
+    cat << 'EOF'
 =================================
             Q1 HELP
 =================================
@@ -399,7 +400,10 @@ To remove the script completely, run: rm ~/qone.sh
     log in via SSH. When enabled, provides quick access to
     node management tools.
 
-'
+EOF
+    echo
+    return $?
+}
 
 #=====================
 # MENU options functions
@@ -793,13 +797,6 @@ disclaimer() {
     wrap_text "$disclaimer_message"
     echo
     echo "-------------------------------"
-}
-
-
-help_message() {
-    echo "$help_message"
-    echo
-    return $?
 }
 
 test_script() {
