@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.9.5"
+SCRIPT_VERSION="1.9.6"
 
 
 #=====================
@@ -48,7 +48,7 @@ display_menu() {
 =================================================================
 1) Check balance / address       7) Split coins
 2) Check individual coins        8) Merge coins
-3) Create transaction            9) Mint all rewards
+3) Create transaction            9) Count coins
 -----------------------------------------------------------------
 B) ⭐ Best server providers      X) Disclaimer                           
 D) 💜 Donations                  S) Security settings
@@ -978,6 +978,30 @@ token_merge_all() {
     echo "If still nothing changes, you may want to try to execute the operation again."
 }
 
+count_coins() {
+    echo
+    echo "$(format_title "Count Coins")"
+    
+    # Run the coins command and capture output silently
+    coins_output=$($QCLIENT_EXEC token coins $CONFIG_FLAG)
+    
+    # Count coins by counting lines containing "QUIL"
+    coin_count=$(echo "$coins_output" | grep -c "QUIL")
+    
+    # Calculate total value
+    total_value=0
+    while read -r line; do
+        if [[ $line =~ ([0-9]+\.[0-9]+)\ QUIL ]]; then
+            value=${BASH_REMATCH[1]}
+            total_value=$(echo "$total_value + $value" | bc)
+        fi
+    done <<< "$coins_output"
+    
+    echo "You currently have $coin_count coins"
+    echo "Total value: $total_value QUIL"
+    echo
+}
+
 donations() {
     echo
     echo "$(format_title "Donations")"
@@ -1120,7 +1144,8 @@ main() {
             6) mutual_transfer; prompt_return_to_menu || break ;;
             7) token_split_advanced && prompt_return_to_menu || break;;
             8) token_merge && prompt_return_to_menu || break ;;
-            9) mint_all && prompt_return_to_menu || break ;;
+            9) count_coins && prompt_return_to_menu || break ;;
+            #9) mint_all && prompt_return_to_menu || break ;;
             [sS]) security_settings; press_any_key ;;
             [bB]) best_providers; press_any_key ;;
             [dD]) donations; press_any_key ;;
