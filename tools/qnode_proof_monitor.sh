@@ -9,7 +9,7 @@
 # Example:  ~/scripts/qnode_proof_monitor.sh 600    # analyzes last 10 hours
 
 # Script version
-SCRIPT_VERSION="2.9"
+SCRIPT_VERSION="3.0"
 
 # Default time window in minutes (1 hour by default)
 DEFAULT_TIME_WINDOW=180
@@ -63,19 +63,19 @@ check_for_updates() {
 calculate_stats() {
     local file=$1
     # Calculate average
-    local avg=$(awk '{ sum += $2; n++ } END { if (n > 0) printf "%.2f", sum / n }' "$file")
+    local avg=$(awk '{ sum += $1; n++ } END { if (n > 0) printf "%.2f", sum / n }' "$file")
     
     # Calculate standard deviation
-    local stddev=$(awk -v avg="$avg" '{ sum += ($2 - avg) * ($2 - avg); n++ } END { if (n > 1) printf "%.2f", sqrt(sum / (n-1)) }' "$file")
+    local stddev=$(awk -v avg="$avg" '{ sum += ($1 - avg) * ($1 - avg); n++ } END { if (n > 1) printf "%.2f", sqrt(sum / (n-1)) }' "$file")
     
-    # Calculate relative standard deviation (CV) as percentage
+    # Calculate relative standard deviation as percentage (CV)
     local relstddev=$(awk -v avg="$avg" -v stddev="$stddev" 'BEGIN { printf "%.1f", (stddev/avg) * 100 }')
     
     # Get min and max
-    local min=$(awk 'NR == 1 { min = $2 } $2 < min { min = $2 } END { printf "%.2f", min }' "$file")
-    local max=$(awk 'NR == 1 { max = $2 } $2 > max { max = $2 } END { printf "%.2f", max }' "$file")
+    local min=$(awk 'NR == 1 { min = $1 } $1 < min { min = $1 } END { printf "%.2f", min }' "$file")
+    local max=$(awk 'NR == 1 { max = $1 } $1 > max { max = $1 } END { printf "%.2f", max }' "$file")
     
-    echo "$avg $stddev $min $max $relstddev"
+    echo "$avg $relstddev $min $max" # Note: now outputting relstddev instead of stddev
 }
 
 # Check for updates and update if available
@@ -102,13 +102,18 @@ calculate_percentages() {
         local critical=$(awk -v warn="$CREATION_WARNING_MAX" \
             '$1 > warn {count++} END {print count+0}' "$file")
     else
-        # Submission stage ranges
+        # Submission stage ranges - comparison operators fixed
         local optimal=$(awk -v min="$SUBMISSION_OPTIMAL_MIN" -v max="$SUBMISSION_OPTIMAL_MAX" \
             '$1 >= min && $1 <= max {count++} END {print count+0}' "$file")
         local warning=$(awk -v max="$SUBMISSION_OPTIMAL_MAX" -v warn="$SUBMISSION_WARNING_MAX" \
             '$1 > max && $1 <= warn {count++} END {print count+0}' "$file")
         local critical=$(awk -v warn="$SUBMISSION_WARNING_MAX" \
             '$1 > warn {count++} END {print count+0}' "$file")
+    fi
+    
+    # Verify total adds up
+    if [ "$((optimal + warning + critical))" -ne "$total" ]; then
+        echo "Warning: Category counts don't add up to total" >&2
     fi
     
     echo "$optimal $warning $critical"
@@ -137,12 +142,10 @@ echo -e "Analyzing proof submissions for the last ${BOLD}$TIME_WINDOW${RESET} mi
 
 # Extract frame_age values with proper precision
 journalctl -u $SERVICE_NAME.service --since "$HOURS_AGO hours ago" | grep -F "creating data shard ring proof" | \
-    sed -E 's/.*"frame_age":([0-9]+\.[0-9]+).*/\1/' | \
-    awk '{ printf "%.2f\n", $1 }' > "$TEMP_CREATE"
+    sed -E 's/.*"frame_age":([0-9]+\.[0-9]+).*/\1/' > "$TEMP_CREATE"
 
 journalctl -u $SERVICE_NAME.service --since "$HOURS_AGO hours ago" | grep -F "submitting data proof" | \
-    sed -E 's/.*"frame_age":([0-9]+\.[0-9]+).*/\1/' | \
-    awk '{ printf "%.2f\n", $1 }' > "$TEMP_SUBMIT"
+    sed -E 's/.*"frame_age":([0-9]+\.[0-9]+).*/\1/' > "$TEMP_SUBMIT"
 
 # Calculate statistics if we have data
 if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
@@ -179,7 +182,7 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
     echo -e "${CRITICAL_COLOR}${BOLD}$CREATE_CRITICAL_PCT%${RESET} ${CRITICAL_COLOR}Ouch!${RESET} (>${CREATION_WARNING_MAX}s) - ${BOLD}${CREATE_STATS[2]}${RESET} proofs"
     
     echo -e "\n${GRAY}Average Frame Age: ${BOLD}${CREATE_AGE_STATS[0]}s${RESET}"
-    echo -e "${GRAY}Standard Deviation: ${BOLD}${CREATE_AGE_STATS[4]}%${RESET} (the lower the better)"
+    echo -e "${GRAY}Standard Deviation: ${BOLD}${CREATE_AGE_STATS[1]}s${RESET} (lower is better)"
     echo -e "${GRAY}Lowest Frame Age: ${BOLD}${CREATE_AGE_STATS[2]}s${RESET}"
     echo -e "${GRAY}Highest Frame Age: ${BOLD}${CREATE_AGE_STATS[3]}s${RESET}${RESET}"
     
@@ -204,7 +207,7 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
     echo -e "${CRITICAL_COLOR}${BOLD}$SUBMIT_CRITICAL_PCT%${RESET} ${CRITICAL_COLOR}Ouch!${RESET} (>${SUBMISSION_WARNING_MAX}s) - ${BOLD}${SUBMIT_STATS[2]}${RESET} proofs"
     
     echo -e "\n${GRAY}Average Frame Age: ${BOLD}${SUBMIT_AGE_STATS[0]}s${RESET}"
-    echo -e "${GRAY}Standard Deviation: ${BOLD}${SUBMIT_AGE_STATS[4]}%${RESET} (the lower the better)"
+    echo -e "${GRAY}Standard Deviation: ${BOLD}${SUBMIT_AGE_STATS[1]}s${RESET} (lower is better)"
     echo -e "${GRAY}Lowest Frame Age: ${BOLD}${SUBMIT_AGE_STATS[2]}s${RESET}"
     echo -e "${GRAY}Highest Frame Age: ${BOLD}${SUBMIT_AGE_STATS[3]}s${RESET}${RESET}"
     
