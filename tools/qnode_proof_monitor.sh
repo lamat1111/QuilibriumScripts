@@ -9,7 +9,7 @@
 # Example:  ~/scripts/qnode_proof_monitor.sh 600    # analyzes last 10 hours
 
 # Script version
-SCRIPT_VERSION="1.9"
+SCRIPT_VERSION="2.0"
 
 # Default time window in minutes (1 hour by default)
 DEFAULT_TIME_WINDOW=180
@@ -135,7 +135,7 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
 
     echo -e "${OPTIMAL_COLOR}${BOLD}$CREATE_OPTIMAL_PCT%${RESET} ${OPTIMAL_COLOR}Good!${RESET} (${CREATION_OPTIMAL_MIN}-${CREATION_OPTIMAL_MAX}s) - ${BOLD}${CREATE_STATS[0]}${RESET} proofs"
     echo -e "${WARNING_COLOR}${BOLD}$CREATE_WARNING_PCT%${RESET} ${WARNING_COLOR}Meh...${RESET} (${CREATION_OPTIMAL_MAX}-${CREATION_WARNING_MAX}s) - ${BOLD}${CREATE_STATS[1]}${RESET} proofs"
-    echo -e "${CRITICAL_COLOR}${BOLD}$CREATE_CRITICAL_PCT%${RESET} ${CRITICAL_COLOR}Ouch :-(${RESET} (>${CREATION_WARNING_MAX}s) - ${BOLD}${CREATE_STATS[2]}${RESET} proofs"
+    echo -e "${CRITICAL_COLOR}${BOLD}$CREATE_CRITICAL_PCT%${RESET} ${CRITICAL_COLOR}Ouch!${RESET} (>${CREATION_WARNING_MAX}s) - ${BOLD}${CREATE_STATS[2]}${RESET} proofs"
     
     print_header "📤 SUBMISSION STAGE ANALYSIS"
     echo -e "Distribution of ${BOLD}$TOTAL_SUBMITS${RESET} submission events:\n"
@@ -155,7 +155,7 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
 
     echo -e "${OPTIMAL_COLOR}${BOLD}$SUBMIT_OPTIMAL_PCT%${RESET} ${OPTIMAL_COLOR}Good!${RESET} (${SUBMISSION_OPTIMAL_MIN}-${SUBMISSION_OPTIMAL_MAX}s) - ${BOLD}${SUBMIT_STATS[0]}${RESET} proofs"
     echo -e "${WARNING_COLOR}${BOLD}$SUBMIT_WARNING_PCT%${RESET} ${WARNING_COLOR}Meh...${RESET} (${SUBMISSION_OPTIMAL_MAX}-${SUBMISSION_WARNING_MAX}s) - ${BOLD}${SUBMIT_STATS[1]}${RESET} proofs"
-    echo -e "${CRITICAL_COLOR}${BOLD}$SUBMIT_CRITICAL_PCT%${RESET} ${CRITICAL_COLOR}Ouch :-(${RESET} (>${SUBMISSION_WARNING_MAX}s) - ${BOLD}${SUBMIT_STATS[2]}${RESET} proofs"
+    echo -e "${CRITICAL_COLOR}${BOLD}$SUBMIT_CRITICAL_PCT%${RESET} ${CRITICAL_COLOR}Ouch!${RESET} (>${SUBMISSION_WARNING_MAX}s) - ${BOLD}${SUBMIT_STATS[2]}${RESET} proofs"
     
     # Overall health assessment
     print_header "📋 OVERALL HEALTH ASSESSMENT"
