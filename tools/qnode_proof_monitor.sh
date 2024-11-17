@@ -9,7 +9,7 @@
 # Example:  ~/scripts/qnode_proof_monitor.sh 600    # analyzes last 10 hours
 
 # Script version
-SCRIPT_VERSION="1.8"
+SCRIPT_VERSION="1.9"
 
 # Default time window in minutes (1 hour by default)
 DEFAULT_TIME_WINDOW=180
@@ -29,12 +29,12 @@ fi
 
 # Frame Age Thresholds (in seconds)
 # Creation stage thresholds
-CREATION_OPTIMAL_MIN=13
+CREATION_OPTIMAL_MIN=1
 CREATION_OPTIMAL_MAX=17
 CREATION_WARNING_MAX=50  
 
 # Submission stage thresholds
-SUBMISSION_OPTIMAL_MIN=24
+SUBMISSION_OPTIMAL_MIN=1
 SUBMISSION_OPTIMAL_MAX=28
 SUBMISSION_WARNING_MAX=70  
 
@@ -116,9 +116,9 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
     TOTAL_CREATES=$(wc -l < "$TEMP_CREATE")
     TOTAL_SUBMITS=$(wc -l < "$TEMP_SUBMIT")
     
-   # Display results
+    # Display results
     print_header "🔄 CREATION STAGE ANALYSIS"
-    echo -e "Distribution of ${BOLD}$TOTAL_CREATES${RESET} creation events:"
+    echo -e "Distribution of ${BOLD}$TOTAL_CREATES${RESET} creation events:\n"
     
     CREATE_OPTIMAL_PCT=$(( CREATE_STATS[0] * 100 / TOTAL_CREATES ))
     CREATE_WARNING_PCT=$(( CREATE_STATS[1] * 100 / TOTAL_CREATES ))
@@ -136,14 +136,9 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
     echo -e "${OPTIMAL_COLOR}${BOLD}$CREATE_OPTIMAL_PCT%${RESET} ${OPTIMAL_COLOR}Good!${RESET} (${CREATION_OPTIMAL_MIN}-${CREATION_OPTIMAL_MAX}s) - ${BOLD}${CREATE_STATS[0]}${RESET} proofs"
     echo -e "${WARNING_COLOR}${BOLD}$CREATE_WARNING_PCT%${RESET} ${WARNING_COLOR}Meh...${RESET} (${CREATION_OPTIMAL_MAX}-${CREATION_WARNING_MAX}s) - ${BOLD}${CREATE_STATS[1]}${RESET} proofs"
     echo -e "${CRITICAL_COLOR}${BOLD}$CREATE_CRITICAL_PCT%${RESET} ${CRITICAL_COLOR}Ouch :-(${RESET} (>${CREATION_WARNING_MAX}s) - ${BOLD}${CREATE_STATS[2]}${RESET} proofs"
-
-    # echo -e "${OPTIMAL_COLOR}${BOLD}$CREATE_OPTIMAL_PCT%${RESET} Optimal (${CREATION_OPTIMAL_MIN}-${CREATION_OPTIMAL_MAX}s) - ${BOLD}${CREATE_STATS[0]}${RESET} proofs"
-    # echo -e "${WARNING_COLOR}${BOLD}$CREATE_WARNING_PCT%${RESET} Marginal (${CREATION_OPTIMAL_MAX}-${CREATION_WARNING_MAX}s) - ${BOLD}${CREATE_STATS[1]}${RESET} proofs"
-    # echo -e "${CRITICAL_COLOR}${BOLD}$CREATE_CRITICAL_PCT%${RESET} Critical (>${CREATION_WARNING_MAX}s) - ${BOLD}${CREATE_STATS[2]}${RESET} proofs"
-
     
     print_header "📤 SUBMISSION STAGE ANALYSIS"
-    echo -e "Distribution of ${BOLD}$TOTAL_SUBMITS${RESET} submission events:"
+    echo -e "Distribution of ${BOLD}$TOTAL_SUBMITS${RESET} submission events:\n"
     
     SUBMIT_OPTIMAL_PCT=$(( SUBMIT_STATS[0] * 100 / TOTAL_SUBMITS ))
     SUBMIT_WARNING_PCT=$(( SUBMIT_STATS[1] * 100 / TOTAL_SUBMITS ))
@@ -161,10 +156,6 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
     echo -e "${OPTIMAL_COLOR}${BOLD}$SUBMIT_OPTIMAL_PCT%${RESET} ${OPTIMAL_COLOR}Good!${RESET} (${SUBMISSION_OPTIMAL_MIN}-${SUBMISSION_OPTIMAL_MAX}s) - ${BOLD}${SUBMIT_STATS[0]}${RESET} proofs"
     echo -e "${WARNING_COLOR}${BOLD}$SUBMIT_WARNING_PCT%${RESET} ${WARNING_COLOR}Meh...${RESET} (${SUBMISSION_OPTIMAL_MAX}-${SUBMISSION_WARNING_MAX}s) - ${BOLD}${SUBMIT_STATS[1]}${RESET} proofs"
     echo -e "${CRITICAL_COLOR}${BOLD}$SUBMIT_CRITICAL_PCT%${RESET} ${CRITICAL_COLOR}Ouch :-(${RESET} (>${SUBMISSION_WARNING_MAX}s) - ${BOLD}${SUBMIT_STATS[2]}${RESET} proofs"
-    
-    # echo -e "${OPTIMAL_COLOR}${BOLD}$SUBMIT_OPTIMAL_PCT%${RESET} Optimal (${SUBMISSION_OPTIMAL_MIN}-${SUBMISSION_OPTIMAL_MAX}s) - ${BOLD}${SUBMIT_STATS[0]}${RESET} proofs"
-    # echo -e "${WARNING_COLOR}${BOLD}$SUBMIT_WARNING_PCT%${RESET} Marginal (${SUBMISSION_OPTIMAL_MAX}-${SUBMISSION_WARNING_MAX}s) - ${BOLD}${SUBMIT_STATS[1]}${RESET} proofs"
-    # echo -e "${CRITICAL_COLOR}${BOLD}$SUBMIT_CRITICAL_PCT%${RESET} Critical (>${SUBMISSION_WARNING_MAX}s) - ${BOLD}${SUBMIT_STATS[2]}${RESET} proofs"
     
     # Overall health assessment
     print_header "📋 OVERALL HEALTH ASSESSMENT"
