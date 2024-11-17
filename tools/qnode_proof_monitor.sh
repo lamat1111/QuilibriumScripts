@@ -250,4 +250,5 @@ echo -e "Submission stage: ${BOLD}$SUBMISSION_OPTIMAL_MIN-$SUBMISSION_OPTIMAL_MA
 echo -e "\nTo analyze a different time window:"
 echo -e "$HOME/scripts/qnode_proof_monitor.sh [minutes]"
 echo -e "Example: $HOME/scripts/qnode_proof_monitor.sh 600  # analyzes last 10 hours"
+echo -e "\nv $SCRIPT_VERSION"
 echo
