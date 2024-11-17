@@ -9,7 +9,7 @@
 # Example:  ~/scripts/qnode_proof_monitor.sh 600    # analyzes last 10 hours
 
 # Script version
-SCRIPT_VERSION="2.8"
+SCRIPT_VERSION="2.9"
 
 # Default time window in minutes (1 hour by default)
 DEFAULT_TIME_WINDOW=180
@@ -102,18 +102,13 @@ calculate_percentages() {
         local critical=$(awk -v warn="$CREATION_WARNING_MAX" \
             '$1 > warn {count++} END {print count+0}' "$file")
     else
-        # Submission stage ranges - comparison operators fixed
+        # Submission stage ranges
         local optimal=$(awk -v min="$SUBMISSION_OPTIMAL_MIN" -v max="$SUBMISSION_OPTIMAL_MAX" \
             '$1 >= min && $1 <= max {count++} END {print count+0}' "$file")
         local warning=$(awk -v max="$SUBMISSION_OPTIMAL_MAX" -v warn="$SUBMISSION_WARNING_MAX" \
             '$1 > max && $1 <= warn {count++} END {print count+0}' "$file")
         local critical=$(awk -v warn="$SUBMISSION_WARNING_MAX" \
             '$1 > warn {count++} END {print count+0}' "$file")
-    fi
-    
-    # Verify total adds up
-    if [ "$((optimal + warning + critical))" -ne "$total" ]; then
-        echo "Warning: Category counts don't add up to total" >&2
     fi
     
     echo "$optimal $warning $critical"
@@ -142,10 +137,12 @@ echo -e "Analyzing proof submissions for the last ${BOLD}$TIME_WINDOW${RESET} mi
 
 # Extract frame_age values with proper precision
 journalctl -u $SERVICE_NAME.service --since "$HOURS_AGO hours ago" | grep -F "creating data shard ring proof" | \
-    sed -E 's/.*"frame_age":([0-9]+\.[0-9]+).*/\1/' > "$TEMP_CREATE"
+    sed -E 's/.*"frame_age":([0-9]+\.[0-9]+).*/\1/' | \
+    awk '{ printf "%.2f\n", $1 }' > "$TEMP_CREATE"
 
 journalctl -u $SERVICE_NAME.service --since "$HOURS_AGO hours ago" | grep -F "submitting data proof" | \
-    sed -E 's/.*"frame_age":([0-9]+\.[0-9]+).*/\1/' > "$TEMP_SUBMIT"
+    sed -E 's/.*"frame_age":([0-9]+\.[0-9]+).*/\1/' | \
+    awk '{ printf "%.2f\n", $1 }' > "$TEMP_SUBMIT"
 
 # Calculate statistics if we have data
 if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
