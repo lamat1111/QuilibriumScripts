@@ -96,7 +96,13 @@ calculate_percentages() {
 get_latest_stats() {
     local latest_log=$(journalctl -u $SERVICE_NAME.service --since "$HOURS_AGO hours ago" | grep -F "submitting data proof" | tail -n 1)
     local ring=$(echo "$latest_log" | grep -o '"ring":[0-9]\+' | cut -d':' -f2)
-    local workers=$(echo "$latest_log" | grep -o '"workers":[0-9]\+' | cut -d':' -f2)
+    local workers=$(echo "$latest_log" | grep -o '"active_workers":[0-9]\+' | cut -d':' -f2)
+    
+    # If empty, mark as unknown
+    if [ -z "$workers" ]; then
+        workers="unknown"
+    fi
+    
     echo "$ring $workers"
 }
 
