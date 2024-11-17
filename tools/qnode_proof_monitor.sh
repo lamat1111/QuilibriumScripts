@@ -9,7 +9,7 @@
 # Example:  ~/scripts/qnode_proof_monitor.sh 600    # analyzes last 10 hours
 
 # Script version
-SCRIPT_VERSION="2.4"
+SCRIPT_VERSION="2.5"
 
 # Default time window in minutes (1 hour by default)
 DEFAULT_TIME_WINDOW=180
@@ -67,7 +67,11 @@ calculate_stats() {
     # Calculate standard deviation
     local stddev=$(awk -v avg="$avg" '{ sum += ($2 - avg) * ($2 - avg); n++ } END { if (n > 1) printf "%.2f", sqrt(sum / (n-1)) }' "$file")
     
-    echo "$avg $stddev"
+    # Get min and max
+    local min=$(awk 'NR == 1 { min = $2 } $2 < min { min = $2 } END { printf "%.2f", min }' "$file")
+    local max=$(awk 'NR == 1 { max = $2 } $2 > max { max = $2 } END { printf "%.2f", max }' "$file")
+    
+    echo "$avg $stddev $min $max"
 }
 
 # Check for updates and update if available
@@ -170,6 +174,8 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
     
     echo -e "\nAverage Frame Age: ${BOLD}${CREATE_AGE_STATS[0]}s${RESET}"
     echo -e "Standard Deviation: ${BOLD}${CREATE_AGE_STATS[1]}s${RESET}"
+    echo -e "Lowest Frame Age: ${BOLD}${CREATE_AGE_STATS[2]}s${RESET}"
+    echo -e "Highest Frame Age: ${BOLD}${CREATE_AGE_STATS[3]}s${RESET}"
     
     print_header "📤 SUBMISSION STAGE ANALYSIS"
     echo -e "Distribution of ${BOLD}$TOTAL_SUBMITS${RESET} submission events:\n"
@@ -193,6 +199,8 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
     
     echo -e "\nAverage Frame Age: ${BOLD}${SUBMIT_AGE_STATS[0]}s${RESET}"
     echo -e "Standard Deviation: ${BOLD}${SUBMIT_AGE_STATS[1]}s${RESET}"
+    echo -e "Lowest Frame Age: ${BOLD}${SUBMIT_AGE_STATS[2]}s${RESET}"
+    echo -e "Highest Frame Age: ${BOLD}${SUBMIT_AGE_STATS[3]}s${RESET}"
     
     # Overall health assessment
     print_header "📋 OVERALL HEALTH ASSESSMENT"
