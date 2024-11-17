@@ -9,7 +9,7 @@
 # Example:  ~/scripts/qnode_proof_monitor.sh 600    # analyzes last 10 hours
 
 # Script version
-SCRIPT_VERSION="2.3"
+SCRIPT_VERSION="2.4"
 
 # Default time window in minutes (1 hour by default)
 DEFAULT_TIME_WINDOW=180
@@ -168,8 +168,7 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
     echo -e "${WARNING_COLOR}${BOLD}$CREATE_WARNING_PCT%${RESET} ${WARNING_COLOR}Meh...${RESET} (${CREATION_OPTIMAL_MAX}-${CREATION_WARNING_MAX}s) - ${BOLD}${CREATE_STATS[1]}${RESET} proofs"
     echo -e "${CRITICAL_COLOR}${BOLD}$CREATE_CRITICAL_PCT%${RESET} ${CRITICAL_COLOR}Ouch!${RESET} (>${CREATION_WARNING_MAX}s) - ${BOLD}${CREATE_STATS[2]}${RESET} proofs"
     
-    echo -e "\nFrame Age Statistics:"
-    echo -e "Average: ${BOLD}${CREATE_AGE_STATS[0]}s${RESET}"
+    echo -e "\nAverage Frame Age: ${BOLD}${CREATE_AGE_STATS[0]}s${RESET}"
     echo -e "Standard Deviation: ${BOLD}${CREATE_AGE_STATS[1]}s${RESET}"
     
     print_header "📤 SUBMISSION STAGE ANALYSIS"
@@ -192,8 +191,7 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
     echo -e "${WARNING_COLOR}${BOLD}$SUBMIT_WARNING_PCT%${RESET} ${WARNING_COLOR}Meh...${RESET} (${SUBMISSION_OPTIMAL_MAX}-${SUBMISSION_WARNING_MAX}s) - ${BOLD}${SUBMIT_STATS[1]}${RESET} proofs"
     echo -e "${CRITICAL_COLOR}${BOLD}$SUBMIT_CRITICAL_PCT%${RESET} ${CRITICAL_COLOR}Ouch!${RESET} (>${SUBMISSION_WARNING_MAX}s) - ${BOLD}${SUBMIT_STATS[2]}${RESET} proofs"
     
-    echo -e "\nFrame Age Statistics:"
-    echo -e "Average: ${BOLD}${SUBMIT_AGE_STATS[0]}s${RESET}"
+    echo -e "\nAverage Frame Age: ${BOLD}${SUBMIT_AGE_STATS[0]}s${RESET}"
     echo -e "Standard Deviation: ${BOLD}${SUBMIT_AGE_STATS[1]}s${RESET}"
     
     # Overall health assessment
