@@ -9,7 +9,7 @@
 # Example:  ~/scripts/qnode_proof_monitor.sh 600    # analyzes last 10 hours
 
 # Script version
-SCRIPT_VERSION="3.0"
+SCRIPT_VERSION="3.1"
 
 # Default time window in minutes (1 hour by default)
 DEFAULT_TIME_WINDOW=180
@@ -182,7 +182,7 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
     echo -e "${CRITICAL_COLOR}${BOLD}$CREATE_CRITICAL_PCT%${RESET} ${CRITICAL_COLOR}Ouch!${RESET} (>${CREATION_WARNING_MAX}s) - ${BOLD}${CREATE_STATS[2]}${RESET} proofs"
     
     echo -e "\n${GRAY}Average Frame Age: ${BOLD}${CREATE_AGE_STATS[0]}s${RESET}"
-    echo -e "${GRAY}Standard Deviation: ${BOLD}${CREATE_AGE_STATS[1]}s${RESET} (lower is better)"
+    echo -e "${GRAY}Standard Deviation: ${BOLD}${CREATE_AGE_STATS[1]}%${RESET} ${GRAY}(lower is better)${RESET}"
     echo -e "${GRAY}Lowest Frame Age: ${BOLD}${CREATE_AGE_STATS[2]}s${RESET}"
     echo -e "${GRAY}Highest Frame Age: ${BOLD}${CREATE_AGE_STATS[3]}s${RESET}${RESET}"
     
@@ -207,7 +207,7 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
     echo -e "${CRITICAL_COLOR}${BOLD}$SUBMIT_CRITICAL_PCT%${RESET} ${CRITICAL_COLOR}Ouch!${RESET} (>${SUBMISSION_WARNING_MAX}s) - ${BOLD}${SUBMIT_STATS[2]}${RESET} proofs"
     
     echo -e "\n${GRAY}Average Frame Age: ${BOLD}${SUBMIT_AGE_STATS[0]}s${RESET}"
-    echo -e "${GRAY}Standard Deviation: ${BOLD}${SUBMIT_AGE_STATS[1]}s${RESET} (lower is better)"
+    echo -e "${GRAY}Standard Deviation: ${BOLD}${SUBMIT_AGE_STATS[1]}%${RESET} ${GRAY}(lower is better)${RESET}"
     echo -e "${GRAY}Lowest Frame Age: ${BOLD}${SUBMIT_AGE_STATS[2]}s${RESET}"
     echo -e "${GRAY}Highest Frame Age: ${BOLD}${SUBMIT_AGE_STATS[3]}s${RESET}${RESET}"
     
