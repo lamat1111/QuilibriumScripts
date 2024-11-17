@@ -9,7 +9,7 @@
 # Example:  ~/scripts/qnode_proof_monitor.sh 600    # analyzes last 10 hours
 
 # Script version
-SCRIPT_VERSION="2.6"
+SCRIPT_VERSION="2.7"
 
 # Default time window in minutes (1 hour by default)
 DEFAULT_TIME_WINDOW=180
@@ -60,17 +60,18 @@ check_for_updates() {
 }
 
 # Function to calculate average and standard deviation
+# Function to calculate average and standard deviation
 calculate_stats() {
     local file=$1
     # Calculate average
-    local avg=$(awk '{ sum += $2; n++ } END { if (n > 0) printf "%.2f", sum / n }' "$file")
+    local avg=$(awk '{ sum += $1; n++ } END { if (n > 0) printf "%.2f", sum / n }' "$file")
     
     # Calculate standard deviation
-    local stddev=$(awk -v avg="$avg" '{ sum += ($2 - avg) * ($2 - avg); n++ } END { if (n > 1) printf "%.2f", sqrt(sum / (n-1)) }' "$file")
+    local stddev=$(awk -v avg="$avg" '{ sum += ($1 - avg) * ($1 - avg); n++ } END { if (n > 1) printf "%.2f", sqrt(sum / (n-1)) }' "$file")
     
     # Get min and max
-    local min=$(awk 'NR == 1 { min = $2 } $2 < min { min = $2 } END { printf "%.2f", min }' "$file")
-    local max=$(awk 'NR == 1 { max = $2 } $2 > max { max = $2 } END { printf "%.2f", max }' "$file")
+    local min=$(awk 'NR == 1 { min = $1 } $1 < min { min = $1 } END { printf "%.2f", min }' "$file")
+    local max=$(awk 'NR == 1 { max = $1 } $1 > max { max = $1 } END { printf "%.2f", max }' "$file")
     
     echo "$avg $stddev $min $max"
 }
@@ -91,19 +92,26 @@ calculate_percentages() {
     local total=$(wc -l < "$file")
     
     if [ "$stage" = "creation" ]; then
+        # Creation stage ranges
         local optimal=$(awk -v min="$CREATION_OPTIMAL_MIN" -v max="$CREATION_OPTIMAL_MAX" \
-            '$2 >= min && $2 <= max {count++} END {print count}' "$file")
+            '$1 >= min && $1 <= max {count++} END {print count+0}' "$file")
         local warning=$(awk -v max="$CREATION_OPTIMAL_MAX" -v warn="$CREATION_WARNING_MAX" \
-            '$2 > max && $2 <= warn {count++} END {print count}' "$file")
+            '$1 > max && $1 <= warn {count++} END {print count+0}' "$file")
         local critical=$(awk -v warn="$CREATION_WARNING_MAX" \
-            '$2 > warn {count++} END {print count}' "$file")
+            '$1 > warn {count++} END {print count+0}' "$file")
     else
+        # Submission stage ranges - comparison operators fixed
         local optimal=$(awk -v min="$SUBMISSION_OPTIMAL_MIN" -v max="$SUBMISSION_OPTIMAL_MAX" \
-            '$2 >= min && $2 <= max {count++} END {print count}' "$file")
+            '$1 >= min && $1 <= max {count++} END {print count+0}' "$file")
         local warning=$(awk -v max="$SUBMISSION_OPTIMAL_MAX" -v warn="$SUBMISSION_WARNING_MAX" \
-            '$2 > max && $2 <= warn {count++} END {print count}' "$file")
+            '$1 > max && $1 <= warn {count++} END {print count+0}' "$file")
         local critical=$(awk -v warn="$SUBMISSION_WARNING_MAX" \
-            '$2 > warn {count++} END {print count}' "$file")
+            '$1 > warn {count++} END {print count+0}' "$file")
+    fi
+    
+    # Verify total adds up
+    if [ "$((optimal + warning + critical))" -ne "$total" ]; then
+        echo "Warning: Category counts don't add up to total" >&2
     fi
     
     echo "$optimal $warning $critical"
@@ -130,14 +138,12 @@ TEMP_SUBMIT=$(mktemp)
 print_header "📊 COLLECTING DATA"
 echo -e "Analyzing proof submissions for the last ${BOLD}$TIME_WINDOW${RESET} minutes (${BOLD}$HOURS_AGO${RESET} hours)..."
 
-# Extract creation and submission data with rounded integers
+# Extract frame_age values with proper precision
 journalctl -u $SERVICE_NAME.service --since "$HOURS_AGO hours ago" | grep -F "creating data shard ring proof" | \
-    sed -E 's/.*"frame_number":([0-9]+).*"frame_age":([0-9]+\.[0-9]+).*/\1 \2/' | \
-    awk '{printf "%d %d\n", $1, $2}' > "$TEMP_CREATE"
+    sed -E 's/.*"frame_age":([0-9]+\.[0-9]+).*/\1/' > "$TEMP_CREATE"
 
 journalctl -u $SERVICE_NAME.service --since "$HOURS_AGO hours ago" | grep -F "submitting data proof" | \
-    sed -E 's/.*"frame_number":([0-9]+).*"frame_age":([0-9]+\.[0-9]+).*/\1 \2/' | \
-    awk '{printf "%d %d\n", $1, $2}' > "$TEMP_SUBMIT"
+    sed -E 's/.*"frame_age":([0-9]+\.[0-9]+).*/\1/' > "$TEMP_SUBMIT"
 
 # Calculate statistics if we have data
 if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
