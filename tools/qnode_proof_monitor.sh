@@ -9,7 +9,7 @@
 # Example:  ~/scripts/qnode_proof_monitor.sh 600    # analyzes last 10 hours
 
 # Script version
-SCRIPT_VERSION="2.1"
+SCRIPT_VERSION="2.2"
 
 # Default time window in minutes (1 hour by default)
 DEFAULT_TIME_WINDOW=180
@@ -92,6 +92,14 @@ calculate_percentages() {
     echo "$optimal $warning $critical"
 }
 
+# Function to get latest ring and workers numbers
+get_latest_stats() {
+    local latest_log=$(journalctl -u $SERVICE_NAME.service --since "$HOURS_AGO hours ago" | grep -F "submitting data proof" | tail -n 1)
+    local ring=$(echo "$latest_log" | grep -o '"ring":[0-9]\+' | cut -d':' -f2)
+    local workers=$(echo "$latest_log" | grep -o '"workers":[0-9]\+' | cut -d':' -f2)
+    echo "$ring $workers"
+}
+
 # Temporary files
 TEMP_CREATE=$(mktemp)
 TEMP_SUBMIT=$(mktemp)
@@ -112,6 +120,7 @@ journalctl -u $SERVICE_NAME.service --since "$HOURS_AGO hours ago" | grep -F "su
 if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
     CREATE_STATS=($(calculate_percentages "$TEMP_CREATE" "creation"))
     SUBMIT_STATS=($(calculate_percentages "$TEMP_SUBMIT" "submission"))
+    NODE_STATS=($(get_latest_stats))
     
     TOTAL_CREATES=$(wc -l < "$TEMP_CREATE")
     TOTAL_SUBMITS=$(wc -l < "$TEMP_SUBMIT")
@@ -179,6 +188,9 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
         echo -e "Status: ${GREEN}${BOLD}HEALTHY${RESET} 🟢"
         echo -e "Most proofs are within acceptable ranges and likely to land successfully."
     fi
+    
+    echo -e "\nRing: ${BOLD}${NODE_STATS[0]}${RESET}"
+    echo -e "Workers: ${BOLD}${NODE_STATS[1]}${RESET}"
     
 else
     echo -e "\n${RED}${BOLD}No proofs found in the last $TIME_WINDOW minutes${RESET}"
