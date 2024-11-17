@@ -40,7 +40,7 @@ sleep 10
 
 # Sync the store directory to Storj
 echo "Starting rclone sync to Storj..."
-if ! rclone sync /root/ceremonyclient/node/.config/store storj:/quilibrium/snapshot/store; then
+if ! rclone sync $HOME/ceremonyclient/node/.config/store storj:/quilibrium/snapshot/store; then
     echo "ERROR: Failed to sync store directory to Storj"
     # Attempt to restart service before exiting
     systemctl start ceremonyclient
