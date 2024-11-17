@@ -9,7 +9,7 @@
 # Example:  ~/scripts/qnode_proof_monitor.sh 600    # analyzes last 10 hours
 
 # Script version
-SCRIPT_VERSION="2.2"
+SCRIPT_VERSION="2.3"
 
 # Default time window in minutes (1 hour by default)
 DEFAULT_TIME_WINDOW=180
@@ -56,6 +56,18 @@ check_for_updates() {
         chmod +x ~/scripts/qnode_proof_monitor.sh
         sleep 1
     fi
+}
+
+# Function to calculate average and standard deviation
+calculate_stats() {
+    local file=$1
+    # Calculate average
+    local avg=$(awk '{ sum += $2; n++ } END { if (n > 0) printf "%.2f", sum / n }' "$file")
+    
+    # Calculate standard deviation
+    local stddev=$(awk -v avg="$avg" '{ sum += ($2 - avg) * ($2 - avg); n++ } END { if (n > 1) printf "%.2f", sqrt(sum / (n-1)) }' "$file")
+    
+    echo "$avg $stddev"
 }
 
 # Check for updates and update if available
@@ -128,6 +140,10 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
     SUBMIT_STATS=($(calculate_percentages "$TEMP_SUBMIT" "submission"))
     NODE_STATS=($(get_latest_stats))
     
+    # Calculate average and standard deviation
+    CREATE_AGE_STATS=($(calculate_stats "$TEMP_CREATE"))
+    SUBMIT_AGE_STATS=($(calculate_stats "$TEMP_SUBMIT"))
+    
     TOTAL_CREATES=$(wc -l < "$TEMP_CREATE")
     TOTAL_SUBMITS=$(wc -l < "$TEMP_SUBMIT")
     
@@ -152,6 +168,10 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
     echo -e "${WARNING_COLOR}${BOLD}$CREATE_WARNING_PCT%${RESET} ${WARNING_COLOR}Meh...${RESET} (${CREATION_OPTIMAL_MAX}-${CREATION_WARNING_MAX}s) - ${BOLD}${CREATE_STATS[1]}${RESET} proofs"
     echo -e "${CRITICAL_COLOR}${BOLD}$CREATE_CRITICAL_PCT%${RESET} ${CRITICAL_COLOR}Ouch!${RESET} (>${CREATION_WARNING_MAX}s) - ${BOLD}${CREATE_STATS[2]}${RESET} proofs"
     
+    echo -e "\nFrame Age Statistics:"
+    echo -e "Average: ${BOLD}${CREATE_AGE_STATS[0]}s${RESET}"
+    echo -e "Standard Deviation: ${BOLD}${CREATE_AGE_STATS[1]}s${RESET}"
+    
     print_header "📤 SUBMISSION STAGE ANALYSIS"
     echo -e "Distribution of ${BOLD}$TOTAL_SUBMITS${RESET} submission events:\n"
     
@@ -171,6 +191,10 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
     echo -e "${OPTIMAL_COLOR}${BOLD}$SUBMIT_OPTIMAL_PCT%${RESET} ${OPTIMAL_COLOR}Good!${RESET} (${SUBMISSION_OPTIMAL_MIN}-${SUBMISSION_OPTIMAL_MAX}s) - ${BOLD}${SUBMIT_STATS[0]}${RESET} proofs"
     echo -e "${WARNING_COLOR}${BOLD}$SUBMIT_WARNING_PCT%${RESET} ${WARNING_COLOR}Meh...${RESET} (${SUBMISSION_OPTIMAL_MAX}-${SUBMISSION_WARNING_MAX}s) - ${BOLD}${SUBMIT_STATS[1]}${RESET} proofs"
     echo -e "${CRITICAL_COLOR}${BOLD}$SUBMIT_CRITICAL_PCT%${RESET} ${CRITICAL_COLOR}Ouch!${RESET} (>${SUBMISSION_WARNING_MAX}s) - ${BOLD}${SUBMIT_STATS[2]}${RESET} proofs"
+    
+    echo -e "\nFrame Age Statistics:"
+    echo -e "Average: ${BOLD}${SUBMIT_AGE_STATS[0]}s${RESET}"
+    echo -e "Standard Deviation: ${BOLD}${SUBMIT_AGE_STATS[1]}s${RESET}"
     
     # Overall health assessment
     print_header "📋 OVERALL HEALTH ASSESSMENT"
