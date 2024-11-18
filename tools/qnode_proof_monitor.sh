@@ -9,16 +9,13 @@
 # Example:  ~/scripts/qnode_proof_monitor.sh 600    # analyzes last 10 hours
 
 # Script version
-SCRIPT_VERSION="3.6"
+SCRIPT_VERSION="3.8"
 
 # Default time window in minutes (3 hours by default)
 DEFAULT_TIME_WINDOW=180
 
 # Get time window from command line argument or use default
 TIME_WINDOW=${1:-$DEFAULT_TIME_WINDOW}
-
-# Convert minutes to hours for journalctl (rounded up)
-HOURS_AGO=$(( (TIME_WINDOW + 59) / 60 ))
 
 # Service Configuration
 if systemctl list-units --full -all | grep -Fq "qmaster.service"; then
@@ -127,7 +124,7 @@ calculate_percentages() {
 
 # Function to get latest ring and workers numbers
 get_latest_stats() {
-    local latest_log=$(journalctl -u $SERVICE_NAME.service --since "$HOURS_AGO hours ago" | grep -F "submitting data proof" | tail -n 1)
+    local latest_log=$(journalctl -u $SERVICE_NAME.service --since "$TIME_WINDOW minutes ago" | grep -F "submitting data proof" | tail -n 1)
     local ring=$(echo "$latest_log" | grep -o '"ring":[0-9]\+' | cut -d':' -f2)
     local workers=$(echo "$latest_log" | grep -o '"active_workers":[0-9]\+' | cut -d':' -f2)
     
@@ -143,7 +140,7 @@ get_latest_stats() {
 check_for_updates
 
 print_header "📊 COLLECTING DATA"
-echo -e "Analyzing proof submissions for the last ${BOLD}$TIME_WINDOW${RESET} minutes (${BOLD}$HOURS_AGO${RESET} hours)..."
+echo -e "Analyzing proof submissions for the last ${BOLD}$TIME_WINDOW${RESET} minutes..."
 
 # Temporary files
 TEMP_CREATE=$(mktemp)
@@ -153,23 +150,22 @@ TEMP_SUBMIT_FRAMES=$(mktemp)
 TEMP_MATCHES=$(mktemp)
 
 # Extract frame ages (not frame numbers) for statistics
-journalctl -u $SERVICE_NAME.service --since "$HOURS_AGO hours ago" | \
+journalctl -u $SERVICE_NAME.service --since "$TIME_WINDOW minutes ago" | \
     grep -F "creating data shard ring proof" | \
     sed -E 's/.*"frame_age":([0-9]+\.[0-9]+).*/\1/' > "$TEMP_CREATE"
 
-journalctl -u $SERVICE_NAME.service --since "$HOURS_AGO hours ago" | \
+journalctl -u $SERVICE_NAME.service --since "$TIME_WINDOW minutes ago" | \
     grep -F "submitting data proof" | \
     sed -E 's/.*"frame_age":([0-9]+\.[0-9]+).*/\1/' > "$TEMP_SUBMIT"
 
 # Extract frame numbers AND ages for CPU time calculation
-journalctl -u $SERVICE_NAME.service --since "$HOURS_AGO hours ago" | \
+journalctl -u $SERVICE_NAME.service --since "$TIME_WINDOW minutes ago" | \
     grep -F "creating data shard ring proof" | \
     sed -E 's/.*"frame_number":([0-9]+).*"frame_age":([0-9]+\.[0-9]+).*/\1 \2/' > "$TEMP_CREATE_FRAMES"
 
-journalctl -u $SERVICE_NAME.service --since "$HOURS_AGO hours ago" | \
+journalctl -u $SERVICE_NAME.service --since "$TIME_WINDOW minutes ago" | \
     grep -F "submitting data proof" | \
     sed -E 's/.*"frame_number":([0-9]+).*"frame_age":([0-9]+\.[0-9]+).*/\1 \2/' > "$TEMP_SUBMIT_FRAMES"
-
 
 # DEBUG STARTS
 
