@@ -9,9 +9,9 @@
 # Example:  ~/scripts/qnode_proof_monitor.sh 600    # analyzes last 10 hours
 
 # Script version
-SCRIPT_VERSION="3.3"
+SCRIPT_VERSION="3.4"
 
-# Default time window in minutes (1 hour by default)
+# Default time window in minutes (3 hours by default)
 DEFAULT_TIME_WINDOW=180
 
 # Get time window from command line argument or use default
@@ -36,7 +36,11 @@ CREATION_WARNING_MAX=50
 # Submission stage thresholds
 SUBMISSION_OPTIMAL_MIN=1
 SUBMISSION_OPTIMAL_MAX=28
-SUBMISSION_WARNING_MAX=70  
+SUBMISSION_WARNING_MAX=70
+
+# CPU processing thresholds
+CPU_OPTIMAL_MAX=30  # Based on user comment about 30 seconds
+CPU_WARNING_MAX=45  # Example threshold
 
 # Colors and formatting
 BOLD='\033[1m'
@@ -67,7 +71,6 @@ calculate_stats() {
     local avg=$(awk '{ sum += $1; n++ } END { if (n > 0) printf "%.2f", sum / n }' "$file")
     
     # Calculate standard deviation
-    # Using formula: sqrt(Σ(x - μ)²/(n-1))
     local stddev=$(awk -v avg="$avg" '
         BEGIN { sum = 0; n = 0 }
         { 
@@ -88,13 +91,11 @@ calculate_stats() {
     
     echo "$avg $stddev $min $max"
 }
-# Check for updates and update if available
-check_for_updates
 
 # Helper function for section headers
 print_header() {
-    echo -e "\n${BOLD}${BLUE}$1${RESET}"
-    echo -e "${BLUE}$SEPARATOR${RESET}"
+    echo -e "\n${BOLD}${CYAN}$1${RESET}"
+    echo -e "${CYAN}$SEPARATOR${RESET}"
 }
 
 # Calculate percentage of proofs in each category
@@ -112,18 +113,13 @@ calculate_percentages() {
         local critical=$(awk -v warn="$CREATION_WARNING_MAX" \
             '$1 > warn {count++} END {print count+0}' "$file")
     else
-        # Submission stage ranges - comparison operators fixed
+        # Submission stage ranges
         local optimal=$(awk -v min="$SUBMISSION_OPTIMAL_MIN" -v max="$SUBMISSION_OPTIMAL_MAX" \
             '$1 >= min && $1 <= max {count++} END {print count+0}' "$file")
         local warning=$(awk -v max="$SUBMISSION_OPTIMAL_MAX" -v warn="$SUBMISSION_WARNING_MAX" \
             '$1 > max && $1 <= warn {count++} END {print count+0}' "$file")
         local critical=$(awk -v warn="$SUBMISSION_WARNING_MAX" \
             '$1 > warn {count++} END {print count+0}' "$file")
-    fi
-    
-    # Verify total adds up
-    if [ "$((optimal + warning + critical))" -ne "$total" ]; then
-        echo "Warning: Category counts don't add up to total" >&2
     fi
     
     echo "$optimal $warning $critical"
@@ -143,19 +139,93 @@ get_latest_stats() {
     echo "$ring $workers"
 }
 
-# Temporary files
-TEMP_CREATE=$(mktemp)
-TEMP_SUBMIT=$(mktemp)
+# Check for updates
+check_for_updates
 
 print_header "📊 COLLECTING DATA"
 echo -e "Analyzing proof submissions for the last ${BOLD}$TIME_WINDOW${RESET} minutes (${BOLD}$HOURS_AGO${RESET} hours)..."
 
-# Extract frame_age values with proper precision
-journalctl -u $SERVICE_NAME.service --since "$HOURS_AGO hours ago" | grep -F "creating data shard ring proof" | \
+# Temporary files
+TEMP_CREATE=$(mktemp)
+TEMP_SUBMIT=$(mktemp)
+TEMP_CREATE_FRAMES=$(mktemp)
+TEMP_SUBMIT_FRAMES=$(mktemp)
+TEMP_MATCHES=$(mktemp)
+
+# Extract frame ages (not frame numbers) for statistics
+journalctl -u $SERVICE_NAME.service --since "$HOURS_AGO hours ago" | \
+    grep -F "creating data shard ring proof" | \
     sed -E 's/.*"frame_age":([0-9]+\.[0-9]+).*/\1/' > "$TEMP_CREATE"
 
-journalctl -u $SERVICE_NAME.service --since "$HOURS_AGO hours ago" | grep -F "submitting data proof" | \
+journalctl -u $SERVICE_NAME.service --since "$HOURS_AGO hours ago" | \
+    grep -F "submitting data proof" | \
     sed -E 's/.*"frame_age":([0-9]+\.[0-9]+).*/\1/' > "$TEMP_SUBMIT"
+
+# Extract frame numbers AND ages for CPU time calculation
+journalctl -u $SERVICE_NAME.service --since "$HOURS_AGO hours ago" | \
+    grep -F "creating data shard ring proof" | \
+    sed -E 's/.*"frame_number":([0-9]+).*"frame_age":([0-9]+\.[0-9]+).*/\1 \2/' > "$TEMP_CREATE_FRAMES"
+
+journalctl -u $SERVICE_NAME.service --since "$HOURS_AGO hours ago" | \
+    grep -F "submitting data proof" | \
+    sed -E 's/.*"frame_number":([0-9]+).*"frame_age":([0-9]+\.[0-9]+).*/\1 \2/' > "$TEMP_SUBMIT_FRAMES"
+
+
+# DEBUG STARTS
+
+# echo -e "\n${CYAN}=== DEBUG: Extracted Frame Data ===${RESET}"
+# echo -e "\n${BOLD}Sample of creation frames (first 5 lines):${RESET}"
+# head -n 5 "$TEMP_CREATE_FRAMES"
+
+# echo -e "\n${BOLD}Sample of submission frames (first 5 lines):${RESET}"
+# head -n 5 "$TEMP_SUBMIT_FRAMES"
+
+# echo -e "\n${CYAN}=== DEBUG: First 5 CPU Time Calculations ===${RESET}"
+# COUNTER=0
+# while read -r create_line; do
+#     if [ $COUNTER -lt 5 ]; then
+#         echo -e "\n${BOLD}Processing creation line:${RESET} $create_line"
+        
+#         create_frame=$(echo "$create_line" | cut -d' ' -f1)
+#         create_age=$(echo "$create_line" | cut -d' ' -f2)
+#         echo "Frame: $create_frame, Creation Age: $create_age"
+        
+#         submit_line=$(grep "^$create_frame " "$TEMP_SUBMIT_FRAMES")
+#         if [ ! -z "$submit_line" ]; then
+#             echo "Found matching submission: $submit_line"
+#             submit_age=$(echo "$submit_line" | cut -d' ' -f2)
+#             echo "Submission Age: $submit_age"
+            
+#             cpu_time=$(awk "BEGIN {printf \"%.2f\", $submit_age - $create_age}")
+#             echo "${YELLOW}CPU Time calculation: $submit_age - $create_age = $cpu_time${RESET}"
+#             echo "$cpu_time" >> "$TEMP_MATCHES"
+#         else
+#             echo "No matching submission found for frame $create_frame"
+#         fi
+#         echo "----------------------------------------"
+#         COUNTER=$((COUNTER + 1))
+#     else
+#         break  # Exit the debug loop after 5 iterations
+#     fi
+# done < "$TEMP_CREATE_FRAMES"
+
+# # Reset for actual processing
+# rm -f "$TEMP_MATCHES"
+
+# DEBUG ENDS
+
+# Calculate CPU Processing Time
+while read -r create_line; do
+    create_frame=$(echo "$create_line" | cut -d' ' -f1)
+    create_age=$(echo "$create_line" | cut -d' ' -f2)
+    
+    submit_line=$(grep "^$create_frame " "$TEMP_SUBMIT_FRAMES")
+    if [ ! -z "$submit_line" ]; then
+        submit_age=$(echo "$submit_line" | cut -d' ' -f2)
+        cpu_time=$(awk "BEGIN {printf \"%.2f\", $submit_age - $create_age}")
+        echo "$cpu_time" >> "$TEMP_MATCHES"
+    fi
+done < "$TEMP_CREATE_FRAMES"
 
 # Calculate statistics if we have data
 if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
@@ -163,15 +233,14 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
     SUBMIT_STATS=($(calculate_percentages "$TEMP_SUBMIT" "submission"))
     NODE_STATS=($(get_latest_stats))
     
-    # Calculate average and standard deviation
     CREATE_AGE_STATS=($(calculate_stats "$TEMP_CREATE"))
     SUBMIT_AGE_STATS=($(calculate_stats "$TEMP_SUBMIT"))
     
     TOTAL_CREATES=$(wc -l < "$TEMP_CREATE")
     TOTAL_SUBMITS=$(wc -l < "$TEMP_SUBMIT")
-    
-    # Display results
-    print_header "🔄 CREATION STAGE ANALYSIS"
+
+    # Creation Stage Analysis
+    print_header "🔄 CREATION STAGE ANALYSIS (Network Latency)"
     echo -e "Distribution of ${BOLD}$TOTAL_CREATES${RESET} creation events:\n"
     
     CREATE_OPTIMAL_PCT=$(( CREATE_STATS[0] * 100 / TOTAL_CREATES ))
@@ -196,14 +265,15 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
     echo -e "${GRAY}Lowest Frame Age: ${BOLD}${CREATE_AGE_STATS[2]}s${RESET}"
     echo -e "${GRAY}Highest Frame Age: ${BOLD}${CREATE_AGE_STATS[3]}s${RESET}${RESET}"
     
-    print_header "📤 SUBMISSION STAGE ANALYSIS"
+    # Submission Stage Analysis
+    print_header "📤 SUBMISSION STAGE ANALYSIS (Total Time)"
     echo -e "Distribution of ${BOLD}$TOTAL_SUBMITS${RESET} submission events:\n"
     
     SUBMIT_OPTIMAL_PCT=$(( SUBMIT_STATS[0] * 100 / TOTAL_SUBMITS ))
     SUBMIT_WARNING_PCT=$(( SUBMIT_STATS[1] * 100 / TOTAL_SUBMITS ))
     SUBMIT_CRITICAL_PCT=$(( SUBMIT_STATS[2] * 100 / TOTAL_SUBMITS ))
     
-    # Reset colors and set only if percentage > 50%
+    # Reset colors
     OPTIMAL_COLOR=""
     WARNING_COLOR=""
     CRITICAL_COLOR=""
@@ -217,31 +287,93 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
     echo -e "${CRITICAL_COLOR}${BOLD}$SUBMIT_CRITICAL_PCT%${RESET} ${CRITICAL_COLOR}Ouch!${RESET} (>${SUBMISSION_WARNING_MAX}s) - ${BOLD}${SUBMIT_STATS[2]}${RESET} proofs"
     
     echo -e "\n${GRAY}Average Frame Age: ${BOLD}${SUBMIT_AGE_STATS[0]}s${RESET}"
-    echo -e "${GRAY}Standard Deviation: ${BOLD}${SUBMIT_AGE_STATS[1]}%${RESET} ${GRAY}(lower is better)${RESET}"
+    echo -e "${GRAY}Standard Deviation: ${BOLD}${SUBMIT_AGE_STATS[1]}s${RESET} ${GRAY}(lower is better)${RESET}"
     echo -e "${GRAY}Lowest Frame Age: ${BOLD}${SUBMIT_AGE_STATS[2]}s${RESET}"
     echo -e "${GRAY}Highest Frame Age: ${BOLD}${SUBMIT_AGE_STATS[3]}s${RESET}${RESET}"
+
+    # CPU Processing Time Analysis (only if we have matches)
+    if [ -s "$TEMP_MATCHES" ]; then
+        CPU_AGE_STATS=($(calculate_stats "$TEMP_MATCHES"))
+        TOTAL_MATCHES=$(wc -l < "$TEMP_MATCHES")
+        
+        # Calculate percentages for CPU processing time
+        CPU_STATS=($(awk -v opt_max="$CPU_OPTIMAL_MAX" -v warn_max="$CPU_WARNING_MAX" '
+            {
+                if ($1 <= opt_max) optimal++
+                else if ($1 <= warn_max) warning++
+                else critical++
+            }
+            END {
+                print optimal+0, warning+0, critical+0
+            }' "$TEMP_MATCHES"))
+        
+        print_header "⚡ CPU PROCESSING TIME ANALYSIS (Processing Only)"
+        echo -e "Distribution of ${BOLD}$TOTAL_MATCHES${RESET} matched proof events:\n"
+        
+        CPU_OPTIMAL_PCT=$(( CPU_STATS[0] * 100 / TOTAL_MATCHES ))
+        CPU_WARNING_PCT=$(( CPU_STATS[1] * 100 / TOTAL_MATCHES ))
+        CPU_CRITICAL_PCT=$(( CPU_STATS[2] * 100 / TOTAL_MATCHES ))
+        
+        # Reset colors
+        OPTIMAL_COLOR=""
+        WARNING_COLOR=""
+        CRITICAL_COLOR=""
+        
+        (( CPU_OPTIMAL_PCT > 50 )) && OPTIMAL_COLOR=$GREEN
+        (( CPU_WARNING_PCT > 50 )) && WARNING_COLOR=$YELLOW
+        (( CPU_CRITICAL_PCT > 50 )) && CRITICAL_COLOR=$RED
+
+        echo -e "${OPTIMAL_COLOR}${BOLD}$CPU_OPTIMAL_PCT%${RESET} ${OPTIMAL_COLOR}Good!${RESET} (≤${CPU_OPTIMAL_MAX}s) - ${BOLD}${CPU_STATS[0]}${RESET} proofs"
+        echo -e "${WARNING_COLOR}${BOLD}$CPU_WARNING_PCT%${RESET} ${WARNING_COLOR}Meh...${RESET} (${CPU_OPTIMAL_MAX}-${CPU_WARNING_MAX}s) - ${BOLD}${CPU_STATS[1]}${RESET} proofs"
+        echo -e "${CRITICAL_COLOR}${BOLD}$CPU_CRITICAL_PCT%${RESET} ${CRITICAL_COLOR}Ouch!${RESET} (>${CPU_WARNING_MAX}s) - ${BOLD}${CPU_STATS[2]}${RESET} proofs"
+        
+        echo -e "\n${GRAY}Average Processing Time: ${BOLD}${CPU_AGE_STATS[0]}s${RESET}"
+        echo -e "${GRAY}Standard Deviation: ${BOLD}${CPU_AGE_STATS[1]}s${RESET} ${GRAY}(lower is better)${RESET}"
+        echo -e "${GRAY}Fastest Processing: ${BOLD}${CPU_AGE_STATS[2]}s${RESET}"
+        echo -e "${GRAY}Slowest Processing: ${BOLD}${CPU_AGE_STATS[3]}s${RESET}${RESET}"
+        
+        if (( CPU_CRITICAL_PCT > 50 )); then
+            echo -e "\n${RED}${BOLD}WARNING:${RESET} Most proofs are taking longer than ${CPU_OPTIMAL_MAX}s to process."
+            echo -e "This may significantly impact your ability to earn rewards."
+        fi
+    fi
     
     # Overall health assessment
     print_header "📋 OVERALL HEALTH ASSESSMENT"
-    CREATE_OPTIMAL_PCT=$(( CREATE_STATS[0] * 100 / TOTAL_CREATES ))
-    CREATE_WARNING_PCT=$(( CREATE_STATS[1] * 100 / TOTAL_CREATES ))
-    CREATE_CRITICAL_PCT=$(( CREATE_STATS[2] * 100 / TOTAL_CREATES ))
     
-    SUBMIT_OPTIMAL_PCT=$(( SUBMIT_STATS[0] * 100 / TOTAL_SUBMITS ))
-    SUBMIT_WARNING_PCT=$(( SUBMIT_STATS[1] * 100 / TOTAL_SUBMITS ))
-    SUBMIT_CRITICAL_PCT=$(( SUBMIT_STATS[2] * 100 / TOTAL_SUBMITS ))
-    
-    # Only CRITICAL if majority of proofs are in critical range for both stages
-    if (( CREATE_CRITICAL_PCT > 50 && SUBMIT_CRITICAL_PCT > 50 )); then
-        echo -e "Status: ${RED}${BOLD}CRITICAL${RESET} 🔴"
-        echo -e "Majority of proofs are outside optimal ranges. System needs attention."
-    # WARNING if either stage has more warnings+critical than optimal
-    elif (( CREATE_OPTIMAL_PCT < 50 || SUBMIT_OPTIMAL_PCT < 50 )); then
-        echo -e "Status: ${YELLOW}${BOLD}SUBOPTIMAL${RESET} 🟡"
-        echo -e "Some proofs are outside optimal ranges but may still land successfully."
+    # Check CPU processing time status if available
+    if [ -s "$TEMP_MATCHES" ]; then
+        CPU_CRITICAL=0
+        (( CPU_CRITICAL_PCT > 50 )) && CPU_CRITICAL=1
+        
+        if (( CREATE_CRITICAL_PCT > 50 && SUBMIT_CRITICAL_PCT > 50 && CPU_CRITICAL == 1 )); then
+            echo -e "Status: ${RED}${BOLD}CRITICAL${RESET} 🔴"
+            echo -e "Both network latency and CPU processing are outside optimal ranges. System needs immediate attention."
+        elif (( CPU_CRITICAL == 1 )); then
+            echo -e "Status: ${RED}${BOLD}CRITICAL${RESET} 🔴"
+            echo -e "CPU processing time is too high. Consider optimizing your system resources."
+        elif (( CREATE_CRITICAL_PCT > 50 && SUBMIT_CRITICAL_PCT > 50 )); then
+            echo -e "Status: ${RED}${BOLD}CRITICAL${RESET} 🔴"
+            echo -e "Network latency is too high. Check your network connection and configuration."
+        elif (( CREATE_OPTIMAL_PCT < 50 || SUBMIT_OPTIMAL_PCT < 50 || CPU_OPTIMAL_PCT < 50 )); then
+            echo -e "Status: ${YELLOW}${BOLD}SUBOPTIMAL${RESET} 🟡"
+            echo -e "Some metrics are outside optimal ranges but may still allow successful proof submission."
+        else
+            echo -e "Status: ${GREEN}${BOLD}HEALTHY${RESET} 🟢"
+            echo -e "All metrics are within acceptable ranges. System is performing well."
+        fi
     else
-        echo -e "Status: ${GREEN}${BOLD}HEALTHY${RESET} 🟢"
-        echo -e "Most proofs are within acceptable ranges and likely to land successfully."
+        # Original health assessment without CPU data
+        if (( CREATE_CRITICAL_PCT > 50 && SUBMIT_CRITICAL_PCT > 50 )); then
+            echo -e "Status: ${RED}${BOLD}CRITICAL${RESET} 🔴"
+            echo -e "Majority of proofs are outside optimal ranges. System needs attention."
+        elif (( CREATE_OPTIMAL_PCT < 50 || SUBMIT_OPTIMAL_PCT < 50 )); then
+            echo -e "Status: ${YELLOW}${BOLD}SUBOPTIMAL${RESET} 🟡"
+            echo -e "Some proofs are outside optimal ranges but may still land successfully."
+        else
+            echo -e "Status: ${GREEN}${BOLD}HEALTHY${RESET} 🟢"
+            echo -e "Most proofs are within acceptable ranges and likely to land successfully."
+        fi
     fi
     
     echo -e "\nRing: ${BOLD}${NODE_STATS[0]}${RESET}"
@@ -252,13 +384,14 @@ else
 fi
 
 # Cleanup
-rm -f "$TEMP_CREATE" "$TEMP_SUBMIT"
+rm -f "$TEMP_CREATE" "$TEMP_SUBMIT" "$TEMP_CREATE_FRAMES" "$TEMP_SUBMIT_FRAMES" "$TEMP_MATCHES"
 
 # Print footer with optimal ranges and usage
 print_header "ℹ️ USAGE INFO"
 echo -e "Optimal ranges:"
-echo -e "Creation stage:  ${BOLD}$CREATION_OPTIMAL_MIN-$CREATION_OPTIMAL_MAX${RESET} seconds"
-echo -e "Submission stage: ${BOLD}$SUBMISSION_OPTIMAL_MIN-$SUBMISSION_OPTIMAL_MAX${RESET} seconds"
+echo -e "Creation stage:  ${BOLD}$CREATION_OPTIMAL_MIN-$CREATION_OPTIMAL_MAX${RESET} seconds (network latency)"
+echo -e "Submission stage: ${BOLD}$SUBMISSION_OPTIMAL_MIN-$SUBMISSION_OPTIMAL_MAX${RESET} seconds (total time)"
+echo -e "CPU processing: ${BOLD}≤${CPU_OPTIMAL_MAX}${RESET} seconds (submission - creation)"
 echo -e "\nTo analyze a different time window:"
 echo -e "$HOME/scripts/qnode_proof_monitor.sh [minutes]"
 echo -e "Example: $HOME/scripts/qnode_proof_monitor.sh 600  # analyzes last 10 hours"
