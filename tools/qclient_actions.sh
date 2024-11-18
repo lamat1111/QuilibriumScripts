@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.9.7"
+SCRIPT_VERSION="1.9.8"
 
 
 #=====================
@@ -747,6 +747,138 @@ token_split_advanced() {
     fi
 }
 
+# token_merge() {
+#     description="This function allows you to merge either two specific coins or all your coins into a single coin"
+
+#     if ! confirm_proceed "Merge Coins" "$description"; then
+#         return 1
+#     fi
+    
+#     # Display merge options first
+#     echo
+#     echo "Choose merge option:"
+#     echo "1) Merge two specific coins"
+#     echo "2) Merge all coins"
+#     echo
+#     read -p "Enter your choice (1-2): " merge_choice
+
+#     # Show current coins after user choice
+#     echo
+#     echo "Your current coins before merging:"
+#     echo "----------------------------------"
+#     coins_output=$($QCLIENT_EXEC token coins $CONFIG_FLAG)
+#     echo "$coins_output"
+#     echo
+
+#     # Count coins by counting lines containing "QUIL"
+#     coin_count=$(echo "$coins_output" | grep -c "QUIL")
+
+#     if [ "$coin_count" -lt 2 ]; then
+#         echo "❌ Not enough coins to merge. You need at least 2 coins."
+#         echo
+#         read -p "Press Enter to return to the main menu..."
+#         return 1
+#     fi
+
+#     case $merge_choice in
+#         1)  # Merge two specific coins
+#             echo "Please select two coins to merge from the list above."
+#             echo
+            
+#             # Get and validate the first coin ID
+#             while true; do
+#                 read -p "Enter the first coin ID: " left_coin
+#                 check_exit "$left_coin" && return 1
+#                 if validate_hash "$left_coin"; then
+#                     break
+#                 else
+#                     echo "❌ Invalid coin ID format. ID must start with '0x' followed by 64 hexadecimal characters."
+#                     echo "Example: 0x1148092cdce78c721835601ef39f9c2cd8b48b7787cbea032dd3913a4106a58d"
+#                     echo
+#                 fi
+#             done
+
+#             # Get and validate the second coin ID
+#             while true; do
+#                 read -p "Enter the second coin ID: " right_coin
+#                 check_exit "$right_coin" && return 1
+#                 if validate_hash "$right_coin"; then
+#                     break
+#                 else
+#                     echo "❌ Invalid coin ID format. ID must start with '0x' followed by 64 hexadecimal characters."
+#                     echo "Example: 0x0140e01731256793bba03914f3844d645fbece26553acdea8ac4de4d84f91690"
+#                     echo
+#                 fi
+#             done
+
+#             # Show merge details for confirmation
+#             echo
+#             echo "Merge Details:"
+#             echo "--------------"
+#             echo "First Coin: $left_coin"
+#             echo "Second Coin: $right_coin"
+#             echo
+#             echo "Command that will be executed:"
+#             echo "$QCLIENT_EXEC token merge $left_coin $right_coin $CONFIG_FLAG"
+#             echo
+
+#             # Ask for confirmation
+#             read -p "Do you want to proceed with this merge? (y/n): " confirm
+
+#             if [[ ${confirm,,} == "y" ]]; then
+#                 $QCLIENT_EXEC token merge "$left_coin" "$right_coin" $CONFIG_FLAG
+#             else
+#                 echo "❌ Merge operation cancelled."
+#                 return 1
+#             fi
+#             ;;
+
+#         2)  # Merge all coins
+#             # Extract coin values and calculate total
+#             total_value=0
+#             while read -r line; do
+#                 if [[ $line =~ ([0-9]+\.[0-9]+)\ QUIL ]]; then
+#                     value=${BASH_REMATCH[1]}
+#                     total_value=$(echo "$total_value + $value" | bc)
+#                 fi
+#             done <<< "$coins_output"
+
+#             echo "Found $coin_count coins to merge"
+#             echo "Total amount in QUIL will be $total_value"
+#             echo
+
+#             # Show command that will be executed
+#             echo "Command that will be executed:"
+#             echo "$QCLIENT_EXEC token merge all $CONFIG_FLAG"
+#             echo
+
+#             # Ask for confirmation
+#             read -p "Do you want to proceed with merging all coins? (y/n): " confirm
+#             if [[ ${confirm,,} == "y" ]]; then
+#                 $QCLIENT_EXEC token merge all $CONFIG_FLAG
+#             else
+#                 echo "❌ Merge operation cancelled."
+#                 return 1
+#             fi
+#             ;;
+
+#         *)  echo "❌ Invalid choice"
+#             return 1
+#             ;;
+#     esac
+
+#     # Show updated coins after merge
+#     echo
+#     wait_with_spinner "Showing your coins in %s secs..." 30
+#     echo
+#     echo "Your coins after merging:"
+#     echo "-------------------------"
+#     check_coins
+#     echo
+#     echo "If you don't see the changes yet, wait a moment and check your coins again from the main menu."
+#     echo "If still nothing changes, you may want to try to execute the operation again."
+# }
+
 token_merge() {
     description="This function allows you to merge either two specific coins or all your coins into a single coin"
 
@@ -762,28 +894,24 @@ token_merge() {
     echo
     read -p "Enter your choice (1-2): " merge_choice
 
-    # Show current coins after user choice
-    echo
-    echo "Your current coins before merging:"
-    echo "----------------------------------"
-    coins_output=$($QCLIENT_EXEC token coins $CONFIG_FLAG)
-    echo "$coins_output"
-    echo
-
-    # Count coins by counting lines containing "QUIL"
-    coin_count=$(echo "$coins_output" | grep -c "QUIL")
-
-    if [ "$coin_count" -lt 2 ]; then
-        echo "❌ Not enough coins to merge. You need at least 2 coins."
-        echo
-        read -p "Press Enter to return to the main menu..."
-        return 1
-    fi
-
     case $merge_choice in
         1)  # Merge two specific coins
-            echo "Please select two coins to merge from the list above."
             echo
+            echo "Your current coins before merging:"
+            echo "----------------------------------"
+            coins_output=$($QCLIENT_EXEC token coins $CONFIG_FLAG)
+            echo "$coins_output"
+            echo
+
+            # Count coins by counting lines containing "QUIL"
+            coin_count=$(echo "$coins_output" | grep -c "QUIL")
+
+            if [ "$coin_count" -lt 2 ]; then
+                echo "❌ Not enough coins to merge. You need at least 2 coins."
+                echo
+                read -p "Press Enter to return to the main menu..."
+                return 1
+            fi
             
             # Get and validate the first coin ID
             while true; do
@@ -793,7 +921,6 @@ token_merge() {
                     break
                 else
                     echo "❌ Invalid coin ID format. ID must start with '0x' followed by 64 hexadecimal characters."
-                    echo "Example: 0x1148092cdce78c721835601ef39f9c2cd8b48b7787cbea032dd3913a4106a58d"
                     echo
                 fi
             done
@@ -806,12 +933,11 @@ token_merge() {
                     break
                 else
                     echo "❌ Invalid coin ID format. ID must start with '0x' followed by 64 hexadecimal characters."
-                    echo "Example: 0x0140e01731256793bba03914f3844d645fbece26553acdea8ac4de4d84f91690"
                     echo
                 fi
             done
 
-            # Show merge details for confirmation
+            # Show merge details and confirm
             echo
             echo "Merge Details:"
             echo "--------------"
@@ -822,9 +948,7 @@ token_merge() {
             echo "$QCLIENT_EXEC token merge $left_coin $right_coin $CONFIG_FLAG"
             echo
 
-            # Ask for confirmation
             read -p "Do you want to proceed with this merge? (y/n): " confirm
-
             if [[ ${confirm,,} == "y" ]]; then
                 $QCLIENT_EXEC token merge "$left_coin" "$right_coin" $CONFIG_FLAG
             else
@@ -834,25 +958,21 @@ token_merge() {
             ;;
 
         2)  # Merge all coins
-            # Extract coin values and calculate total
-            total_value=0
-            while read -r line; do
-                if [[ $line =~ ([0-9]+\.[0-9]+)\ QUIL ]]; then
-                    value=${BASH_REMATCH[1]}
-                    total_value=$(echo "$total_value + $value" | bc)
-                fi
-            done <<< "$coins_output"
+            # Verify we have enough coins to merge
+            coin_count=$($QCLIENT_EXEC token coins $CONFIG_FLAG | grep -c "QUIL")
+            
+            if [ "$coin_count" -lt 2 ]; then
+                echo "❌ Not enough coins to merge. You need at least 2 coins."
+                echo
+                read -p "Press Enter to return to the main menu..."
+                return 1
+            fi
 
-            echo "Found $coin_count coins to merge"
-            echo "Total amount in QUIL will be $total_value"
-            echo
-
-            # Show command that will be executed
+            # Show command and confirm
             echo "Command that will be executed:"
             echo "$QCLIENT_EXEC token merge all $CONFIG_FLAG"
             echo
-
-            # Ask for confirmation
+            
             read -p "Do you want to proceed with merging all coins? (y/n): " confirm
             if [[ ${confirm,,} == "y" ]]; then
                 $QCLIENT_EXEC token merge all $CONFIG_FLAG
