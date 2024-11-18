@@ -9,7 +9,7 @@
 # Example:  ~/scripts/qnode_proof_monitor.sh 600    # analyzes last 10 hours
 
 # Script version
-SCRIPT_VERSION="3.4"
+SCRIPT_VERSION="3.5"
 
 # Default time window in minutes (3 hours by default)
 DEFAULT_TIME_WINDOW=180
@@ -39,8 +39,8 @@ SUBMISSION_OPTIMAL_MAX=28
 SUBMISSION_WARNING_MAX=70
 
 # CPU processing thresholds
-CPU_OPTIMAL_MAX=30  # Based on user comment about 30 seconds
-CPU_WARNING_MAX=45  # Example threshold
+CPU_OPTIMAL_MAX=20  # Optimal max CPU time
+CPU_WARNING_MAX=35  # Warning max CPU time
 
 # Colors and formatting
 BOLD='\033[1m'
