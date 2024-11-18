@@ -9,7 +9,7 @@
 # Example:  ~/scripts/qnode_proof_monitor.sh 600    # analyzes last 10 hours
 
 # Script version
-SCRIPT_VERSION="3.8"
+SCRIPT_VERSION="3.9"
 
 # Default time window in minutes (3 hours by default)
 DEFAULT_TIME_WINDOW=180
@@ -337,38 +337,38 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
     # Overall health assessment
     print_header "📋 OVERALL HEALTH ASSESSMENT"
     
-    # Check CPU processing time status if available
+    # Check if we have CPU data
     if [ -s "$TEMP_MATCHES" ]; then
-        CPU_CRITICAL=0
-        (( CPU_CRITICAL_PCT > 50 )) && CPU_CRITICAL=1
+        # Calculate majority percentages for each section
+        CREATE_MAJORITY_PCT=$(( CREATE_OPTIMAL_PCT > 50 ? 1 : CREATE_WARNING_PCT > 50 ? 2 : CREATE_CRITICAL_PCT > 50 ? 3 : 0 ))
+        SUBMIT_MAJORITY_PCT=$(( SUBMIT_OPTIMAL_PCT > 50 ? 1 : SUBMIT_WARNING_PCT > 50 ? 2 : SUBMIT_CRITICAL_PCT > 50 ? 3 : 0 ))
+        CPU_MAJORITY_PCT=$(( CPU_OPTIMAL_PCT > 50 ? 1 : CPU_WARNING_PCT > 50 ? 2 : CPU_CRITICAL_PCT > 50 ? 3 : 0 ))
         
-        if (( CREATE_CRITICAL_PCT > 50 && SUBMIT_CRITICAL_PCT > 50 && CPU_CRITICAL == 1 )); then
+        # Evaluate overall health
+        if [ $CREATE_MAJORITY_PCT -eq 1 ] && [ $SUBMIT_MAJORITY_PCT -eq 1 ] && [ $CPU_MAJORITY_PCT -eq 1 ]; then
+            echo -e "Status: ${GREEN}${BOLD}OPTIMAL${RESET} 🟢"
+            echo -e "All metrics show excellent performance. System is running ideally."
+        elif [ $CREATE_MAJORITY_PCT -eq 3 ] && [ $SUBMIT_MAJORITY_PCT -eq 3 ] && [ $CPU_MAJORITY_PCT -eq 3 ]; then
             echo -e "Status: ${RED}${BOLD}CRITICAL${RESET} 🔴"
-            echo -e "Both network latency and CPU processing are outside optimal ranges. System needs immediate attention."
-        elif (( CPU_CRITICAL == 1 )); then
-            echo -e "Status: ${RED}${BOLD}CRITICAL${RESET} 🔴"
-            echo -e "CPU processing time is too high. Consider optimizing your system resources."
-        elif (( CREATE_CRITICAL_PCT > 50 && SUBMIT_CRITICAL_PCT > 50 )); then
-            echo -e "Status: ${RED}${BOLD}CRITICAL${RESET} 🔴"
-            echo -e "Network latency is too high. Check your network connection and configuration."
-        elif (( CREATE_OPTIMAL_PCT < 50 || SUBMIT_OPTIMAL_PCT < 50 || CPU_OPTIMAL_PCT < 50 )); then
-            echo -e "Status: ${YELLOW}${BOLD}SUBOPTIMAL${RESET} 🟡"
-            echo -e "Some metrics are outside optimal ranges but may still allow successful proof submission."
+            echo -e "All metrics show critical performance issues. System needs immediate attention."
         else
-            echo -e "Status: ${GREEN}${BOLD}HEALTHY${RESET} 🟢"
-            echo -e "All metrics are within acceptable ranges. System is performing well."
+            echo -e "Status: ${YELLOW}${BOLD}SUBOPTIMAL${RESET} 🟡"
+            echo -e "Mixed performance metrics. System may need optimization."
         fi
     else
-        # Original health assessment without CPU data
-        if (( CREATE_CRITICAL_PCT > 50 && SUBMIT_CRITICAL_PCT > 50 )); then
+        # Evaluation without CPU data
+        CREATE_MAJORITY_PCT=$(( CREATE_OPTIMAL_PCT > 50 ? 1 : CREATE_WARNING_PCT > 50 ? 2 : CREATE_CRITICAL_PCT > 50 ? 3 : 0 ))
+        SUBMIT_MAJORITY_PCT=$(( SUBMIT_OPTIMAL_PCT > 50 ? 1 : SUBMIT_WARNING_PCT > 50 ? 2 : SUBMIT_CRITICAL_PCT > 50 ? 3 : 0 ))
+        
+        if [ $CREATE_MAJORITY_PCT -eq 1 ] && [ $SUBMIT_MAJORITY_PCT -eq 1 ]; then
+            echo -e "Status: ${GREEN}${BOLD}OPTIMAL${RESET} 🟢"
+            echo -e "All metrics show excellent performance. System is running ideally."
+        elif [ $CREATE_MAJORITY_PCT -eq 3 ] && [ $SUBMIT_MAJORITY_PCT -eq 3 ]; then
             echo -e "Status: ${RED}${BOLD}CRITICAL${RESET} 🔴"
-            echo -e "Majority of proofs are outside optimal ranges. System needs attention."
-        elif (( CREATE_OPTIMAL_PCT < 50 || SUBMIT_OPTIMAL_PCT < 50 )); then
-            echo -e "Status: ${YELLOW}${BOLD}SUBOPTIMAL${RESET} 🟡"
-            echo -e "Some proofs are outside optimal ranges but may still land successfully."
+            echo -e "All metrics show critical performance issues. System needs immediate attention."
         else
-            echo -e "Status: ${GREEN}${BOLD}HEALTHY${RESET} 🟢"
-            echo -e "Most proofs are within acceptable ranges and likely to land successfully."
+            echo -e "Status: ${YELLOW}${BOLD}SUBOPTIMAL${RESET} 🟡"
+            echo -e "Mixed performance metrics. System may need optimization."
         fi
     fi
     
