@@ -397,7 +397,7 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
 
     echo -e "\nCPU Model: $cpu_model"
     echo -e "CPU Cores: $cpu_cores ($cpu_threads threads)"
-    echo -e "Total RAM: ${ram_gb}GB"
+    echo -e "Total RAM: ${ram_gb} GB"
     
 else
     echo -e "\n${RED}${BOLD}No proofs found in the last $TIME_WINDOW minutes${RESET}"
