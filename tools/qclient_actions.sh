@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.9.6"
+SCRIPT_VERSION="1.9.7"
 
 
 #=====================
@@ -119,6 +119,32 @@ validate_hash() {
     return 0
 }
 
+# wait with spinner - is not trapping CTRL + C
+# wait_with_spinner() {
+#     local message="${1:-Wait for %s seconds...}"
+#     local seconds="$2"
+#     local chars="⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
+#     local pid
+
+#     message="${message//%s/$seconds}"
+
+#     (
+#         while true; do
+#             for (( i=0; i<${#chars}; i++ )); do
+#                 echo -en "\r$message ${chars:$i:1} "
+#                 sleep 0.1
+#             done
+#         done
+#     ) &
+#     pid=$!
+
+#     sleep "$seconds"
+#     kill $pid 2>/dev/null
+#     wait $pid 2>/dev/null
+#     echo -en "\r\033[K"
+# }
+
+# wait with spinner - goes back to menu on CTRL + C
 wait_with_spinner() {
     local message="${1:-Wait for %s seconds...}"
     local seconds="$2"
@@ -126,6 +152,9 @@ wait_with_spinner() {
     local pid
 
     message="${message//%s/$seconds}"
+
+    # Set up trap for SIGINT (Ctrl+C)
+    trap 'kill $pid 2>/dev/null; wait $pid 2>/dev/null; echo -en "\r\033[K"; echo -e "\n\nOperation cancelled. Returning to main menu..."; main; exit 0' INT
 
     (
         while true; do
@@ -141,6 +170,9 @@ wait_with_spinner() {
     kill $pid 2>/dev/null
     wait $pid 2>/dev/null
     echo -en "\r\033[K"
+    
+    # Remove the trap after completion
+    trap - INT
 }
 
 check_exit() {
