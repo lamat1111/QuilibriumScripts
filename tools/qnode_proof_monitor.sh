@@ -9,7 +9,7 @@
 # Example:  ~/scripts/qnode_proof_monitor.sh 600    # analyzes last 10 hours
 
 # Script version
-SCRIPT_VERSION="3.1"
+SCRIPT_VERSION="3.2"
 
 # Default time window in minutes (1 hour by default)
 DEFAULT_TIME_WINDOW=180
@@ -46,7 +46,7 @@ RED='\033[31m'
 YELLOW='\033[33m'
 CYAN='\033[36m'
 RESET='\033[0m'
-GRAY='\033[38;5;248m'
+GRAY='\033[38;5;240m'
 SEPARATOR="━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 # Function to check for newer script version
@@ -62,22 +62,32 @@ check_for_updates() {
 # Function to calculate average and standard deviation
 calculate_stats() {
     local file=$1
+    
     # Calculate average
     local avg=$(awk '{ sum += $1; n++ } END { if (n > 0) printf "%.2f", sum / n }' "$file")
     
     # Calculate standard deviation
-    local stddev=$(awk -v avg="$avg" '{ sum += ($1 - avg) * ($1 - avg); n++ } END { if (n > 1) printf "%.2f", sqrt(sum / (n-1)) }' "$file")
-    
-    # Calculate relative standard deviation as percentage (CV)
-    local relstddev=$(awk -v avg="$avg" -v stddev="$stddev" 'BEGIN { printf "%.1f", (stddev/avg) * 100 }')
+    # Using formula: sqrt(Σ(x - μ)²/(n-1))
+    local stddev=$(awk -v avg="$avg" '
+        BEGIN { sum = 0; n = 0 }
+        { 
+            diff = $1 - avg
+            sum += diff * diff
+            n++
+        }
+        END { 
+            if (n > 1) 
+                printf "%.2f", sqrt(sum / (n-1))
+            else 
+                printf "0"
+        }' "$file")
     
     # Get min and max
     local min=$(awk 'NR == 1 { min = $1 } $1 < min { min = $1 } END { printf "%.2f", min }' "$file")
     local max=$(awk 'NR == 1 { max = $1 } $1 > max { max = $1 } END { printf "%.2f", max }' "$file")
     
-    echo "$avg $relstddev $min $max" # Note: now outputting relstddev instead of stddev
+    echo "$avg $stddev $min $max"
 }
-
 # Check for updates and update if available
 check_for_updates
 
@@ -181,8 +191,8 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
     echo -e "${WARNING_COLOR}${BOLD}$CREATE_WARNING_PCT%${RESET} ${WARNING_COLOR}Meh...${RESET} (${CREATION_OPTIMAL_MAX}-${CREATION_WARNING_MAX}s) - ${BOLD}${CREATE_STATS[1]}${RESET} proofs"
     echo -e "${CRITICAL_COLOR}${BOLD}$CREATE_CRITICAL_PCT%${RESET} ${CRITICAL_COLOR}Ouch!${RESET} (>${CREATION_WARNING_MAX}s) - ${BOLD}${CREATE_STATS[2]}${RESET} proofs"
     
-    echo -e "\n${GRAY}Average Frame Age: ${BOLD}${CREATE_AGE_STATS[0]}s${RESET}"
-    echo -e "${GRAY}Standard Deviation: ${BOLD}${CREATE_AGE_STATS[1]}%${RESET} ${GRAY}(lower is better)${RESET}"
+    echo -e "${GRAY}Average Frame Age: ${BOLD}${CREATE_AGE_STATS[0]}s${RESET}"
+    echo -e "${GRAY}Standard Deviation: ${BOLD}${CREATE_AGE_STATS[1]}s${RESET} ${GRAY}(lower is better)${RESET}"
     echo -e "${GRAY}Lowest Frame Age: ${BOLD}${CREATE_AGE_STATS[2]}s${RESET}"
     echo -e "${GRAY}Highest Frame Age: ${BOLD}${CREATE_AGE_STATS[3]}s${RESET}${RESET}"
     
