@@ -9,7 +9,7 @@
 # Example:  ~/scripts/qnode_proof_monitor.sh 600    # analyzes last 10 hours
 
 # Script version
-SCRIPT_VERSION="3.2"
+SCRIPT_VERSION="3.3"
 
 # Default time window in minutes (1 hour by default)
 DEFAULT_TIME_WINDOW=180
@@ -46,7 +46,7 @@ RED='\033[31m'
 YELLOW='\033[33m'
 CYAN='\033[36m'
 RESET='\033[0m'
-GRAY='\033[38;5;240m'
+GRAY='\033[38;5;244m'
 SEPARATOR="━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 # Function to check for newer script version
@@ -191,7 +191,7 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
     echo -e "${WARNING_COLOR}${BOLD}$CREATE_WARNING_PCT%${RESET} ${WARNING_COLOR}Meh...${RESET} (${CREATION_OPTIMAL_MAX}-${CREATION_WARNING_MAX}s) - ${BOLD}${CREATE_STATS[1]}${RESET} proofs"
     echo -e "${CRITICAL_COLOR}${BOLD}$CREATE_CRITICAL_PCT%${RESET} ${CRITICAL_COLOR}Ouch!${RESET} (>${CREATION_WARNING_MAX}s) - ${BOLD}${CREATE_STATS[2]}${RESET} proofs"
     
-    echo -e "${GRAY}Average Frame Age: ${BOLD}${CREATE_AGE_STATS[0]}s${RESET}"
+    echo -e "\n${GRAY}Average Frame Age: ${BOLD}${CREATE_AGE_STATS[0]}s${RESET}"
     echo -e "${GRAY}Standard Deviation: ${BOLD}${CREATE_AGE_STATS[1]}s${RESET} ${GRAY}(lower is better)${RESET}"
     echo -e "${GRAY}Lowest Frame Age: ${BOLD}${CREATE_AGE_STATS[2]}s${RESET}"
     echo -e "${GRAY}Highest Frame Age: ${BOLD}${CREATE_AGE_STATS[3]}s${RESET}${RESET}"
