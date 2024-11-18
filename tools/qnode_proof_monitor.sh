@@ -9,7 +9,7 @@
 # Example:  ~/scripts/qnode_proof_monitor.sh 600    # analyzes last 10 hours
 
 # Script version
-SCRIPT_VERSION="4.0"
+SCRIPT_VERSION="4.1"
 
 # Default time window in minutes (3 hours by default)
 DEFAULT_TIME_WINDOW=180
@@ -134,6 +134,19 @@ get_latest_stats() {
     fi
     
     echo "$ring $workers"
+}
+
+# Add these functions BEFORE they are called
+get_cpu_info() {
+    local cpu_model=$(grep "model name" /proc/cpuinfo | head -n1 | cut -d':' -f2 | xargs)
+    local cpu_cores=$(nproc)
+    local cpu_threads=$(grep -c processor /proc/cpuinfo)
+    echo "$cpu_model|$cpu_cores|$cpu_threads"
+}
+
+get_ram_info() {
+    local total_ram=$(free -g | awk '/^Mem:/ {printf "%.1f", $2}')
+    echo "$total_ram"
 }
 
 # Check for updates
@@ -372,19 +385,19 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
         fi
     fi
     
-    # Add system information section
+    # System information section
     print_header "💻 NODE & SYSTEM INFORMATION"
-    
-    echo -e "Ring: ${BOLD}${NODE_STATS[0]}${RESET}"
-    echo -e "Workers: ${BOLD}${NODE_STATS[1]}${RESET}"
-    
+
+    echo -e "Ring: ${NODE_STATS[0]}"
+    echo -e "Workers: ${NODE_STATS[1]}"
+
     # Get CPU and RAM info
     IFS='|' read -r cpu_model cpu_cores cpu_threads <<< "$(get_cpu_info)"
     ram_gb=$(get_ram_info)
-    
-    echo -e "\nCPU Model: ${BOLD}$cpu_model${RESET}"
-    echo -e "CPU Cores: ${BOLD}$cpu_cores${RESET} (${GRAY}$cpu_threads threads${RESET})"
-    echo -e "Total RAM: ${BOLD}${ram_gb}GB${RESET}"
+
+    echo -e "\nCPU Model: $cpu_model"
+    echo -e "CPU Cores: $cpu_cores ($cpu_threads threads)"
+    echo -e "Total RAM: ${ram_gb}GB"
     
 else
     echo -e "\n${RED}${BOLD}No proofs found in the last $TIME_WINDOW minutes${RESET}"
