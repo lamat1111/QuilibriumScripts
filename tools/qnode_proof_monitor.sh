@@ -9,7 +9,7 @@
 # Example:  ~/scripts/qnode_proof_monitor.sh 600    # analyzes last 10 hours
 
 # Script version
-SCRIPT_VERSION="3.9"
+SCRIPT_VERSION="4.0"
 
 # Default time window in minutes (3 hours by default)
 DEFAULT_TIME_WINDOW=180
@@ -372,8 +372,19 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
         fi
     fi
     
-    echo -e "\nRing: ${BOLD}${NODE_STATS[0]}${RESET}"
+    # Add system information section
+    print_header "💻 NODE & SYSTEM INFORMATION"
+    
+    echo -e "Ring: ${BOLD}${NODE_STATS[0]}${RESET}"
     echo -e "Workers: ${BOLD}${NODE_STATS[1]}${RESET}"
+    
+    # Get CPU and RAM info
+    IFS='|' read -r cpu_model cpu_cores cpu_threads <<< "$(get_cpu_info)"
+    ram_gb=$(get_ram_info)
+    
+    echo -e "\nCPU Model: ${BOLD}$cpu_model${RESET}"
+    echo -e "CPU Cores: ${BOLD}$cpu_cores${RESET} (${GRAY}$cpu_threads threads${RESET})"
+    echo -e "Total RAM: ${BOLD}${ram_gb}GB${RESET}"
     
 else
     echo -e "\n${RED}${BOLD}No proofs found in the last $TIME_WINDOW minutes${RESET}"
