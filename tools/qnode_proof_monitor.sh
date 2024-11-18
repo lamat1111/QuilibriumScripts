@@ -9,7 +9,7 @@
 # Example:  ~/scripts/qnode_proof_monitor.sh 600    # analyzes last 10 hours
 
 # Script version
-SCRIPT_VERSION="3.5"
+SCRIPT_VERSION="3.6"
 
 # Default time window in minutes (3 hours by default)
 DEFAULT_TIME_WINDOW=180
