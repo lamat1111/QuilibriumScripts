@@ -270,7 +270,7 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
     echo -e "${CRITICAL_COLOR}${BOLD}$CREATE_CRITICAL_PCT%${RESET} ${CRITICAL_COLOR}Ouch!${RESET} (>${CREATION_WARNING_MAX}s) - ${BOLD}${CREATE_STATS[2]}${RESET} proofs"
     
     echo -e "\n${GRAY}Average Frame Age: ${BOLD}${CREATE_AGE_STATS[0]}s${RESET}"
-    echo -e "${GRAY}Standard Deviation: ${BOLD}${CREATE_AGE_STATS[1]}s${RESET} ${GRAY}(lower is better)${RESET}"
+    echo -e "${GRAY}Standard Deviation: ${BOLD}${CREATE_AGE_STATS[1]}s${RESET}"
     echo -e "${GRAY}Lowest Frame Age: ${BOLD}${CREATE_AGE_STATS[2]}s${RESET}"
     echo -e "${GRAY}Highest Frame Age: ${BOLD}${CREATE_AGE_STATS[3]}s${RESET}${RESET}"
     
@@ -296,7 +296,7 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
     echo -e "${CRITICAL_COLOR}${BOLD}$SUBMIT_CRITICAL_PCT%${RESET} ${CRITICAL_COLOR}Ouch!${RESET} (>${SUBMISSION_WARNING_MAX}s) - ${BOLD}${SUBMIT_STATS[2]}${RESET} proofs"
     
     echo -e "\n${GRAY}Average Frame Age: ${BOLD}${SUBMIT_AGE_STATS[0]}s${RESET}"
-    echo -e "${GRAY}Standard Deviation: ${BOLD}${SUBMIT_AGE_STATS[1]}s${RESET} ${GRAY}(lower is better)${RESET}"
+    echo -e "${GRAY}Standard Deviation: ${BOLD}${SUBMIT_AGE_STATS[1]}s${RESET}"
     echo -e "${GRAY}Lowest Frame Age: ${BOLD}${SUBMIT_AGE_STATS[2]}s${RESET}"
     echo -e "${GRAY}Highest Frame Age: ${BOLD}${SUBMIT_AGE_STATS[3]}s${RESET}${RESET}"
 
@@ -337,7 +337,7 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
         echo -e "${CRITICAL_COLOR}${BOLD}$CPU_CRITICAL_PCT%${RESET} ${CRITICAL_COLOR}Ouch!${RESET} (>${CPU_WARNING_MAX}s) - ${BOLD}${CPU_STATS[2]}${RESET} proofs"
         
         echo -e "\n${GRAY}Average Processing Time: ${BOLD}${CPU_AGE_STATS[0]}s${RESET}"
-        echo -e "${GRAY}Standard Deviation: ${BOLD}${CPU_AGE_STATS[1]}s${RESET} ${GRAY}(lower is better)${RESET}"
+        echo -e "${GRAY}Standard Deviation: ${BOLD}${CPU_AGE_STATS[1]}s${RESET}"
         echo -e "${GRAY}Fastest Processing: ${BOLD}${CPU_AGE_STATS[2]}s${RESET}"
         echo -e "${GRAY}Slowest Processing: ${BOLD}${CPU_AGE_STATS[3]}s${RESET}${RESET}"
         
