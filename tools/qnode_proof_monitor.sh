@@ -40,7 +40,7 @@ SUBMISSION_WARNING_MAX=70
 
 # CPU processing thresholds
 CPU_OPTIMAL_MAX=20  # Optimal max CPU time
-CPU_WARNING_MAX=35  # Warning max CPU time
+CPU_WARNING_MAX=30  # Warning max CPU time
 
 # Colors and formatting
 BOLD='\033[1m'
