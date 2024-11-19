@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.0.0"
+SCRIPT_VERSION="2.0.1"
 
 
 #=====================
@@ -15,7 +15,7 @@ SCRIPT_PATH=$HOME/scripts
 
 # Qclient binary determination
 QCLIENT_DIR="$HOME/ceremonyclient/client"
-CONFIG_FLAG="--config $HOME/ceremonyclient/node/.config"
+FLAGS="--config $HOME/ceremonyclient/node/.config --public-rpc"
 
 QCLIENT_EXEC=$(find "$QCLIENT_DIR" -name "qclient-*" ! -name "*.dgst" ! -name "*.sig*" -type f -executable 2>/dev/null | sort -V | tail -n 1)
 
@@ -187,7 +187,7 @@ check_balance() {
     echo
     echo "$(format_title "Token balance and account address")"
     echo
-    $QCLIENT_EXEC token balance $CONFIG_FLAG
+    $QCLIENT_EXEC token balance $FLAGS
     echo
 }
 
@@ -195,7 +195,7 @@ check_coins() {
     echo
     echo "$(format_title "Individual coins")"
     echo
-    $QCLIENT_EXEC token coins $CONFIG_FLAG
+    $QCLIENT_EXEC token coins $FLAGS
     echo
 }
 
@@ -213,7 +213,7 @@ mint_all() {
     echo "- Create a tmux session"
     echo "- Execute the below command:"
     echo
-    echo "$QCLIENT_EXEC token mint all $CONFIG_FLAG"
+    echo "$QCLIENT_EXEC token mint all $FLAGS"
     echo
 }
 
@@ -263,7 +263,7 @@ IMPORTANT:
     done
 
     # Construct and show command
-    cmd="$QCLIENT_EXEC token transfer $to_address $coin_id $CONFIG_FLAG"
+    cmd="$QCLIENT_EXEC token transfer $to_address $coin_id $FLAGS"
     echo
     echo "Transaction Details:"
     echo "--------------------"
@@ -360,7 +360,7 @@ IMPORTANT:
     fi
 
     # Construct the command
-    cmd="$QCLIENT_EXEC token transfer $to_address $transfer_param $CONFIG_FLAG"
+    cmd="$QCLIENT_EXEC token transfer $to_address $transfer_param $FLAGS"
 
     # Show transaction details for confirmation
     echo
@@ -463,14 +463,14 @@ token_split() {
     echo "Second Amount: $right_amount QUIL"
     echo
     echo "Command that will be executed:"
-    echo "$QCLIENT_EXEC token split $coin_id $left_amount $right_amount $CONFIG_FLAG"
+    echo "$QCLIENT_EXEC token split $coin_id $left_amount $right_amount $FLAGS"
     echo
 
     # Ask for confirmation
     read -p "Do you want to proceed with this split? (y/n): " confirm
 
     if [[ ${confirm,,} == "y" ]]; then
-        $QCLIENT_EXEC token split "$coin_id" "$left_amount" "$right_amount" $CONFIG_FLAG
+        $QCLIENT_EXEC token split "$coin_id" "$left_amount" "$right_amount" $FLAGS
         
         # Show updated coins after split
         echo
@@ -531,7 +531,7 @@ token_split_advanced() {
     done
 
     # Get the coin amount for the selected coin
-    coin_info=$($QCLIENT_EXEC token coins $CONFIG_FLAG | grep "$coin_id")
+    coin_info=$($QCLIENT_EXEC token coins $FLAGS | grep "$coin_id")
     if [[ $coin_info =~ ([0-9]+\.[0-9]+)\ QUIL ]]; then
         total_amount=${BASH_REMATCH[1]}
     else
@@ -680,7 +680,7 @@ token_split_advanced() {
     for amount in "${amounts[@]}"; do
         cmd="$cmd $amount"
     done
-    cmd="$cmd $CONFIG_FLAG"
+    cmd="$cmd $FLAGS"
 
     # Show split details for confirmation
     echo
@@ -738,7 +738,7 @@ token_merge() {
             echo
             echo "Your current coins before merging:"
             echo "----------------------------------"
-            coins_output=$($QCLIENT_EXEC token coins $CONFIG_FLAG)
+            coins_output=$($QCLIENT_EXEC token coins $FLAGS)
             echo "$coins_output"
             echo
 
@@ -784,12 +784,12 @@ token_merge() {
             echo "Second Coin: $right_coin"
             echo
             echo "Command that will be executed:"
-            echo "$QCLIENT_EXEC token merge $left_coin $right_coin $CONFIG_FLAG"
+            echo "$QCLIENT_EXEC token merge $left_coin $right_coin $FLAGS"
             echo
 
             read -p "Do you want to proceed with this merge? (y/n): " confirm
             if [[ ${confirm,,} == "y" ]]; then
-                $QCLIENT_EXEC token merge "$left_coin" "$right_coin" $CONFIG_FLAG
+                $QCLIENT_EXEC token merge "$left_coin" "$right_coin" $FLAGS
             else
                 echo "❌ Merge operation cancelled."
                 return 1
@@ -798,7 +798,7 @@ token_merge() {
 
         2)  # Merge all coins
             # Verify we have enough coins to merge
-            coin_count=$($QCLIENT_EXEC token coins $CONFIG_FLAG | grep -c "QUIL")
+            coin_count=$($QCLIENT_EXEC token coins $FLAGS | grep -c "QUIL")
             
             if [ "$coin_count" -lt 2 ]; then
                 echo "❌ Not enough coins to merge. You need at least 2 coins."
@@ -809,12 +809,12 @@ token_merge() {
 
             # Show command and confirm
             echo "Command that will be executed:"
-            echo "$QCLIENT_EXEC token merge all $CONFIG_FLAG"
+            echo "$QCLIENT_EXEC token merge all $FLAGS"
             echo
             
             read -p "Do you want to proceed with merging all coins? (y/n): " confirm
             if [[ ${confirm,,} == "y" ]]; then
-                $QCLIENT_EXEC token merge all $CONFIG_FLAG
+                $QCLIENT_EXEC token merge all $FLAGS
             else
                 echo "❌ Merge operation cancelled."
                 return 1
@@ -887,14 +887,14 @@ token_merge_simple() {
     echo "Second Coin: $right_coin"
     echo
     echo "Command that will be executed:"
-    echo "$QCLIENT_EXEC token merge $left_coin $right_coin $CONFIG_FLAG"
+    echo "$QCLIENT_EXEC token merge $left_coin $right_coin $FLAGS"
     echo
 
     # Ask for confirmation
     read -p "Do you want to proceed with this merge? (y/n): " confirm
 
     if [[ ${confirm,,} == "y" ]]; then
-        $QCLIENT_EXEC token merge "$left_coin" "$right_coin" $CONFIG_FLAG
+        $QCLIENT_EXEC token merge "$left_coin" "$right_coin" $FLAGS
         
         # Show updated coins after merge
         echo
@@ -920,7 +920,7 @@ token_merge_all() {
 
     echo "Current coins that will be merged:"
     echo "---------------------------------"
-    coins_output=$($QCLIENT_EXEC token coins $CONFIG_FLAG)
+    coins_output=$($QCLIENT_EXEC token coins $FLAGS)
     echo "$coins_output"
     echo
 
@@ -955,7 +955,7 @@ token_merge_all() {
     fi
 
     echo
-    $QCLIENT_EXEC token merge all $CONFIG_FLAG
+    $QCLIENT_EXEC token merge all $FLAGS
 
     # Show updated coins after merge
     echo
@@ -974,7 +974,7 @@ count_coins() {
     echo "$(format_title "Count Coins")"
     
     # Run the coins command and capture output silently
-    coins_output=$($QCLIENT_EXEC token coins $CONFIG_FLAG)
+    coins_output=$($QCLIENT_EXEC token coins $FLAGS)
     
     # Count coins by counting lines containing "QUIL"
     coin_count=$(echo "$coins_output" | grep -c "QUIL")
