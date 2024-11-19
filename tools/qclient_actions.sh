@@ -997,7 +997,7 @@ count_coins() {
 
 help() {
     echo
-    $QCLIENT_EXEC --help $FLAGS
+    $QCLIENT_EXEC --help
     echo
 }
 
