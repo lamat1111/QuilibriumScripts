@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="1.9.8"
+SCRIPT_VERSION="1.9.9"
 
 
 #=====================
@@ -126,7 +126,7 @@ wait_with_spinner() {
     local chars="⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
     local pid
 
-    message="${message//%s/$seconds}"
+    message="${message//%s/"$seconds (CTRL+C to esc)"}"
 
     # Set up trap for SIGINT (Ctrl+C)
     trap 'kill $pid 2>/dev/null; wait $pid 2>/dev/null; echo -en "\r\033[K"; echo -e "\n\nOperation cancelled. Returning to main menu..."; main; exit 0' INT
