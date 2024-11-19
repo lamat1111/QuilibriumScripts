@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.0.1"
+SCRIPT_VERSION="2.0.2"
 
 
 #=====================
@@ -50,8 +50,10 @@ display_menu() {
 2) Check individual coins        8) Merge coins
 3) Create transaction            9) Count coins
 -----------------------------------------------------------------
-B) ⭐ Best server providers      X) Disclaimer                           
-D) 💜 Donations                  S) Security settings
+S) Security settings             X) Disclaimer   
+H) Help                     
+----------------------------------------------------------------- 
+B) ⭐ Best server providers     D) 💜 Donations 
 -----------------------------------------------------------------    
 E) Exit
 
@@ -993,6 +995,12 @@ count_coins() {
     echo
 }
 
+help() {
+    echo
+    $QCLIENT_EXEC --help $FLAGS
+    echo
+}
+
 donations() {
     echo
     echo "$(format_title "Donations")"
@@ -1141,6 +1149,7 @@ main() {
             [bB]) best_providers; press_any_key ;;
             [dD]) donations; press_any_key ;;
             [xX]) disclaimer; press_any_key ;;
+            [hH]) help; press_any_key ;;
             [eE]) echo; break ;;
             *) echo "Invalid option, please try again." ;;
         esac
