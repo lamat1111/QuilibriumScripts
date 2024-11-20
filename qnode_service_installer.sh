@@ -334,52 +334,52 @@ EXEC_START="$NODE_PATH/$NODE_BINARY"
 echo "⏳ Creating Ceremonyclient Service"
 sleep 1
 
-# Calculate GOMAXPROCS based on the system's RAM and CPU cores
-calculate_gomaxprocs() {
-    local ram_gb=$(free -g | awk '/^Mem:/{print $2}')
-    local cpu_cores=$(nproc)
-    local original_calc=0
+# # Calculate GOMAXPROCS based on the system's RAM and CPU cores
+# calculate_gomaxprocs() {
+#     local ram_gb=$(free -g | awk '/^Mem:/{print $2}')
+#     local cpu_cores=$(nproc)
+#     local original_calc=0
     
-    # Check if RAM is at least double the number of CPU cores
-    if [ $ram_gb -ge $((cpu_cores * 2)) ]; then
-        echo "0"  # GOMAXPROCS not needed
-    else
-        local gomaxprocs=$((ram_gb / 2))
-        if [ $gomaxprocs -gt $cpu_cores ]; then
-            gomaxprocs=$cpu_cores
-        fi
-        gomaxprocs=$((gomaxprocs + 1))
-        original_calc=$gomaxprocs
+#     # Check if RAM is at least double the number of CPU cores
+#     if [ $ram_gb -ge $((cpu_cores * 2)) ]; then
+#         echo "0"  # GOMAXPROCS not needed
+#     else
+#         local gomaxprocs=$((ram_gb / 2))
+#         if [ $gomaxprocs -gt $cpu_cores ]; then
+#             gomaxprocs=$cpu_cores
+#         fi
+#         gomaxprocs=$((gomaxprocs + 1))
+#         original_calc=$gomaxprocs
         
-        # Ensure GOMAXPROCS is never less than 4
-        if [ $gomaxprocs -lt 4 ]; then
-            echo "WARNING:$original_calc:4"  # Special format to handle warning
-        else
-            echo $gomaxprocs
-        fi
-    fi
-}
+#         # Ensure GOMAXPROCS is never less than 4
+#         if [ $gomaxprocs -lt 4 ]; then
+#             echo "WARNING:$original_calc:4"  # Special format to handle warning
+#         else
+#             echo $gomaxprocs
+#         fi
+#     fi
+# }
 
-GOMAXPROCS_OUTPUT=$(calculate_gomaxprocs)
+# GOMAXPROCS_OUTPUT=$(calculate_gomaxprocs)
 
-# Parse the output to handle warning case
-if [[ $GOMAXPROCS_OUTPUT == WARNING:*:* ]]; then
-    # Extract original and new values from warning output
-    ORIGINAL_CALC=$(echo $GOMAXPROCS_OUTPUT | cut -d':' -f2)
-    GOMAXPROCS=4
-    display_header "⚠️  WARNING: INSUFFICIENT RESOURCES DETECTED"
-    echo "You only have enough RAM to run ${ORIGINAL_CALC} cores, which are not sufficient for your node."
-    echo "We have still set your service to run the minimum number of cores (4),"
-    echo "but you will likely have OOM (out of memory errors) once the node begins to produce proofs."
-    echo
-elif [ "$GOMAXPROCS_OUTPUT" -eq "0" ]; then
-    GOMAXPROCS=0
-    echo "✅ RAM is sufficient (at least double the CPU cores). GOMAXPROCS setting is not needed."
-else
-    GOMAXPROCS=$GOMAXPROCS_OUTPUT
-    echo "✅ GOMAXPROCS has been set to $GOMAXPROCS based on your server's resources."
-fi
-echo
+# # Parse the output to handle warning case
+# if [[ $GOMAXPROCS_OUTPUT == WARNING:*:* ]]; then
+#     # Extract original and new values from warning output
+#     ORIGINAL_CALC=$(echo $GOMAXPROCS_OUTPUT | cut -d':' -f2)
+#     GOMAXPROCS=4
+#     display_header "⚠️  WARNING: INSUFFICIENT RESOURCES DETECTED"
+#     echo "You only have enough RAM to run ${ORIGINAL_CALC} cores, which are not sufficient for your node."
+#     echo "We have still set your service to run the minimum number of cores (4),"
+#     echo "but you will likely have OOM (out of memory errors) once the node begins to produce proofs."
+#     echo
+# elif [ "$GOMAXPROCS_OUTPUT" -eq "0" ]; then
+#     GOMAXPROCS=0
+#     echo "✅ RAM is sufficient (at least double the CPU cores). GOMAXPROCS setting is not needed."
+# else
+#     GOMAXPROCS=$GOMAXPROCS_OUTPUT
+#     echo "✅ GOMAXPROCS has been set to $GOMAXPROCS based on your server's resources."
+# fi
+# echo
 
 # Check if the file exists before attempting to remove it
 if [ -f "/lib/systemd/system/ceremonyclient.service" ]; then
@@ -407,11 +407,11 @@ RestartKillSignal=SIGINT
 FinalKillSignal=SIGKILL
 TimeoutStopSec=30s"
 
-# Add GOMAXPROCS to the service file only if needed
-if [ "$GOMAXPROCS" -ne "0" ]; then
-    SERVICE_CONTENT+="
-Environment=\"GOMAXPROCS=$GOMAXPROCS\""
-fi
+# # Add GOMAXPROCS to the service file only if needed
+# if [ "$GOMAXPROCS" -ne "0" ]; then
+#     SERVICE_CONTENT+="
+# Environment=\"GOMAXPROCS=$GOMAXPROCS\""
+# fi
 
 SERVICE_CONTENT+="
 
