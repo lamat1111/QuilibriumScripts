@@ -191,7 +191,6 @@ sudo /etc/init.d/procps restart
 echo "✅ Network buffer sizes updated"
 echo
 
-
 #==========================
 # SECURITY CONFIGURATION
 #==========================
@@ -246,6 +245,8 @@ EOF
     echo "✅ Fail2Ban configured"
 fi
 echo
+
+sleep 3
 
 #==========================
 # DIRECTORY SETUP
@@ -492,7 +493,6 @@ EXEC_START="$NODE_PATH/$NODE_BINARY"
 
 # Step 6: Create Ceremonyclient Service
 echo "⏳ Creating Ceremonyclient Service"
-sleep 1
 
 # # Calculate GOMAXPROCS based on the system's RAM and CPU cores
 # calculate_gomaxprocs() {
@@ -587,7 +587,7 @@ echo "If you notice errors please correct them manually and restart your node."
 echo "------------------------------------------------"
 cat /lib/systemd/system/ceremonyclient.service
 echo "------------------------------------------------"
-sleep 1
+sleep 5
 
 #==========================
 # .CONFIG YML SETUP
@@ -612,6 +612,8 @@ else
         echo "❌ Config.yml not found. No worries, the node will generate it automatically once it starts."
     fi
 fi
+
+sleep 3
 
 #==========================
 # INSTALLATION COMPLETED
