@@ -571,6 +571,30 @@ echo "------------------------------------------------"
 sleep 1
 
 #==========================
+# .CONFIG YML SETUP
+#==========================
+echo "⏳ Creating node config.yml file..."
+
+cd "$HOME/ceremonyclient/node"
+
+if ! ./"$NODE_BINARY" -peer-id; then
+    echo "❌ Config.yml generation failed. No worries, the node will generate it automatically once it starts."
+else
+    if [ -f ".config/config.yml" ]; then
+        echo "✅ Config.yml generated successfully."
+        cd "$HOME/ceremonyclient/node/.config" 
+        if ! sed -i 's|listenGrpcMultiaddr: ""|listenGrpcMultiaddr: "/ip4/127.0.0.1/tcp/8337"|' ./config.yml || \
+           ! sed -i 's|listenRESTMultiaddr: ""|listenRESTMultiaddr: "/ip4/127.0.0.1/tcp/8338"|' ./config.yml; then
+            echo "❌ Failed to update gRPC settings in config.yml. No worries, you can to do this later..."
+        else
+            echo "✅ gRPC settings added successfully to config.yml"
+        fi
+    else
+        echo "❌ Config.yml not found. No worries, the node will generate it automatically once it starts."
+    fi
+fi
+
+#==========================
 # START NODE VIA SERVICE
 #==========================
 
@@ -587,19 +611,15 @@ sudo systemctl start ceremonyclient
 
 # Final messages
 echo "✅ Now your node is starting!"
-echo "Let it run for at least 15-30 minutes to generate your keys."
+echo "You can logout of your server if you want and login again later."
 echo
-echo "✅ You can logout of your server if you want and login again later."
-echo
+echo "Let the node run for some minutes to generate your keys."
 echo "After 30 minutes, backup your keys.yml and config.yml files."
-echo "Then proceed to set up your gRPC calls,"
-echo "and lastly set up an automatic backup for your .config folder."
-echo
-echo "More info about all this in the online guide: https://docs.quilibrium.one"
+echo "More info in the online guide: https://docs.quilibrium.one"
 echo
 echo "⏳ Now I will show the node log below..."
 echo "To exit the log, just type CTRL +C."
 echo
 # See the logs of the ceremonyclient service
-sleep 3  # Add a 5-second delay
+sleep 3 
 sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
