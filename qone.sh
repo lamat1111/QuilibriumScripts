@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.7.4"
+SCRIPT_VERSION="2.7.5"
 
 # ------------------------------------------------------------------
 SHOW_TEMP_MESSAGE=true  # Toggle to control message visibility
@@ -77,12 +77,10 @@ EOF
         cat << EOF
 
 HOW TO INSTALL A NEW NODE?
-Choose option 1, reboot and then choose 2.
-Let your node run for 30 minutes, then choose option 3. Done!
+Choose option 1, and reboot.
+Let your node run for 30 minutes, then backup your keys.
 
-1) Prepare your server  
-2) Install node
-3) Set up gRPC   
+1) Install node 
 
 EOF
     fi
@@ -128,12 +126,12 @@ main() {
         
         
         case $choice in
+            # 1) 
+            #     if confirm_action "$(wrap_text "$prepare_server_message" "")" "Prepare your server" install_prerequisites; then
+            #         prompt_return_to_menu "skip_check"
+            #     fi
+            #     ;;
             1) 
-                if confirm_action "$(wrap_text "$prepare_server_message" "")" "Prepare your server" install_prerequisites; then
-                    prompt_return_to_menu "skip_check"
-                fi
-                ;;
-            2) 
                 if confirm_action "$(wrap_text "$install_node_message" "")" "Install node" install_node; then
                     prompt_return_to_menu
                 fi
@@ -316,13 +314,10 @@ To remove the script completely, run: rm ~/qone.sh
     at ⭐️ https://iri.quest/q-best-providers ⭐️
     Avoid using providers that specifically ban crypto and mining.
 
- 1) Prepare your server:
-    Installs the necessary prerequisites for your server. 
-    If this is the first time you install a Quilibrium node, it is recommended
-    to follow the online guide at: https://docs.quilibrium.one/
-
- 2) Install node:
-    Installs the Qnode & Qclient on your server. 
+ 1) Install node:
+    - Installs the necessary prerequisites for your server.
+    - Installs the Qnode & Qclient on your server. 
+    - Generates the config.yml and set the local RPC.
     If this is the first time you install a Quilibrium node, it is recommended
     to follow the online guide at: https://docs.quilibrium.one/ 
     Ensure that your server meets all the requirements and that you have 
@@ -908,7 +903,7 @@ QCLIENT_EXEC=$(find "${CLIENT_DIR}" -name "qclient-[0-9]*" ! -name "*.dgst" ! -n
 NODE_BINARY=$(basename "$NODE_EXEC")
 
 # URLs for scripts
-PREREQUISITES_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/server_setup.sh"
+PREREQUISITES_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/tools/server_setup.sh"
 NODE_INSTALL_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/master/qnode_service_installer.sh"
 QCLIENT_INSTALL_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qclient_install.sh"
 GRPCURL_CONFIG_URL="https://raw.githubusercontent.com/lamat1111/quilibriumscripts/master/tools/qnode_gRPC_calls_setup.sh"
