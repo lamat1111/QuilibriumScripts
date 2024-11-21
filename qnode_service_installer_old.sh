@@ -3,12 +3,12 @@
 # Step 0: Welcome
 
 #Comment out for automatic creation of the node version
-#NODE_VERSION=2.0.4
+#NODE_VERSION=2.0.3
 
 #Comment out for automatic creation of the qclient version
-#QCLIENT_VERSION=2.0.3
+#QCLIENT_VERSION=2.0.2.4
 
-SCRIPT_VERSION="2.2"
+SCRIPT_VERSION="2.1"
 
 cat << EOF
 
@@ -41,21 +41,6 @@ EOF
 
 sleep 7  # Add a 7-second delay
 
-GIT_CLONE=false
-
-# Add version check and warning at start
-check_existing_installation() {
-    if systemctl is-active --quiet ceremonyclient; then
-        echo "⚠️  WARNING: Seems like you already have a node isntalled!"
-        read -p "Do you want to proceed with reinstallation? (y/n): " proceed
-        if [[ $proceed != "y" && $proceed != "Y" ]]; then
-            exit 0
-        fi
-    fi
-}
-
-check_existing_installation
-
 # Function to display section headers
 display_header() {
     echo
@@ -65,6 +50,8 @@ display_header() {
     echo
 }
 
+
+GIT_CLONE=false
 
 #==========================
 # MANAGE ERRORS
@@ -86,28 +73,6 @@ exit_message() {
 trap exit_message ERR
 
 #==========================
-# HOSTNAME CONFIGURATION
-#==========================
-
-display_header "CONFIGURING HOSTNAME"
-
-# Display current hostname
-current_hostname=$(hostname)
-echo "Current hostname is: $current_hostname"
-
-# Ask if user wants to change the hostname
-read -p "Do you want to change it? (y/n): " answer
-
-if [[ $answer == "y" || $answer == "Y" ]]; then
-    read -p "Enter new hostname: " new_hostname
-    sudo hostnamectl set-hostname "$new_hostname"
-    echo "✅ Hostname changed to: $new_hostname"
-else
-    echo "✅ Hostname not changed."
-fi
-echo
-
-#==========================
 # INSTALL APPS
 #==========================
 
@@ -127,137 +92,11 @@ check_and_install() {
     fi
 }
 
-# Update and Upgrade the Machine
-echo "⏳ Updating the machine..."
-sleep 2
-sudo apt update -y && sudo apt upgrade -y
-echo "✅ Machine updated."
-echo
+# For DEBIAN OS - Check if sudo, git, and curl are installed
+check_and_install sudo
+check_and_install git
+check_and_install curl
 
-# Install required packages
-echo "⏳ Installing required packages: sudo, git, wget, tar, curl..."
-for pkg in sudo git wget tar curl; do
-    check_and_install "$pkg" || { 
-        echo "❌ These are necessary apps, installation failed..."
-        exit_message
-        exit 1
-    }
-done
-echo "✅ Required packages installed successfully."
-echo
-
-# Install optional packages
-echo "⏳ Installing optional packages: tmux, cron, jq, htop..."
-for pkg in tmux cron jq htop; do
-    check_and_install "$pkg" || echo "⚠️ Optional package $pkg installation failed, continuing..."
-done
-echo "✅ Optional packages installation completed."
-echo
-
-#==========================
-# NETWORK CONFIGURATION
-#==========================
-
-display_header "CONFIGURING NETWORK SETTINGS"
-
-echo "⏳ Adjusting network buffer sizes..."
-
-# Load OS release information including VERSION_ID
-if [ -f /etc/os-release ]; then
-    . /etc/os-release  # This loads VERSION_ID, NAME, and other OS variables
-fi
-
-add_sysctl_setting() {
-    local key=$1
-    local value=$2
-    # Remove existing entry if present
-    sudo sed -i "/^${key}=/d" /etc/sysctl.conf
-    # Add new entry
-    echo "${key}=${value}" | sudo tee -a /etc/sysctl.conf > /dev/null
-    echo "✅ Added ${key}=${value}"
-}
-
-add_sysctl_setting "net.core.rmem_max" "600000000"
-add_sysctl_setting "net.core.wmem_max" "600000000"
-
-# Use VERSION_ID from os-release to determine sysctl command
-if [[ "${VERSION_ID}" == "24.04" ]]; then
-    sudo /sbin/sysctl -p/etc/sysctl.conf
-else
-    sudo sysctl -p
-fi
-
-sudo /etc/init.d/procps restart
-echo "✅ Network buffer sizes updated"
-echo
-
-#==========================
-# SECURITY CONFIGURATION
-#==========================
-
-display_header "CONFIGURING SECURITY SETTINGS"
-
-# Add UFW rule deduplication
-ufw_add_unique() {
-    local port=$1
-    if ! sudo ufw status | grep -q "^$port"; then
-        sudo ufw allow $port
-    fi
-}
-
-# UFW Firewall Setup
-# UFW Firewall Setup
-echo "⏳ Setting up UFW firewall..."
-sudo apt install ufw -y || echo "⚠️ Failed to install UFW"
-
-if command -v ufw >/dev/null 2>&1 && sudo ufw status >/dev/null 2>&1; then
-    echo "y" | sudo ufw enable
-    for port in 22 8336 443; do
-        ufw_add_unique $port
-    done
-    sudo ufw status
-    echo "✅ Firewall configured"
-else
-    echo "⚠️ UFW installation failed. Manual configuration required."
-fi
-echo
-
-# Fail2Ban Setup
-echo "⏳ Setting up Fail2Ban..."
-if ! dpkg -s fail2ban &> /dev/null; then
-    sudo apt install fail2ban -y
-fi
-
-if [ ! -f "/etc/fail2ban/jail.d/sshd.conf" ]; then
-    sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.conf.backup
-    cat << EOF | sudo tee /etc/fail2ban/jail.d/sshd.conf > /dev/null
-[sshd]
-enabled = true
-port = ssh
-filter = sshd
-logpath = %(sshd_log)s
-maxretry = 3
-findtime = 300
-bantime = 1800
-EOF
-    sudo systemctl restart fail2ban
-    sudo systemctl enable fail2ban
-    echo "✅ Fail2Ban configured"
-fi
-echo
-
-sleep 3
-
-#==========================
-# DIRECTORY SETUP
-#==========================
-
-display_header "SETTING UP DIRECTORIES"
-
-echo "⏳ Creating utility directories..."
-sudo mkdir -p /root/{backup,scripts,scripts/log}
-echo "✅ Directories created"
-echo
 
 #==========================
 # CREATE PATH VARIABLES
@@ -493,6 +332,7 @@ EXEC_START="$NODE_PATH/$NODE_BINARY"
 
 # Step 6: Create Ceremonyclient Service
 echo "⏳ Creating Ceremonyclient Service"
+sleep 1
 
 # # Calculate GOMAXPROCS based on the system's RAM and CPU cores
 # calculate_gomaxprocs() {
@@ -587,48 +427,38 @@ echo "If you notice errors please correct them manually and restart your node."
 echo "------------------------------------------------"
 cat /lib/systemd/system/ceremonyclient.service
 echo "------------------------------------------------"
-sleep 5
+sleep 1
 
 #==========================
-# .CONFIG YML SETUP
-#==========================
-echo "⏳ Creating node config.yml file..."
-
-cd "$HOME/ceremonyclient/node"
-
-if ! ./"$NODE_BINARY" -peer-id; then
-    echo "❌ Config.yml generation failed. No worries, the node will generate it automatically once it starts."
-else
-    if [ -f ".config/config.yml" ]; then
-        echo "✅ Config.yml generated successfully."
-        cd "$HOME/ceremonyclient/node/.config" 
-        if ! sed -i 's|listenGrpcMultiaddr: ""|listenGrpcMultiaddr: "/ip4/127.0.0.1/tcp/8337"|' ./config.yml || \
-           ! sed -i 's|listenRESTMultiaddr: ""|listenRESTMultiaddr: "/ip4/127.0.0.1/tcp/8338"|' ./config.yml; then
-            echo "❌ Failed to update gRPC settings in config.yml. No worries, you can to do this later..."
-        else
-            echo "✅ gRPC settings added successfully to config.yml"
-        fi
-    else
-        echo "❌ Config.yml not found. No worries, the node will generate it automatically once it starts."
-    fi
-fi
-
-sleep 3
-
-#==========================
-# INSTALLATION COMPLETED
+# START NODE VIA SERVICE
 #==========================
 
-display_header "✅ INSTALLATION COMPLETED"
+display_header "STARTING NODE"
 
+# Start the ceremonyclient service
+echo "✅ Starting Ceremonyclient Service"
+echo
+
+sleep 2  # Add a 2-second delay
 sudo systemctl daemon-reload
 sudo systemctl enable ceremonyclient
-# Prompt for reboot
-echo "Server setup is finished!"
-echo "⚠️ Your server will reboot in 10 seconds..."
+sudo systemctl start ceremonyclient
+
+# Final messages
+echo "✅ Now your node is starting!"
+echo "Let it run for at least 15-30 minutes to generate your keys."
 echo
-echo "After the reboot, your node will start automatically"
-echo "After 30 minutes that your node has been running, backup your keys.yml and config.yml files."
-echo "More info in the online guide: https://docs.quilibrium.one"
-sleep 10
-sudo reboot
+echo "✅ You can logout of your server if you want and login again later."
+echo
+echo "After 30 minutes, backup your keys.yml and config.yml files."
+echo "Then proceed to set up your gRPC calls,"
+echo "and lastly set up an automatic backup for your .config folder."
+echo
+echo "More info about all this in the online guide: https://docs.quilibrium.one"
+echo
+echo "⏳ Now I will show the node log below..."
+echo "To exit the log, just type CTRL +C."
+echo
+# See the logs of the ceremonyclient service
+sleep 3  # Add a 5-second delay
+sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
