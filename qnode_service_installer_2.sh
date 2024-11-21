@@ -614,31 +614,19 @@ else
 fi
 
 #==========================
-# START NODE VIA SERVICE
+# INSTALLATION COMPLETED
 #==========================
 
-display_header "STARTING NODE"
+display_header "✅ INSTALLATION COMPLETED"
 
-# Start the ceremonyclient service
-echo "✅ Starting Ceremonyclient Service"
-echo
-
-sleep 2  # Add a 2-second delay
 sudo systemctl daemon-reload
 sudo systemctl enable ceremonyclient
-sudo systemctl start ceremonyclient
-
-# Final messages
-echo "✅ Now your node is starting!"
-echo "You can logout of your server if you want and login again later."
+# Prompt for reboot
+echo "Server setup is finished!"
+echo "⚠️ Your server will reboot in 10 seconds..."
 echo
-echo "Let the node run for some minutes to generate your keys."
-echo "After 30 minutes, backup your keys.yml and config.yml files."
+echo "After the reboot, your node will start automatically"
+echo "After 30 minutes that your node has been running, backup your keys.yml and config.yml files."
 echo "More info in the online guide: https://docs.quilibrium.one"
-echo
-echo "⏳ Now I will show the node log below..."
-echo "To exit the log, just type CTRL +C."
-echo
-# See the logs of the ceremonyclient service
-sleep 3 
-sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
+sleep 10
+sudo reboot
