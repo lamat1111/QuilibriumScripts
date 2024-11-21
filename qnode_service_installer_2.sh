@@ -41,6 +41,21 @@ EOF
 
 sleep 7  # Add a 7-second delay
 
+GIT_CLONE=false
+
+# Add version check and warning at start
+check_existing_installation() {
+    if systemctl is-active --quiet ceremonyclient; then
+        echo "⚠️  WARNING: Seems like you already have a node isntalled!"
+        read -p "Do you want to proceed with reinstallation? (y/n): " proceed
+        if [[ $proceed != "y" && $proceed != "Y" ]]; then
+            exit 0
+        fi
+    fi
+}
+
+check_existing_installation
+
 # Function to display section headers
 display_header() {
     echo
@@ -51,7 +66,24 @@ display_header() {
 }
 
 
-GIT_CLONE=false
+#==========================
+# MANAGE ERRORS
+#==========================
+
+# Exit on any error
+set -e
+
+# Define a function for displaying exit messages
+exit_message() {
+    echo "❌ Oops! There was an error during the script execution and the process stopped. No worries!"
+    echo "You can try to run the script from scratch again."
+    echo
+    echo "If you still receive an error, you may want to proceed manually, step by step instead of using the auto-installer."
+    echo "The step by step installation instructions are here: https://iri.quest/q-node-step-by-step"
+}
+
+# Set a trap to call exit_message on any error
+trap exit_message ERR
 
 #==========================
 # HOSTNAME CONFIGURATION
@@ -74,25 +106,6 @@ else
     echo "✅ Hostname not changed."
 fi
 echo
-
-#==========================
-# MANAGE ERRORS
-#==========================
-
-# Exit on any error
-set -e
-
-# Define a function for displaying exit messages
-exit_message() {
-    echo "❌ Oops! There was an error during the script execution and the process stopped. No worries!"
-    echo "You can try to run the script from scratch again."
-    echo
-    echo "If you still receive an error, you may want to proceed manually, step by step instead of using the auto-installer."
-    echo "The step by step installation instructions are here: https://iri.quest/q-node-step-by-step"
-}
-
-# Set a trap to call exit_message on any error
-trap exit_message ERR
 
 #==========================
 # INSTALL APPS
@@ -149,28 +162,25 @@ display_header "CONFIGURING NETWORK SETTINGS"
 
 echo "⏳ Adjusting network buffer sizes..."
 
-# Detect Ubuntu version
+# Load OS release information including VERSION_ID
 if [ -f /etc/os-release ]; then
-    . /etc/os-release
+    . /etc/os-release  # This loads VERSION_ID, NAME, and other OS variables
 fi
 
-# Add settings to sysctl.conf
 add_sysctl_setting() {
     local key=$1
     local value=$2
-    
-    if grep -q "^${key}=${value}$" /etc/sysctl.conf; then
-        echo "✅ ${key}=${value} already configured"
-    else
-        echo -e "\n# Network buffer size configuration for ceremonyclient\n${key}=${value}" | sudo tee -a /etc/sysctl.conf > /dev/null
-        echo "✅ Added ${key}=${value}"
-    fi
+    # Remove existing entry if present
+    sudo sed -i "/^${key}=/d" /etc/sysctl.conf
+    # Add new entry
+    echo "${key}=${value}" | sudo tee -a /etc/sysctl.conf > /dev/null
+    echo "✅ Added ${key}=${value}"
 }
 
 add_sysctl_setting "net.core.rmem_max" "600000000"
 add_sysctl_setting "net.core.wmem_max" "600000000"
 
-# Apply changes based on Ubuntu version
+# Use VERSION_ID from os-release to determine sysctl command
 if [[ "${VERSION_ID}" == "24.04" ]]; then
     sudo /sbin/sysctl -p/etc/sysctl.conf
 else
@@ -188,14 +198,23 @@ echo
 
 display_header "CONFIGURING SECURITY SETTINGS"
 
+# Add UFW rule deduplication
+ufw_add_unique() {
+    local port=$1
+    if ! sudo ufw status | grep -q "^$port"; then
+        sudo ufw allow $port
+    fi
+}
+
+# UFW Firewall Setup
 # UFW Firewall Setup
 echo "⏳ Setting up UFW firewall..."
 sudo apt install ufw -y || echo "⚠️ Failed to install UFW"
 
-if command -v ufw >/dev/null 2>&1; then
+if command -v ufw >/dev/null 2>&1 && sudo ufw status >/dev/null 2>&1; then
     echo "y" | sudo ufw enable
     for port in 22 8336 443; do
-        sudo ufw allow $port
+        ufw_add_unique $port
     done
     sudo ufw status
     echo "✅ Firewall configured"
