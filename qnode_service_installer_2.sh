@@ -3,10 +3,10 @@
 # Step 0: Welcome
 
 #Comment out for automatic creation of the node version
-#NODE_VERSION=2.0.3
+#NODE_VERSION=2.0.4
 
 #Comment out for automatic creation of the qclient version
-#QCLIENT_VERSION=2.0.2.4
+#QCLIENT_VERSION=2.0.3
 
 SCRIPT_VERSION="2.1"
 
