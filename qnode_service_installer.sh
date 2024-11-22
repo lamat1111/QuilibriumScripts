@@ -8,7 +8,7 @@
 #Comment out for automatic creation of the qclient version
 #QCLIENT_VERSION=2.0.3
 
-SCRIPT_VERSION="2.2"
+SCRIPT_VERSION="2.3"
 
 cat << EOF
 
@@ -177,6 +177,9 @@ add_sysctl_setting() {
     echo "✅ Added ${key}=${value}"
 }
 
+# Temporarily disable exit on error for this section
+set +e
+
 add_sysctl_setting "net.core.rmem_max" "600000000"
 add_sysctl_setting "net.core.wmem_max" "600000000"
 
@@ -190,6 +193,9 @@ fi
 sudo /etc/init.d/procps restart
 echo "✅ Network buffer sizes updated"
 echo
+
+# Re-enable exit on error for the rest of the script
+set -e
 
 #==========================
 # SECURITY CONFIGURATION
