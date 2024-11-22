@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.0.4"
+SCRIPT_VERSION="2.0.5"
 
 
 #=====================
@@ -194,12 +194,18 @@ check_balance() {
 }
 
 check_coins() {
-    echo
-    echo "$(format_title "Individual coins")"
-    echo
-    $QCLIENT_EXEC token coins metadata $FLAGS | awk '{gsub("Timestamp ", ""); frame=$(NF-2); ts=$NF; gsub("T", " ", ts); gsub("+01:00", "", ts); cmd="date -d \""ts"\" \"+%d/%m/%Y %H.%M.%S\" 2>/dev/null"; cmd | getline newts; close(cmd); $(NF)=newts; print frame, $0}' | sort -k1,1nr | cut -d' ' -f2- | awk -F'Frame ' '{num=substr($2,1,index($2,",")-1); print num"|"$0}' | sort -t'|' -k1nr | cut -d'|' -f2-
-    #$QCLIENT_EXEC token coins $FLAGS
-    echo
+   echo
+   echo "$(format_title "Individual coins")"
+   echo
+   tput sc  # Save cursor position
+   echo "Loading your coins..."
+   tput rc  # Restore cursor position
+   
+   output=$($QCLIENT_EXEC token coins metadata $FLAGS | awk '{gsub("Timestamp ", ""); frame=$(NF-2); ts=$NF; gsub("T", " ", ts); gsub("+01:00", "", ts); cmd="date -d \""ts"\" \"+%d/%m/%Y %H.%M.%S\" 2>/dev/null"; cmd | getline newts; close(cmd); $(NF)=newts; print frame, $0}' | sort -k1,1nr | cut -d' ' -f2- | awk -F'Frame ' '{num=substr($2,1,index($2,",")-1); print num"|"$0}' | sort -t'|' -k1nr | cut -d'|' -f2-)
+   
+   tput el  # Clear line
+   echo "$output"
+   echo
 }
 
 mint_all() {
