@@ -8,7 +8,7 @@
 #Comment out for automatic creation of the qclient version
 #QCLIENT_VERSION=2.0.3
 
-SCRIPT_VERSION="2.3"
+SCRIPT_VERSION="2.4"
 
 cat << EOF
 
@@ -98,6 +98,9 @@ echo "Current hostname is: $current_hostname"
 # Ask if user wants to change the hostname
 read -p "Do you want to change it? (y/n): " answer
 
+# Temporarily disable exit on error for this section
+set +e
+
 if [[ $answer == "y" || $answer == "Y" ]]; then
     read -p "Enter new hostname: " new_hostname
     sudo hostnamectl set-hostname "$new_hostname"
@@ -107,19 +110,25 @@ else
 fi
 echo
 
+# Re-enable exit on error for the rest of the script
+set -e
+
 #==========================
 # INSTALL APPS
 #==========================
 
 display_header "INSTALLING REQUIRED APPLICATIONS"
 
-# Function to check and install a package
+# Function to check and install a package with better error handling
 check_and_install() {
     if ! command -v $1 &> /dev/null
     then
         echo "$1 could not be found"
         echo "⏳ Installing $1..."
-        sudo apt install $1 -y
+        if ! sudo apt install $1 -y; then
+            echo "⚠️ Failed to install $1"
+            return 1
+        fi
         echo
     else
         echo "✅ $1 is installed"
@@ -130,7 +139,12 @@ check_and_install() {
 # Update and Upgrade the Machine
 echo "⏳ Updating the machine..."
 sleep 2
-sudo apt update -y && sudo apt upgrade -y
+if ! sudo apt update -y; then
+    echo "⚠️ Warning: apt update failed, continuing..."
+fi
+if ! sudo apt upgrade -y; then
+    echo "⚠️ Warning: apt upgrade failed, continuing..."
+fi
 echo "✅ Machine updated."
 echo
 
@@ -148,9 +162,15 @@ echo
 
 # Install optional packages
 echo "⏳ Installing optional packages: tmux, cron, jq, htop..."
+# Temporarily disable exit on error for optional packages
+set +e
 for pkg in tmux cron jq htop; do
-    check_and_install "$pkg" || echo "⚠️ Optional package $pkg installation failed, continuing..."
+    if ! check_and_install "$pkg"; then
+        echo "⚠️ Optional package $pkg installation failed, continuing..."
+    fi
 done
+# Re-enable exit on error
+set -e
 echo "✅ Optional packages installation completed."
 echo
 
@@ -203,6 +223,9 @@ set -e
 
 display_header "CONFIGURING SECURITY SETTINGS"
 
+# Temporarily disable exit on error for this section
+set +e
+
 # Add UFW rule deduplication
 ufw_add_unique() {
     local port=$1
@@ -230,6 +253,7 @@ echo
 
 # Fail2Ban Setup
 echo "⏳ Setting up Fail2Ban..."
+
 if ! dpkg -s fail2ban &> /dev/null; then
     sudo apt install fail2ban -y
 fi
@@ -251,6 +275,9 @@ EOF
     echo "✅ Fail2Ban configured"
 fi
 echo
+
+# Re-enable exit on error for the rest of the script
+set -e
 
 sleep 3
 
@@ -439,6 +466,9 @@ done
 
 display_header "UPDATING QCLIENT"
 
+# Temporarily disable exit on error for optional packages
+set +e
+
 # Change to the download directory
 if ! cd ~/ceremonyclient/client; then
     echo "❌ Error: Unable to change to the qclient directory"
@@ -485,6 +515,9 @@ for file in $files; do
         echo "File $file already exists, skipping"
     fi
 done
+
+# Re-enable exit on error for optional packages
+set -e
 
 
 #==========================
@@ -600,6 +633,9 @@ sleep 5
 #==========================
 echo "⏳ Creating node config.yml file..."
 
+# Disable exit on error for optional packages
+set +e
+
 cd "$HOME/ceremonyclient/node"
 
 if ! ./"$NODE_BINARY" -peer-id; then
@@ -618,6 +654,9 @@ else
         echo "❌ Config.yml not found. No worries, the node will generate it automatically once it starts."
     fi
 fi
+
+# Re-enable exit on error for optional packages
+set -e
 
 sleep 3
 
