@@ -46,7 +46,7 @@ GIT_CLONE=false
 # Add version check and warning at start
 check_existing_installation() {
     if systemctl is-active --quiet ceremonyclient; then
-        echo "⚠️  WARNING: Seems like you already have a node isntalled!"
+        echo "⚠️  WARNING: Seems like you already have a node installed!"
         read -p "Do you want to proceed with reinstallation? (y/n): " proceed
         if [[ $proceed != "y" && $proceed != "Y" ]]; then
             exit 0
