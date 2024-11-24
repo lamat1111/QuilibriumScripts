@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.7.5"
+SCRIPT_VERSION="2.7.6"
 
 # ------------------------------------------------------------------
 SHOW_TEMP_MESSAGE=true  # Toggle to control message visibility
@@ -92,7 +92,7 @@ EOF
 5)  Update node                 13) Restore backup
 6)  Stop node                              
 7)  Start node                  14) Qclient install/update
-8)  Restart node                15) Qclient actions
+8)  Restart node                15) Qclient menu
 9)  Node info & balance          
 10) Node status                 16) Proofs monitor
 -----------------------------------------------------------------
