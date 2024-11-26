@@ -4,7 +4,7 @@
 export TZ="Europe/Rome"
 
 # Script version
-SCRIPT_VERSION="1.5.8"
+SCRIPT_VERSION="1.5.9"
 
 # Function to check for newer script version
 check_for_updates() {
@@ -59,7 +59,6 @@ get_unclaimed_balance() {
     fi
 }
 
-# Function to write data to CSV file
 write_to_csv() {
     local filename="$HOME/scripts/balance_log.csv"
     local data="$1"
@@ -74,8 +73,21 @@ write_to_csv() {
     
     # Only process if balance is not an error
     if [ "$balance" != "ERROR" ]; then
-        # Round to 2 decimal places and replace dot with comma
-        balance=$(printf "%.2f" "$balance" | sed 's/\./,/')
+        # Clean the balance input:
+        # 1. Remove any existing commas
+        # 2. Ensure decimal point is a dot
+        # 3. Remove any whitespace
+        balance=$(echo "$balance" | tr ',' '.' | sed 's/[[:space:]]//g')
+        
+        # Verify if the balance is a valid number
+        if ! echo "$balance" | grep -E '^[0-9]+\.?[0-9]*$' > /dev/null; then
+            echo "❌ Error: Invalid number format: $balance"
+            exit 1
+        fi
+        
+        # Replace dot with comma for CSV format
+        balance=$(echo "$balance" | sed 's/\./,/')
+        
         # Format the data with quotes
         local formatted_data="\"$time\",\"$balance\""
         echo "$formatted_data" >> "$filename"
