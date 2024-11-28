@@ -9,7 +9,7 @@
 # Example:  ~/scripts/qnode_proof_monitor.sh 600    # analyzes last 10 hours
 
 # Script version
-SCRIPT_VERSION="4.3"
+SCRIPT_VERSION="4.4"
 
 # Default time window in minutes (3 hours by default)
 DEFAULT_TIME_WINDOW=180
@@ -166,10 +166,11 @@ print_header "🎯 PROOF LANDING RATE"
 if [ ! -x "$QCLIENT_EXEC" ]; then
     echo -e "${RED}Error: Could not find qclient executable${RESET}"
     echo -e "${GRAY}Landing rate calculation skipped. Continuing with other metrics...${RESET}\n"
+    LANDING_RATE_STATUS=0  # Indicate no landing rate available
 else
     # Redirect stderr to a temporary file
     STDERR_FILE=$(mktemp)
-    LANDING_RATE=$("$QCLIENT_EXEC" token coins metadata $FLAGS 2>"$STDERR_FILE" | 
+    LANDING_RATE_OUTPUT=$("$QCLIENT_EXEC" token coins metadata $FLAGS 2>"$STDERR_FILE" | 
     awk -v time_ago="$(date -d "${TIME_WINDOW} minutes ago" '+%Y-%m-%dT%H:%M')" '
       $NF ~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}/ {
         ts = substr($NF, 1, 16);
@@ -178,18 +179,38 @@ else
         }
       }
     ' | 
-    awk '/Frame /{c++;match($0,/Frame ([0-9]+),/,a);f=a[1];if(c==1 || f<s){s=f}if(f>e){e=f}}END{d=(e-s)+1;r=(d!=0)?(c/d)*100:0;printf("%d Coins / %d Frames = %.2f%% landing rate",c,d,r)}')
+    awk '/Frame /{c++;match($0,/Frame ([0-9]+),/,a);f=a[1];if(c==1 || f<s){s=f}if(f>e){e=f}}END{
+        d=(e-s)+1;
+        r=(d!=0)?(c/d)*100:0;
+        printf("%d|%d|%.2f",c,d,r)
+    }')
 
     # Check if there were any errors
     if [ -s "$STDERR_FILE" ]; then
         echo -e "${RED}Error during landing rate calculation:${RESET}"
         cat "$STDERR_FILE"
         echo -e "${GRAY}Landing rate calculation failed. Continuing with other metrics...${RESET}\n"
-    elif [ -z "$LANDING_RATE" ]; then
+        LANDING_RATE_STATUS=0
+    elif [ -z "$LANDING_RATE_OUTPUT" ]; then
         echo -e "${RED}No landing rate data available for the specified time period${RESET}"
         echo -e "${GRAY}This might be normal if you haven't received any coins yet${RESET}\n"
+        LANDING_RATE_STATUS=0
     else
-        echo -e "${BOLD}$LANDING_RATE${RESET}"
+        IFS='|' read -r coins frames rate <<< "$LANDING_RATE_OUTPUT"
+        
+        # Determine the status message based on the rate
+        if (( $(echo "$rate >= 70" | bc -l) )); then
+            STATUS_MSG="${GREEN}Good!${RESET} (70-100%)"
+            LANDING_RATE_STATUS=1  # Good
+        elif (( $(echo "$rate >= 50" | bc -l) )); then
+            STATUS_MSG="${YELLOW}Meh...${RESET} (50-70%)"
+            LANDING_RATE_STATUS=2  # Warning
+        else
+            STATUS_MSG="${RED}Ouch!${RESET} (0-50%)"
+            LANDING_RATE_STATUS=3  # Critical
+        fi
+        
+        echo -e "${BOLD}$coins Coins / $frames Frames = $rate% landing rate - $STATUS_MSG${RESET}"
         echo -e "${GRAY}\nNote: The above calculation is an approximation.\nIt will only work if you have not merged your coins in the last $TIME_WINDOW minutes${RESET}\n"
     fi
     
@@ -391,7 +412,7 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
     
     # Overall health assessment
     print_header "📋 OVERALL HEALTH ASSESSMENT"
-    
+
     # Check if we have CPU data
     if [ -s "$TEMP_MATCHES" ]; then
         # Calculate majority percentages for each section
@@ -399,31 +420,62 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
         SUBMIT_MAJORITY_PCT=$(( SUBMIT_OPTIMAL_PCT > 50 ? 1 : SUBMIT_WARNING_PCT > 50 ? 2 : SUBMIT_CRITICAL_PCT > 50 ? 3 : 0 ))
         CPU_MAJORITY_PCT=$(( CPU_OPTIMAL_PCT > 50 ? 1 : CPU_WARNING_PCT > 50 ? 2 : CPU_CRITICAL_PCT > 50 ? 3 : 0 ))
         
-        # Evaluate overall health
-        if [ $CREATE_MAJORITY_PCT -eq 1 ] && [ $SUBMIT_MAJORITY_PCT -eq 1 ] && [ $CPU_MAJORITY_PCT -eq 1 ]; then
-            echo -e "Status: ${GREEN}${BOLD}OPTIMAL${RESET} 🟢"
-            echo -e "All metrics show excellent performance. System is running ideally."
-        elif [ $CREATE_MAJORITY_PCT -eq 3 ] && [ $SUBMIT_MAJORITY_PCT -eq 3 ] && [ $CPU_MAJORITY_PCT -eq 3 ]; then
-            echo -e "Status: ${RED}${BOLD}CRITICAL${RESET} 🔴"
-            echo -e "All metrics show critical performance issues. System needs immediate attention."
+        # Evaluate overall health including landing rate
+        if [ $LANDING_RATE_STATUS -eq 0 ]; then
+            # Evaluate without landing rate
+            if [ $CREATE_MAJORITY_PCT -eq 1 ] && [ $SUBMIT_MAJORITY_PCT -eq 1 ] && [ $CPU_MAJORITY_PCT -eq 1 ]; then
+                echo -e "Status: ${GREEN}${BOLD}OPTIMAL${RESET} 🟢"
+                echo -e "All available metrics show excellent performance. System is running ideally."
+            elif [ $CREATE_MAJORITY_PCT -eq 3 ] || [ $SUBMIT_MAJORITY_PCT -eq 3 ] || [ $CPU_MAJORITY_PCT -eq 3 ]; then
+                echo -e "Status: ${RED}${BOLD}CRITICAL${RESET} 🔴"
+                echo -e "One or more metrics show critical performance issues. System needs attention."
+            else
+                echo -e "Status: ${YELLOW}${BOLD}SUBOPTIMAL${RESET} 🟡"
+                echo -e "Mixed performance metrics. System may need optimization."
+            fi
         else
-            echo -e "Status: ${YELLOW}${BOLD}SUBOPTIMAL${RESET} 🟡"
-            echo -e "Mixed performance metrics. System may need optimization."
+            # Evaluate with landing rate
+            if [ $CREATE_MAJORITY_PCT -eq 1 ] && [ $SUBMIT_MAJORITY_PCT -eq 1 ] && [ $CPU_MAJORITY_PCT -eq 1 ] && [ $LANDING_RATE_STATUS -eq 1 ]; then
+                echo -e "Status: ${GREEN}${BOLD}OPTIMAL${RESET} 🟢"
+                echo -e "All metrics, including landing rate, show excellent performance. System is running ideally."
+            elif [ $CREATE_MAJORITY_PCT -eq 3 ] || [ $SUBMIT_MAJORITY_PCT -eq 3 ] || [ $CPU_MAJORITY_PCT -eq 3 ] || [ $LANDING_RATE_STATUS -eq 3 ]; then
+                echo -e "Status: ${RED}${BOLD}CRITICAL${RESET} 🔴"
+                echo -e "One or more metrics, including landing rate, show critical performance issues. System needs attention."
+            else
+                echo -e "Status: ${YELLOW}${BOLD}SUBOPTIMAL${RESET} 🟡"
+                echo -e "Mixed performance metrics. System may need optimization."
+            fi
         fi
     else
         # Evaluation without CPU data
         CREATE_MAJORITY_PCT=$(( CREATE_OPTIMAL_PCT > 50 ? 1 : CREATE_WARNING_PCT > 50 ? 2 : CREATE_CRITICAL_PCT > 50 ? 3 : 0 ))
         SUBMIT_MAJORITY_PCT=$(( SUBMIT_OPTIMAL_PCT > 50 ? 1 : SUBMIT_WARNING_PCT > 50 ? 2 : SUBMIT_CRITICAL_PCT > 50 ? 3 : 0 ))
         
-        if [ $CREATE_MAJORITY_PCT -eq 1 ] && [ $SUBMIT_MAJORITY_PCT -eq 1 ]; then
-            echo -e "Status: ${GREEN}${BOLD}OPTIMAL${RESET} 🟢"
-            echo -e "All metrics show excellent performance. System is running ideally."
-        elif [ $CREATE_MAJORITY_PCT -eq 3 ] && [ $SUBMIT_MAJORITY_PCT -eq 3 ]; then
-            echo -e "Status: ${RED}${BOLD}CRITICAL${RESET} 🔴"
-            echo -e "All metrics show critical performance issues. System needs immediate attention."
+        # Include landing rate in evaluation
+        if [ $LANDING_RATE_STATUS -eq 0 ]; then
+            # Evaluate without landing rate
+            if [ $CREATE_MAJORITY_PCT -eq 1 ] && [ $SUBMIT_MAJORITY_PCT -eq 1 ]; then
+                echo -e "Status: ${GREEN}${BOLD}OPTIMAL${RESET} 🟢"
+                echo -e "All available metrics show excellent performance. System is running ideally."
+            elif [ $CREATE_MAJORITY_PCT -eq 3 ] || [ $SUBMIT_MAJORITY_PCT -eq 3 ]; then
+                echo -e "Status: ${RED}${BOLD}CRITICAL${RESET} 🔴"
+                echo -e "One or more metrics show critical performance issues. System needs attention."
+            else
+                echo -e "Status: ${YELLOW}${BOLD}SUBOPTIMAL${RESET} 🟡"
+                echo -e "Mixed performance metrics. System may need optimization."
+            fi
         else
-            echo -e "Status: ${YELLOW}${BOLD}SUBOPTIMAL${RESET} 🟡"
-            echo -e "Mixed performance metrics. System may need optimization."
+            # Evaluate with landing rate
+            if [ $CREATE_MAJORITY_PCT -eq 1 ] && [ $SUBMIT_MAJORITY_PCT -eq 1 ] && [ $LANDING_RATE_STATUS -eq 1 ]; then
+                echo -e "Status: ${GREEN}${BOLD}OPTIMAL${RESET} 🟢"
+                echo -e "All metrics, including landing rate, show excellent performance. System is running ideally."
+            elif [ $CREATE_MAJORITY_PCT -eq 3 ] || [ $SUBMIT_MAJORITY_PCT -eq 3 ] || [ $LANDING_RATE_STATUS -eq 3 ]; then
+                echo -e "Status: ${RED}${BOLD}CRITICAL${RESET} 🔴"
+                echo -e "One or more metrics, including landing rate, show critical performance issues. System needs attention."
+            else
+                echo -e "Status: ${YELLOW}${BOLD}SUBOPTIMAL${RESET} 🟡"
+                echo -e "Mixed performance metrics. System may need optimization."
+            fi
         fi
     fi
     
