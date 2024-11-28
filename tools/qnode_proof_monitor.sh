@@ -9,7 +9,7 @@
 # Example:  ~/scripts/qnode_proof_monitor.sh 600    # analyzes last 10 hours
 
 # Script version
-SCRIPT_VERSION="4.1"
+SCRIPT_VERSION="4.2"
 
 # Default time window in minutes (3 hours by default)
 DEFAULT_TIME_WINDOW=180
@@ -23,6 +23,11 @@ if systemctl list-units --full -all | grep -Fq "qmaster.service"; then
 else
     SERVICE_NAME=ceremonyclient
 fi
+
+#Qclient directories
+QCLIENT_DIR="$HOME/ceremonyclient/client"
+FLAGS="--config $HOME/ceremonyclient/node/.config --public-rpc"
+QCLIENT_EXEC=$(find "$QCLIENT_DIR" -name "qclient-*" ! -name "*.dgst" ! -name "*.sig*" -type f -executable 2>/dev/null | sort -V | tail -n 1)
 
 # Frame Age Thresholds (in seconds)
 # Creation stage thresholds
@@ -154,6 +159,42 @@ check_for_updates
 
 print_header "📊 COLLECTING DATA"
 echo -e "Analyzing proof submissions for the last ${BOLD}$TIME_WINDOW${RESET} minutes..."
+
+print_header "🎯 PROOF LANDING RATE"
+# Calculate proof landing rate
+if [ ! -x "$QCLIENT_EXEC" ]; then
+    echo -e "${RED}Error: Could not find qclient executable${RESET}"
+    echo -e "${GRAY}Landing rate calculation skipped. Continuing with other metrics...${RESET}\n"
+else
+    # Redirect stderr to a temporary file
+    STDERR_FILE=$(mktemp)
+    LANDING_RATE=$("$QCLIENT_EXEC" token coins metadata $FLAGS 2>"$STDERR_FILE" | 
+    awk -v time_ago="$(date -d "${TIME_WINDOW} minutes ago" '+%Y-%m-%dT%H:%M')" '
+      $NF ~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}/ {
+        ts = substr($NF, 1, 16);
+        if (ts >= time_ago) {
+          print
+        }
+      }
+    ' | 
+    awk '/Frame /{c++;match($0,/Frame ([0-9]+),/,a);f=a[1];if(c==1 || f<s){s=f}if(f>e){e=f}}END{d=e-s;r=(d!=0)?(c/d)*100:0;printf("%d Coins / %d Frames = %.2f%% landing rate",c,d,r)}')
+
+    # Check if there were any errors
+    if [ -s "$STDERR_FILE" ]; then
+        echo -e "${RED}Error during landing rate calculation:${RESET}"
+        cat "$STDERR_FILE"
+        echo -e "${GRAY}Landing rate calculation failed. Continuing with other metrics...${RESET}\n"
+    elif [ -z "$LANDING_RATE" ]; then
+        echo -e "${RED}No landing rate data available for the specified time period${RESET}"
+        echo -e "${GRAY}This might be normal if you haven't received any coins yet${RESET}\n"
+    else
+        echo -e "${BOLD}$LANDING_RATE${RESET}"
+        echo -e "${GRAY}\nNote: The above calculation is an approximation.\nIt will only work if you have not merged your coins in the last $TIME_WINDOW minutes${RESET}\n"
+    fi
+    
+    # Cleanup
+    rm -f "$STDERR_FILE"
+fi
 
 # Temporary files
 TEMP_CREATE=$(mktemp)
