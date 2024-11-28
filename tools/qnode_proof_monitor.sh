@@ -9,7 +9,7 @@
 # Example:  ~/scripts/qnode_proof_monitor.sh 600    # analyzes last 10 hours
 
 # Script version
-SCRIPT_VERSION="4.2"
+SCRIPT_VERSION="4.3"
 
 # Default time window in minutes (3 hours by default)
 DEFAULT_TIME_WINDOW=180
@@ -162,6 +162,7 @@ echo -e "Analyzing proof submissions for the last ${BOLD}$TIME_WINDOW${RESET} mi
 
 print_header "🎯 PROOF LANDING RATE"
 # Calculate proof landing rate
+# Calculate proof landing rate
 if [ ! -x "$QCLIENT_EXEC" ]; then
     echo -e "${RED}Error: Could not find qclient executable${RESET}"
     echo -e "${GRAY}Landing rate calculation skipped. Continuing with other metrics...${RESET}\n"
@@ -177,7 +178,7 @@ else
         }
       }
     ' | 
-    awk '/Frame /{c++;match($0,/Frame ([0-9]+),/,a);f=a[1];if(c==1 || f<s){s=f}if(f>e){e=f}}END{d=e-s;r=(d!=0)?(c/d)*100:0;printf("%d Coins / %d Frames = %.2f%% landing rate",c,d,r)}')
+    awk '/Frame /{c++;match($0,/Frame ([0-9]+),/,a);f=a[1];if(c==1 || f<s){s=f}if(f>e){e=f}}END{d=(e-s)+1;r=(d!=0)?(c/d)*100:0;printf("%d Coins / %d Frames = %.2f%% landing rate",c,d,r)}')
 
     # Check if there were any errors
     if [ -s "$STDERR_FILE" ]; then
