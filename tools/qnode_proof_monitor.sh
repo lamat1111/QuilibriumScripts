@@ -9,7 +9,7 @@
 # Example:  ~/scripts/qnode_proof_monitor.sh 600    # analyzes last 10 hours
 
 # Script version
-SCRIPT_VERSION="4.4"
+SCRIPT_VERSION="4.5"
 
 # Default time window in minutes (3 hours by default)
 DEFAULT_TIME_WINDOW=180
@@ -187,9 +187,8 @@ else
 
     # Check if there were any errors
     if [ -s "$STDERR_FILE" ]; then
-        echo -e "${RED}Error during landing rate calculation:${RESET}"
-        cat "$STDERR_FILE"
-        echo -e "${GRAY}Landing rate calculation failed. Continuing with other metrics...${RESET}\n"
+        echo -e "${RED}Unable to calculate landing rate${RESET}"
+        echo -e "${GRAY}This might be temporary. Continuing with other metrics...${RESET}\n"
         LANDING_RATE_STATUS=0
     elif [ -z "$LANDING_RATE_OUTPUT" ]; then
         echo -e "${RED}No landing rate data available for the specified time period${RESET}"
