@@ -37,9 +37,7 @@ WantedBy=multi-user.target
 EOF
 }
 
-# Function to create timer file - once every 12 hrs
-# create_timer_file() {
-#     cat << EOF > /etc/systemd/system/qnode-autoupdate.timer
+# Timer - once every 12 hrs
 # [Unit]
 # Description=Run QNode Service Update every 12 hours at a consistent time
 
@@ -57,8 +55,21 @@ EOF
 
 # [Install]
 # WantedBy=timers.target
-# EOF
-# }
+
+#  Timer - once every 5 mins
+# [Unit]
+# Description=Run QNode Service Update every 5 minutes at a fixed second offset
+
+# [Timer]
+# OnBootSec=5min
+# OnCalendar=*:0/5
+# RandomizedDelaySec=300sec
+# FixedRandomDelay=true
+# Persistent=true
+# Unit=qnode-autoupdate.service
+
+# [Install]
+# WantedBy=timers.target
 
 # Function to create timer file - once every 1 hr
 create_timer_file() {
