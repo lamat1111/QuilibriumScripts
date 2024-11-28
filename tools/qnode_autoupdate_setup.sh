@@ -64,12 +64,13 @@ EOF
 create_timer_file() {
     cat << EOF > /etc/systemd/system/qnode-autoupdate.timer
 [Unit]
-Description=Run QNode Service Update every hour at a consistent random minute
+Description=Run QNode Service Update every hour at a fixed minute
 
 [Timer]
 OnBootSec=5min
 OnCalendar=hourly
-RandomizedDelaySec=3600
+RandomizedDelaySec=3600sec
+FixedRandomDelay=true
 Persistent=true
 Unit=qnode-autoupdate.service
 
