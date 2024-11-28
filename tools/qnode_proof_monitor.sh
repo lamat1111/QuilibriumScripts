@@ -173,6 +173,7 @@ check_bc() {
 }
 
 # Landing rate calculation section
+# Landing rate calculation section
 if [ ! -x "$QCLIENT_EXEC" ]; then
     echo -e "${RED}Error: Could not find qclient executable${RESET}"
     echo -e "${GRAY}Landing rate calculation skipped. Continuing with other metrics...${RESET}\n"
@@ -224,9 +225,9 @@ else
             fi
             
             # Modified output order
-            echo -e "$STATUS_MSG"
             echo -e "${BOLD}$coins Coins / $frames Frames = $rate% landing rate${RESET}"
-            echo -e "${GRAY}\nNote: The calculation will only work\nif you have not merged your coins in the last $TIME_WINDOW minutes${RESET}\n"
+            echo -e "$STATUS_MSG"
+            echo -e "\nNote: The above calculation is an approximation.\nIt will only work if you have not merged your coins in the last $TIME_WINDOW minutes\n"
         fi
         
         # Cleanup
