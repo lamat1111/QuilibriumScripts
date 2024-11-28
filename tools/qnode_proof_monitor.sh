@@ -9,7 +9,7 @@
 # Example:  ~/scripts/qnode_proof_monitor.sh 600    # analyzes last 10 hours
 
 # Script version
-SCRIPT_VERSION="4.6"
+SCRIPT_VERSION="4.7"
 
 # Default time window in minutes (3 hours by default)
 DEFAULT_TIME_WINDOW=180
@@ -212,7 +212,6 @@ else
         else
             IFS='|' read -r coins frames rate <<< "$LANDING_RATE_OUTPUT"
             
-            # Use simple numeric comparison instead of bc
             if [ $(echo "$rate >= 70" | awk '{print ($1>=70)}') -eq 1 ]; then
                 STATUS_MSG="${GREEN}Good!${RESET} (70-100%)"
                 LANDING_RATE_STATUS=1  # Good
@@ -224,7 +223,9 @@ else
                 LANDING_RATE_STATUS=3  # Critical
             fi
             
-            echo -e "${BOLD}$coins Coins / $frames Frames = $rate% landing rate - $STATUS_MSG${RESET}"
+            # Modified output order
+            echo -e "$STATUS_MSG"
+            echo -e "${BOLD}$coins Coins / $frames Frames = $rate% landing rate${RESET}"
             echo -e "${GRAY}\nNote: The above calculation is an approximation.\nIt will only work if you have not merged your coins in the last $TIME_WINDOW minutes${RESET}\n"
         fi
         
