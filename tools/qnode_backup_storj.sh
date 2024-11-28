@@ -89,6 +89,13 @@ get_backup_type() {
 # USER PROMPTS
 #====================
 
+echo "ATTENTION:"
+echo "From Quilibrium 2.0 is not necessary to backup the store folder anymore."
+echo "This script is still set to back it up, but it will back it up while the node is running, which may lead to errors when you restore it."
+echo "After the script has finished setting everything up, you may simply edit manually your cronjobs to avoid backing up your store folder."
+echo "More info here: https://iri.quest/q-backup-node-changes"
+echo
+
 # Prompt the user for StorJ S3 credentials
 echo
 echo
