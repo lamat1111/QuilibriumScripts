@@ -9,13 +9,16 @@
 # Example:  ~/scripts/qnode_proof_monitor.sh 600    # analyzes last 10 hours
 
 # Script version
-SCRIPT_VERSION="4.8"
+SCRIPT_VERSION="4.9"
 
 # Default time window in minutes (3 hours by default)
 DEFAULT_TIME_WINDOW=180
 
 # Get time window from command line argument or use default
 TIME_WINDOW=${1:-$DEFAULT_TIME_WINDOW}
+
+#Skip final health assessment
+SKIP_HEALTH=true
 
 # Service Configuration
 if systemctl list-units --full -all | grep -Fq "qmaster.service"; then
@@ -426,113 +429,115 @@ if [ -s "$TEMP_CREATE" ] && [ -s "$TEMP_SUBMIT" ]; then
             echo -e "This may significantly impact your ability to earn rewards."
         fi
     fi
-    
+
     # Overall health assessment
-    print_header "📋 OVERALL HEALTH ASSESSMENT"
+    if [ "$SKIP_HEALTH" = false ]; then
+        print_header "📋 OVERALL HEALTH ASSESSMENT"
 
-    # Check if we have CPU data
-    if [ -s "$TEMP_MATCHES" ]; then
-        # Calculate majority percentages for each section
-        CREATE_MAJORITY_PCT=$(( CREATE_OPTIMAL_PCT > 50 ? 1 : CREATE_WARNING_PCT > 50 ? 2 : CREATE_CRITICAL_PCT > 50 ? 3 : 0 ))
-        SUBMIT_MAJORITY_PCT=$(( SUBMIT_OPTIMAL_PCT > 50 ? 1 : SUBMIT_WARNING_PCT > 50 ? 2 : SUBMIT_CRITICAL_PCT > 50 ? 3 : 0 ))
-        CPU_MAJORITY_PCT=$(( CPU_OPTIMAL_PCT > 50 ? 1 : CPU_WARNING_PCT > 50 ? 2 : CPU_CRITICAL_PCT > 50 ? 3 : 0 ))
-        
-        # Count available metrics and critical ones
-        METRICS_COUNT=0
-        CRITICAL_COUNT=0
+        # Check if we have CPU data
+        if [ -s "$TEMP_MATCHES" ]; then
+            # Calculate majority percentages for each section
+            CREATE_MAJORITY_PCT=$(( CREATE_OPTIMAL_PCT > 50 ? 1 : CREATE_WARNING_PCT > 50 ? 2 : CREATE_CRITICAL_PCT > 50 ? 3 : 0 ))
+            SUBMIT_MAJORITY_PCT=$(( SUBMIT_OPTIMAL_PCT > 50 ? 1 : SUBMIT_WARNING_PCT > 50 ? 2 : SUBMIT_CRITICAL_PCT > 50 ? 3 : 0 ))
+            CPU_MAJORITY_PCT=$(( CPU_OPTIMAL_PCT > 50 ? 1 : CPU_WARNING_PCT > 50 ? 2 : CPU_CRITICAL_PCT > 50 ? 3 : 0 ))
+            
+            # Count available metrics and critical ones
+            METRICS_COUNT=0
+            CRITICAL_COUNT=0
 
-        # Check creation metric
-        if [ $CREATE_MAJORITY_PCT -ne 0 ]; then
-            METRICS_COUNT=$((METRICS_COUNT + 1))
-            if [ $CREATE_MAJORITY_PCT -eq 3 ]; then
-                CRITICAL_COUNT=$((CRITICAL_COUNT + 1))
+            # Check creation metric
+            if [ $CREATE_MAJORITY_PCT -ne 0 ]; then
+                METRICS_COUNT=$((METRICS_COUNT + 1))
+                if [ $CREATE_MAJORITY_PCT -eq 3 ]; then
+                    CRITICAL_COUNT=$((CRITICAL_COUNT + 1))
+                fi
             fi
-        fi
 
-        # Check submission metric
-        if [ $SUBMIT_MAJORITY_PCT -ne 0 ]; then
-            METRICS_COUNT=$((METRICS_COUNT + 1))
-            if [ $SUBMIT_MAJORITY_PCT -eq 3 ]; then
-                CRITICAL_COUNT=$((CRITICAL_COUNT + 1))
+            # Check submission metric
+            if [ $SUBMIT_MAJORITY_PCT -ne 0 ]; then
+                METRICS_COUNT=$((METRICS_COUNT + 1))
+                if [ $SUBMIT_MAJORITY_PCT -eq 3 ]; then
+                    CRITICAL_COUNT=$((CRITICAL_COUNT + 1))
+                fi
             fi
-        fi
 
-        # Check CPU metric
-        if [ $CPU_MAJORITY_PCT -ne 0 ]; then
-            METRICS_COUNT=$((METRICS_COUNT + 1))
-            if [ $CPU_MAJORITY_PCT -eq 3 ]; then
-                CRITICAL_COUNT=$((CRITICAL_COUNT + 1))
+            # Check CPU metric
+            if [ $CPU_MAJORITY_PCT -ne 0 ]; then
+                METRICS_COUNT=$((METRICS_COUNT + 1))
+                if [ $CPU_MAJORITY_PCT -eq 3 ]; then
+                    CRITICAL_COUNT=$((CRITICAL_COUNT + 1))
+                fi
             fi
-        fi
 
-        # Check landing rate if available
-        if [ $LANDING_RATE_STATUS -ne 0 ]; then
-            METRICS_COUNT=$((METRICS_COUNT + 1))
-            if [ $LANDING_RATE_STATUS -eq 3 ]; then
-                CRITICAL_COUNT=$((CRITICAL_COUNT + 1))
+            # Check landing rate if available
+            if [ $LANDING_RATE_STATUS -ne 0 ]; then
+                METRICS_COUNT=$((METRICS_COUNT + 1))
+                if [ $LANDING_RATE_STATUS -eq 3 ]; then
+                    CRITICAL_COUNT=$((CRITICAL_COUNT + 1))
+                fi
             fi
-        fi
 
-        # Calculate if majority are critical
-        if [ $METRICS_COUNT -gt 0 ]; then
-            CRITICAL_THRESHOLD=$(( METRICS_COUNT / 2 + METRICS_COUNT % 2 ))
-            if [ $CRITICAL_COUNT -ge $CRITICAL_THRESHOLD ]; then
-                echo -e "Status: ${RED}${BOLD}CRITICAL${RESET} 🔴"
-                echo -e "Majority of metrics show critical performance issues. System needs attention."
-            elif [ $CREATE_MAJORITY_PCT -eq 1 ] && [ $SUBMIT_MAJORITY_PCT -eq 1 ] && [ $CPU_MAJORITY_PCT -eq 1 ] && [ $LANDING_RATE_STATUS -eq 1 ]; then
-                echo -e "Status: ${GREEN}${BOLD}OPTIMAL${RESET} 🟢"
-                echo -e "All metrics show excellent performance. System is running ideally."
-            else
-                echo -e "Status: ${YELLOW}${BOLD}SUBOPTIMAL${RESET} 🟡"
-                echo -e "Mixed performance metrics. System may need optimization."
+            # Calculate if majority are critical
+            if [ $METRICS_COUNT -gt 0 ]; then
+                CRITICAL_THRESHOLD=$(( METRICS_COUNT / 2 + METRICS_COUNT % 2 ))
+                if [ $CRITICAL_COUNT -ge $CRITICAL_THRESHOLD ]; then
+                    echo -e "Status: ${RED}${BOLD}CRITICAL${RESET} 🔴"
+                    echo -e "Majority of metrics show critical performance issues. System needs attention."
+                elif [ $CREATE_MAJORITY_PCT -eq 1 ] && [ $SUBMIT_MAJORITY_PCT -eq 1 ] && [ $CPU_MAJORITY_PCT -eq 1 ] && [ $LANDING_RATE_STATUS -eq 1 ]; then
+                    echo -e "Status: ${GREEN}${BOLD}OPTIMAL${RESET} 🟢"
+                    echo -e "All metrics show excellent performance. System is running ideally."
+                else
+                    echo -e "Status: ${YELLOW}${BOLD}SUBOPTIMAL${RESET} 🟡"
+                    echo -e "Mixed performance metrics. System may need optimization."
+                fi
             fi
-        fi
 
-    else
-        # Evaluation without CPU data
-        CREATE_MAJORITY_PCT=$(( CREATE_OPTIMAL_PCT > 50 ? 1 : CREATE_WARNING_PCT > 50 ? 2 : CREATE_CRITICAL_PCT > 50 ? 3 : 0 ))
-        SUBMIT_MAJORITY_PCT=$(( SUBMIT_OPTIMAL_PCT > 50 ? 1 : SUBMIT_WARNING_PCT > 50 ? 2 : SUBMIT_CRITICAL_PCT > 50 ? 3 : 0 ))
-        
-        # Count available metrics and critical ones
-        METRICS_COUNT=0
-        CRITICAL_COUNT=0
+        else
+            # Evaluation without CPU data
+            CREATE_MAJORITY_PCT=$(( CREATE_OPTIMAL_PCT > 50 ? 1 : CREATE_WARNING_PCT > 50 ? 2 : CREATE_CRITICAL_PCT > 50 ? 3 : 0 ))
+            SUBMIT_MAJORITY_PCT=$(( SUBMIT_OPTIMAL_PCT > 50 ? 1 : SUBMIT_WARNING_PCT > 50 ? 2 : SUBMIT_CRITICAL_PCT > 50 ? 3 : 0 ))
+            
+            # Count available metrics and critical ones
+            METRICS_COUNT=0
+            CRITICAL_COUNT=0
 
-        # Check creation metric
-        if [ $CREATE_MAJORITY_PCT -ne 0 ]; then
-            METRICS_COUNT=$((METRICS_COUNT + 1))
-            if [ $CREATE_MAJORITY_PCT -eq 3 ]; then
-                CRITICAL_COUNT=$((CRITICAL_COUNT + 1))
+            # Check creation metric
+            if [ $CREATE_MAJORITY_PCT -ne 0 ]; then
+                METRICS_COUNT=$((METRICS_COUNT + 1))
+                if [ $CREATE_MAJORITY_PCT -eq 3 ]; then
+                    CRITICAL_COUNT=$((CRITICAL_COUNT + 1))
+                fi
             fi
-        fi
 
-        # Check submission metric
-        if [ $SUBMIT_MAJORITY_PCT -ne 0 ]; then
-            METRICS_COUNT=$((METRICS_COUNT + 1))
-            if [ $SUBMIT_MAJORITY_PCT -eq 3 ]; then
-                CRITICAL_COUNT=$((CRITICAL_COUNT + 1))
+            # Check submission metric
+            if [ $SUBMIT_MAJORITY_PCT -ne 0 ]; then
+                METRICS_COUNT=$((METRICS_COUNT + 1))
+                if [ $SUBMIT_MAJORITY_PCT -eq 3 ]; then
+                    CRITICAL_COUNT=$((CRITICAL_COUNT + 1))
+                fi
             fi
-        fi
 
-        # Check landing rate if available
-        if [ $LANDING_RATE_STATUS -ne 0 ]; then
-            METRICS_COUNT=$((METRICS_COUNT + 1))
-            if [ $LANDING_RATE_STATUS -eq 3 ]; then
-                CRITICAL_COUNT=$((CRITICAL_COUNT + 1))
+            # Check landing rate if available
+            if [ $LANDING_RATE_STATUS -ne 0 ]; then
+                METRICS_COUNT=$((METRICS_COUNT + 1))
+                if [ $LANDING_RATE_STATUS -eq 3 ]; then
+                    CRITICAL_COUNT=$((CRITICAL_COUNT + 1))
+                fi
             fi
-        fi
 
-        # Calculate if majority are critical
-        if [ $METRICS_COUNT -gt 0 ]; then
-            CRITICAL_THRESHOLD=$(( METRICS_COUNT / 2 + METRICS_COUNT % 2 ))
-            if [ $CRITICAL_COUNT -ge $CRITICAL_THRESHOLD ]; then
-                echo -e "Status: ${RED}${BOLD}CRITICAL${RESET} 🔴"
-                echo -e "Majority of metrics show critical performance issues. System needs attention."
-            elif [ $CREATE_MAJORITY_PCT -eq 1 ] && [ $SUBMIT_MAJORITY_PCT -eq 1 ] && [ $LANDING_RATE_STATUS -eq 1 ]; then
-                echo -e "Status: ${GREEN}${BOLD}OPTIMAL${RESET} 🟢"
-                echo -e "All metrics show excellent performance. System is running ideally."
-            else
-                echo -e "Status: ${YELLOW}${BOLD}SUBOPTIMAL${RESET} 🟡"
-                echo -e "Mixed performance metrics. System may need optimization."
+            # Calculate if majority are critical
+            if [ $METRICS_COUNT -gt 0 ]; then
+                CRITICAL_THRESHOLD=$(( METRICS_COUNT / 2 + METRICS_COUNT % 2 ))
+                if [ $CRITICAL_COUNT -ge $CRITICAL_THRESHOLD ]; then
+                    echo -e "Status: ${RED}${BOLD}CRITICAL${RESET} 🔴"
+                    echo -e "Majority of metrics show critical performance issues. System needs attention."
+                elif [ $CREATE_MAJORITY_PCT -eq 1 ] && [ $SUBMIT_MAJORITY_PCT -eq 1 ] && [ $LANDING_RATE_STATUS -eq 1 ]; then
+                    echo -e "Status: ${GREEN}${BOLD}OPTIMAL${RESET} 🟢"
+                    echo -e "All metrics show excellent performance. System is running ideally."
+                else
+                    echo -e "Status: ${YELLOW}${BOLD}SUBOPTIMAL${RESET} 🟡"
+                    echo -e "Mixed performance metrics. System may need optimization."
+                fi
             fi
         fi
     fi
