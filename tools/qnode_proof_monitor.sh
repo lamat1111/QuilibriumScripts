@@ -226,7 +226,7 @@ else
             # Modified output order
             echo -e "$STATUS_MSG"
             echo -e "${BOLD}$coins Coins / $frames Frames = $rate% landing rate${RESET}"
-            echo -e "${GRAY}\nNote: The above calculation is an approximation.\nIt will only work if you have not merged your coins in the last $TIME_WINDOW minutes${RESET}\n"
+            echo -e "${GRAY}\nNote: The calculation will only work\nif you have not merged your coins in the last $TIME_WINDOW minutes${RESET}\n"
         fi
         
         # Cleanup
