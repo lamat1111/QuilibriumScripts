@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.7.8"
+SCRIPT_VERSION="2.7.6"
 
 # ------------------------------------------------------------------
 SHOW_TEMP_MESSAGE=true  # Toggle to control message visibility
@@ -628,8 +628,7 @@ node_info() {
 }
 
 node_logs() {
-    local service_name=$(get_active_service)
-    if [ $? -ne 0 ]; then
+    if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
         return 1
     fi
@@ -638,10 +637,12 @@ node_logs() {
     echo "⌛️  Displaying your node log...  (Press CTRL+C to return to the main menu)"
     echo
 
+    # Create a subshell for the log monitoring
     (
+        # Trap CTRL+C within the subshell
         trap 'exit 0' INT
 
-        sudo journalctl -u ${service_name}.service -f --no-hostname -o cat | while read -r line; do
+        sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat | while read -r line; do
             timestamp=$(date "+%b %d %H:%M:%S")
             echo "$timestamp $(echo "$line" | sed -E 's/"level":"info","ts":[0-9.]+,//')"
         done
@@ -649,88 +650,80 @@ node_logs() {
 }
 
 start_node() {
-    local service_name=$(get_active_service)
-    if [ $? -ne 0 ]; then
+    if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
-        return 1
+    else
+        echo
+        echo "⌛️ Starting node service..."
+        echo
+        service ceremonyclient start
+        echo "✅ Node started"
+        echo
     fi
-
-    echo
-    echo "⌛️ Starting node service..."
-    echo
-    service $service_name start
-    echo "✅ Node started"
-    echo
 }
 
 stop_node() {
-    local service_name=$(get_active_service)
-    if [ $? -ne 0 ]; then
+    if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
-        return 1
+    else
+        echo
+        echo "⌛️ Stopping node service..."
+        echo
+        service ceremonyclient stop
+        echo "🔴 Node stopped"
+        echo
     fi
-
-    echo
-    echo "⌛️ Stopping node service..."
-    echo
-    service $service_name stop
-    echo "🔴 Node stopped"
-    echo
 }
 
 restart_node() {
-    local service_name=$(get_active_service)
-    if [ $? -ne 0 ]; then
+    if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
-        return 1
+    else
+        echo
+        echo "⌛️ Restarting node service..."
+        echo
+        service ceremonyclient restart
+        echo "✅ Node restarted"
+        echo
     fi
-
-    echo
-    echo "⌛️ Restarting node service..."
-    echo
-    service $service_name restart
-    echo "✅ Node restarted"
-    echo
 }
 
+
 node_status() {
-    local service_name=$(get_active_service)
-    if [ $? -ne 0 ]; then
+    if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
         press_any_key
-        return 1
+    else
+        echo
+        echo "Quilibrium Node Service Status:"
+        echo
+
+        # Get the status output, excluding log entries
+        systemctl status ceremonyclient.service --no-pager | 
+        awk '
+        /^[●○]/ { print; in_cgroup = 0; next }
+        /^ *(Loaded|Active|Process|Main PID|Tasks|Memory|CPU):/ { print; in_cgroup = 0; next }
+        /^     CGroup:/ { print; in_cgroup = 1; next }
+        in_cgroup == 1 && /^[[:space:]]/ { print; next }
+        in_cgroup == 1 && $0 == "" { exit }
+        '
+
+        echo
     fi
-
-    echo
-    echo "Quilibrium Node Service Status:"
-    echo
-
-    systemctl status ${service_name}.service --no-pager | 
-    awk '
-    /^[●○]/ { print; in_cgroup = 0; next }
-    /^ *(Loaded|Active|Process|Main PID|Tasks|Memory|CPU):/ { print; in_cgroup = 0; next }
-    /^     CGroup:/ { print; in_cgroup = 1; next }
-    in_cgroup == 1 && /^[[:space:]]/ { print; next }
-    in_cgroup == 1 && $0 == "" { exit }
-    '
-
-    echo
 }
 
 proof_monitor() {
-    local service_name=$(get_active_service)
-    if [ $? -ne 0 ]; then
+    if [ ! -f "$SERVICE_FILE" ]; then
         echo "$MISSING_SERVICE_MSG"
         press_any_key
-        return 1
+    else
+        echo
+        mkdir -p ~/scripts
+        curl -sSL -o ~/scripts/qnode_proof_monitor.sh "$PROOF_MONITOR_URL"
+        chmod +x ~/scripts/qnode_proof_monitor.sh
+        ~/scripts/qnode_proof_monitor.sh
+        return $?
     fi
-
-    echo
-    mkdir -p ~/scripts
-    curl -sSL -o ~/scripts/qnode_proof_monitor.sh "$PROOF_MONITOR_URL"
-    chmod +x ~/scripts/qnode_proof_monitor.sh
-    ~/scripts/qnode_proof_monitor.sh
-    return $?
 }
 
 prover_pause() {
@@ -740,11 +733,8 @@ prover_pause() {
         return 1
     fi
 
-    # Get active service
-    local service_name=$(get_active_service)
-    
-    # Check if any service is running
-    if [ $? -eq 0 ] && systemctl is-active --quiet ${service_name}.service; then
+    # Check if the service is running
+    if systemctl is-active --quiet ceremonyclient.service; then
         echo
         echo "⚠️ It seems your node is running correctly, are you sure you want to send the \"Prover Pause\" message?"
         read -p "Proceed? (y/n): " second_confirm
@@ -1285,29 +1275,6 @@ display_temp_message() {
     fi
 }
 
-# Function to check which service to use
-get_active_service() {
-    # Check qmaster first
-    if [ -f "/etc/systemd/system/qmaster.service" ] && systemctl is-active --quiet qmaster.service; then
-        echo "qmaster"
-        return 0
-    # Then check ceremonyclient
-    elif [ -f "$SERVICE_FILE" ] && systemctl is-active --quiet ceremonyclient.service; then
-        echo "ceremonyclient"
-        return 0
-    # If qmaster exists but isn't active, still use it
-    elif [ -f "/etc/systemd/system/qmaster.service" ]; then
-        echo "qmaster"
-        return 0
-    # If ceremonyclient exists but isn't active, still use it
-    elif [ -f "$SERVICE_FILE" ]; then
-        echo "ceremonyclient"
-        return 0
-    else
-        # No service found
-        return 1
-    fi
-}
 
 #=====================
 # Run everything
