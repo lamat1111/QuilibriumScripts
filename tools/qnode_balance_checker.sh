@@ -86,7 +86,7 @@ write_to_csv() {
         fi
         
         # Replace dot with comma for CSV format
-        balance=$(echo "$balance" | sed 's/\./,/')
+        #balance=$(echo "$balance" | sed 's/\./,/')
         
         # Format the data with quotes
         local formatted_data="\"$time\",\"$balance\""
