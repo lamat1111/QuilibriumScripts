@@ -176,7 +176,6 @@ check_bc() {
 }
 
 # Landing rate calculation section
-# Landing rate calculation section
 if [ ! -x "$QCLIENT_EXEC" ]; then
     echo -e "${RED}Error: Could not find qclient executable${RESET}"
     echo -e "${GRAY}Landing rate calculation skipped. Continuing with other metrics...${RESET}\n"
