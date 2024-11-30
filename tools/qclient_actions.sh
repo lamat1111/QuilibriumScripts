@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.0.7"
+SCRIPT_VERSION="2.0.8"
 
 
 #=====================
@@ -1086,12 +1086,12 @@ SCRIPT_DIR="$HOME/scripts"  # Hardcoded path
 # Or use this more dynamic approach that follows symlinks:
 #SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
 
-ALIAS_MARKER_FILE="$SCRIPT_DIR/.qclient_actions_alias_added"
+ALIAS_MARKER_FILE="$SCRIPT_DIR/.quilclient_menu_alias_added"
 
 add_alias_if_needed() {
     if [ ! -f "$ALIAS_MARKER_FILE" ]; then
-        local comment_line="# This alias calls the \"qclient menu\" by typing \"qclient\""
-        local alias_line="alias qclient='/root/scripts/$(basename "${BASH_SOURCE[0]}")'"  # Hardcoded path
+        local comment_line="# This alias calls the \"qclient menu\" by typing \"quilclient\""
+        local alias_line="alias quilclient='$HOME/scripts/qclient_actions.sh'"  # Hardcoded path
         if ! grep -q "$alias_line" "$HOME/.bashrc"; then
             echo "" >> "$HOME/.bashrc"  # Add a blank line for better readability
             echo "$comment_line" >> "$HOME/.bashrc"
@@ -1101,12 +1101,42 @@ add_alias_if_needed() {
             # Source .bashrc to make the alias immediately available
             if [ -n "$BASH_VERSION" ]; then
                 source "$HOME/.bashrc"
-                echo "Alias 'qclient' is now active."
+                echo "Alias 'quilclient' is now active."
             else
-                echo "Please run 'source ~/.bashrc' or restart your terminal to use the 'qclient' command."
+                echo "Please run 'source ~/.bashrc' or restart your terminal to use the 'quilclient' command."
             fi
         fi
         touch "$ALIAS_MARKER_FILE"
+    fi
+}
+
+
+migrate_old_alias() {
+    # Only proceed if the old marker file exists
+    if [ -f "$SCRIPT_DIR/.qclient_actions_alias_added" ]; then
+        # Check if old alias exists
+        if grep -q "alias qclient=" "$HOME/.bashrc"; then
+            # Remove the old alias and its comment - using more flexible patterns
+            sed -i '/^#.*qclient menu.*typing.*qclient/d' "$HOME/.bashrc"
+            sed -i '/^alias.*qclient=.*scripts.*qclient_actions.sh/d' "$HOME/.bashrc"
+            
+            # Add the new alias
+            echo "" >> "$HOME/.bashrc"  # Add a blank line for readability
+            echo "# This alias calls the \"qclient menu\" by typing \"quilclient\"" >> "$HOME/.bashrc"
+            echo "alias quilclient='$HOME/scripts/qclient_actions.sh'" >> "$HOME/.bashrc"
+            
+            # Source bashrc to apply changes
+            if [ -n "$BASH_VERSION" ]; then
+                source "$HOME/.bashrc"
+                echo "Alias migrated from 'qclient' to 'quilclient'"
+            else
+                echo "Please run 'source ~/.bashrc' or restart your terminal to use the new 'quilclient' alias"
+            fi
+            
+            # Remove the old marker file and create the new one
+            rm "$SCRIPT_DIR/.qclient_actions_alias_added"
+            touch "$SCRIPT_DIR/.quilclient_menu_alias_added"
+        fi
     fi
 }
 
@@ -1180,6 +1210,7 @@ main() {
 #=====================
 
 check_for_updates
+migrate_old_alias
 add_alias_if_needed
 
 main
