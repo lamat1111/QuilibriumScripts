@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="2.3"
+SCRIPT_VERSION="2.4"
 
 
 # Check for sudo privileges immediately
