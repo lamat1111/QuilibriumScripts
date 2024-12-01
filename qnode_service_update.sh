@@ -483,6 +483,27 @@ if [ "$NODE_NEEDS_UPDATE" = true ]; then
     display_header "CLEANING UP OLD NODE RELEASES"
     cleanup_old_releases "$NODE_DIR" "node"
 
+    #==========================
+    # NODE BINARY SYMLINK
+    #==========================
+
+    display_header "UPDATING NODE BINARY SYMLINK"
+
+    # Remove existing symlink if it exists
+    if [ -L "/usr/local/bin/quilnode" ]; then
+        echo "⏳ Removing existing quilnode symlink..."
+        sudo rm /usr/local/bin/quilnode
+    fi
+
+    # Create new symlink
+    echo "⏳ Creating quilnode symlink..."
+    if sudo ln -s "$HOME/ceremonyclient/node/$NODE_BINARY" /usr/local/bin/quilnode; then
+        echo "✅ Quilnode symlink updated successfully"
+    else
+        echo "❌ Failed to create quilnode symlink"
+    fi
+    echo
+
 fi
 
 if [ "$QCLIENT_NEEDS_UPDATE" = true ]; then
@@ -542,6 +563,27 @@ if [ "$QCLIENT_NEEDS_UPDATE" = true ]; then
     
     display_header "CLEANING UP OLD QCLIENT RELEASES"
     cleanup_old_releases "$CLIENT_DIR" "qclient"
+
+    #==========================
+    # QCLIENT BINARY SYMLINK
+    #==========================
+
+    display_header "UPDATING QCLIENT BINARY SYMLINK"
+
+    # Remove existing symlink if it exists
+    if [ -L "/usr/local/bin/qclient" ]; then
+        echo "⏳ Removing existing qclient symlink..."
+        sudo rm /usr/local/bin/qclient
+    fi
+
+    # Create new symlink
+    echo "⏳ Creating qclient symlink..."
+    if sudo ln -s "$HOME/ceremonyclient/client/$QCLIENT_BINARY" /usr/local/bin/qclient; then
+        echo "✅ Qclient symlink updated successfully"
+    else
+        echo "❌ Failed to create qclient symlink"
+    fi
+    echo
 
 fi
 
