@@ -458,7 +458,28 @@ for file in $files; do
     fi
 done
 
+#==========================
+# NODE BINARY SYMLINK
+#==========================
 
+display_header "CREATING NODE BINARY SYMLINK"
+
+# Remove existing symlink if it exists
+if [ -L "/usr/local/bin/quilnode" ]; then
+    echo "⏳ Updating existing quilnode symlink..."
+    sudo rm /usr/local/bin/quilnode
+fi
+
+# Create new symlink
+echo "⏳ Creating quilnode symlink..."
+if sudo ln -s "$HOME/ceremonyclient/node/$NODE_BINARY" /usr/local/bin/quilnode; then
+    echo "✅ Quilnode symlink created successfully"
+else
+    echo "❌ Failed to create quilnode symlink"
+fi
+echo
+
+sleep 3
 
 #==========================
 # DOWNLOAD QCLIENT
@@ -519,6 +540,28 @@ done
 # Re-enable exit on error for optional packages
 set -e
 
+#==========================
+# QCLIENT BINARY SYMLINK
+#==========================
+
+display_header "CREATING QCLIENT BINARY SYMLINK"
+
+# Remove existing symlink if it exists
+if [ -L "/usr/local/bin/qclient" ]; then
+    echo "⏳ Updating existing qclient symlink..."
+    sudo rm /usr/local/bin/qclient
+fi
+
+# Create new symlink
+echo "⏳ Creating qclient symlink..."
+if sudo ln -s "$HOME/ceremonyclient/client/$QCLIENT_BINARY" /usr/local/bin/qclient; then
+    echo "✅ Qclient symlink created successfully"
+else
+    echo "❌ Failed to create qclient symlink"
+fi
+echo
+
+sleep 3
 
 #==========================
 # SETUP SERVICE
@@ -626,7 +669,7 @@ echo "If you notice errors please correct them manually and restart your node."
 echo "------------------------------------------------"
 cat /lib/systemd/system/ceremonyclient.service
 echo "------------------------------------------------"
-sleep 5
+sleep 7
 
 #==========================
 # .CONFIG YML SETUP
