@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.7.8"
+SCRIPT_VERSION="2.7.9"
 
 # ------------------------------------------------------------------
 SHOW_TEMP_MESSAGE=true  # Toggle to control message visibility
@@ -148,7 +148,14 @@ main() {
             8) restart_node; press_any_key ;;
             9) node_info; press_any_key ;;
             10) node_status; press_any_key ;;
-            11) balance_log && prompt_return_to_menu "skip_check" ;;
+            11) 
+                if balance_log; then
+                    : # Do nothing if balance_log succeeded
+                else
+                    REDRAW_MENU=true # Redraw menu if balance_log returned 1 (exit option)
+                    display_menu "skip_check"
+                fi
+                ;;
             12) confirm_action "$(wrap_text "$backup_storj_message" "")" "Backup your node on StorJ" backup_storj && prompt_return_to_menu "skip_check" ;;
             13) confirm_action "$(wrap_text "$backup_restore_storj_message" "")" "Restore a node backup from StorJ" backup_restore_storj && prompt_return_to_menu "skip_check" ;;
             #14) system_cleaner && prompt_return_to_menu "skip_check" ;;
@@ -494,24 +501,100 @@ system_cleaner() {
     return $?
 }
 
+show_quil_balance() {
+    local filename="$HOME/scripts/balance_log.csv"
+    local timestamp_max=0
+    local balance_max=0
+    local rewards_min=""
+    local rewards_hrs=""
+    local rewards_day=""
+
+    echo
+    echo "--------------------------"
+    
+    # read file in reverse order
+    tac "$filename" | while IFS=, read -r time balance; do
+        # skip header line 
+        if [[ $time = '"time"' ]] ; then
+            break
+        fi
+        # skip error lines
+        if [[ $balance == *"Error"* ]] ; then
+            continue
+        fi
+        # Remove quotes from time and balance
+        time=${time//\"/}
+        balance=${balance//\"/}
+        if [[ $timestamp_max -eq 0 ]] ; then
+            timestamp_max=$(date -d "$time" +%s)
+            balance_max=$balance
+        fi
+        timestamp_line=$(date -d "$time" +%s)
+        time_diff=$(($timestamp_max - $timestamp_line))
+        
+        # calculate the rewards per min as average of at least the last 15 minutes
+        if [[ $rewards_min == "" && $time_diff -gt 900 ]] ; then
+            rewards_min=$(echo "scale=4; ($balance_max - $balance) * 60 / $time_diff" | bc | awk '{printf "%.4f\n", $0}')
+            echo "QUIL per min : $rewards_min"
+        fi
+        
+        # calculate the rewards per hour as average of at least the last hour
+        if [[ $rewards_hrs == "" && $time_diff -gt 3590 ]] ; then
+            rewards_hrs=$(echo "scale=4; ($balance_max - $balance) * 3600 / $time_diff" | bc | awk '{printf "%.4f\n", $0}')
+            echo "QUIL per hour: $rewards_hrs"
+        fi
+        
+        # Calculate daily rate when we find two consecutive entries less than 25 hours apart
+        # where one is more than 24 hours from the latest entry
+        if [[ $rewards_day == "" && $time_diff -gt 86400 ]] ; then
+            if [[ -n $prev_time && -n $prev_balance ]] ; then
+                prev_timestamp=$(date -d "$prev_time" +%s)
+                entry_diff=$(($prev_timestamp - $timestamp_line))
+                if [[ $entry_diff -lt 90000 ]] ; then  # 25 hours in seconds
+                    rewards_day=$(echo "scale=4; ($balance_max - $balance) * 86400 / $time_diff" | bc | awk '{printf "%.4f\n", $0}')
+                    echo "QUIL per day : $rewards_day"
+                    break
+                fi
+            fi
+        fi
+        
+        prev_time=$time
+        prev_balance=$balance
+    done
+    echo "--------------------------"
+    echo
+}
+
+# Updated balance_log function with clean menu return
 balance_log() {
     echo
     if [ -f "$HOME/scripts/qnode_balance_checker.sh" ] && crontab -l | grep -q "qnode_balance_checker.sh"; then
+        # Show QUIL balance rates if the balance log exists
+        if [ -f "$HOME/scripts/balance_log.csv" ]; then
+            show_quil_balance
+        fi
+        
         echo "Balance log is already set up. What would you like to do?"
         echo
         echo "1 - Download balance log"
         echo "2 - See balance log"
-        echo "3 - Clean balance log"
+        echo "3 - Delete balance log"
+        echo "4 - Exit"
         echo
-        read -p "Enter your choice (1, 2 or 3): " choice
+        read -p "Enter your choice: " choice
 
         case $choice in
+            4)
+                REDRAW_MENU=true
+                return 1
+                ;;
             1)
                 echo
                 mkdir -p ~/scripts && \
                 curl -sSL -o ~/scripts/qnode_balance_log_download.sh "https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_balance_log_download.sh" && \
                 chmod +x ~/scripts/qnode_balance_log_download.sh && \
                 ~/scripts/qnode_balance_log_download.sh
+                prompt_return_to_menu "skip_check"
                 ;;
             2)
                 if [ -f "$HOME/scripts/balance_log.csv" ]; then
@@ -523,6 +606,7 @@ balance_log() {
                 else
                     echo "Balance log file not found."
                 fi
+                prompt_return_to_menu "skip_check"
                 ;;
             3)
                 echo "This option will completely delete your balance log. Proceed? (y/n)"
@@ -536,16 +620,18 @@ balance_log() {
                 else
                     echo "Operation cancelled."
                 fi
+                prompt_return_to_menu "skip_check"
                 ;;
             *)
                 echo "Invalid choice. Please run the balance log option again."
+                prompt_return_to_menu "skip_check"
                 ;;
         esac
     else
         echo "⌛️  Installing the balance log script..."
         curl -sSL "$BALANCE_LOG_URL" | bash
     fi
-    return $?
+    return 0
 }
 
 backup_storj() {
