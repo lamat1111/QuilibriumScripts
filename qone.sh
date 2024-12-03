@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.7.9"
+SCRIPT_VERSION="2.8.0"
 
 # ------------------------------------------------------------------
 SHOW_TEMP_MESSAGE=true  # Toggle to control message visibility
@@ -509,10 +509,24 @@ show_quil_balance() {
     local rewards_hrs=""
     local rewards_day=""
 
+    # First check if we have at least two different entries
+    local entry_count=$(grep -v '"time"' "$filename" | sort -u | wc -l)
+    
+    if [ "$entry_count" -lt 2 ]; then
+        echo
+        echo "--------------------------"
+        echo "Not enough data to calculate rates."
+        echo "Current balance: $(tail -n 1 "$filename" | cut -d',' -f2 | tr -d '"')"
+        echo "Need more time to collect data..."
+        echo "--------------------------"
+        echo
+        return
+    fi
+
     echo
     echo "--------------------------"
     
-    # read file in reverse order
+    # Rest of your existing code...
     tac "$filename" | while IFS=, read -r time balance; do
         # skip header line 
         if [[ $time = '"time"' ]] ; then
