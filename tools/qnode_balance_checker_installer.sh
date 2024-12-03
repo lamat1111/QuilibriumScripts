@@ -37,7 +37,6 @@ sleep 7
 #sudo apt install -y python3 python3-pip > /dev/null || { echo "❌ Failed to install Python 3 and pip3."; exit 1; } 
 #sleep 1
 
-
 echo "⚙️ Removing existing script if it exists..."
 echo
 rm -f $HOME/scripts/qnode_balance_checker.sh
@@ -48,7 +47,7 @@ mkdir -p $HOME/scripts
 sleep 1
 
 echo "⚙️ Downloading new script..."
-wget -q -P $HOME/scripts -O $HOME/scripts/qnode_balance_checker.sh https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_balance_checker.sh
+curl -s -o "$HOME/scripts/qnode_balance_checker.sh" https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_balance_checker.sh
 sleep 1
 
 echo "⚙️ Setting executable permissions for the script..."
@@ -64,7 +63,7 @@ echo "⚙️ Setting up cronjob to run the script once every hour..."
 sleep 1
 
 echo "⚙️ Installing the balance log downloader script..."
-wget -O ~/scripts/qnode_balance_log_download.sh https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_balance_log_download.sh
+curl -s -o "$HOME/scripts/qnode_balance_log_download.sh" https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_balance_log_download.sh
 chmod +x ~/scripts/qnode_balance_log_download.sh
 
 echo
@@ -76,4 +75,13 @@ echo
 echo "ℹ️ To see the log just run 'cat $HOME/scripts/balance_log.csv'"
 echo
 echo "ℹ️ To download your balance CSV file you can run '$HOME/scripts/qnode_balance_log_download.sh'"
-sleep 5
+echo
+echo "Press Enter to continue..."
+read -r
+
+clear
+if [ -f "$HOME/qone.sh" ]; then
+    "$HOME/qone.sh"
+else
+    exit 0
+fi
