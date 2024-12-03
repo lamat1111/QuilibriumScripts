@@ -76,8 +76,5 @@ echo "ℹ️ To see the log just run 'cat $HOME/scripts/balance_log.csv'"
 echo
 echo "ℹ️ To download your balance CSV file you can run '$HOME/scripts/qnode_balance_log_download.sh'"
 echo
-echo
-echo "Press Enter to continue..."
-read -r
 
 exit 0
