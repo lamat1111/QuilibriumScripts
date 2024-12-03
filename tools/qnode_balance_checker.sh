@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION="1.6.1"
+SCRIPT_VERSION="1.6.3"
 
 ###################
 # Constants
@@ -16,9 +16,9 @@ readonly MIGRATION_FLAG="$SCRIPTS_DIR/balance_log_fix_applied"
 ###################
 
 check_for_updates() {
-    LATEST_VERSION=$(wget -qO- "https://github.com/lamat1111/QuilibriumScripts/raw/main/tools/qnode_balance_checker.sh" | grep 'SCRIPT_VERSION="' | head -1 | cut -d'"' -f2)
+    LATEST_VERSION=$(curl -s "https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_balance_checker.sh" | grep 'SCRIPT_VERSION="' | head -1 | cut -d'"' -f2)
     if [ "$SCRIPT_VERSION" != "$LATEST_VERSION" ]; then
-        wget -O "$SCRIPTS_DIR/qnode_balance_checker.sh" "https://github.com/lamat1111/QuilibriumScripts/raw/main/tools/qnode_balance_checker.sh"
+        curl -s -o "$SCRIPTS_DIR/qnode_balance_checker.sh" "https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_balance_checker.sh"
         chmod +x "$SCRIPTS_DIR/qnode_balance_checker.sh"
         sleep 1
     fi
@@ -32,7 +32,10 @@ check_and_migrate() {
 
     # Check file existence and readability
     if [ ! -f "$BALANCE_LOG" ] || [ ! -r "$BALANCE_LOG" ]; then
+        echo
         echo "❌ Error: Migration failed - File not found or not readable"
+        echo "This is ok if you are installing the sript for the first time"
+        echo
         return 1
     fi
     
@@ -142,7 +145,7 @@ main() {
     
     # Get current balance
     local current_time
-    current_time=$(date +'%d/%m/%Y %H:%M')
+    current_time=$(date +'%Y-%m-%d %H:%M')
     
     local balance
     balance=$(get_unclaimed_balance)
