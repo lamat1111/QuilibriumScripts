@@ -647,7 +647,7 @@ ExecStop=/bin/kill -s SIGINT \$MAINPID
 KillSignal=SIGINT
 RestartKillSignal=SIGINT
 FinalKillSignal=SIGKILL
-TimeoutStopSec=30s"
+TimeoutStopSec=60s"
 
 # # Add GOMAXPROCS to the service file only if needed
 # if [ "$GOMAXPROCS" -ne "0" ]; then
