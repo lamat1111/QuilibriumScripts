@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.8.0"
+SCRIPT_VERSION="2.8.1"
 
 # ------------------------------------------------------------------
 SHOW_TEMP_MESSAGE=true  # Toggle to control message visibility
@@ -509,8 +509,8 @@ show_quil_balance() {
     local rewards_hrs=""
     local rewards_day=""
 
-    # First check if we have at least two different entries
-    local entry_count=$(grep -v '"time"' "$filename" | sort -u | wc -l)
+    # First check if we have at least two different entries (excluding header)
+    local entry_count=$(tail -n +2 "$filename" | sort -u | wc -l)
     
     if [ "$entry_count" -lt 2 ]; then
         echo
@@ -526,12 +526,8 @@ show_quil_balance() {
     echo
     echo "--------------------------"
     
-    # Rest of your existing code...
-    tac "$filename" | while IFS=, read -r time balance; do
-        # skip header line 
-        if [[ $time = '"time"' ]] ; then
-            break
-        fi
+    # Skip header and read file in reverse order
+    tail -n +2 "$filename" | tac | while IFS=, read -r time balance; do
         # skip error lines
         if [[ $balance == *"Error"* ]] ; then
             continue
