@@ -686,7 +686,7 @@ ExecStop=/bin/kill -s SIGINT \$MAINPID
 KillSignal=SIGINT
 RestartKillSignal=SIGINT
 FinalKillSignal=SIGKILL
-TimeoutStopSec=60s
+TimeoutStopSec=240s
 
 [Install]
 WantedBy=multi-user.target
@@ -701,7 +701,7 @@ else
     update_service_section "KillSignal" "SIGINT" "$SERVICE_FILE"
     update_service_section "RestartKillSignal" "SIGINT" "$SERVICE_FILE"
     update_service_section "FinalKillSignal" "SIGKILL" "$SERVICE_FILE"
-    update_service_section "TimeoutStopSec" "30s" "$SERVICE_FILE"
+    update_service_section "TimeoutStopSec" "240s" "$SERVICE_FILE"
 
     # Ensure proper formatting and order
     ensure_correct_formatting "$SERVICE_FILE"
