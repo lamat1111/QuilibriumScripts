@@ -8,7 +8,7 @@
 #Comment out for automatic creation of the qclient version
 #QCLIENT_VERSION=2.0.3
 
-SCRIPT_VERSION="2.5"
+SCRIPT_VERSION="2.6"
 
 cat << EOF
 
@@ -29,7 +29,6 @@ This script will install your Quilibrum node as a service.
 It will run your node from the binary file, and you will have to
 update manually.
 
-Be sure to run the 'Server Setup' script first.
 Follow the guide at https://docs.quilibrium.one
 
 Made with 🔥 by LaMat - https://quilibrium.one
