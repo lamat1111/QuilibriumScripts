@@ -128,10 +128,8 @@ check_and_install() {
             echo "⚠️ Failed to install $1"
             return 1
         fi
-        echo
     else
-        echo "✅ $1 is installed"
-        echo
+        echo "$1 is installed"
     fi
 }
 
