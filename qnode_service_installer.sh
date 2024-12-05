@@ -639,7 +639,7 @@ StartLimitBurst=0
 
 [Service]
 Type=simple
-Restart=always
+Restart=on-failure
 RestartSec=5s
 WorkingDirectory=$NODE_PATH
 ExecStart=$EXEC_START
