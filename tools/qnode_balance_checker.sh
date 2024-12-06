@@ -34,7 +34,7 @@ check_and_migrate() {
     if [ ! -f "$BALANCE_LOG" ] || [ ! -r "$BALANCE_LOG" ]; then
         echo
         echo "❌ Error: Migration failed - File not found or not readable"
-        echo "This is ok if you are installing the sript for the first time"
+        echo "This is ok if you are installing the script for the first time"
         echo
         return 1
     fi
