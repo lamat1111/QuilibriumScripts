@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.8.3"
+SCRIPT_VERSION="2.8.4"
 
 # ------------------------------------------------------------------
 SHOW_TEMP_MESSAGE=true  # Toggle to control message visibility
@@ -709,7 +709,6 @@ node_info() {
     else
         echo
         echo "⌛️  Displaying node info..."
-        echo
 
         if [ -d "$NODE_DIR" ]; then
             cd "$NODE_DIR" && ./"$NODE_BINARY" -node-info
@@ -718,13 +717,16 @@ node_info() {
         fi
         echo
 
-        # Show QUIL balance rates if the required files exist
-        if [ -f "$HOME/scripts/qnode_balance_checker.sh" ] && [ -f "$HOME/scripts/balance_log.csv" ]; then
+        # Show QUIL balance rates if log exists and is being updated
+        if [ -f "$HOME/scripts/balance_log.csv" ] && \
+           crontab -l 2>/dev/null | grep "qnode_balance_checker.sh" | grep -vq "^#"; then
             show_quil_balance
+        else
+            echo "--------------------------"
+            echo "Activate your balance log (option 11 in the main menu)"
+            echo "in order to see here your hourly and daily rewards"
+            echo "--------------------------"
         fi
-
-        echo 
-        echo "You can also try the direct commands: https://iri.quest/q-node-info"
     fi
 }
 
