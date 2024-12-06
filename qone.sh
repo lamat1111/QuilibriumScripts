@@ -709,7 +709,6 @@ node_info() {
     else
         echo
         echo "⌛️  Displaying node info..."
-        echo
 
         # Show QUIL balance rates if the required files exist
         if [ -f "$HOME/scripts/qnode_balance_checker.sh" ] && [ -f "$HOME/scripts/balance_log.csv" ]; then
