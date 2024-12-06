@@ -370,15 +370,13 @@ if [ "$NODE_NEEDS_UPDATE" = true ]; then
         else
             # Ask user with timeout
             echo
-            echo "Would you like to backup your .config folder? [Y/n]"
-            echo "Auto-selecting YES in 20 seconds..."
+            echo "Would you like to backup your .config folder? [y/N]"
+            echo "Auto-selecting NO in 20 seconds..."
             
             read -t 20 -r REPLY
-            REPLY=${REPLY:-Y}
+            REPLY=${REPLY:-N}
             
-            if [[ ! $REPLY =~ ^[Yy]$ ]] && [ ! -z "$REPLY" ]; then
-                echo "❌ Backup skipped by user."
-            else
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
                 echo "⏳ Starting backup process..."
 
                 # Remove any existing backup - matching any config backup with q1backup pattern
@@ -391,11 +389,13 @@ if [ "$NODE_NEEDS_UPDATE" = true ]; then
                 
                 if cp -r "$NODE_DIR/.config" "$BACKUP_PATH"; then
                     echo "✅ Backup completed successfully!"
-                    echo "📂 Backup location: $BACKUP_PATH"
+                    echo "Backup location: $BACKUP_PATH"
                 else
                     echo "❌ Backup failed!"
                     rm -rf "$BACKUP_PATH" 2>/dev/null
                 fi
+            else
+                echo "❌ Backup skipped."
             fi
         fi
     fi
