@@ -311,7 +311,7 @@ if [ -z "$NODE_VERSION" ]; then
         echo
         echo "This could be caused by your provider blocking access to quilibrium.com"
         echo "A solution could be to change your machine DNS and try again the update script."
-        echo "You can change your machine DNS with the command below:"
+        echo "You can try to change your machine DNS with the command below:"
         echo "sudo sh -c 'echo "nameserver 8.8.8.8" | tee /etc/systemd/resolved.conf.d/dns_servers.conf > /dev/null && systemctl restart systemd-resolved'"
         echo
         echo "Or, you can try the manual step by step installation instead:"
