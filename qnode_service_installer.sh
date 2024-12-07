@@ -709,7 +709,7 @@ display_header "✅ INSTALLATION COMPLETED"
 sudo systemctl daemon-reload
 sudo systemctl enable ceremonyclient
 
-echo "Server setup is finished!"
+echo "Node installation is finished!"
 echo "⚠️ Your server will reboot in 20 seconds..."
 echo
 echo "After the reboot, your node will start automatically"
