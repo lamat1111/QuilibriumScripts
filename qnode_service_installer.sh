@@ -708,7 +708,7 @@ display_header "✅ INSTALLATION COMPLETED"
 
 sudo systemctl daemon-reload
 sudo systemctl enable ceremonyclient
-# Prompt for reboot
+
 echo "Server setup is finished!"
 echo "⚠️ Your server will reboot in 10 seconds..."
 echo
