@@ -710,10 +710,10 @@ sudo systemctl daemon-reload
 sudo systemctl enable ceremonyclient
 
 echo "Server setup is finished!"
-echo "⚠️ Your server will reboot in 10 seconds..."
+echo "⚠️ Your server will reboot in 20 seconds..."
 echo
 echo "After the reboot, your node will start automatically"
 echo "After 30 minutes that your node has been running, backup your keys.yml and config.yml files."
 echo "More info in the online guide: https://docs.quilibrium.one"
-sleep 10
+sleep 20
 sudo reboot
