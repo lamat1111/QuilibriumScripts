@@ -666,6 +666,10 @@ echo "If you notice errors please correct them manually and restart your node."
 echo "------------------------------------------------"
 cat /lib/systemd/system/ceremonyclient.service
 echo "------------------------------------------------"
+echo
+sudo systemctl daemon-reload
+sudo systemctl enable ceremonyclient
+echo
 sleep 7
 
 #==========================
@@ -704,12 +708,9 @@ sleep 3
 # INSTALLATION COMPLETED
 #==========================
 
-display_header "✅ INSTALLATION COMPLETED"
+display_header "INSTALLATION COMPLETED"
 
-sudo systemctl daemon-reload
-sudo systemctl enable ceremonyclient
-
-echo "Quilibrium node installation v$NODE_VERSION is finished!"
+echo "✅ Quilibrium node installation v$NODE_VERSION is finished!"
 echo "⚠️ Your server will reboot in 20 seconds..."
 echo
 echo "After the reboot, your node will start automatically"
