@@ -1,6 +1,30 @@
 #!/bin/bash
 
-cat << "EOF"
+SCRIPT_VERSION="2.4"
+
+
+# Check for sudo privileges immediately
+check_sudo() {
+    if ! sudo -v &> /dev/null; then
+        cat << EOF
+
+❌ Error: This script requires sudo privileges to run properly.
+Please run this script again with sudo privileges to ensure proper version detection
+and updates.
+
+You can either:
+1. Run the script with sudo: sudo bash <script_name>
+2. Grant your user sudo privileges and try again
+
+EOF
+        exit 1
+    fi
+}
+
+# Run sudo check before anything else
+check_sudo
+
+cat << EOF
 
                     Q1Q1Q1\    Q1\   
                    Q1  __Q1\ Q1Q1 |  
@@ -13,9 +37,9 @@ cat << "EOF"
                         \___|        
                               
 ===========================================================================
-                       ✨ QNODE FORCED UPDATER ✨
+                 ✨ QNODE / QCLIENT UPDATER - $SCRIPT_VERSION ✨
 ===========================================================================
-This script will forcefully update your Quilibrium node when running it as a service.
+This script will update your Quilibrium node when running it as a service.
 It will run your node from the binary file, and you will have to
 update manually.
 Follow the guide at https://docs.quilibrium.one
@@ -34,14 +58,36 @@ EOF
 
 sleep 7  
 
+#Comment out for automatic creation of the node version
+#NODE_VERSION=2.0
+
+#Comment out for automatic creation of the qclient version
+#QCLIENT_VERSION=1.4.19.1
+
+#useful variables
 SERVICE_FILE="/lib/systemd/system/ceremonyclient.service"
+QUILIBRIUM_RELEASES="https://releases.quilibrium.com"
+NODE_RELEASE_URL="https://releases.quilibrium.com/release"
+QCLIENT_RELEASE_URL="https://releases.quilibrium.com/qclient-release"
+NODE_DIR="$HOME/ceremonyclient/node"
+CLIENT_DIR="$HOME/ceremonyclient/client"
+GSHEET_CONFIG_UPDATE_SCRIPT_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_gsheet_config_update.sh"
+# Get current node version
+current_node_binary=$(find "$NODE_DIR" -name "node-[0-9]*" ! -name "*.dgst" ! -name "*.sig*" -type f -executable 2>/dev/null | sort -V | tail -n 1)
+if [ -n "$current_node_binary" ]; then
+    CURRENT_NODE_VERSION=$(basename "$current_node_binary" | grep -o '[0-9]\+\.[0-9]\+\(\.[0-9]\+\)*' || echo "")
+fi
 
 # Check if the service file exists
-if [ ! -f "$SERVICE_FILE" ]; then
-    echo "❌ Error: you are not running your node via service file:  $SERVICE_FILE"
-    echo "This update script won't work for you. Exiting."
-    exit 1
-fi
+# if [ ! -f "$SERVICE_FILE" ]; then
+#     echo "❌ Error: you are not running your node via service file:  $SERVICE_FILE"
+#     echo "This update script won't work for you. Exiting."
+#     exit 1
+# fi
+
+#==========================
+# UTILITY FUNCTIONS
+#==========================
 
 # Function to display section headers
 display_header() {
@@ -51,6 +97,33 @@ display_header() {
     echo "=============================================================="
     echo
 }
+
+
+# The cleanup function
+cleanup_old_releases() {
+    local directory=$1
+    local prefix=$2
+    
+    echo "⏳ Cleaning up old $prefix releases in $directory..."
+    
+    # Find the latest executable binary (will be the one we want to keep)
+    local current_binary=$(find "$directory" -name "${prefix}-[0-9]*" ! -name "*.dgst" ! -name "*.sig*" -type f -executable 2>/dev/null | sort -V | tail -n 1)
+    
+    if [ -z "$current_binary" ]; then
+        echo "❌ No current $prefix binary found"
+        return 1
+    fi
+    
+    # Get just the filename without the path
+    current_binary=$(basename "$current_binary")
+    echo "Current binary: $current_binary"
+    
+    # Find and delete old files in one go - simpler approach
+    find "$directory" -type f -name "${prefix}-[0-9.]*-${release_os}-${release_arch}*" ! -name "${current_binary}*" -delete
+    
+    echo "✅ Cleanup completed for $prefix"
+}
+
 
 #==========================
 # INSTALL APPS
@@ -79,72 +152,72 @@ check_and_install curl
 # CREATE PATH VARIABLES
 #==========================
 
-display_header "PREPARING FOR UPDATE"
-
-# Determine the ExecStart line based on the architecture
-ARCH=$(uname -m)
-OS=$(uname -s)
+display_header "CHECK NEEDED UPDATES"
 
 # Determine node latest version
-NODE_VERSION=$(curl -s https://releases.quilibrium.com/release | grep -E "^node-[0-9]+(\.[0-9]+)*" | grep -v "dgst" | sed 's/^node-//' | cut -d '-' -f 1 | head -n 1)
+# Check if NODE_VERSION is empty
 if [ -z "$NODE_VERSION" ]; then
-    echo "❌ Error: Unable to determine the latest node release automatically."
-    exit 1
+    NODE_VERSION=$(curl -s "$NODE_RELEASE_URL" | grep -E "^node-[0-9]+(\.[0-9]+)*" | grep -v "dgst" | sed 's/^node-//' | cut -d '-' -f 1 | head -n 1)
+    if [ -z "$NODE_VERSION" ]; then
+        echo "❌ Error: Unable to determine the latest node release automatically."
+        echo "The script cannot proceed without a correct node version number."
+        echo
+        echo "This could be caused by your provider blocking access to quilibrium.com"
+        echo "A solution could be to change your machine DNS and try again the update script."
+        echo "You can change your machine DNS with the command below:"
+        echo "sudo sh -c 'echo "nameserver 8.8.8.8" | tee /etc/systemd/resolved.conf.d/dns_servers.conf > /dev/null && systemctl restart systemd-resolved'"
+        echo
+        echo "Or, you can try the manual step by step installation instead:"
+        echo "https://docs.quilibrium.one/start/tutorials/node-step-by-step-installation"
+        echo
+        exit 1
+    else
+        echo "✅ Latest Node release: $NODE_VERSION"
+    fi
 else
-    echo "✅ Latest Node release: $NODE_VERSION"
+    echo "✅ Using specified Node version: $NODE_VERSION"
 fi
 
 # Determine qclient latest version
-QCLIENT_VERSION=$(curl -s https://releases.quilibrium.com/qclient-release | grep -E "^qclient-[0-9]+(\.[0-9]+)*" | sed 's/^qclient-//' | cut -d '-' -f 1 |  head -n 1)
+# Check if QCLIENT_VERSION is empty
 if [ -z "$QCLIENT_VERSION" ]; then
-    echo "❌ Error: Unable to determine the latest Qclient release automatically."
-    exit 1
-else
-    echo "✅ Latest Qclient release: $QCLIENT_VERSION"
-fi
-
-# Determine the node binary name based on the architecture and OS
-if [ "$ARCH" = "x86_64" ]; then
-    if [ "$OS" = "Linux" ]; then
-        NODE_BINARY="node-$NODE_VERSION-linux-amd64"
-        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-amd64"
-    elif [ "$OS" = "Darwin" ]; then
-        NODE_BINARY="node-$NODE_VERSION-darwin-amd64"
-        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-amd64"
-    fi
-elif [ "$ARCH" = "aarch64" ]; then
-    if [ "$OS" = "Linux" ]; then
-        NODE_BINARY="node-$NODE_VERSION-linux-arm64"
-        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-linux-arm64"
-    elif [ "$OS" = "Darwin" ]; then
-        NODE_BINARY="node-$NODE_VERSION-darwin-arm64"
-        QCLIENT_BINARY="qclient-$QCLIENT_VERSION-darwin-arm64"
+    QCLIENT_VERSION=$(curl -s "$QCLIENT_RELEASE_URL" | grep -E "^qclient-[0-9]+(\.[0-9]+)*" | sed 's/^qclient-//' | cut -d '-' -f 1 |  head -n 1)
+    if [ -z "$QCLIENT_VERSION" ]; then
+        echo "⚠️ Warning: Unable to determinethe latest Qclient release automatically. Continuing without it."
+        echo "The script won't be able to install the Qclient, but it will still install your node."
+        echo "You can install the Qclient later manually if you need to."
+        echo
+        sleep 1
+    else
+        echo "✅ Latest Qclient release: $QCLIENT_VERSION"
     fi
 else
-    echo "❌ Error: Unsupported system architecture ($ARCH) or operating system ($OS)."
-    exit 1
+    echo "✅ Using specified Qclient version: $QCLIENT_VERSION"
 fi
 
-get_os_arch() {
-    local os=$(uname -s | tr '[:upper:]' '[:lower:]')
-    local arch=$(uname -m)
+# Detect OS and architecture in a unified way
+case "$OSTYPE" in
+    "linux-gnu"*)
+        release_os="linux"
+        case "$(uname -m)" in
+            "x86_64") release_arch="amd64" ;;
+            "aarch64") release_arch="arm64" ;;
+            *) echo "❌ Error: Unsupported system architecture ($(uname -m))"; exit 1 ;;
+        esac ;;
+    "darwin"*)
+        release_os="darwin"
+        case "$(uname -m)" in
+            "x86_64") release_arch="amd64" ;;
+            "arm64") release_arch="arm64" ;;
+            *) echo "❌ Error: Unsupported system architecture ($(uname -m))"; exit 1 ;;
+        esac ;;
+    *) echo "❌ Error: Unsupported operating system ($OSTYPE)"; exit 1 ;;
+esac
 
-    case "$os" in
-        linux|darwin) ;;
-        *) echo "Unsupported operating system: $os" >&2; return 1 ;;
-    esac
-
-    case "$arch" in
-        x86_64|amd64) arch="amd64" ;;
-        arm64|aarch64) arch="arm64" ;;
-        *) echo "Unsupported architecture: $arch" >&2; return 1 ;;
-    esac
-
-    echo "${os}-${arch}"
-}
-
-# Get the current OS and architecture
-OS_ARCH=$(get_os_arch)
+# Set binary names based on detected OS and architecture
+NODE_BINARY="node-$NODE_VERSION-$release_os-$release_arch"
+GO_BINARY="go$GO_VERSION.$release_os-$release_arch.tar.gz"
+QCLIENT_BINARY="qclient-$QCLIENT_VERSION-$release_os-$release_arch"
 
 echo
 
@@ -155,7 +228,7 @@ echo
 display_header "STOPPING SERVICE"
 
 # Stop the ceremonyclient service if it exists
-echo "⏳ Stopping the ceremonyclient service..."
+echo "⏳ Stopping the ceremonyclient service if it exists..."
 if systemctl is-active --quiet ceremonyclient; then
     if sudo systemctl stop ceremonyclient; then
         echo "✅ Service stopped successfully."
@@ -176,35 +249,84 @@ sleep 1
 
 display_header "DOWNLOADING NODE BINARY"
 
-# Base URL for the Quilibrium releases
-RELEASE_FILES_URL="https://releases.quilibrium.com/release"
-
-# Fetch the list of files from the release page
-RELEASE_FILES=$(curl -s $RELEASE_FILES_URL | grep -oE "node-[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?-${OS_ARCH}(\.dgst)?(\.sig\.[0-9]+)?")
-
 # Change to the download directory
-cd ~/ceremonyclient/node
+if ! cd ~/ceremonyclient/node; then
+    echo "❌ Error: Unable to change to the node directory"
+    exit 1
+fi
 
-# Download each file
-for file in $RELEASE_FILES; do
-    echo "Downloading $file..."
-    if curl -L -o "$file" "https://releases.quilibrium.com/$file" --fail --silent; then
+# Fetch the file list with error handling
+if ! files=$(curl -s -f --connect-timeout 10 --max-time 30 "$NODE_RELEASE_URL"); then
+    echo "❌ Error: Failed to connect to $NODE_RELEASE_URL"
+    echo "Please check your internet connection and try again."
+    exit 1
+fi
+
+# Filter files for current architecture
+files=$(echo "$files" | grep "$release_os-$release_arch" || true)
+
+if [ -z "$files" ]; then
+    echo "❌ Error: No node files found for $release_os-$release_arch"
+    echo "This could be due to network issues or no releases for your architecture."
+    exit 1
+fi
+
+# Download files
+for file in $files; do
+    version=$(echo "$file" | cut -d '-' -f 2)
+    if ! test -f "./$file"; then
+        echo "⏳ Downloading $file..."
+        if ! curl -s -f --connect-timeout 10 --max-time 300 "$QUILIBRIUM_RELEASES/$file" > "$file"; then
+            echo "❌ Failed to download $file"
+            rm -f "$file" # Cleanup failed download
+            continue
+        fi
         echo "Successfully downloaded $file"
-        # Check if the file is the base binary (without .dgst or .sig suffix)
-        if [[ $file =~ ^node-[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?-${OS_ARCH}$ ]]; then
-            if chmod +x "$file"; then
-                echo "Made $file executable"
-            else
+        
+        # Make binary executable if it's not a signature or digest file
+        if [[ ! $file =~ \.(dgst|sig)$ ]]; then
+            if ! chmod +x "$file"; then
                 echo "❌ Failed to make $file executable"
+                continue
             fi
+            echo "Made $file executable"
         fi
     else
-        echo "❌ Failed to download $file"
+        echo "File $file already exists, skipping"
     fi
-    echo "------------------------"
 done
 
-echo "✅ Node binary download completed."
+#==========================
+# CLEAN UP OLD RELEASE
+#==========================
+
+display_header "CLEANING UP OLD NODE RELEASES"
+cleanup_old_releases "$NODE_DIR" "node"
+
+#==========================
+# NODE BINARY SYMLINK
+#==========================
+
+display_header "UPDATING NODE BINARY SYMLINK"
+
+# Remove existing symlink if it exists
+if [ -L "/usr/local/bin/quilnode" ]; then
+    echo "⏳ Removing existing quilnode symlink..."
+    sudo rm /usr/local/bin/quilnode
+fi
+
+# Create new symlink
+echo "⏳ Creating quilnode symlink..."
+if sudo ln -s "$HOME/ceremonyclient/node/$NODE_BINARY" /usr/local/bin/quilnode; then
+    echo "✅ Quilnode symlink updated successfully"
+else
+    echo "❌ Failed to create quilnode symlink"
+fi
+echo
+
+
+
+
 
 #==========================
 # QCLIENT UPDATE
@@ -212,52 +334,77 @@ echo "✅ Node binary download completed."
 
 display_header "UPDATING QCLIENT"
 
-# Base URL for the Quilibrium releases
-BASE_URL="https://releases.quilibrium.com"
-
 # Change to the download directory
 if ! cd ~/ceremonyclient/client; then
-    echo "❌ Error: Unable to change to the download directory"
+    echo "❌ Error: Unable to change to the qclient directory"
     exit 1
 fi
 
-# Function to download file and overwrite if it exists
-download_and_overwrite() {
-    local url="$1"
-    local filename="$2"
-    if curl -L -o "$filename" "$url" --fail --silent; then
-        echo "Successfully downloaded $filename"
-        return 0
+# Fetch the file list with error handling
+if ! files=$(curl -s -f --connect-timeout 10 --max-time 30 "$QCLIENT_RELEASE_URL"); then
+    echo "❌ Error: Failed to connect to $QCLIENT_RELEASE_URL"
+    echo "Please check your internet connection and try again."
+    exit 1
+fi
+
+# Filter files for current architecture
+files=$(echo "$files" | grep "$release_os-$release_arch" || true)
+
+if [ -z "$files" ]; then
+    echo "❌ Error: No qclient files found for $release_os-$release_arch"
+    echo "This could be due to network issues or no releases for your architecture."
+    exit 1
+fi
+
+# Download files
+for file in $files; do
+    version=$(echo "$file" | cut -d '-' -f 2)
+    if ! test -f "./$file"; then
+        echo "⏳ Downloading $file..."
+        if ! curl -s -f --connect-timeout 10 --max-time 300 "$QUILIBRIUM_RELEASES/$file" > "$file"; then
+            echo "❌ Failed to download $file"
+            rm -f "$file" # Cleanup failed download
+            continue
+        fi
+        echo "Successfully downloaded $file"
+        
+        # Make binary executable if it's not a signature or digest file
+        if [[ ! $file =~ \.(dgst|sig)$ ]]; then
+            if ! chmod +x "$file"; then
+                echo "❌ Failed to make $file executable"
+                continue
+            fi
+            echo "Made $file executable"
+        fi
     else
-        return 1
-    fi
-}
-
-# Download the main binary
-echo "Downloading $QCLIENT_BINARY..."
-if download_and_overwrite "$BASE_URL/$QCLIENT_BINARY" "$QCLIENT_BINARY"; then
-    chmod +x $QCLIENT_BINARY
-else
-    echo "❌ Failed to download qclient binary. Manual installation may be required."
-    exit 1
-fi
-
-# Download the .dgst file
-echo "Downloading ${QCLIENT_BINARY}.dgst..."
-if ! download_and_overwrite "$BASE_URL/${QCLIENT_BINARY}.dgst" "${QCLIENT_BINARY}.dgst"; then
-    echo "❌ Failed to download .dgst file. Continuing without it."
-fi
-
-# Download signature files
-echo "Downloading signature files..."
-for i in {1..20}; do
-    sig_file="${QCLIENT_BINARY}.dgst.sig.${i}"
-    if download_and_overwrite "$BASE_URL/$sig_file" "$sig_file"; then
-        echo "Downloaded $sig_file"
+        echo "File $file already exists, skipping"
     fi
 done
 
-echo "✅ Qclient download completed."
+display_header "CLEANING UP OLD QCLIENT RELEASES"
+cleanup_old_releases "$CLIENT_DIR" "qclient"
+
+#==========================
+# QCLIENT BINARY SYMLINK
+#==========================
+
+display_header "UPDATING QCLIENT BINARY SYMLINK"
+
+# Remove existing symlink if it exists
+if [ -L "/usr/local/bin/qclient" ]; then
+    echo "⏳ Removing existing qclient symlink..."
+    sudo rm /usr/local/bin/qclient
+fi
+
+# Create new symlink
+echo "⏳ Creating qclient symlink..."
+if sudo ln -s "$HOME/ceremonyclient/client/$QCLIENT_BINARY" /usr/local/bin/qclient; then
+    echo "✅ Qclient symlink updated successfully"
+else
+    echo "❌ Failed to create qclient symlink"
+fi
+echo
+
 
 #==========================
 # SERVICE UPDATE
@@ -276,8 +423,11 @@ update_service_section() {
     local value="$2"
     local file="$3"
     
-    if grep -q "^$key=" "$file"; then
-        # If the key exists, update its value
+    if grep -q "^$key=$value$" "$file"; then
+        # If the key exists with exactly the same value, do nothing
+        return
+    elif grep -q "^$key=" "$file"; then
+        # If the key exists but with different value, update it
         sudo sed -i "s|^$key=.*|$key=$value|" "$file"
     else
         # If the key doesn't exist, add it before the [Install] section
@@ -344,7 +494,7 @@ StartLimitBurst=0
 
 [Service]
 Type=simple
-Restart=always
+Restart=on-failure
 RestartSec=5s
 WorkingDirectory=$NODE_PATH
 ExecStart=$EXEC_START
@@ -367,7 +517,7 @@ else
     update_service_section "KillSignal" "SIGINT" "$SERVICE_FILE"
     update_service_section "RestartKillSignal" "SIGINT" "$SERVICE_FILE"
     update_service_section "FinalKillSignal" "SIGKILL" "$SERVICE_FILE"
-    update_service_section "TimeoutStopSec" "30s" "$SERVICE_FILE"
+    update_service_section "TimeoutStopSec" "240s" "$SERVICE_FILE"
 
     # Ensure proper formatting and order
     ensure_correct_formatting "$SERVICE_FILE"
@@ -377,6 +527,17 @@ echo "⏳ Reloading daemon and restarting the node to apply the new settings..."
 sudo systemctl daemon-reload
 sudo systemctl restart ceremonyclient
 echo "✅ Service file update completed and applied."
+
+
+
+
+#==========================
+# CONFIG FILE UPDATE for "REWARDS TO GOOGLE SHEET SCRIPT"
+#==========================
+
+PARENT_SCRIPT=1
+
+curl -sSL "$GSHEET_CONFIG_UPDATE_SCRIPT_URL" | bash || true
 
 #==========================
 # START NODE VIA SERVICE
@@ -390,14 +551,10 @@ sudo systemctl enable ceremonyclient
 sudo systemctl start ceremonyclient
 
 # Showing the node version and logs
-echo "🌟 Your node is now updated to v$NODE_VERSION!"
-echo "🌟 Your qclient is now updated to v$QCLIENT_VERSION!"
+echo "🌟Your node is now updated to v$NODE_VERSION !"
 echo
 echo "⏳ Showing the node log... (CTRL+C to exit)"
 echo
 echo
 sleep 2
 sudo journalctl -u ceremonyclient.service -f --no-hostname -o cat
-
-# This is the end of the script. The last command (journalctl) will run indefinitely
-# until the user interrupts it with CTRL+C.
