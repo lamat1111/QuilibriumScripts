@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT-VERSION=1.0
+SCRIPT_VERSION=1.0
 
 # Colors and formatting
 BOLD='\033[1m'
