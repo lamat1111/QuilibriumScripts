@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION=1.5
+SCRIPT_VERSION=1.6
 
 # Colors and formatting
 BOLD='\033[1m'
@@ -25,19 +25,15 @@ else
     minutes=$1
 fi
 
-# Show processing message
-echo -e "\n${BLUE}${PROCESSING}   Processing... Please wait${NC}\n"
-
 # Get current timestamp
 current_timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 # Function to check for newer script version
 check_for_updates() {
-    LATEST_VERSION=$(wget -qO- "https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_rewards_monitor.sh" | grep 'SCRIPT_VERSION="' | head -1 | cut -d'"' -f2)
+    LATEST_VERSION=$(curl -s "https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_rewards_monitor.sh" | grep 'SCRIPT_VERSION=' | head -1 | cut -d'=' -f2)
     if [ "$SCRIPT_VERSION" != "$LATEST_VERSION" ]; then
-        wget -O ~/scripts/qnode_rewards_monitor.sh "https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_rewards_monitor.sh"
+        curl -s -o ~/scripts/qnode_rewards_monitor.sh "https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_rewards_monitor.sh"
         chmod +x ~/scripts/qnode_rewards_monitor.sh
-        sleep 1
     fi
 }
 
@@ -130,11 +126,15 @@ calculate_stats() {
     echo "To analyze a different time span add the number of minutes to the command, e.g.:"
     echo "$HOME/scripts/qnode_rewards_monitor.sh 180"
     echo
-    echo "$SCRIPT_VERSION"
+    echo "Version $SCRIPT_VERSION"
 }
 
 # Main execution
 check_for_updates
+
+# Show processing message
+echo -e "\n${BLUE}${PROCESSING}   Processing... Please wait${NC}\n"
+echo ""
 
 qclient_output=$(qclient token coins metadata --config /root/ceremonyclient/node/.config --public-rpc)
 
