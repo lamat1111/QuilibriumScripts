@@ -29,7 +29,7 @@ fi
 set -e
 
 # Show processing message
-echo -e "\n${BLUE}${PROCESSING}   Processing... Please wait${NC}\n"
+echo -e "\n${BLUE}${PROCESSING}  Processing...${NC}\n"
 
 # Get current timestamp
 current_timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
@@ -143,7 +143,7 @@ calculate_stats() {
 check_for_updates
 
 if ! qclient_output=$(qclient token coins metadata --config /root/ceremonyclient/node/.config --public-rpc); then
-    echo -e "${RED}${WARNING} Error: Failed to get qclient output${NC}"
+    echo -e "${RED}${WARNING} Error: Failed to get qclient output - This script only works if you have installed/updated the node via the Q1 menu${NC}"
     exit 1
 fi
 
