@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION=1.3
+SCRIPT_VERSION=1.4
 
 # Colors and formatting
 BOLD='\033[1m'
@@ -32,7 +32,7 @@ set -e
 echo -e "\n${BLUE}${PROCESSING}   Processing... Please wait${NC}\n"
 
 # Get current timestamp
-current_timestamp=$(date +"%d/%m/%Y %H.%M.%S")
+current_timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 # Function to check for newer script version
 check_for_updates() {
@@ -47,29 +47,27 @@ check_for_updates() {
 # Process the input data
 process_data() {
     while IFS= read -r line; do
+        # Extract amount (first word) and timestamp (after "Timestamp ")
         amount=$(echo "$line" | awk '{print $1}')
-        # Extract date and time from the format "DD/MM/YYYY HH.MM.SS"
-        timestamp=$(echo "$line" | grep -oE '[0-9]{2}/[0-9]{2}/[0-9]{4} [0-9]{2}\.[0-9]{2}\.[0-9]{2}')
+        timestamp=$(echo "$line" | grep -o 'Timestamp [^ ]*' | cut -d' ' -f2)
         
         # Skip invalid lines
         [ -z "$amount" ] || [ -z "$timestamp" ] && continue
         
-        # Convert timestamps to seconds for comparison
-        current_seconds=$(date -d "$(echo $current_timestamp | tr '.' ':')" +%s)
-        coin_seconds=$(date -d "$(echo $timestamp | tr '.' ':')" +%s)
+        current_seconds=$(date -d "$current_timestamp" +%s)
+        coin_seconds=$(date -d "$timestamp" +%s)
         time_diff=$(( (current_seconds - coin_seconds) / 60 ))
         
         if [ $time_diff -le $minutes ]; then
             echo "$timestamp $amount $time_diff"
         fi
-    done | sort -r -t ' ' -k1,1
+    done | sort -k1,1
 }
 
 # Format timestamp to human readable
 format_timestamp() {
     local timestamp=$1
-    # Already in readable format, just convert dots to colons
-    echo "$timestamp" | tr '.' ':'
+    date -d "$timestamp" "+%Y-%m-%d %H:%M:%S"
 }
 
 # Calculate statistics from the processed data
@@ -97,8 +95,8 @@ calculate_stats() {
     average=$(echo "scale=8; $total / $count" | bc)
     
     # Calculate time span of available data
-    start_seconds=$(date -d "$(echo $first_timestamp | tr '.' ':')" +%s)
-    end_seconds=$(date -d "$(echo $last_timestamp | tr '.' ':')" +%s)
+    start_seconds=$(date -d "$first_timestamp" +%s)
+    end_seconds=$(date -d "$last_timestamp" +%s)
     span_minutes=$(( (end_seconds - start_seconds) / 60 ))
     
     # Calculate rewards per minute for projections
