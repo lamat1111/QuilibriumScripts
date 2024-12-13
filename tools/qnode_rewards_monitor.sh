@@ -106,9 +106,9 @@ calculate_stats() {
     echo -e "${BOLD}Projections:${NC}"
     echo -e "  Hourly QUIL: ${BOLD}$hourly_rewards${NC}"
     echo -e "  Daily QUIL: ${BOLD}$daily_rewards${NC}"
+    echo ""
     
     if [ $span_minutes -lt 60 ]; then
-        echo ""
         echo -e "${BLUE}Hourly projections are based on less than one hour of data${NC}"
     fi
     if [ $span_minutes -lt 1440 ]; then
