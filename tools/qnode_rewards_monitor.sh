@@ -29,10 +29,10 @@ fi
 set -e
 
 # Show processing message
-echo -e "\n${BLUE}${PROCESSING}  Processing...${NC}\n"
+echo -e "\n${BLUE}${PROCESSING}   Processing... Please wait${NC}\n"
 
 # Get current timestamp
-current_timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+current_timestamp=$(date +"%d/%m/%Y %H.%M.%S")
 
 # Function to check for newer script version
 check_for_updates() {
@@ -48,25 +48,28 @@ check_for_updates() {
 process_data() {
     while IFS= read -r line; do
         amount=$(echo "$line" | awk '{print $1}')
-        timestamp=$(echo "$line" | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z')
+        # Extract date and time from the format "DD/MM/YYYY HH.MM.SS"
+        timestamp=$(echo "$line" | grep -oE '[0-9]{2}/[0-9]{2}/[0-9]{4} [0-9]{2}\.[0-9]{2}\.[0-9]{2}')
         
         # Skip invalid lines
         [ -z "$amount" ] || [ -z "$timestamp" ] && continue
         
-        current_seconds=$(date -d "$current_timestamp" +%s)
-        coin_seconds=$(date -d "$timestamp" +%s)
+        # Convert timestamps to seconds for comparison
+        current_seconds=$(date -d "$(echo $current_timestamp | tr '.' ':')" +%s)
+        coin_seconds=$(date -d "$(echo $timestamp | tr '.' ':')" +%s)
         time_diff=$(( (current_seconds - coin_seconds) / 60 ))
         
         if [ $time_diff -le $minutes ]; then
             echo "$timestamp $amount $time_diff"
         fi
-    done | sort -k1,1
+    done | sort -r -t ' ' -k1,1
 }
 
 # Format timestamp to human readable
 format_timestamp() {
     local timestamp=$1
-    date -d "$timestamp" "+%Y-%m-%d %H:%M:%S"
+    # Already in readable format, just convert dots to colons
+    echo "$timestamp" | tr '.' ':'
 }
 
 # Calculate statistics from the processed data
@@ -94,8 +97,8 @@ calculate_stats() {
     average=$(echo "scale=8; $total / $count" | bc)
     
     # Calculate time span of available data
-    start_seconds=$(date -d "$first_timestamp" +%s)
-    end_seconds=$(date -d "$last_timestamp" +%s)
+    start_seconds=$(date -d "$(echo $first_timestamp | tr '.' ':')" +%s)
+    end_seconds=$(date -d "$(echo $last_timestamp | tr '.' ':')" +%s)
     span_minutes=$(( (end_seconds - start_seconds) / 60 ))
     
     # Calculate rewards per minute for projections
@@ -143,7 +146,7 @@ calculate_stats() {
 check_for_updates
 
 if ! qclient_output=$(qclient token coins metadata --config /root/ceremonyclient/node/.config --public-rpc); then
-    echo -e "${RED}${WARNING} Error: Failed to get qclient output - This script only works if you have installed/updated the node via the Q1 menu${NC}"
+    echo -e "${RED}${WARNING} Error: Failed to get qclient output${NC}"
     exit 1
 fi
 
