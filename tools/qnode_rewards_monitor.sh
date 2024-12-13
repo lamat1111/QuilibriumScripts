@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION=1.6
+SCRIPT_VERSION=1.7
 
 # Colors and formatting
 BOLD='\033[1m'
@@ -11,7 +11,6 @@ NC='\033[0m' # No Color
 
 # Icons (Unicode)
 WARNING="⚠️"
-PROCESSING="⚙️"
 
 # Set default minutes to 60 if no argument provided
 if [ $# -eq 0 ]; then
@@ -133,8 +132,7 @@ calculate_stats() {
 check_for_updates
 
 # Show processing message
-echo -e "\n${BLUE}${PROCESSING}   Processing... Please wait${NC}\n"
-echo ""
+echo -e "\n${BLUE}Processing... Please wait${NC}\n"
 
 qclient_output=$(qclient token coins metadata --config /root/ceremonyclient/node/.config --public-rpc)
 
