@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION=1.0
+SCRIPT_VERSION=1.1
 
 # Colors and formatting
 BOLD='\033[1m'
@@ -50,7 +50,7 @@ process_data() {
 # Format timestamp to human readable
 format_timestamp() {
     local timestamp=$1
-    date -d "$timestamp" "+%Y-%m-%d %H:%M:%S UTC"
+    date -d "$timestamp" "+%Y-%m-%d %H:%M:%S"
 }
 
 # Calculate statistics from the processed data
@@ -93,8 +93,8 @@ calculate_stats() {
     start_time=$(format_timestamp "$first_timestamp")
     end_time=$(format_timestamp "$last_timestamp")
     
-    echo -e "${BOLD}Analysis Results:${NC}"
-    echo -e "------------------------------------------------------------"
+    echo -e "${BOLD}Rewards analisis:${NC}"
+    echo -e "---------------------------------------------------------------"
     echo -e "Time range: $start_time to $end_time"
     echo -e "Time span analized: $span_minutes minutes"
     echo ""
@@ -114,7 +114,7 @@ calculate_stats() {
     if [ $span_minutes -lt 1440 ]; then
         echo -e "${BLUE}Daily projections are based on less than 24 hours of data${NC}"
     fi
-    echo "------------------------------------------------------------"
+    echo "---------------------------------------------------------------"
     echo
     echo "To analyze a different time span add the number of minutes to the command, e.g.:"
     echo "$HOME/scripts/qnode_rewards_monitor.sh 180"
