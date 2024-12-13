@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_VERSION=1.4
+SCRIPT_VERSION=1.5
 
 # Colors and formatting
 BOLD='\033[1m'
@@ -25,9 +25,6 @@ else
     minutes=$1
 fi
 
-# Exit on error
-set -e
-
 # Show processing message
 echo -e "\n${BLUE}${PROCESSING}   Processing... Please wait${NC}\n"
 
@@ -36,23 +33,20 @@ current_timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 # Function to check for newer script version
 check_for_updates() {
-    LATEST_VERSION=$(curl -s "https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_rewards_monitor.sh" | grep 'SCRIPT_VERSION=' | head -1 | cut -d'"' -f2)
+    LATEST_VERSION=$(wget -qO- "https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_rewards_monitor.sh" | grep 'SCRIPT_VERSION="' | head -1 | cut -d'"' -f2)
     if [ "$SCRIPT_VERSION" != "$LATEST_VERSION" ]; then
-        curl -o ~/scripts/qnode_rewards_monitor.sh "https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_rewards_monitor.sh"
+        wget -O ~/scripts/qnode_rewards_monitor.sh "https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_rewards_monitor.sh"
         chmod +x ~/scripts/qnode_rewards_monitor.sh
         sleep 1
     fi
 }
 
+
 # Process the input data
 process_data() {
     while IFS= read -r line; do
-        # Extract amount (first word) and timestamp (after "Timestamp ")
         amount=$(echo "$line" | awk '{print $1}')
-        timestamp=$(echo "$line" | grep -o 'Timestamp [^ ]*' | cut -d' ' -f2)
-        
-        # Skip invalid lines
-        [ -z "$amount" ] || [ -z "$timestamp" ] && continue
+        timestamp=$(echo "$line" | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z')
         
         current_seconds=$(date -d "$current_timestamp" +%s)
         coin_seconds=$(date -d "$timestamp" +%s)
@@ -87,7 +81,7 @@ calculate_stats() {
     done
 
     if [ $count -eq 0 ]; then
-        echo -e "${RED}No data found for the last $minutes minutes${NC}"
+        echo -e "${RED}${INFO} No data found for the last $minutes minutes${NC}"
         exit 0
     fi
 
@@ -110,7 +104,6 @@ calculate_stats() {
     start_time=$(format_timestamp "$first_timestamp")
     end_time=$(format_timestamp "$last_timestamp")
     
-    # Print results
     echo -e "${BOLD}Rewards analysis:${NC}"
     echo -e "---------------------------------------------------------------"
     echo -e "Time range: $start_time to $end_time"
@@ -127,25 +120,22 @@ calculate_stats() {
     echo ""
     
     if [ $span_minutes -lt 60 ]; then
-        echo -e "${YELLOW}Note: Hourly projections are based on less than one hour of data${NC}"
+        echo -e "${BLUE}Hourly projections are based on less than one hour of data${NC}"
     fi
     if [ $span_minutes -lt 1440 ]; then
-        echo -e "${YELLOW}Note: Daily projections are based on less than 24 hours of data${NC}"
+        echo -e "${BLUE}Daily projections are based on less than 24 hours of data${NC}"
     fi
     echo "---------------------------------------------------------------"
     echo
     echo "To analyze a different time span add the number of minutes to the command, e.g.:"
     echo "$HOME/scripts/qnode_rewards_monitor.sh 180"
     echo
-    echo "Script version: $SCRIPT_VERSION"
+    echo "$SCRIPT_VERSION"
 }
 
 # Main execution
 check_for_updates
 
-if ! qclient_output=$(qclient token coins metadata --config /root/ceremonyclient/node/.config --public-rpc); then
-    echo -e "${RED}${WARNING} Error: Failed to get qclient output${NC}"
-    exit 1
-fi
+qclient_output=$(qclient token coins metadata --config /root/ceremonyclient/node/.config --public-rpc)
 
 echo "$qclient_output" | process_data | calculate_stats
