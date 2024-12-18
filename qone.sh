@@ -1390,19 +1390,19 @@ display_temp_message() {
 
 # Function to check which service to use
 get_active_service() {
-    # Check qmaster first
+    # If qmaster exists and is active, echo qmaster
     if [ -f "/etc/systemd/system/qmaster.service" ] && systemctl is-active --quiet qmaster.service; then
         echo "qmaster"
         return 0
-    # Then check ceremonyclient
+    # If ceremonyclient exists and is active, echo ceremonyclient
     elif [ -f "$SERVICE_FILE" ] && systemctl is-active --quiet ceremonyclient.service; then
         echo "ceremonyclient"
         return 0
-    # If qmaster exists but isn't active, still use it
+    # If no active services, check for qmaster
     elif [ -f "/etc/systemd/system/qmaster.service" ]; then
         echo "qmaster"
         return 0
-    # If ceremonyclient exists but isn't active, still use it
+    # If no qmaster, check for ceremonyclient
     elif [ -f "$SERVICE_FILE" ]; then
         echo "ceremonyclient"
         return 0
