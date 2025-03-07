@@ -90,9 +90,9 @@ get_backup_type() {
 #====================
 
 echo "ATTENTION:"
-echo "From Quilibrium 2.0 is not necessary to backup the store folder anymore."
-echo "This script is still set to back it up, but it will back it up while the node is running, which may lead to errors when you restore it."
+echo "This script will back up your node while is running, which may lead to errors when you restore it."
 echo "After the script has finished setting everything up, you may simply edit manually your cronjobs to avoid backing up your store folder."
+echo "This way the script will back up your "scripts" folders and yourb cronjobs every day, but not your node "store" folder, which can backup manually by stopping the node."
 echo "More info here: https://iri.quest/q-backup-node-changes"
 echo
 
@@ -286,7 +286,10 @@ perform_backup() {
 }
 
 # Backup node store folder if selected
-read -p "❔ Do you want to setup a recurring backup for your 'node/.config' folder? (y/n): " backup_node_folder
+echo "❔ Do you want to setup a recurring backup for your 'node/.config' folder?"
+echo "This IS NOT recommended because it will back up the folder while the node is running, which could lead to errors when you restore it."
+echo
+read -p "Proceed (not recommended)? (y/n): " backup_node_folder
 if [[ $backup_node_folder =~ ^[Yy]$ ]]; then
     # Prompt user for backup interval
     read -p "▶️ Backup 'node/.config' folder every how many hours? (1-100): " backup_interval
@@ -298,7 +301,7 @@ if [[ $backup_node_folder =~ ^[Yy]$ ]]; then
     cron_schedule="$random_minute */$backup_interval * * *"
 
     # Define the cron command
-    cron_command="rclone $backup_type --transfers 10 --checkers 20 --disable-http2 --retries 1 --filter '+ store/**' --filter '+ store' --filter '- SELF_TEST' --filter '- keys.yml' --filter '- config.yml' /root/ceremonyclient/node/.config/ storj:/$bucket/$target_folder/.config/"
+    cron_command="rclone $backup_type --include 'store/**' --exclude 'SELF_TEST' --exclude 'keys.yml' --exclude 'config.yml' /root/ceremonyclient/node/.config/ storj:/$bucket/$target_folder/.config/"
 
     # Pattern to check if the cron job already exists
     existing_store_pattern="/ceremonyclient/node/.config/ storj:"
@@ -363,6 +366,7 @@ echo "Your 'node.config' folder has not been backed up yet, but it will be accor
 echo
 # Ask user if they want to perform an immediate backup of node/.config folder
 echo "❔ Do you want to perform an immediate backup of your 'node/.config' folder?"
+echo "   It's recommende to stop the node before doing this."
 echo "   The backup may require several minutes depending on your server bandwidth."
 read -p "   Enter (y/n): " immediate_backup
 
