@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.8.5"
+SCRIPT_VERSION="2.8.6"
 
 # =============================================================================
 # Q1 Menu - a menu to install and manage Quilibrium nodes
@@ -1054,23 +1054,11 @@ TEST_URL="https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tes
 # Autoupdate Toggle 
 #=====================
 
-# Function to check if auto-update service files exist
-check_autoupdate_files() {
-    if [ -f "/etc/systemd/system/qnode-autoupdate.service" ] && [ -f "/etc/systemd/system/qnode-autoupdate.timer" ]; then
-        return 0
-    else
-        return 1
-    fi
-}
-
-# Function to check the status of the auto-update service
+# Function to check if the cronjob exists and is active
 check_autoupdate_status() {
-    if check_autoupdate_files; then
-        if systemctl is-active --quiet qnode-autoupdate.timer; then
-            echo "ON"
-        else
-            echo "OFF"
-        fi
+    # Check if cronjob exists (uncommented) for the specific script
+    if crontab -l 2>/dev/null | grep -q "^[^#].*$HOME/scripts/qnode_service_update.sh"; then
+        echo "ON"
     else
         echo "OFF"
     fi
@@ -1079,42 +1067,80 @@ check_autoupdate_status() {
 # Function to set up auto-update
 setup_autoupdate() {
     echo "⌛️ Setting up auto-update..."
-    mkdir -p ~/scripts && \
-    curl -sSL "https://raw.githubusercontent.com/lamat1111/QuilibriumScripts/main/tools/qnode_autoupdate_setup.sh" -o ~/scripts/qnode_autoupdate_setup.sh && \
-    chmod +x ~/scripts/qnode_autoupdate_setup.sh && \
-    sudo ~/scripts/qnode_autoupdate_setup.sh
+    # Create scripts directory if it doesn't exist
+    mkdir -p "$HOME/scripts"
+    # Download the script, overwriting any existing one
+    if curl -sSL "$NODE_UPDATE_URL" -o "$HOME/scripts/qnode_service_update.sh"; then
+        chmod +x "$HOME/scripts/qnode_service_update.sh"
+        echo "✅ Script downloaded successfully."
+    else
+        echo "❌ Failed to download the script."
+        return 1
+    fi
+    
+    # Generate a random minute (0-59)
+    RANDOM_MINUTE=$(( RANDOM % 60 ))
+    # Create or update the cronjob
+    (crontab -l 2>/dev/null | grep -v "$HOME/scripts/qnode_service_update.sh"; echo "$RANDOM_MINUTE * * * * $HOME/scripts/qnode_service_update.sh") | crontab -
     if [ $? -eq 0 ]; then
-        echo "✅ Auto-update setup completed successfully."
+        echo "✅ Cronjob set up to run hourly at minute $RANDOM_MINUTE."
         return 0
     else
-        echo "❌ Failed to set up auto-update."
+        echo "❌ Failed to set up cronjob."
         return 1
     fi
 }
 
 # Function to enable auto-update
 enable_autoupdate() {
-    echo
     echo "⌛️ Enabling auto-update..."
-    if sudo systemctl enable qnode-autoupdate.timer && sudo systemctl start qnode-autoupdate.timer; then
-        echo "✅ Auto-update enabled."
-        return 0
+    # Check if cronjob exists (commented or uncommented)
+    if crontab -l 2>/dev/null | grep -q "$HOME/scripts/qnode_service_update.sh"; then
+        # Uncomment the cronjob if it’s commented
+        if crontab -l 2>/dev/null | grep -q "^#.*$HOME/scripts/qnode_service_update.sh"; then
+            (crontab -l 2>/dev/null | sed "s|^#\(.*$HOME/scripts/qnode_service_update.sh\)|\1|") | crontab -
+            if [ $? -eq 0 ]; then
+                echo "✅ Auto-update enabled (cronjob uncommented)."
+                return 0
+            else
+                echo "❌ Failed to enable auto-update."
+                return 1
+            fi
+        else
+            echo "✅ Auto-update already enabled."
+            return 0
+        fi
     else
-        echo "❌ Failed to enable auto-update."
-        return 1
+        # No cronjob exists, create a new one
+        RANDOM_MINUTE=$(( RANDOM % 60 ))
+        (crontab -l 2>/dev/null; echo "$RANDOM_MINUTE * * * * $HOME/scripts/qnode_service_update.sh") | crontab -
+        if [ $? -eq 0 ]; then
+            echo "✅ Auto-update enabled with new cronjob at minute $RANDOM_MINUTE."
+            return 0
+        else
+            echo "❌ Failed to enable auto-update."
+            return 1
+        fi
     fi
 }
 
 # Function to disable auto-update
 disable_autoupdate() {
-    echo
     echo "⌛️ Disabling auto-update..."
-    if sudo systemctl stop qnode-autoupdate.timer && sudo systemctl disable qnode-autoupdate.timer; then
-        echo "✅ Auto-update disabled."
-        return 0
+    # Check if an uncommented cronjob exists
+    if crontab -l 2>/dev/null | grep -q "^[^#].*$HOME/scripts/qnode_service_update.sh"; then
+        # Comment out the cronjob
+        (crontab -l 2>/dev/null | sed "s|^\(.*$HOME/scripts/qnode_service_update.sh\)|#\1|") | crontab -
+        if [ $? -eq 0 ]; then
+            echo "✅ Auto-update disabled (cronjob commented out)."
+            return 0
+        else
+            echo "❌ Failed to disable auto-update."
+            return 1
+        fi
     else
-        echo "❌ Failed to disable auto-update."
-        return 1
+        echo "✅ Auto-update is already disabled."
+        return 0
     fi
 }
 
@@ -1123,8 +1149,9 @@ toggle_autoupdate() {
     local current_status=$(check_autoupdate_status)
     
     if [ "$current_status" = "OFF" ]; then
-        if ! check_autoupdate_files; then
-            echo "⌛️ Auto-update is not set up. Setting up now..."
+        echo "⌛️ Auto-update is OFF. Enabling it now..."
+        if ! [ -f "$HOME/scripts/qnode_service_update.sh" ]; then
+            echo "⌛️ Script not found. Setting up auto-update..."
             if ! setup_autoupdate; then
                 echo "❌ Failed to set up auto-update. Please check your permissions and try again."
                 return 1
