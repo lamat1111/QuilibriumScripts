@@ -4,7 +4,7 @@
 SCRIPT_VERSION="2.9.0"
 
 # =============================================================================
-# Q1 Menu - a menu to install and manage Quilibrium nodes
+# Q1 Node Manager - a menu to install and manage Quilibrium nodes
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -48,7 +48,7 @@ display_menu() {
                         \___|        
                               
 ==================================================================
-////////////////// Q1 NODE MANAGER - $SCRIPT_VERSION ////////////////////
+/////////////////// Q1 NODE MANAGER - $SCRIPT_VERSION /////////////////////
 ==================================================================
              Node guide: https://docs.quilibrium.one
 ------------------------------------------------------------------
