@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the version number here
-SCRIPT_VERSION="2.8.6"
+SCRIPT_VERSION="2.9.0"
 
 # =============================================================================
 # Q1 Menu - a menu to install and manage Quilibrium nodes
@@ -104,23 +104,20 @@ EOF
 
     cat << EOF
 -----------------------------------------------------------------
-3)  Set up gRPC                 11) Balance log
-4)  Node Log                    12) Backup your node
-5)  Update node                 13) Restore backup
-6)  Stop node                              
-7)  Start node                  14) Qclient install/update
-8)  Restart node                15) Qclient menu
-9)  Node info & balance          
-10) Node status                 16) Proofs monitor
+3) Set up gRPC                 10) Node info & balance  
+4) Node Log                    11) Balance log
+5) Update node                 12) Q1 Wallet
+6) Stop node                              
+7) Start node                  13) Backup your node
+8) Restart node                14) Restore backup
+9) Node status
 -----------------------------------------------------------------
-P) Prover Pause                  H) Help 
-A) Auto-update ON/OFF            X) Disclaimer                                             
-M) Menu autoload on login       
+P) Prover Pause                 H) Help 
+A) Auto-update ON/OFF           X) Disclaimer                                             
+M) Menu autoload on login       D) Donations 
 ----------------------------------------------------------------- 
-B) ⭐ Best server providers     D) 💜 Donations 
------------------------------------------------------------------   
 E) Exit                         
- 
+
                         
 EOF
 }
@@ -163,8 +160,8 @@ main() {
             6) stop_node; press_any_key ;;  
             7) start_node; press_any_key ;;
             8) restart_node; press_any_key ;;
-            9) node_info; press_any_key ;;
-            10) node_status; press_any_key ;;
+            9) node_status; press_any_key ;;
+            10) node_info; press_any_key ;;
             11) 
                 if balance_log; then
                     : # Do nothing if balance_log succeeded
@@ -173,18 +170,18 @@ main() {
                     display_menu "skip_check"
                 fi
                 ;;
-            12) confirm_action "$(wrap_text "$backup_storj_message" "")" "Backup your node on StorJ" backup_storj && prompt_return_to_menu "skip_check" ;;
-            13) confirm_action "$(wrap_text "$backup_restore_storj_message" "")" "Restore a node backup from StorJ" backup_restore_storj && prompt_return_to_menu "skip_check" ;;
-            #14) system_cleaner && prompt_return_to_menu "skip_check" ;;
-            14) 
-                if confirm_action "$(wrap_text "$qclient_install_message" "")" "qClient install" qclient_install; then
-                    prompt_return_to_menu
-                fi
-                ;;
-            15) qclient_actions; clear; display_menu "skip_check" ;;
-            16) proof_monitor; press_any_key ;;
+            12) q1wallet ;;
+            13) confirm_action "$(wrap_text "$backup_storj_message" "")" "Backup your node on StorJ" backup_storj && prompt_return_to_menu "skip_check" ;;
+            14) confirm_action "$(wrap_text "$backup_restore_storj_message" "")" "Restore a node backup from StorJ" backup_restore_storj && prompt_return_to_menu "skip_check" ;;
+        #    15) 
+        #       if confirm_action "$(wrap_text "$qclient_install_message" "")" "qClient install" qclient_install; then
+        #           prompt_return_to_menu
+        #      fi
+        #       ;;
+
+        #   16) proof_monitor; press_any_key ;;
             [aA]) toggle_autoupdate; press_any_key ;;
-            [bB]) best_providers; press_any_key ;;
+        #   [bB]) best_providers; press_any_key ;;
             [dD]) donations; press_any_key ;;
             [eE]) exit ;;
             [mM]) handle_menu_autoload; press_any_key ;;
@@ -225,6 +222,12 @@ https://docs.quilibrium.one/
 
 qclient_install_message='
 This action will install or update the Qclient.
+'
+
+q1wallet_install_message='
+This option will install the Q1 Wallet, a menu to manage your tokens, in $HOME/q1wallet.
+It will also copy your current node keys to that same folder, which is necessary to manage the tokens connected to your node.
+This will not affect your node in any way.
 '
 
 setup_grpcurl_message='
@@ -278,16 +281,11 @@ donations_message='
 ----------
 DONATIONS
 ----------
-Quilbrium.one is a one-man volunteer effort.
-If you would like to chip in some financial help, thank you!
+To support us, you can send a donation to the Quilibrium Community Treasury.
+This is the official treasury (you can verify the address on Discord).
 
-You can send native QUIL at this address:
-0x0e15a09539c95784c8d7e1b80beb175f12967764daa7d19626cc526575483180
-
-You can send ERC-20 tokens at this address:
-0x0fd383A1cfbcf4d1F493Dd71b798ebca89e8a013
-
-Or visit this page: https://iri.quest/q-donations
+Send ERC-20 tokens at this address:
+0xE09e96E3A3CCBEafC0996d6c0214E10adFD01D65
 '
 
 disclaimer_message='
@@ -388,12 +386,11 @@ To remove the script completely, run: rm ~/qone.sh
     Restores your node backup from StorJ.
     You need a Storj account https://www.storj.io/ and a Public/Secret access key.
 
-14) Qclient install:
-    Installs or update the Qclient, to manage your QUIL tokens via CLI.
-
-15) Qclient actions:
-    Opens a submenu with serveral actions for the Qclient, like: check balance,
-    create transaction, accept transaction etc.  
+14) Q1 wallet install or launch:
+    The Q1 Wallet is a script that wraps around the qclient to allow for easy management of your tokens.
+    This option will install or launch the Q1 Wallet in $HOME/q1wallet.
+    It will also copy your current node keys to that same folder, which is necessary to manage the tokens connected to your node.
+    This will not affect your node in any way.
 
 16) Auto-update ON/OFF:
     Sets up auto-updates for Node and Qclient via service file and timer.
@@ -491,6 +488,7 @@ qclient_install() {
     return $?
 }
 
+# Qclient actions is obsolete
 qclient_actions() {
     clear  # This clears everything, including the main menu
     
@@ -509,6 +507,32 @@ qclient_actions() {
         display_menu "skip_check"
     fi
     return $exit_status
+}
+
+q1wallet() {
+    install_wallet() {
+        clear
+        echo "Installing Q1 Wallet now..."
+        sleep 3
+        cd && \
+        mkdir -p ~/q1wallet && \
+        curl -sSL "https://raw.githubusercontent.com/lamat1111/Q1-Wallet/main/install.sh" -o ~/q1wallet/install.sh && \
+        chmod +x ~/q1wallet/install.sh && \
+        ~/q1wallet/install.sh
+    }
+    
+    if [ ! -f "$HOME/q1wallet/menu.sh" ]; then
+        if confirm_action "$(wrap_text "$q1wallet_install_message" "")" "Install Q1 Wallet" install_wallet; then
+            # Installation will launch its own menu, no action needed
+            :
+        else
+            # Reload original menu directly
+            "$HOME/qone.sh"
+        fi
+    else
+        "$HOME/q1wallet/menu.sh"
+        exit $?  # Exit with the status of menu.sh
+    fi
 }
 
 system_cleaner() {
