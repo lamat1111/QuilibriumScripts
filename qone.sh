@@ -22,7 +22,7 @@ SCRIPT_VERSION="2.9.1"
 
 SHOW_TEMP_MESSAGE=true  # Toggle to control message visibility
 TEMP_MESSAGE=$(cat << 'EOF'
-➤ Join the Q1 Telegram channel >> https://t.me/quilibriumone
+➤ Join Q1 on Telegram >> https://t.me/quilibriumone
 ➤ for important updates on all Q1 scripts.
 EOF
 )
@@ -1448,9 +1448,9 @@ wrap_text() {
 
 display_temp_message() {
     if [ "$SHOW_TEMP_MESSAGE" = true ] && [ -n "$TEMP_MESSAGE" ]; then                              
-        echo "──────────────────────────────────────────────────────────────────"
+        echo "──────────────────────────────────────────────────────"
         echo "$TEMP_MESSAGE"                                        
-        echo "──────────────────────────────────────────────────────────────────"
+        echo "──────────────────────────────────────────────────────"
         echo 
     fi
 }
