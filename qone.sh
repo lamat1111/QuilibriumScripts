@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Define the version number here
-SCRIPT_VERSION="2.9.0"
-
 # =============================================================================
 # Q1 Node Manager - a menu to install and manage Quilibrium nodes
 #
@@ -20,7 +17,9 @@ SCRIPT_VERSION="2.9.0"
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 # =============================================================================
 
-# ------------------------------------------------------------------
+# Define the version number here
+SCRIPT_VERSION="2.9.1"
+
 SHOW_TEMP_MESSAGE=true  # Toggle to control message visibility
 TEMP_MESSAGE=$(cat << 'EOF'
 ➤ Join the Q1 Telegram channel >> https://t.me/quilibriumone
@@ -37,21 +36,21 @@ display_menu() {
     source ~/.bashrc
     cat << EOF
 
-                    Q1Q1Q1\    Q1\   
-                   Q1  __Q1\ Q1Q1 |  
-                   Q1 |  Q1 |\_Q1 |  
-                   Q1 |  Q1 |  Q1 |  
-                   Q1 |  Q1 |  Q1 |  
-                   Q1  Q1Q1 |  Q1 |  
-                   \Q1Q1Q1 / Q1Q1Q1\ 
-                    \___Q1Q\ \______|  QUILIBRIUM.ONE
-                        \___|        
+                Q1Q1Q1\    Q1\   
+               Q1  __Q1\ Q1Q1 |  
+               Q1 |  Q1 |\_Q1 |  
+               Q1 |  Q1 |  Q1 |  
+               Q1 |  Q1 |  Q1 |  
+               Q1  Q1Q1 |  Q1 |  
+               \Q1Q1Q1 / Q1Q1Q1\ 
+                \___Q1Q\ \______|  QUILIBRIUM.ONE
+                    \___|        
                               
-==================================================================
-/////////////////// Q1 NODE MANAGER - $SCRIPT_VERSION /////////////////////
-==================================================================
-             Node guide: https://docs.quilibrium.one
-------------------------------------------------------------------
+======================================================
+$(printf "\033[1mQ1 NODE MANAGER\033[0m - $SCRIPT_VERSION")
+======================================================
+Node guide: https://docs.quilibrium.one
+------------------------------------------------------
 
 EOF
 
@@ -103,19 +102,19 @@ EOF
     fi
 
     cat << EOF
------------------------------------------------------------------
-3) Set up gRPC                 10) Node info & balance  
-4) Node Log                    11) Balance log
-5) Update node                 12) Q1 Wallet
+------------------------------------------------------
+3) Set up gRPC              10) Node info & balance  
+4) Node Log                 11) Balance log
+5) Update node              12) Q1 Wallet
 6) Stop node                              
-7) Start node                  13) Backup your node
-8) Restart node                14) Restore backup
+7) Start node               13) Backup your node
+8) Restart node             14) Restore backup
 9) Node status
------------------------------------------------------------------
-P) Prover Pause                 H) Help 
-A) Auto-update ON/OFF           X) Disclaimer                                             
-M) Menu autoload on login       D) Donations 
------------------------------------------------------------------ 
+------------------------------------------------------
+P) Prover Pause              H) Help 
+A) Auto-update ON/OFF        X) Disclaimer                                             
+M) Menu autoload on login    D) Donations 
+------------------------------------------------------
 E) Exit                         
 
                         
