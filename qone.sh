@@ -47,7 +47,7 @@ display_menu() {
                     \___|        
                               
 ======================================================
-$(printf "\033[1mQ1 NODE MANAGER\033[0m - $SCRIPT_VERSION")
+$(printf "\033[1mQ1 NODE MANAGER\033[0m - v $SCRIPT_VERSION")
 ======================================================
 Node guide: https://docs.quilibrium.one
 ------------------------------------------------------
