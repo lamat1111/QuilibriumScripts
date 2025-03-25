@@ -18,12 +18,18 @@
 # =============================================================================
 
 # Define the version number here
-SCRIPT_VERSION="2.9.1"
+SCRIPT_VERSION="2.9.2"
 
 SHOW_TEMP_MESSAGE=true  # Toggle to control message visibility
+# TEMP_MESSAGE=$(cat << 'EOF'
+# ➤ Join Q1 on Telegram >> https://t.me/quilibriumone
+# ➤ for important updates on all Q1 scripts.
+# EOF
+# )
+
 TEMP_MESSAGE=$(cat << 'EOF'
-➤ Join Q1 on Telegram >> https://t.me/quilibriumone
-➤ for important updates on all Q1 scripts.
+➤ ATTENTION: this script will be phased out soon!
+➤ More info >> https://t.me/quilibriumone/80
 EOF
 )
 
